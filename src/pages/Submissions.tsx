@@ -140,10 +140,6 @@ const Submissions = () => {
                 <p className="text-sm text-muted-foreground mb-4">
                   {user?.email}
                 </p>
-                
-                <div className="mt-4 text-xs text-muted-foreground">
-                  Click to view profile
-                </div>
               </div>
             </div>
           </div>
