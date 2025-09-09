@@ -226,12 +226,23 @@ const Index = () => {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         try {
-          // Using reverse geocoding to get zipcode (this is a simplified example)
-          // In a real app, you'd use a proper geocoding service
           const { latitude, longitude } = position.coords;
           
-          // Simulated zipcode based on coordinates (replace with actual API call)
-          const zipcode = `${Math.floor(latitude)}${Math.floor(Math.abs(longitude))}`.slice(0, 5);
+          // Use a free reverse geocoding API to get actual zipcode
+          const response = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          );
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch location data');
+          }
+          
+          const data = await response.json();
+          const zipcode = data.postcode || data.postalCode || 'Unknown';
+          
+          if (zipcode === 'Unknown') {
+            throw new Error('Could not determine zipcode');
+          }
           
           setProfileData(prev => ({
             ...prev,
@@ -243,9 +254,10 @@ const Index = () => {
             description: `Zipcode updated to ${zipcode}`,
           });
         } catch (error) {
+          console.error('Geocoding error:', error);
           toast({
             title: "Error",
-            description: "Failed to get location information.",
+            description: "Failed to get zipcode from your location. Please enter it manually.",
             variant: "destructive"
           });
         } finally {
@@ -254,11 +266,30 @@ const Index = () => {
       },
       (error) => {
         setIsLoadingLocation(false);
+        let errorMessage = "Please allow location access to get your zipcode.";
+        
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location access denied. Please enable location services and try again.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information unavailable. Please enter your zipcode manually.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out. Please try again or enter manually.";
+            break;
+        }
+        
         toast({
-          title: "Location access denied",
-          description: "Please allow location access to get your zipcode.",
+          title: "Location Error",
+          description: errorMessage,
           variant: "destructive"
         });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutes
       }
     );
   };
