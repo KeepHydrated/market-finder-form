@@ -107,6 +107,12 @@ const Index = () => {
     website: "",
     description: ""
   });
+  const [customMarketData, setCustomMarketData] = useState<{
+    name: string;
+    address: string;
+    days: string[];
+    hours: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
+  } | null>(null);
 
   // Load products from localStorage on component mount
   useEffect(() => {
@@ -155,9 +161,15 @@ const Index = () => {
     setShowAddForm(false);
   };
 
-  const handleMarketAdded = (marketName: string) => {
-    setSearchTerm(marketName);
-    setSubmittedMarketName(marketName);
+  const handleMarketAdded = (marketData: {
+    name: string;
+    address: string;
+    days: string[];
+    hours: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
+  }) => {
+    setSearchTerm(marketData.name);
+    setSubmittedMarketName(marketData.name);
+    setCustomMarketData(marketData);
   };
 
   const handleAddProduct = () => {
@@ -627,8 +639,11 @@ const Index = () => {
                                 website: vendorApplicationData.website,
                                 description: vendorApplicationData.description,
                                 products: JSON.stringify(products),
-                                selected_market: selectedMarket?.name || null,
-                                search_term: searchTerm,
+                                selected_market: selectedMarket?.name || customMarketData?.name || null,
+                                search_term: selectedMarket ? null : searchTerm,
+                                market_address: customMarketData?.address || null,
+                                market_days: customMarketData?.days || null,
+                                market_hours: customMarketData?.hours || null,
                                 status: 'pending'
                               };
                               console.log('Data to insert:', insertData);

@@ -10,7 +10,12 @@ import { cn } from "@/lib/utils";
 interface AddMarketFormProps {
   open: boolean;
   onClose: () => void;
-  onMarketAdded: (marketName: string) => void;
+  onMarketAdded: (marketData: {
+    name: string;
+    address: string;
+    days: string[];
+    hours: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
+  }) => void;
 }
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -53,13 +58,14 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
 
   const handleSubmit = () => {
     // In a real app, this would submit to an API
-    console.log({
-      marketName,
+    const marketData = {
+      name: marketName,
       address,
-      selectedDays,
+      days: selectedDays,
       hours
-    });
-    onMarketAdded(marketName);
+    };
+    console.log(marketData);
+    onMarketAdded(marketData);
     onClose();
   };
 
