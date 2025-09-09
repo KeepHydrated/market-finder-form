@@ -338,7 +338,7 @@ const Index = () => {
                         <h2 className="text-xl font-semibold mb-4">Location</h2>
                         <div className="flex gap-4 items-center mb-2">
                           <Input 
-                            placeholder="GPS coordinates will appear here..." 
+                            placeholder="Zipcode will appear here..." 
                             className="bg-muted flex-1" 
                             readOnly 
                           />
@@ -347,7 +347,7 @@ const Index = () => {
                           </Button>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Click the button to get your current GPS coordinates.
+                          Click the button to get your current zipcode.
                         </p>
                       </div>
 
