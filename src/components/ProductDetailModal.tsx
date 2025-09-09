@@ -19,16 +19,18 @@ interface ProductDetailModalProps {
   onProductChange?: (product: Product) => void;
 }
 
-export const ProductDetailModal = ({ product, products, open, onClose, onProductChange }: ProductDetailModalProps) => {
+export const ProductDetailModal = ({ product, products = [], open, onClose, onProductChange }: ProductDetailModalProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  if (!product) return null;
+  if (!product || !products.length) return null;
 
   const currentProductIndex = products.findIndex(p => p.id === product.id);
   const hasPrevious = currentProductIndex > 0;
   const hasNext = currentProductIndex < products.length - 1;
 
-  const goToPrevious = () => {
+  const goToPrevious = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (hasPrevious) {
       const previousProduct = products[currentProductIndex - 1];
       setCurrentImageIndex(0);
@@ -36,7 +38,9 @@ export const ProductDetailModal = ({ product, products, open, onClose, onProduct
     }
   };
 
-  const goToNext = () => {
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (hasNext) {
       const nextProduct = products[currentProductIndex + 1];
       setCurrentImageIndex(0);
