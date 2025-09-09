@@ -1,4 +1,7 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Product {
   id: number;
@@ -12,6 +15,98 @@ interface ProductGridProps {
   products: Product[];
 }
 
+interface ProductCardProps {
+  product: Product;
+}
+
+const ProductCard = ({ product }: ProductCardProps) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === product.images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? product.images.length - 1 : prev - 1
+    );
+  };
+
+  return (
+    <Card className="overflow-hidden">
+      <div className="aspect-square overflow-hidden bg-muted relative group">
+        {product.images.length > 0 ? (
+          <>
+            <img
+              src={product.images[currentImageIndex]}
+              alt={`${product.name} - Image ${currentImageIndex + 1}`}
+              className="w-full h-full object-cover transition-opacity duration-200"
+            />
+            
+            {/* Navigation arrows - only show if more than 1 image */}
+            {product.images.length > 1 && (
+              <>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={prevImage}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0 bg-white/80 hover:bg-white"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={nextImage}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0 bg-white/80 hover:bg-white"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                
+                {/* Image indicators */}
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
+                  {product.images.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`w-2 h-2 rounded-full transition-colors duration-200 ${
+                        index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+            No Image
+          </div>
+        )}
+      </div>
+      
+      <CardContent className="p-4">
+        <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
+        <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+          {product.description}
+        </p>
+        <div className="flex items-center justify-between">
+          <span className="text-2xl font-bold text-primary">
+            ${product.price.toFixed(2)}
+          </span>
+          {product.images.length > 1 && (
+            <span className="text-xs text-muted-foreground">
+              {currentImageIndex + 1}/{product.images.length}
+            </span>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 export const ProductGrid = ({ products }: ProductGridProps) => {
   if (products.length === 0) {
     return (
@@ -24,37 +119,7 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map((product) => (
-        <Card key={product.id} className="overflow-hidden">
-          <div className="aspect-square overflow-hidden bg-muted">
-            {product.images.length > 0 ? (
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                No Image
-              </div>
-            )}
-          </div>
-          <CardContent className="p-4">
-            <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
-            <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
-              {product.description}
-            </p>
-            <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold text-primary">
-                ${product.price.toFixed(2)}
-              </span>
-              {product.images.length > 1 && (
-                <span className="text-xs text-muted-foreground">
-                  +{product.images.length - 1} more
-                </span>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <ProductCard key={product.id} product={product} />
       ))}
     </div>
   );
