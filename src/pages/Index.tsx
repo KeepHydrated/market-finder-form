@@ -3,6 +3,7 @@ import { MarketSearch } from "@/components/MarketSearch";
 import { MarketDetails } from "@/components/MarketDetails";
 import { AddMarketForm } from "@/components/AddMarketForm";
 import { AddProductForm } from "@/components/AddProductForm";
+import { ProductGrid } from "@/components/ProductGrid";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { VendorApplication } from "@/components/VendorApplication";
@@ -67,12 +68,21 @@ interface Market {
   hours: string;
 }
 
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  images: string[];
+}
+
 const Index = () => {
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAddProductForm, setShowAddProductForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedMarketName, setSubmittedMarketName] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
 
   const handleSelectMarket = (market: Market) => {
     setSelectedMarket(market);
@@ -103,8 +113,16 @@ const Index = () => {
     setShowAddProductForm(false);
   };
 
-  const handleProductAdded = (productName: string) => {
-    console.log('Product added:', productName);
+  const handleProductAdded = (product: { name: string; description: string; price: number; images: File[] }) => {
+    const newProduct: Product = {
+      id: Date.now(), // Simple ID generation
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      images: product.images.map(img => URL.createObjectURL(img)) // Convert File to URL for display
+    };
+    
+    setProducts(prev => [...prev, newProduct]);
   };
 
   return (
@@ -142,9 +160,7 @@ const Index = () => {
                     Add Product
                   </Button>
                 </div>
-                <div className="min-h-[100px] flex items-center justify-center text-muted-foreground">
-                  {/* Products will be displayed here */}
-                </div>
+                <ProductGrid products={products} />
               </Card>
             </>
           )}

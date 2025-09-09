@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 interface AddProductFormProps {
   open: boolean;
   onClose: () => void;
-  onProductAdded: (productName: string) => void;
+  onProductAdded: (product: { name: string; description: string; price: number; images: File[] }) => void;
 }
 
 export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductFormProps) => {
@@ -57,7 +57,12 @@ export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductForm
       description: `${productName} has been added to your products.`,
     });
     
-    onProductAdded(productName);
+    onProductAdded({
+      name: productName,
+      description,
+      price: parseFloat(price),
+      images
+    });
     
     // Reset form
     setProductName('');
