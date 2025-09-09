@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, Edit } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -37,6 +37,7 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
 
   const showResults = isOpen && searchTerm.length > 0;
   const totalItems = filteredMarkets.length + 1; // +1 for "Add Market" option
+  const hasMarketInSearch = searchTerm.length > 0 && filteredMarkets.some(market => market.name.toLowerCase() === searchTerm.toLowerCase());
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -137,8 +138,17 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
                 selectedIndex === filteredMarkets.length && "bg-muted"
               )}
             >
-              <Plus className="h-4 w-4 text-success" />
-              <span className="text-success font-medium">Add your market</span>
+              {hasMarketInSearch ? (
+                <>
+                  <Edit className="h-4 w-4 text-success" />
+                  <span className="text-success font-medium">Edit market</span>
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 text-success" />
+                  <span className="text-success font-medium">Add your market</span>
+                </>
+              )}
             </button>
           </div>
         </Card>
