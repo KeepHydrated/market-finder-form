@@ -44,7 +44,7 @@ export const ProductDetailModal = ({ product, open, onClose }: ProductDetailModa
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0">
-        <div className="flex flex-col md:flex-row">
+        <div className="flex flex-col md:flex-row min-h-0">
           {/* Left side - Images */}
           <div className="md:w-1/2 relative">
             {/* Close button */}
@@ -112,11 +112,11 @@ export const ProductDetailModal = ({ product, open, onClose }: ProductDetailModa
 
           {/* Right side - Product info */}
           <div className="md:w-1/2 p-6 flex flex-col justify-center">
-            <DialogHeader className="mb-6">
+            <DialogHeader className="mb-0">
               <DialogTitle className="text-2xl font-bold">{product.name}</DialogTitle>
             </DialogHeader>
             
-            <div className="space-y-6">
+            <div className="space-y-6 mt-6">
               <div>
                 <span className="text-3xl font-bold text-primary">
                   ${product.price.toFixed(2)}
