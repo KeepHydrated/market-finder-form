@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -18,8 +19,14 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ user, profile }: UserMenuProps) {
+  const navigate = useNavigate();
+  
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
   };
 
   const getInitials = (name?: string) => {
@@ -54,7 +61,7 @@ export function UserMenu({ user, profile }: UserMenuProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleProfileClick}>
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
