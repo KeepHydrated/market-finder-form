@@ -12,7 +12,7 @@ import { AuthForm } from "@/components/auth/AuthForm";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, ArrowLeft, RotateCcw, Upload } from "lucide-react";
+import { Plus, ArrowLeft, RotateCcw, Upload, Edit } from "lucide-react";
 
 // Sample data - in a real app, this would come from an API
 const sampleMarkets = [
@@ -354,7 +354,7 @@ const Index = () => {
                       {/* Edit Profile Button */}
                       <div className="pt-4">
                         <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3">
-                          <Upload className="h-4 w-4 mr-2" />
+                          <Edit className="h-4 w-4 mr-2" />
                           Edit Profile
                         </Button>
                       </div>
