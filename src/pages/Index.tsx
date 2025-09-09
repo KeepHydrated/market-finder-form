@@ -6,7 +6,6 @@ import { AddProductForm } from "@/components/AddProductForm";
 import { ProductGrid } from "@/components/ProductGrid";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VendorApplication } from "@/components/VendorApplication";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { UserMenu } from "@/components/auth/UserMenu";
@@ -232,54 +231,33 @@ const Index = () => {
               onBack={handleBackToSearch} 
             />
           ) : (
-            <div className="flex gap-8">
-              {/* Left Sidebar - Submit Section */}
-              <div className="w-80 flex-shrink-0">
-                <Card className="p-6 bg-card border-border">
-                  <h2 className="text-xl font-semibold text-foreground mb-6">Submit</h2>
-                  
-                  {/* Vendor Application */}
-                  <div className="mb-8">
-                    <VendorApplication />
-                  </div>
-                  
-                  {/* Add Product Button */}
-                  <div className="space-y-4">
-                    <Button className="w-full flex items-center gap-2" onClick={handleAddProduct}>
-                      <Plus className="h-4 w-4" />
-                      Add Product
-                    </Button>
-                    
-                    {/* Products List */}
-                    {products.length > 0 && (
-                      <div>
-                        <h3 className="text-sm font-medium text-foreground mb-3">Your Products ({products.length})</h3>
-                        <div className="space-y-2 max-h-60 overflow-y-auto">
-                          {products.map((product) => (
-                            <div key={product.id} className="p-2 bg-muted rounded text-sm">
-                              <div className="font-medium">{product.name}</div>
-                              <div className="text-muted-foreground">${product.price}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </Card>
-              </div>
+            <>
+              <MarketSearch 
+                markets={sampleMarkets}
+                onSelectMarket={handleSelectMarket}
+                onAddMarket={handleAddMarket}
+                searchTerm={searchTerm}
+                onSearchTermChange={setSearchTerm}
+                submittedMarketName={submittedMarketName}
+              />
               
-              {/* Right Content - Market Search */}
-              <div className="flex-1">
-                <MarketSearch 
-                  markets={sampleMarkets}
-                  onSelectMarket={handleSelectMarket}
-                  onAddMarket={handleAddMarket}
-                  searchTerm={searchTerm}
-                  onSearchTermChange={setSearchTerm}
-                  submittedMarketName={submittedMarketName}
-                />
-              </div>
-            </div>
+              {/* Vendor Application Form */}
+              <Card className="mt-8 p-8 bg-card border-border">
+                <VendorApplication />
+              </Card>
+              
+              {/* Products Section */}
+              <Card className="mt-8 p-8 bg-card border-border">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold text-foreground">Products</h2>
+                  <Button className="flex items-center gap-2" onClick={handleAddProduct}>
+                    <Plus className="h-4 w-4" />
+                    Add Product
+                  </Button>
+                </div>
+                <ProductGrid products={products} />
+              </Card>
+            </>
           )}
         </div>
       </main>
