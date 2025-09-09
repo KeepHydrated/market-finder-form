@@ -28,9 +28,11 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             )}
-            <h1 className="text-2xl font-bold">
-              Farmer's Market Hub
-            </h1>
+            <Link to="/homepage" className="hover:opacity-80 transition-opacity">
+              <h1 className="text-2xl font-bold cursor-pointer">
+                Farmer's Market Hub
+              </h1>
+            </Link>
           </div>
           <div className="flex items-center space-x-4">
             {user?.email === 'nadiachibri@gmail.com' && (
