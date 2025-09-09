@@ -8,10 +8,9 @@ interface HeaderProps {
   profile: any;
   onBackClick?: () => void;
   showBackButton?: boolean;
-  title?: string;
 }
 
-export const Header = ({ user, profile, onBackClick, showBackButton, title }: HeaderProps) => {
+export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderProps) => {
   const location = useLocation();
 
   return (
@@ -30,26 +29,22 @@ export const Header = ({ user, profile, onBackClick, showBackButton, title }: He
               </Button>
             )}
             <h1 className="text-2xl font-bold">
-              {title || (location.pathname === '/submissions' ? 'Submissions' : "Farmer's Market Hub")}
+              Farmer's Market Hub
             </h1>
           </div>
           <div className="flex items-center space-x-4">
             {user?.email === 'nadiachibri@gmail.com' && (
               <>
-                {location.pathname !== '/' && location.pathname !== '/profile' && (
-                  <Link to="/profile">
-                    <Button variant="outline">
-                      Home
-                    </Button>
-                  </Link>
-                )}
-                {location.pathname !== '/submissions' && (
-                  <Link to="/submissions">
-                    <Button variant="outline">
-                      Submissions
-                    </Button>
-                  </Link>
-                )}
+                <Link to="/profile">
+                  <Button variant={location.pathname === '/profile' ? "default" : "outline"}>
+                    Home
+                  </Button>
+                </Link>
+                <Link to="/submissions">
+                  <Button variant={location.pathname === '/submissions' ? "default" : "outline"}>
+                    Submissions
+                  </Button>
+                </Link>
               </>
             )}
             <UserMenu user={user} profile={profile} />
