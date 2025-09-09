@@ -11,6 +11,8 @@ import { ProductGrid } from "@/components/ProductGrid";
 import { MarketDetails } from "@/components/MarketDetails";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 interface Submission {
   id: string;
@@ -118,31 +120,21 @@ const Submissions = () => {
                   
                   {/* Market Selection Info */}
                   <Card className="mb-6 p-6">
-                    <h4 className="text-lg font-semibold mb-4">Which farmers market do you want to join? *</h4>
-                    <div className="relative">
-                      <div className="flex items-center border border-input rounded-md px-3 py-2 bg-background h-10">
-                        <svg
-                          className="h-5 w-5 text-muted-foreground mr-3"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                          />
-                        </svg>
-                        <span className={`flex-1 text-base ${submission.selected_market ? 'text-foreground' : 'text-muted-foreground'}`}>
-                          {submission.selected_market || 'Search for a farmers market...'}
-                        </span>
+                    <div className="space-y-2">
+                      <label className="text-lg font-medium text-foreground">
+                        Which farmers market do you want to join? *
+                      </label>
+                      
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          type="text"
+                          placeholder="Search for a farmers market..."
+                          value={submission.selected_market || submission.search_term || ''}
+                          readOnly
+                          className="pl-10 h-14 text-lg border-2 border-border rounded-xl"
+                        />
                       </div>
-                      {submission.search_term && !submission.selected_market && (
-                        <div className="mt-2 text-muted-foreground">
-                          Search term used: "{submission.search_term}"
-                        </div>
-                      )}
                     </div>
                   </Card>
 
