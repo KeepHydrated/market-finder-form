@@ -119,19 +119,19 @@ const Homepage = () => {
                   
                   {submission.market_address && (
                     <div className="text-sm text-muted-foreground">
-                      📍 {submission.market_address}
+                      {submission.market_address}
                     </div>
                   )}
                   
                   {submission.market_days && submission.market_days.length > 0 && (
                     <div className="text-sm text-muted-foreground">
-                      📅 {submission.market_days.join(', ')}
+                      {submission.market_days.join(', ')}
                     </div>
                   )}
                   
                   {submission.market_hours && (
                     <div className="text-sm text-muted-foreground">
-                      🕒 {formatMarketHours(submission.market_hours)}
+                      {formatMarketHours(submission.market_hours)}
                     </div>
                   )}
                   
