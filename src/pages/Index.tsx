@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MarketSearch } from "@/components/MarketSearch";
 import { MarketDetails } from "@/components/MarketDetails";
 import { AddMarketForm } from "@/components/AddMarketForm";
@@ -84,6 +84,26 @@ const Index = () => {
   const [submittedMarketName, setSubmittedMarketName] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
 
+  // Load products from localStorage on component mount
+  useEffect(() => {
+    const savedProducts = localStorage.getItem('farmer-market-products');
+    if (savedProducts) {
+      try {
+        const parsedProducts = JSON.parse(savedProducts);
+        setProducts(parsedProducts);
+      } catch (error) {
+        console.error('Failed to parse saved products:', error);
+      }
+    }
+  }, []);
+
+  // Save products to localStorage whenever products change
+  useEffect(() => {
+    if (products.length > 0) {
+      localStorage.setItem('farmer-market-products', JSON.stringify(products));
+    }
+  }, [products]);
+
   const handleSelectMarket = (market: Market) => {
     setSelectedMarket(market);
   };
@@ -113,13 +133,24 @@ const Index = () => {
     setShowAddProductForm(false);
   };
 
-  const handleProductAdded = (product: { name: string; description: string; price: number; images: File[] }) => {
+  const handleProductAdded = async (product: { name: string; description: string; price: number; images: File[] }) => {
+    // Convert File objects to base64 strings for persistence
+    const imagePromises = product.images.map(file => {
+      return new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
+    });
+
+    const imageBase64Array = await Promise.all(imagePromises);
+
     const newProduct: Product = {
       id: Date.now(), // Simple ID generation
       name: product.name,
       description: product.description,
       price: product.price,
-      images: product.images.map(img => URL.createObjectURL(img)) // Convert File to URL for display
+      images: imageBase64Array
     };
     
     setProducts(prev => [...prev, newProduct]);
