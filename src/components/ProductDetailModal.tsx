@@ -129,7 +129,6 @@ export const ProductDetailModal = ({ product, open, onClose }: ProductDetailModa
               </div>
               
               <div>
-                <h3 className="font-semibold mb-3 text-lg">Description</h3>
                 <p className="text-muted-foreground leading-relaxed">
                   {product.description}
                 </p>
