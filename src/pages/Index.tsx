@@ -65,6 +65,7 @@ interface Market {
 const Index = () => {
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleSelectMarket = (market: Market) => {
     setSelectedMarket(market);
@@ -80,6 +81,10 @@ const Index = () => {
 
   const handleCloseAddForm = () => {
     setShowAddForm(false);
+  };
+
+  const handleMarketAdded = (marketName: string) => {
+    setSearchTerm(marketName);
   };
 
   return (
@@ -109,6 +114,8 @@ const Index = () => {
               markets={sampleMarkets}
               onSelectMarket={handleSelectMarket}
               onAddMarket={handleAddMarket}
+              searchTerm={searchTerm}
+              onSearchTermChange={setSearchTerm}
             />
           )}
         </div>
@@ -116,7 +123,8 @@ const Index = () => {
 
       <AddMarketForm 
         open={showAddForm} 
-        onClose={handleCloseAddForm} 
+        onClose={handleCloseAddForm}
+        onMarketAdded={handleMarketAdded}
       />
     </div>
   );

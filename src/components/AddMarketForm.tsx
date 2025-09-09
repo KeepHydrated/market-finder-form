@@ -10,11 +10,12 @@ import { cn } from "@/lib/utils";
 interface AddMarketFormProps {
   open: boolean;
   onClose: () => void;
+  onMarketAdded: (marketName: string) => void;
 }
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-export const AddMarketForm = ({ open, onClose }: AddMarketFormProps) => {
+export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormProps) => {
   const [marketName, setMarketName] = useState('');
   const [address, setAddress] = useState('');
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
@@ -41,6 +42,7 @@ export const AddMarketForm = ({ open, onClose }: AddMarketFormProps) => {
       selectedDays,
       hours
     });
+    onMarketAdded(marketName);
     onClose();
   };
 

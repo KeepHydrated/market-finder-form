@@ -19,10 +19,11 @@ interface MarketSearchProps {
   markets: Market[];
   onSelectMarket: (market: Market) => void;
   onAddMarket: () => void;
+  searchTerm: string;
+  onSearchTermChange: (term: string) => void;
 }
 
-export const MarketSearch = ({ markets, onSelectMarket, onAddMarket }: MarketSearchProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
+export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm, onSearchTermChange }: MarketSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -77,13 +78,13 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket }: MarketSea
   };
 
   const handleSelectMarket = (market: Market) => {
-    setSearchTerm(market.name);
+    onSearchTermChange(market.name);
     setIsOpen(false);
     setSelectedIndex(-1);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    onSearchTermChange(e.target.value);
     setIsOpen(true);
     setSelectedIndex(-1);
   };
