@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -15,11 +17,32 @@ interface AddMarketFormProps {
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+const SPECIALTIES = [
+  "Fresh Produce",
+  "Organic Vegetables", 
+  "Fruits",
+  "Herbs & Spices",
+  "Baked Goods",
+  "Dairy Products",
+  "Meat & Poultry",
+  "Prepared Foods",
+  "Flowers & Plants",
+  "Artisan Crafts",
+  "Honey & Preserves",
+  "Other"
+];
+
 export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormProps) => {
   const [marketName, setMarketName] = useState('');
   const [address, setAddress] = useState('');
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [hours, setHours] = useState<Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>>({});
+  
+  // Vendor details state
+  const [storeName, setStoreName] = useState('');
+  const [specialty, setSpecialty] = useState('');
+  const [website, setWebsite] = useState('');
+  const [description, setDescription] = useState('');
 
   const toggleDay = (day: string) => {
     setSelectedDays(prev => {
@@ -57,10 +80,26 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
       marketName,
       address,
       selectedDays,
-      hours
+      hours,
+      vendorDetails: {
+        storeName,
+        specialty,
+        website,
+        description
+      }
     });
     onMarketAdded(marketName);
     onClose();
+    
+    // Reset form
+    setMarketName('');
+    setAddress('');
+    setSelectedDays([]);
+    setHours({});
+    setStoreName('');
+    setSpecialty('');
+    setWebsite('');
+    setDescription('');
   };
 
   return (
@@ -180,6 +219,63 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
               <p className="text-sm text-muted-foreground">Select market days above to set hours</p>
             )}
           </div>
+
+          {/* Vendor Details Section */}
+          <div className="space-y-6 pt-6 border-t">
+            <h3 className="text-lg font-semibold">Vendor Details</h3>
+            
+            <div className="space-y-2">
+              <Label htmlFor="store-name">
+                Store Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="store-name"
+                value={storeName}
+                onChange={(e) => setStoreName(e.target.value)}
+                placeholder="e.g., Fresh Produce Stand"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Primary Specialty</Label>
+              <Select value={specialty} onValueChange={setSpecialty}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your main specialty" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SPECIALTIES.map((specialtyOption) => (
+                    <SelectItem key={specialtyOption} value={specialtyOption}>
+                      {specialtyOption}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="website">Website (Optional)</Label>
+              <Input
+                id="website"
+                type="url"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                placeholder="https://yourwebsite.com"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">
+                Description <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Tell us about your products, farming practices, and what makes your business special..."
+                className="min-h-[120px]"
+              />
+            </div>
+          </div>
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t">
@@ -188,10 +284,10 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
           </Button>
           <Button 
             onClick={handleSubmit}
-            disabled={!marketName || !address || selectedDays.length === 0}
+            disabled={!marketName || !address || selectedDays.length === 0 || !storeName || !description}
             className="bg-earth text-earth-foreground hover:bg-earth/90"
           >
-            Add Market
+            Add Market & Register as Vendor
           </Button>
         </div>
       </DialogContent>
