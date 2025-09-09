@@ -11,16 +11,18 @@ export const VendorApplication = () => {
   const [description, setDescription] = useState("");
 
   const specialties = [
-    "Fresh Produce",
-    "Organic Vegetables",
-    "Artisan Breads",
-    "Local Honey",
-    "Dairy Products",
-    "Handmade Crafts",
-    "Prepared Foods",
-    "Flowers & Plants",
-    "Meat & Poultry",
-    "Other"
+    "Fresh Flowers & Plants",
+    "Bakery",
+    "Dairy",
+    "Rancher",
+    "Beverages",
+    "Seasonings & Spices",
+    "Pets",
+    "Home Goods",
+    "Farmers",
+    "Ready to Eat",
+    "Packaged Goods & Snacks",
+    "Artisan"
   ];
 
   return (
