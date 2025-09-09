@@ -11,10 +11,12 @@ interface AcceptedSubmission {
   primary_specialty: string;
   website: string;
   description: string;
+  products: any[];
   selected_market: string;
   search_term: string;
   market_address?: string;
   market_days?: string[];
+  market_hours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
   created_at: string;
 }
 
@@ -26,6 +28,33 @@ const Homepage = () => {
     fetchAcceptedSubmissions();
   }, []);
 
+  const getDayFullName = (day: string) => {
+    const dayMap: Record<string, string> = {
+      'Mon': 'Monday',
+      'Tue': 'Tuesday', 
+      'Wed': 'Wednesday',
+      'Thu': 'Thursday',
+      'Fri': 'Friday',
+      'Sat': 'Saturday',
+      'Sun': 'Sunday'
+    };
+    return dayMap[day] || day;
+  };
+
+  const formatMarketHours = (hours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>) => {
+    if (!hours || Object.keys(hours).length === 0) return null;
+    
+    const entries = Object.entries(hours);
+    if (entries.length === 1) {
+      const [day, time] = entries[0];
+      return `${getDayFullName(day)}: ${time.start} ${time.startPeriod} - ${time.end} ${time.endPeriod}`;
+    }
+    
+    return entries.map(([day, time]) => 
+      `${getDayFullName(day)}: ${time.start} ${time.startPeriod} - ${time.end} ${time.endPeriod}`
+    ).join(', ');
+  };
+
   const fetchAcceptedSubmissions = async () => {
     try {
       const { data, error } = await supabase
@@ -36,7 +65,15 @@ const Homepage = () => {
 
       if (error) throw error;
       
-      setAcceptedSubmissions(data || []);
+      const parsedSubmissions = data?.map(sub => ({
+        ...sub,
+        products: typeof sub.products === 'string' ? JSON.parse(sub.products) : sub.products,
+        market_hours: sub.market_hours && typeof sub.market_hours === 'object' && sub.market_hours !== null 
+          ? sub.market_hours as Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>
+          : undefined
+      })) || [];
+      
+      setAcceptedSubmissions(parsedSubmissions);
     } catch (error) {
       console.error('Error fetching accepted submissions:', error);
     }
@@ -58,59 +95,52 @@ const Homepage = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {acceptedSubmissions.map((submission) => (
-              <Card key={submission.id} className="p-6 hover:shadow-lg transition-shadow">
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <h3 className="text-xl font-semibold">{submission.store_name}</h3>
-                    <Badge variant="secondary" className="bg-green-100 text-green-800">
-                      Accepted
-                    </Badge>
-                  </div>
+              <Card key={submission.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                {/* Product Image */}
+                <div className="aspect-video bg-muted relative">
+                  {submission.products && submission.products.length > 0 && submission.products[0].images && submission.products[0].images.length > 0 ? (
+                    <img 
+                      src={submission.products[0].images[0]} 
+                      alt={submission.products[0].name || 'Product'} 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                      No Image Available
+                    </div>
+                  )}
+                </div>
+                
+                {/* Market Information */}
+                <div className="p-4 space-y-3">
+                  <h3 className="text-lg font-semibold">
+                    {submission.selected_market || submission.search_term}
+                  </h3>
                   
-                  {submission.primary_specialty && (
-                    <div>
-                      <span className="text-sm font-medium text-muted-foreground">Specialty: </span>
-                      <span className="text-sm">{submission.primary_specialty}</span>
+                  {submission.market_address && (
+                    <div className="text-sm text-muted-foreground">
+                      📍 {submission.market_address}
                     </div>
                   )}
                   
-                  <p className="text-muted-foreground text-sm line-clamp-3">
-                    {submission.description}
-                  </p>
-                  
-                  <div className="space-y-2">
-                    <div>
-                      <span className="text-sm font-medium text-muted-foreground">Market: </span>
-                      <span className="text-sm">{submission.selected_market || submission.search_term}</span>
-                    </div>
-                    
-                    {submission.market_address && (
-                      <div>
-                        <span className="text-sm font-medium text-muted-foreground">Address: </span>
-                        <span className="text-sm">{submission.market_address}</span>
-                      </div>
-                    )}
-                    
-                    {submission.market_days && submission.market_days.length > 0 && (
-                      <div>
-                        <span className="text-sm font-medium text-muted-foreground">Days: </span>
-                        <span className="text-sm">{submission.market_days.join(', ')}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {submission.website && (
-                    <div className="pt-2">
-                      <a 
-                        href={submission.website} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm"
-                      >
-                        Visit Website →
-                      </a>
+                  {submission.market_days && submission.market_days.length > 0 && (
+                    <div className="text-sm text-muted-foreground">
+                      📅 {submission.market_days.join(', ')}
                     </div>
                   )}
+                  
+                  {submission.market_hours && (
+                    <div className="text-sm text-muted-foreground">
+                      🕒 {formatMarketHours(submission.market_hours)}
+                    </div>
+                  )}
+                  
+                  {/* Vendor Badge */}
+                  <div className="pt-2 border-t">
+                    <div className="text-xs text-muted-foreground">
+                      Vendor: <span className="font-medium text-foreground">{submission.store_name}</span>
+                    </div>
+                  </div>
                 </div>
               </Card>
             ))}
