@@ -7,7 +7,11 @@ import { ProductGrid } from "@/components/ProductGrid";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { VendorApplication } from "@/components/VendorApplication";
-import { Plus } from "lucide-react";
+import { AuthForm } from "@/components/auth/AuthForm";
+import { UserMenu } from "@/components/auth/UserMenu";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { Plus, ArrowLeft } from "lucide-react";
 
 // Sample data - in a real app, this would come from an API
 const sampleMarkets = [
@@ -77,6 +81,8 @@ interface Product {
 }
 
 const Index = () => {
+  const { user, profile, loading } = useAuth();
+  const { toast } = useToast();
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAddProductForm, setShowAddProductForm] = useState(false);
@@ -154,10 +160,68 @@ const Index = () => {
     };
     
     setProducts(prev => [...prev, newProduct]);
+    setShowAddProductForm(false);
+    toast({
+      title: "Product Added",
+      description: "Your product has been successfully added.",
+    });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-4">
+        <AuthForm onSuccess={() => {
+          toast({
+            title: "Welcome!",
+            description: "You've successfully signed in.",
+          });
+        }} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="bg-card shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              {selectedMarket && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleBackToSearch}
+                  className="mr-4"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              )}
+              <h1 className="text-2xl font-bold">
+                Farmer's Market Hub
+              </h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              {!selectedMarket && (
+                <Button onClick={handleAddMarket}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Market
+                </Button>
+              )}
+              <UserMenu user={user} profile={profile} />
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* Main Content */}
       <main className="py-12">
         <div className="container mx-auto px-4">
