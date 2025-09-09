@@ -92,18 +92,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-primary text-primary-foreground py-12">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-4">
-            Find Local Farmers Markets
-          </h1>
-          <p className="text-center text-primary-foreground/90 text-lg">
-            Discover fresh, local produce in your community
-          </p>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="py-12">
         <div className="container mx-auto px-4">
