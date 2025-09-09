@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { VendorApplication, VendorApplicationData } from "@/components/VendorApplication";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { UserMenu } from "@/components/auth/UserMenu";
+import { Header } from "@/components/Header";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -380,38 +381,13 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header spans full width */}
-      <header className="bg-card shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              {selectedMarket && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleBackToSearch}
-                  className="mr-4"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-              )}
-              <h1 className="text-2xl font-bold">
-                Farmer's Market Hub
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              {user?.email === 'nadiachibri@gmail.com' && (
-                <Link to="/submissions">
-                  <Button variant="outline">
-                    Submissions
-                  </Button>
-                </Link>
-              )}
-              <UserMenu user={user} profile={profile} />
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Universal Header */}
+      <Header 
+        user={user} 
+        profile={profile} 
+        showBackButton={!!selectedMarket}
+        onBackClick={handleBackToSearch}
+      />
 
       {/* Sidebar and Main Content */}
       <div className="flex">
