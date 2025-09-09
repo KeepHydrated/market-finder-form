@@ -111,7 +111,13 @@ const Submissions = () => {
         <div className="container mx-auto px-4 flex gap-6">
           {/* Left Sidebar - User Profile */}
           <div className="w-64 flex-shrink-0">
-            <div className="bg-card border border-border rounded-lg p-6">
+            <div 
+              className="bg-card border border-border rounded-lg p-6 cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => {
+                // TODO: Navigate to profile page or open profile modal
+                console.log('Profile clicked');
+              }}
+            >
               <div className="text-center">
                 <div className="w-16 h-16 bg-muted rounded-full mx-auto mb-4 flex items-center justify-center">
                   {profile?.avatar_url ? (
@@ -154,6 +160,10 @@ const Submissions = () => {
                       {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
                     </span>
                   </div>
+                </div>
+                
+                <div className="mt-4 text-xs text-muted-foreground">
+                  Click to view profile
                 </div>
               </div>
             </div>
