@@ -120,7 +120,7 @@ const Submissions = () => {
                   <Card className="mb-6 p-6">
                     <h4 className="text-lg font-semibold mb-4">Which farmers market do you want to join? *</h4>
                     <div className="relative">
-                      <div className="flex items-center border border-input rounded-md px-3 py-2 bg-background">
+                      <div className="flex items-center border border-input rounded-md px-3 py-2 bg-background h-10">
                         <svg
                           className="h-5 w-5 text-muted-foreground mr-3"
                           fill="none"
@@ -134,12 +134,12 @@ const Submissions = () => {
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                           />
                         </svg>
-                        <span className="text-foreground flex-1">
+                        <span className={`flex-1 text-base ${submission.selected_market ? 'text-foreground' : 'text-muted-foreground'}`}>
                           {submission.selected_market || 'Search for a farmers market...'}
                         </span>
                       </div>
-                      {submission.search_term && (
-                        <div className="mt-2 text-sm text-muted-foreground">
+                      {submission.search_term && !submission.selected_market && (
+                        <div className="mt-2 text-muted-foreground">
                           Search term used: "{submission.search_term}"
                         </div>
                       )}
