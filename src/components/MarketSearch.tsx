@@ -80,7 +80,6 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket }: MarketSea
     setSearchTerm(market.name);
     setIsOpen(false);
     setSelectedIndex(-1);
-    onSelectMarket(market);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
