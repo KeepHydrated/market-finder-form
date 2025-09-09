@@ -117,15 +117,10 @@ export const ProductDetailModal = ({ product, open, onClose }: ProductDetailModa
             </DialogHeader>
             
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div>
                 <span className="text-3xl font-bold text-primary">
                   ${product.price.toFixed(2)}
                 </span>
-                {product.images.length > 1 && (
-                  <span className="text-sm text-muted-foreground">
-                    {currentImageIndex + 1} of {product.images.length} images
-                  </span>
-                )}
               </div>
               
               <div>
