@@ -76,7 +76,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
 
           <div className="space-y-4">
             <Label>Market Days *</Label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2">
               {DAYS.map((day) => (
                 <Button
                   key={day}
