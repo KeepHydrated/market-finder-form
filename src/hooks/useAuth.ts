@@ -10,14 +10,22 @@ export function useAuth() {
   useEffect(() => {
     // Get initial session
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        await fetchProfile(session.user.id);
+      try {
+        console.log('Getting session...');
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Session received:', session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          await fetchProfile(session.user.id);
+        }
+        
+        setLoading(false);
+        console.log('Loading set to false');
+      } catch (error) {
+        console.error('Error getting session:', error);
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
 
     getSession();
