@@ -36,7 +36,7 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
   );
 
   const showResults = isOpen;
-  const visibleMarkets = searchTerm.length > 0 ? filteredMarkets : [];
+  const visibleMarkets = markets; // Always show all markets
   const totalItems = visibleMarkets.length + 1; // +1 for "Add Market" option
   const hasTextInSearch = searchTerm.trim().length > 0;
 
