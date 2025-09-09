@@ -605,25 +605,60 @@ const Index = () => {
                         <Button 
                           className="bg-blue-500 hover:bg-blue-600 text-white px-12 py-3 text-lg"
                           onClick={async () => {
-                            if (!user) return;
+                            console.log('Submit button clicked!');
+                            console.log('User:', user);
+                            console.log('Vendor data:', vendorApplicationData);
+                            console.log('Products:', products);
+                            
+                            if (!user) {
+                              console.error('No user found');
+                              return;
+                            }
+                            
+                            // Validate required fields
+                            if (!vendorApplicationData.storeName.trim()) {
+                              toast({
+                                title: "Missing Information",
+                                description: "Please fill in the store name.",
+                                variant: "destructive"
+                              });
+                              return;
+                            }
+                            
+                            if (!vendorApplicationData.description.trim()) {
+                              toast({
+                                title: "Missing Information",
+                                description: "Please fill in the description.",
+                                variant: "destructive"
+                              });
+                              return;
+                            }
                             
                             try {
+                              console.log('Attempting to submit to database...');
+                              const insertData = {
+                                user_id: user.id,
+                                store_name: vendorApplicationData.storeName,
+                                primary_specialty: vendorApplicationData.primarySpecialty,
+                                website: vendorApplicationData.website,
+                                description: vendorApplicationData.description,
+                                products: JSON.stringify(products),
+                                selected_market: selectedMarket?.name || null,
+                                search_term: searchTerm,
+                                status: 'pending'
+                              };
+                              console.log('Data to insert:', insertData);
+                              
                               const { error } = await supabase
                                 .from('submissions')
-                                .insert({
-                                  user_id: user.id,
-                                  store_name: vendorApplicationData.storeName,
-                                  primary_specialty: vendorApplicationData.primarySpecialty,
-                                  website: vendorApplicationData.website,
-                                  description: vendorApplicationData.description,
-                                  products: JSON.stringify(products),
-                                  selected_market: selectedMarket?.name || null,
-                                  search_term: searchTerm,
-                                  status: 'pending'
-                                });
+                                .insert(insertData);
 
-                              if (error) throw error;
+                              if (error) {
+                                console.error('Database error:', error);
+                                throw error;
+                              }
 
+                              console.log('Submission successful!');
                               toast({
                                 title: "Application Submitted",
                                 description: "Your vendor application has been submitted successfully!",
@@ -644,7 +679,7 @@ const Index = () => {
                               console.error('Submission error:', error);
                               toast({
                                 title: "Error",
-                                description: "Failed to submit application. Please try again.",
+                                description: `Failed to submit application: ${error.message || 'Unknown error'}`,
                                 variant: "destructive"
                               });
                             }
