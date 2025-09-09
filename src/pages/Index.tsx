@@ -105,17 +105,30 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="py-12">
-        <div className="container mx-auto px-4 max-w-2xl">
-          <div className="bg-card p-6 rounded-lg shadow-sm border">
-            <h2 className="text-2xl font-bold mb-6">Join Farmers Market</h2>
-            <AddMarketForm 
-              open={true} 
-              onClose={() => {}}
-              onMarketAdded={handleMarketAdded}
+        <div className="container mx-auto px-4">
+          {selectedMarket ? (
+            <MarketDetails 
+              market={selectedMarket} 
+              onBack={handleBackToSearch} 
             />
-          </div>
+          ) : (
+            <MarketSearch 
+              markets={sampleMarkets}
+              onSelectMarket={handleSelectMarket}
+              onAddMarket={handleAddMarket}
+              searchTerm={searchTerm}
+              onSearchTermChange={setSearchTerm}
+              submittedMarketName={submittedMarketName}
+            />
+          )}
         </div>
       </main>
+
+      <AddMarketForm 
+        open={showAddForm} 
+        onClose={handleCloseAddForm}
+        onMarketAdded={handleMarketAdded}
+      />
     </div>
   );
 };
