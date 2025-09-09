@@ -119,13 +119,23 @@ const Submissions = () => {
                   {/* Market Selection Info */}
                   <Card className="mb-6 p-6">
                     <h4 className="text-lg font-semibold mb-4">Which farmers market do you want to join? *</h4>
-                    <div className="border rounded-lg p-4 bg-muted/10">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-6 h-6 rounded-full border-2 border-muted-foreground flex items-center justify-center">
-                          <div className="w-2 h-2 rounded-full bg-muted-foreground"></div>
-                        </div>
-                        <span className="text-foreground">
-                          {submission.selected_market || 'No market selected'}
+                    <div className="relative">
+                      <div className="flex items-center border border-input rounded-md px-3 py-2 bg-background">
+                        <svg
+                          className="h-5 w-5 text-muted-foreground mr-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                        <span className="text-foreground flex-1">
+                          {submission.selected_market || 'Search for a farmers market...'}
                         </span>
                       </div>
                       {submission.search_term && (
