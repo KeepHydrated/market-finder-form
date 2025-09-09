@@ -95,25 +95,27 @@ const Index = () => {
       {/* Main Content */}
       <main className="py-12">
         <div className="container mx-auto px-4">
-          {/* Blank Box */}
-          <Card className="mb-8 p-8 min-h-[200px] bg-card border-border">
-            {/* This is a blank box */}
-          </Card>
-
           {selectedMarket ? (
             <MarketDetails 
               market={selectedMarket} 
               onBack={handleBackToSearch} 
             />
           ) : (
-            <MarketSearch 
-              markets={sampleMarkets}
-              onSelectMarket={handleSelectMarket}
-              onAddMarket={handleAddMarket}
-              searchTerm={searchTerm}
-              onSearchTermChange={setSearchTerm}
-              submittedMarketName={submittedMarketName}
-            />
+            <>
+              <MarketSearch 
+                markets={sampleMarkets}
+                onSelectMarket={handleSelectMarket}
+                onAddMarket={handleAddMarket}
+                searchTerm={searchTerm}
+                onSearchTermChange={setSearchTerm}
+                submittedMarketName={submittedMarketName}
+              />
+              
+              {/* Blank Box */}
+              <Card className="mt-8 p-8 min-h-[200px] bg-card border-border">
+                {/* This is a blank box */}
+              </Card>
+            </>
           )}
         </div>
       </main>
