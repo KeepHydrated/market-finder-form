@@ -3,6 +3,7 @@ import { MarketSearch } from "@/components/MarketSearch";
 import { MarketDetails } from "@/components/MarketDetails";
 import { AddMarketForm } from "@/components/AddMarketForm";
 import { Card } from "@/components/ui/card";
+import { VendorApplication } from "@/components/VendorApplication";
 
 // Sample data - in a real app, this would come from an API
 const sampleMarkets = [
@@ -111,9 +112,9 @@ const Index = () => {
                 submittedMarketName={submittedMarketName}
               />
               
-              {/* Blank Box */}
-              <Card className="mt-8 p-8 min-h-[200px] bg-card border-border">
-                {/* This is a blank box */}
+              {/* Vendor Application Form */}
+              <Card className="mt-8 p-8 bg-card border-border">
+                <VendorApplication />
               </Card>
             </>
           )}
