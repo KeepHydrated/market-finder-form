@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ProductDetailModal } from "./ProductDetailModal";
 
 interface Product {
   id: number;
@@ -17,25 +18,31 @@ interface ProductGridProps {
 
 interface ProductCardProps {
   product: Product;
+  onProductClick: (product: Product) => void;
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const nextImage = () => {
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the card click
     setCurrentImageIndex((prev) => 
       prev === product.images.length - 1 ? 0 : prev + 1
     );
   };
 
-  const prevImage = () => {
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the card click
     setCurrentImageIndex((prev) => 
       prev === 0 ? product.images.length - 1 : prev - 1
     );
   };
 
   return (
-    <Card className="overflow-hidden">
+    <Card 
+      className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200"
+      onClick={() => onProductClick(product)}
+    >
       <div className="aspect-square overflow-hidden bg-muted relative group">
         {product.images.length > 0 ? (
           <>
@@ -105,6 +112,19 @@ const ProductCard = ({ product }: ProductCardProps) => {
 };
 
 export const ProductGrid = ({ products }: ProductGridProps) => {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
+  };
+
   if (products.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
@@ -114,10 +134,22 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {products.map((product) => (
+          <ProductCard 
+            key={product.id} 
+            product={product} 
+            onProductClick={handleProductClick}
+          />
+        ))}
+      </div>
+      
+      <ProductDetailModal
+        product={selectedProduct}
+        open={isModalOpen}
+        onClose={handleCloseModal}
+      />
+    </>
   );
 };

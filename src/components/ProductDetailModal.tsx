@@ -1,0 +1,141 @@
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  images: string[];
+}
+
+interface ProductDetailModalProps {
+  product: Product | null;
+  open: boolean;
+  onClose: () => void;
+}
+
+export const ProductDetailModal = ({ product, open, onClose }: ProductDetailModalProps) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  if (!product) return null;
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === product.images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? product.images.length - 1 : prev - 1
+    );
+  };
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      setCurrentImageIndex(0); // Reset image index when closing
+      onClose();
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto p-0">
+        <div className="relative">
+          {/* Close button */}
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 h-8 w-8 p-0 bg-white/80 hover:bg-white"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+
+          {/* Image section */}
+          <div className="aspect-square bg-muted relative group">
+            {product.images.length > 0 ? (
+              <>
+                <img
+                  src={product.images[currentImageIndex]}
+                  alt={`${product.name} - Image ${currentImageIndex + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                
+                {/* Navigation arrows - only show if more than 1 image */}
+                {product.images.length > 1 && (
+                  <>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={prevImage}
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 h-10 w-10 p-0 bg-white/80 hover:bg-white"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </Button>
+                    
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={nextImage}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 h-10 w-10 p-0 bg-white/80 hover:bg-white"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </Button>
+                    
+                    {/* Image indicators */}
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                      {product.images.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`w-3 h-3 rounded-full transition-colors duration-200 ${
+                            index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                No Image
+              </div>
+            )}
+          </div>
+
+          {/* Product details */}
+          <div className="p-6">
+            <DialogHeader className="mb-4">
+              <DialogTitle className="text-2xl font-bold">{product.name}</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-3xl font-bold text-primary">
+                  ${product.price.toFixed(2)}
+                </span>
+                {product.images.length > 1 && (
+                  <span className="text-sm text-muted-foreground">
+                    {currentImageIndex + 1} of {product.images.length} images
+                  </span>
+                )}
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2">Description</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {product.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
