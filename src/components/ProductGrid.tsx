@@ -88,10 +88,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </div>
       
       <CardContent className="p-4">
-        <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
-        <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
-          {product.description}
-        </p>
+        <h3 className="font-semibold text-lg mb-3">{product.name}</h3>
         <div className="flex items-center justify-between">
           <span className="text-2xl font-bold text-primary">
             ${product.price.toFixed(2)}
