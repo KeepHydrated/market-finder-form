@@ -98,6 +98,7 @@ const Index = () => {
     avatarUrl: ""
   });
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   // Load products from localStorage on component mount
   useEffect(() => {
@@ -298,6 +299,13 @@ const Index = () => {
   const handleSaveProfile = async () => {
     if (!user) return;
 
+    if (!isEditing) {
+      // Switch to edit mode
+      setIsEditing(true);
+      return;
+    }
+
+    // Save the changes
     try {
       const { error } = await supabase
         .from('profiles')
@@ -313,6 +321,8 @@ const Index = () => {
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
       });
+      
+      setIsEditing(false); // Exit edit mode after saving
     } catch (error) {
       toast({
         title: "Error",
@@ -498,8 +508,9 @@ const Index = () => {
                         <Input 
                           value={profileData.username} 
                           onChange={(e) => setProfileData(prev => ({ ...prev, username: e.target.value }))}
-                          className="bg-background" 
+                          className={isEditing ? "bg-background" : "bg-muted"}
                           placeholder="Enter your username"
+                          disabled={!isEditing}
                         />
                       </div>
 
@@ -511,18 +522,19 @@ const Index = () => {
                             value={profileData.zipcode}
                             onChange={(e) => setProfileData(prev => ({ ...prev, zipcode: e.target.value }))}
                             placeholder="Zipcode will appear here..." 
-                            className="bg-background flex-1" 
+                            className={isEditing ? "bg-background" : "bg-muted"}
+                            disabled={!isEditing}
                           />
                           <Button 
                             className="bg-green-500 hover:bg-green-600 text-white px-4 py-2"
                             onClick={getCurrentLocation}
-                            disabled={isLoadingLocation}
+                            disabled={isLoadingLocation || !isEditing}
                           >
                             <RotateCcw className={`h-4 w-4 ${isLoadingLocation ? 'animate-spin' : ''}`} />
                           </Button>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Click the button to get your current zipcode.
+                          {isEditing ? "Click the button to get your current zipcode." : "Enable editing to update your location."}
                         </p>
                       </div>
 
@@ -533,7 +545,7 @@ const Index = () => {
                           onClick={handleSaveProfile}
                         >
                           <Edit className="h-4 w-4 mr-2" />
-                          Edit Profile
+                          {isEditing ? "Save" : "Edit Profile"}
                         </Button>
                       </div>
                     </div>
