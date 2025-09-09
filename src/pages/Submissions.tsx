@@ -157,12 +157,6 @@ const Submissions = () => {
               <div className="space-y-8">
                 {submissions.map((submission) => (
                   <div key={submission.id} className="border rounded-lg p-6 bg-card">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-xl font-semibold">Application #{submission.id.slice(-8)}</h3>
-                      <span className="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
-                        {submission.status}
-                      </span>
-                    </div>
                     
                     {/* Vendor Application */}
                     <Card className="p-6">
