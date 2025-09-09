@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { UserMenu } from "@/components/auth/UserMenu";
@@ -8,6 +9,7 @@ import { VendorApplication, VendorApplicationData } from "@/components/VendorApp
 import { ProductGrid } from "@/components/ProductGrid";
 import { MarketDetails } from "@/components/MarketDetails";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface Submission {
   id: string;
@@ -99,6 +101,11 @@ const Submissions = () => {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
+              <Link to="/profile">
+                <Button variant="outline">
+                  Home
+                </Button>
+              </Link>
               <UserMenu user={user} profile={profile} />
             </div>
           </div>
