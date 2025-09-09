@@ -136,13 +136,6 @@ const Homepage = () => {
                       {formatMarketHours(submission.market_hours)}
                     </div>
                   )}
-                  
-                  {/* Vendor Badge */}
-                  <div className="pt-2 border-t">
-                    <div className="text-xs text-muted-foreground">
-                      Vendor: <span className="font-medium text-foreground">{submission.store_name}</span>
-                    </div>
-                  </div>
                 </div>
               </Card>
             ))}
