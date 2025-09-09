@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/Header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AcceptedSubmission {
@@ -119,7 +120,7 @@ const Homepage = () => {
                   
                   {submission.market_address && (
                     <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <img src="/lovable-uploads/ca46fc05-9c4c-4370-a0c1-5a6dad09bae8.png" alt="Location" className="w-4 h-4 mt-0.5" />
+                      <MapPin className="w-4 h-4 mt-0.5" />
                       {submission.market_address}
                     </div>
                   )}
