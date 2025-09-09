@@ -116,6 +116,11 @@ const Index = () => {
               <Card className="mt-8 p-8 bg-card border-border">
                 <VendorApplication />
               </Card>
+              
+              {/* Second Blank Box */}
+              <Card className="mt-8 p-8 min-h-[200px] bg-card border-border">
+                {/* This is another blank box */}
+              </Card>
             </>
           )}
         </div>
