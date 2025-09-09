@@ -3,143 +3,182 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Clock } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AddMarketFormProps {
   open: boolean;
   onClose: () => void;
   onMarketAdded: (marketName: string) => void;
-  markets: Array<{ id: number; name: string; }>;
 }
 
-const SPECIALTIES = [
-  "Fresh Produce",
-  "Organic Vegetables", 
-  "Fruits",
-  "Herbs & Spices",
-  "Baked Goods",
-  "Dairy Products",
-  "Meat & Poultry",
-  "Prepared Foods",
-  "Flowers & Plants",
-  "Artisan Crafts",
-  "Honey & Preserves",
-  "Other"
-];
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-export const AddMarketForm = ({ open, onClose, onMarketAdded, markets }: AddMarketFormProps) => {
-  const [selectedMarket, setSelectedMarket] = useState('');
-  const [vendorData, setVendorData] = useState({
-    storeName: '',
-    specialty: '',
-    website: '',
-    description: ''
-  });
+export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormProps) => {
+  const [marketName, setMarketName] = useState('');
+  const [address, setAddress] = useState('');
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [hours, setHours] = useState<Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>>({});
 
-  const handleSubmit = () => {
-    // In a real app, this would submit to an API
-    console.log("Vendor application:", { 
-      selectedMarket,
-      ...vendorData
-    });
-    onMarketAdded(selectedMarket);
-    onClose();
-    // Reset form
-    setSelectedMarket('');
-    setVendorData({
-      storeName: '',
-      specialty: '',
-      website: '',
-      description: ''
+  const toggleDay = (day: string) => {
+    setSelectedDays(prev => {
+      const newDays = prev.includes(day) 
+        ? prev.filter(d => d !== day)
+        : [...prev, day];
+      
+      // Add default hours for newly selected days
+      if (!prev.includes(day) && newDays.includes(day)) {
+        setHours(prevHours => ({
+          ...prevHours,
+          [day]: {
+            start: '08:00',
+            end: '14:00',
+            startPeriod: 'AM' as 'AM' | 'PM',
+            endPeriod: 'PM' as 'AM' | 'PM',
+          }
+        }));
+      }
+      // Remove hours for deselected days
+      else if (prev.includes(day) && !newDays.includes(day)) {
+        setHours(prevHours => {
+          const { [day]: removed, ...rest } = prevHours;
+          return rest;
+        });
+      }
+      
+      return newDays;
     });
   };
 
-  const isFormValid = selectedMarket && vendorData.storeName.trim() && vendorData.specialty && vendorData.description.trim();
+  const handleSubmit = () => {
+    // In a real app, this would submit to an API
+    console.log({
+      marketName,
+      address,
+      selectedDays,
+      hours
+    });
+    onMarketAdded(marketName);
+    onClose();
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Vendor Application</DialogTitle>
+          <DialogTitle>Add Farmers Market</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6 py-4">
-          {/* Market Selection */}
           <div className="space-y-2">
-            <Label>
-              Which farmers market do you want to join? <span className="text-destructive">*</span>
-            </Label>
-            <Select value={selectedMarket} onValueChange={setSelectedMarket}>
-              <SelectTrigger>
-                <SelectValue placeholder="Search and select a market" />
-              </SelectTrigger>
-              <SelectContent>
-                {markets.map((market) => (
-                  <SelectItem key={market.id} value={market.name}>
-                    {market.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label htmlFor="market-name">Market Name *</Label>
+            <Input
+              id="market-name"
+              value={marketName}
+              onChange={(e) => setMarketName(e.target.value)}
+              placeholder="Enter market name"
+            />
           </div>
 
-          {/* Vendor Details */}
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="store-name">
-                Store Name <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="store-name"
-                value={vendorData.storeName}
-                onChange={(e) => setVendorData(prev => ({ ...prev, storeName: e.target.value }))}
-                placeholder="e.g., Fresh Produce Stand"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="address">Address *</Label>
+            <Input
+              id="address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter market address"
+            />
+          </div>
 
-            <div className="space-y-2">
-              <Label>Primary Specialty</Label>
-              <Select 
-                value={vendorData.specialty} 
-                onValueChange={(value) => setVendorData(prev => ({ ...prev, specialty: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select your main specialty" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SPECIALTIES.map((specialty) => (
-                    <SelectItem key={specialty} value={specialty}>
-                      {specialty}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div className="space-y-4">
+            <Label>Market Days *</Label>
+            <div className="flex gap-2">
+              {DAYS.map((day) => (
+                <Button
+                  key={day}
+                  type="button"
+                  variant={selectedDays.includes(day) ? "default" : "outline"}
+                  onClick={() => toggleDay(day)}
+                  className={cn(
+                    "h-12 px-6",
+                    selectedDays.includes(day) && "bg-earth text-earth-foreground hover:bg-earth/90"
+                  )}
+                >
+                  {day}
+                </Button>
+              ))}
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="website">Website (Optional)</Label>
-              <Input
-                id="website"
-                type="url"
-                value={vendorData.website}
-                onChange={(e) => setVendorData(prev => ({ ...prev, website: e.target.value }))}
-                placeholder="https://yourwebsite.com"
-              />
-            </div>
+          <div className="space-y-4">
+            <Label>Market Hours</Label>
+            {selectedDays.length > 0 ? (
+              <div className="space-y-4">
+                {selectedDays.map((day) => (
+                  <div key={day} className="space-y-3">
+                    <h4 className="font-medium">{day === 'Mon' ? 'Monday' : day === 'Tue' ? 'Tuesday' : day === 'Wed' ? 'Wednesday' : day === 'Thu' ? 'Thursday' : day === 'Fri' ? 'Friday' : day === 'Sat' ? 'Saturday' : 'Sunday'}</h4>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <div className="relative">
+                          <Input
+                            type="time"
+                            value={hours[day]?.start || '08:00'}
+                            onChange={(e) => setHours(prev => ({
+                              ...prev,
+                              [day]: { ...prev[day], start: e.target.value }
+                            }))}
+                            className="pr-8"
+                          />
+                          <Clock className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <select
+                          value={hours[day]?.startPeriod || 'AM'}
+                          onChange={(e) => setHours(prev => ({
+                            ...prev,
+                            [day]: { ...prev[day], startPeriod: e.target.value as 'AM' | 'PM' }
+                          }))}
+                          className="border rounded px-2 py-1 text-sm"
+                        >
+                          <option value="AM">AM</option>
+                          <option value="PM">PM</option>
+                        </select>
+                      </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">
-                Description <span className="text-destructive">*</span>
-              </Label>
-              <Textarea
-                id="description"
-                value={vendorData.description}
-                onChange={(e) => setVendorData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Tell us about your products, farming practices, and what makes your business special..."
-                className="min-h-[120px]"
-              />
-            </div>
+                      <span className="text-muted-foreground">to</span>
+
+                      <div className="flex items-center gap-2">
+                        <div className="relative">
+                          <Input
+                            type="time"
+                            value={hours[day]?.end || '14:00'}
+                            onChange={(e) => setHours(prev => ({
+                              ...prev,
+                              [day]: { ...prev[day], end: e.target.value }
+                            }))}
+                            className="pr-8"
+                          />
+                          <Clock className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <select
+                          value={hours[day]?.endPeriod || 'PM'}
+                          onChange={(e) => setHours(prev => ({
+                            ...prev,
+                            [day]: { ...prev[day], endPeriod: e.target.value as 'AM' | 'PM' }
+                          }))}
+                          className="border rounded px-2 py-1 text-sm"
+                        >
+                          <option value="AM">AM</option>
+                          <option value="PM">PM</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">Select market days above to set hours</p>
+            )}
           </div>
         </div>
 
@@ -149,10 +188,10 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, markets }: AddMark
           </Button>
           <Button 
             onClick={handleSubmit}
-            disabled={!isFormValid}
-            className="bg-success text-success-foreground hover:bg-success/90"
+            disabled={!marketName || !address || selectedDays.length === 0}
+            className="bg-earth text-earth-foreground hover:bg-earth/90"
           >
-            Submit Application
+            Add Market
           </Button>
         </div>
       </DialogContent>

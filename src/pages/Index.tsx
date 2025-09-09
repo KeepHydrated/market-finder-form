@@ -128,7 +128,6 @@ const Index = () => {
         open={showAddForm} 
         onClose={handleCloseAddForm}
         onMarketAdded={handleMarketAdded}
-        markets={sampleMarkets}
       />
     </div>
   );
