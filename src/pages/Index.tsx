@@ -320,12 +320,26 @@ const Index = () => {
         throw error;
       }
 
+      // Refetch the profile data to update it everywhere in the app
+      const { data: updatedProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching updated profile:', fetchError);
+      }
+
       toast({
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
       });
       
       setIsEditing(false); // Exit edit mode after saving
+      
+      // Refresh the page to ensure all components see the updated profile
+      window.location.reload();
     } catch (error) {
       console.error('Save profile error:', error);
       toast({
