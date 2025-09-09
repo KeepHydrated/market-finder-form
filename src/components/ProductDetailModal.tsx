@@ -111,7 +111,7 @@ export const ProductDetailModal = ({ product, open, onClose }: ProductDetailModa
           </div>
 
           {/* Right side - Product info */}
-          <div className="md:w-1/2 p-6 flex flex-col justify-center">
+          <div className="md:w-1/2 p-6 flex flex-col">
             <h2 className="text-2xl font-bold mb-6">{product.name}</h2>
             
             <div className="space-y-6">
