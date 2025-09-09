@@ -69,7 +69,17 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0 flex [&>button]:hidden">
+      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0 flex [&>button]:hidden relative">
+        {/* Close button at top-right of entire modal */}
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={onClose}
+          className="absolute top-4 right-4 z-20 h-8 w-8 p-0 bg-white/80 hover:bg-white"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+
         {/* Navigation arrows positioned outside the modal content */}
         {hasPrevious && (
           <Button
@@ -96,15 +106,6 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         <div className="flex flex-col md:flex-row min-h-0 w-full">
           {/* Left side - Images */}
           <div className="md:w-1/2 relative">
-            {/* Close button */}
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={onClose}
-              className="absolute top-4 right-4 z-10 h-8 w-8 p-0 bg-white/80 hover:bg-white"
-            >
-              <X className="h-4 w-4" />
-            </Button>
 
               <div className="aspect-square bg-muted relative group">
                 {product.images.length > 0 ? (
