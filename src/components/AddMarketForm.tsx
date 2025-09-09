@@ -65,12 +65,12 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-6">
+        <DialogHeader className="pb-4">
           <DialogTitle>Add Farmers Market</DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6 py-4">
+        <div className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="market-name">Market Name *</Label>
             <Input
@@ -182,7 +182,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t">
+        <div className="flex justify-end gap-3 pt-6 border-t mt-6">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
