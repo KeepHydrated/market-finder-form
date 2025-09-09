@@ -89,6 +89,7 @@ const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedMarketName, setSubmittedMarketName] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("submit");
 
   // Load products from localStorage on component mount
   useEffect(() => {
@@ -227,13 +228,34 @@ const Index = () => {
         {/* Left Sidebar - Navigation Tabs */}
         <div className="w-64 bg-card border-r border-border min-h-[calc(100vh-4rem)]">
           <div className="p-4 space-y-2">
-            <div className="px-4 py-3 rounded-md text-muted-foreground hover:bg-muted cursor-pointer transition-colors">
+            <div 
+              className={`px-4 py-3 rounded-md cursor-pointer transition-colors ${
+                activeTab === "profile" 
+                  ? "bg-primary/10 text-primary font-medium border border-primary/20" 
+                  : "text-muted-foreground hover:bg-muted"
+              }`}
+              onClick={() => setActiveTab("profile")}
+            >
               Profile
             </div>
-            <div className="px-4 py-3 rounded-md text-muted-foreground hover:bg-muted cursor-pointer transition-colors">
+            <div 
+              className={`px-4 py-3 rounded-md cursor-pointer transition-colors ${
+                activeTab === "account" 
+                  ? "bg-primary/10 text-primary font-medium border border-primary/20" 
+                  : "text-muted-foreground hover:bg-muted"
+              }`}
+              onClick={() => setActiveTab("account")}
+            >
               Account
             </div>
-            <div className="px-4 py-3 rounded-md bg-primary/10 text-primary font-medium cursor-pointer transition-colors border border-primary/20">
+            <div 
+              className={`px-4 py-3 rounded-md cursor-pointer transition-colors ${
+                activeTab === "submit" 
+                  ? "bg-primary/10 text-primary font-medium border border-primary/20" 
+                  : "text-muted-foreground hover:bg-muted"
+              }`}
+              onClick={() => setActiveTab("submit")}
+            >
               Submit
             </div>
           </div>
@@ -250,31 +272,77 @@ const Index = () => {
                 />
               ) : (
                 <>
-                  <MarketSearch 
-                    markets={sampleMarkets}
-                    onSelectMarket={handleSelectMarket}
-                    onAddMarket={handleAddMarket}
-                    searchTerm={searchTerm}
-                    onSearchTermChange={setSearchTerm}
-                    submittedMarketName={submittedMarketName}
-                  />
-                  
-                  {/* Vendor Application Form */}
-                  <Card className="mt-8 p-8 bg-card border-border">
-                    <VendorApplication />
-                  </Card>
-                  
-                  {/* Products Section */}
-                  <Card className="mt-8 p-8 bg-card border-border">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-semibold text-foreground">Products</h2>
-                      <Button className="flex items-center gap-2" onClick={handleAddProduct}>
-                        <Plus className="h-4 w-4" />
-                        Add Product
-                      </Button>
+                  {activeTab === "account" && (
+                    <div className="max-w-2xl mx-auto space-y-8">
+                      <div>
+                        <h2 className="text-xl font-semibold mb-4">Email Address</h2>
+                        <div className="bg-muted p-4 rounded-md mb-2 text-muted-foreground">
+                          {user?.email}
+                        </div>
+                        <p className="text-sm text-muted-foreground">Your email address cannot be changed</p>
+                      </div>
+
+                      <div>
+                        <h2 className="text-xl font-semibold mb-4">Password</h2>
+                        <div className="flex gap-4 items-center mb-2">
+                          <div className="bg-muted p-4 rounded-md flex-1 text-muted-foreground tracking-widest">
+                            ••••••••••••
+                          </div>
+                          <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+                            Change Password
+                          </Button>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Click to receive a password reset link via email</p>
+                      </div>
+
+                      <div className="border-t pt-8">
+                        <h2 className="text-xl font-semibold mb-4 text-red-600">Danger Zone</h2>
+                        <p className="text-muted-foreground mb-4">
+                          Once you delete your account, there is no going back. Please be certain.
+                        </p>
+                        <Button className="bg-red-600 hover:bg-red-700 text-white">
+                          Delete Account
+                        </Button>
+                      </div>
                     </div>
-                    <ProductGrid products={products} />
-                  </Card>
+                  )}
+
+                  {activeTab === "profile" && (
+                    <div className="max-w-2xl mx-auto">
+                      <h2 className="text-2xl font-semibold mb-6">Profile Settings</h2>
+                      <p className="text-muted-foreground">Profile settings will be implemented here.</p>
+                    </div>
+                  )}
+
+                  {activeTab === "submit" && (
+                    <>
+                      <MarketSearch 
+                        markets={sampleMarkets}
+                        onSelectMarket={handleSelectMarket}
+                        onAddMarket={handleAddMarket}
+                        searchTerm={searchTerm}
+                        onSearchTermChange={setSearchTerm}
+                        submittedMarketName={submittedMarketName}
+                      />
+                      
+                      {/* Vendor Application Form */}
+                      <Card className="mt-8 p-8 bg-card border-border">
+                        <VendorApplication />
+                      </Card>
+                      
+                      {/* Products Section */}
+                      <Card className="mt-8 p-8 bg-card border-border">
+                        <div className="flex items-center justify-between mb-6">
+                          <h2 className="text-2xl font-semibold text-foreground">Products</h2>
+                          <Button className="flex items-center gap-2" onClick={handleAddProduct}>
+                            <Plus className="h-4 w-4" />
+                            Add Product
+                          </Button>
+                        </div>
+                        <ProductGrid products={products} />
+                      </Card>
+                    </>
+                  )}
                 </>
               )}
             </div>
