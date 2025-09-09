@@ -1,14 +1,39 @@
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
-export const VendorApplication = () => {
-  const [storeName, setStoreName] = useState("");
-  const [primarySpecialty, setPrimarySpecialty] = useState("");
-  const [website, setWebsite] = useState("");
-  const [description, setDescription] = useState("");
+interface VendorApplicationData {
+  storeName: string;
+  primarySpecialty: string;
+  website: string;
+  description: string;
+}
+
+export type { VendorApplicationData };
+
+interface VendorApplicationProps {
+  data?: VendorApplicationData;
+  onChange?: (data: VendorApplicationData) => void;
+  readOnly?: boolean;
+}
+
+export const VendorApplication = ({ data, onChange, readOnly = false }: VendorApplicationProps) => {
+  const currentData = data || {
+    storeName: "",
+    primarySpecialty: "",
+    website: "",
+    description: ""
+  };
+
+  const updateData = (field: keyof VendorApplicationData, value: string) => {
+    if (onChange && !readOnly) {
+      onChange({
+        ...currentData,
+        [field]: value
+      });
+    }
+  };
 
   const specialties = [
     "Fresh Flowers & Plants",
@@ -34,10 +59,11 @@ export const VendorApplication = () => {
           </Label>
           <Input
             id="store-name"
-            value={storeName}
-            onChange={(e) => setStoreName(e.target.value)}
+            value={currentData.storeName}
+            onChange={(e) => updateData('storeName', e.target.value)}
             placeholder="e.g., Fresh Produce Stand"
             className="h-14 text-lg border-2 border-border rounded-xl"
+            disabled={readOnly}
           />
         </div>
 
@@ -45,7 +71,11 @@ export const VendorApplication = () => {
           <Label htmlFor="primary-specialty" className="text-lg font-medium text-foreground">
             Primary Specialty
           </Label>
-          <Select value={primarySpecialty} onValueChange={setPrimarySpecialty}>
+          <Select 
+            value={currentData.primarySpecialty} 
+            onValueChange={(value) => updateData('primarySpecialty', value)}
+            disabled={readOnly}
+          >
             <SelectTrigger className="h-14 text-lg border-2 border-border rounded-xl">
               <SelectValue placeholder="Select your main specialty" />
             </SelectTrigger>
@@ -65,11 +95,12 @@ export const VendorApplication = () => {
           </Label>
           <Input
             id="website"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
+            value={currentData.website}
+            onChange={(e) => updateData('website', e.target.value)}
             placeholder="https://yourwebsite.com"
             type="url"
             className="h-14 text-lg border-2 border-border rounded-xl"
+            disabled={readOnly}
           />
         </div>
 
@@ -79,10 +110,11 @@ export const VendorApplication = () => {
           </Label>
           <Textarea
             id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={currentData.description}
+            onChange={(e) => updateData('description', e.target.value)}
             placeholder="Tell us about your business..."
             className="min-h-[120px] text-lg border-2 border-border rounded-xl resize-none"
+            disabled={readOnly}
           />
         </div>
       </div>

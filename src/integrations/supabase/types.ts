@@ -41,6 +41,51 @@ export type Database = {
         }
         Relationships: []
       }
+      submissions: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          primary_specialty: string | null
+          products: Json | null
+          search_term: string | null
+          selected_market: string | null
+          status: string | null
+          store_name: string
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          primary_specialty?: string | null
+          products?: Json | null
+          search_term?: string | null
+          selected_market?: string | null
+          status?: string | null
+          store_name: string
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          primary_specialty?: string | null
+          products?: Json | null
+          search_term?: string | null
+          selected_market?: string | null
+          status?: string | null
+          store_name?: string
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

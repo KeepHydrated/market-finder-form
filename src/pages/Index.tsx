@@ -7,7 +7,7 @@ import { ProductGrid } from "@/components/ProductGrid";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { VendorApplication } from "@/components/VendorApplication";
+import { VendorApplication, VendorApplicationData } from "@/components/VendorApplication";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { useAuth } from "@/hooks/useAuth";
@@ -99,6 +99,12 @@ const Index = () => {
   });
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [vendorApplicationData, setVendorApplicationData] = useState<VendorApplicationData>({
+    storeName: "",
+    primarySpecialty: "",
+    website: "",
+    description: ""
+  });
 
   // Load products from localStorage on component mount
   useEffect(() => {
@@ -576,7 +582,10 @@ const Index = () => {
                       
                       {/* Vendor Application Form */}
                       <Card className="mt-8 p-8 bg-card border-border">
-                        <VendorApplication />
+                        <VendorApplication 
+                          data={vendorApplicationData}
+                          onChange={setVendorApplicationData}
+                        />
                       </Card>
                       
                       {/* Products Section */}
@@ -595,11 +604,50 @@ const Index = () => {
                       <div className="mt-8 flex justify-center">
                         <Button 
                           className="bg-blue-500 hover:bg-blue-600 text-white px-12 py-3 text-lg"
-                          onClick={() => {
-                            toast({
-                              title: "Application Submitted",
-                              description: "Your vendor application has been submitted successfully!",
-                            });
+                          onClick={async () => {
+                            if (!user) return;
+                            
+                            try {
+                              const { error } = await supabase
+                                .from('submissions')
+                                .insert({
+                                  user_id: user.id,
+                                  store_name: vendorApplicationData.storeName,
+                                  primary_specialty: vendorApplicationData.primarySpecialty,
+                                  website: vendorApplicationData.website,
+                                  description: vendorApplicationData.description,
+                                  products: JSON.stringify(products),
+                                  selected_market: selectedMarket?.name || null,
+                                  search_term: searchTerm,
+                                  status: 'pending'
+                                });
+
+                              if (error) throw error;
+
+                              toast({
+                                title: "Application Submitted",
+                                description: "Your vendor application has been submitted successfully!",
+                              });
+
+                              // Reset form after successful submission
+                              setVendorApplicationData({
+                                storeName: "",
+                                primarySpecialty: "",
+                                website: "",
+                                description: ""
+                              });
+                              setProducts([]);
+                              setSearchTerm("");
+                              setSelectedMarket(null);
+                              setSubmittedMarketName(null);
+                            } catch (error) {
+                              console.error('Submission error:', error);
+                              toast({
+                                title: "Error",
+                                description: "Failed to submit application. Please try again.",
+                                variant: "destructive"
+                              });
+                            }
                           }}
                         >
                           Submit Application
