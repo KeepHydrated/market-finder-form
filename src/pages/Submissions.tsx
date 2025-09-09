@@ -126,9 +126,10 @@ const Submissions = () => {
                     </span>
                   </div>
                   
-                  {/* Market Selection Info */}
-                  <Card className="mb-6 p-6">
-                    <div className="space-y-2">
+                  {/* Vendor Application */}
+                  <Card className="p-6">
+                    {/* Market Selection Info */}
+                    <div className="space-y-2 mb-6">
                       <label className="text-lg font-medium text-foreground">
                         Which farmers market do you want to join? *
                       </label>
@@ -153,10 +154,8 @@ const Submissions = () => {
                         />
                       </div>
                     </div>
-                  </Card>
 
-                  {/* Vendor Application */}
-                  <Card className="mb-6 p-6">
+                    {/* Vendor Application Form */}
                     <VendorApplication 
                       data={{
                         storeName: submission.store_name,
