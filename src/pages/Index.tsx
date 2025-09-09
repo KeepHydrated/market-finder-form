@@ -226,7 +226,11 @@ const Index = () => {
       <div className="flex">
         {/* Left Sidebar - Blank Box */}
         <div className="w-64 bg-card border-r border-border min-h-[calc(100vh-4rem)]">
-          {/* Blank sidebar content */}
+          <div className="p-4">
+            <div className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-center font-medium cursor-pointer hover:bg-primary/90 transition-colors">
+              Submit
+            </div>
+          </div>
         </div>
 
         {/* Main Content Area */}
