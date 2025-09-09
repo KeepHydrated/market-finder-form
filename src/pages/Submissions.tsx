@@ -163,9 +163,32 @@ const Submissions = () => {
                     variant="default"
                     size="sm"
                     className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                    onClick={() => {
-                      // TODO: Handle accept logic
-                      console.log('Accept clicked for submission:', currentSubmission?.id);
+                    onClick={async () => {
+                      if (!currentSubmission) return;
+                      
+                      try {
+                        const { error } = await supabase
+                          .from('submissions')
+                          .update({ status: 'accepted' })
+                          .eq('id', currentSubmission.id);
+
+                        if (error) throw error;
+
+                        toast({
+                          title: "Submission Accepted",
+                          description: "The submission has been accepted successfully!",
+                        });
+
+                        // Refresh submissions to show updated status
+                        fetchSubmissions();
+                      } catch (error) {
+                        console.error('Error accepting submission:', error);
+                        toast({
+                          title: "Error",
+                          description: "Failed to accept submission.",
+                          variant: "destructive"
+                        });
+                      }
                     }}
                   >
                     Accept
@@ -175,9 +198,32 @@ const Submissions = () => {
                     variant="destructive"
                     size="sm"
                     className="flex-1"
-                    onClick={() => {
-                      // TODO: Handle reject logic
-                      console.log('Reject clicked for submission:', currentSubmission?.id);
+                    onClick={async () => {
+                      if (!currentSubmission) return;
+                      
+                      try {
+                        const { error } = await supabase
+                          .from('submissions')
+                          .update({ status: 'rejected' })
+                          .eq('id', currentSubmission.id);
+
+                        if (error) throw error;
+
+                        toast({
+                          title: "Submission Rejected",
+                          description: "The submission has been rejected.",
+                        });
+
+                        // Refresh submissions to show updated status
+                        fetchSubmissions();
+                      } catch (error) {
+                        console.error('Error rejecting submission:', error);
+                        toast({
+                          title: "Error",
+                          description: "Failed to reject submission.",
+                          variant: "destructive"
+                        });
+                      }
                     }}
                   >
                     Reject
