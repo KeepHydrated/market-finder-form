@@ -244,6 +244,7 @@ const Submissions = () => {
                             placeholder="Search for a farmers market..."
                             value={currentSubmission.selected_market || currentSubmission.search_term || ''}
                             readOnly
+                            disabled={!(currentSubmission.market_address || currentSubmission.market_days || currentSubmission.market_hours)}
                             className={`pl-10 h-14 text-lg border-2 border-border rounded-xl ${
                               (currentSubmission.market_address || currentSubmission.market_days || currentSubmission.market_hours) 
                                 ? 'cursor-pointer hover:bg-muted/50' 
