@@ -109,10 +109,53 @@ const Submissions = () => {
       {/* Main Content */}
       <main className="py-12">
         <div className="container mx-auto px-4 flex gap-6">
-          {/* Left Sidebar - Blank Box */}
+          {/* Left Sidebar - User Profile */}
           <div className="w-64 flex-shrink-0">
-            <div className="bg-card border border-border rounded-lg p-6 h-64">
-              {/* Blank box content can be added here later */}
+            <div className="bg-card border border-border rounded-lg p-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-muted rounded-full mx-auto mb-4 flex items-center justify-center">
+                  {profile?.avatar_url ? (
+                    <img 
+                      src={profile.avatar_url} 
+                      alt="Profile" 
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                      <span className="text-2xl font-semibold text-primary">
+                        {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                
+                <h3 className="font-semibold text-lg mb-1">
+                  {profile?.full_name || 'Vendor'}
+                </h3>
+                
+                <p className="text-sm text-muted-foreground mb-4">
+                  {user?.email}
+                </p>
+                
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Total Submissions:</span>
+                    <span className="font-medium">{submissions.length}</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Status:</span>
+                    <span className="font-medium">Active</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Member Since:</span>
+                    <span className="font-medium">
+                      {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
