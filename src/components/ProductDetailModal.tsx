@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { createPortal } from "react-dom";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -69,37 +68,33 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   };
 
   return (
-    <>
-      {/* External navigation arrows - rendered with portal to document.body */}
-      {open && hasPrevious && createPortal(
-        <Button
-          variant="secondary"
-          size="lg"
-          onClick={goToPrevious}
-          className="fixed left-4 top-1/2 transform -translate-y-1/2 z-[9999] h-12 w-12 p-0 bg-white/90 hover:bg-white border-2 border-border shadow-lg"
-          style={{ zIndex: 9999 }}
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </Button>,
-        document.body
-      )}
-      
-      {open && hasNext && createPortal(
-        <Button
-          variant="secondary"
-          size="lg"
-          onClick={goToNext}
-          className="fixed right-4 top-1/2 transform -translate-y-1/2 z-[9999] h-12 w-12 p-0 bg-white/90 hover:bg-white border-2 border-border shadow-lg"
-          style={{ zIndex: 9999 }}
-        >
-          <ChevronRight className="h-6 w-6" />
-        </Button>,
-        document.body
-      )}
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0 flex [&>button]:hidden relative">
+        
+        {/* Navigation arrows inside modal */}
+        {hasPrevious && (
+          <Button
+            variant="secondary"
+            size="lg"
+            onClick={goToPrevious}
+            className="absolute -left-16 top-1/2 transform -translate-y-1/2 z-10 h-12 w-12 p-0 bg-white/90 hover:bg-white border-2 border-border shadow-lg"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+        )}
+        
+        {hasNext && (
+          <Button
+            variant="secondary"
+            size="lg"
+            onClick={goToNext}
+            className="absolute -right-16 top-1/2 transform -translate-y-1/2 z-10 h-12 w-12 p-0 bg-white/90 hover:bg-white border-2 border-border shadow-lg"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </Button>
+        )}
 
-      <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0 flex [&>button]:hidden">
-          <div className="flex flex-col md:flex-row min-h-0 w-full">
+        <div className="flex flex-col md:flex-row min-h-0 w-full">
             {/* Left side - Images */}
             <div className="md:w-1/2 relative">
               {/* Close button */}
@@ -186,6 +181,5 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
           </div>
         </DialogContent>
       </Dialog>
-    </>
   );
 };
