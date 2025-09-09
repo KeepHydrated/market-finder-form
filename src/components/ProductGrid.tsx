@@ -43,7 +43,7 @@ const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
       className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200"
       onClick={() => onProductClick(product)}
     >
-      <div className="aspect-square overflow-hidden bg-muted relative group">
+      <div className="aspect-[4/3] overflow-hidden bg-muted relative group">
         {product.images.length > 0 ? (
           <>
             <img
