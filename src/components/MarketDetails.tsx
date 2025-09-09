@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, MapPin, ArrowLeft } from "lucide-react";
+import { VendorApplicationForm } from "./VendorApplicationForm";
 
 interface Market {
   id: number;
@@ -19,6 +21,16 @@ interface MarketDetailsProps {
 }
 
 export const MarketDetails = ({ market, onBack }: MarketDetailsProps) => {
+  const [showVendorForm, setShowVendorForm] = useState(false);
+
+  const handleJoinMarket = () => {
+    setShowVendorForm(true);
+  };
+
+  const handleCloseVendorForm = () => {
+    setShowVendorForm(false);
+  };
+
   return (
     <div className="space-y-6">
       <Button 
@@ -61,6 +73,7 @@ export const MarketDetails = ({ market, onBack }: MarketDetailsProps) => {
 
           <div className="pt-4 border-t">
             <Button 
+              onClick={handleJoinMarket}
               className="w-full bg-success text-success-foreground hover:bg-success/90"
               size="lg"
             >
@@ -69,6 +82,12 @@ export const MarketDetails = ({ market, onBack }: MarketDetailsProps) => {
           </div>
         </CardContent>
       </Card>
+
+      <VendorApplicationForm 
+        open={showVendorForm}
+        onClose={handleCloseVendorForm}
+        marketName={market.name}
+      />
     </div>
   );
 };
