@@ -22,9 +22,10 @@ interface MarketSearchProps {
   searchTerm: string;
   onSearchTermChange: (term: string) => void;
   submittedMarketName?: string | null;
+  disabled?: boolean;
 }
 
-export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm, onSearchTermChange, submittedMarketName }: MarketSearchProps) => {
+export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm, onSearchTermChange, submittedMarketName, disabled = false }: MarketSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -108,14 +109,15 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
             placeholder="Search for a farmers market..."
             value={searchTerm}
             onChange={handleInputChange}
-            onFocus={() => setIsOpen(true)}
+            onFocus={() => !disabled && setIsOpen(true)}
             onKeyDown={handleKeyDown}
             className="pl-10 h-14 text-lg border-2 border-border rounded-xl"
+            disabled={disabled}
           />
         </div>
       </div>
 
-      {showResults && (
+      {showResults && !disabled && (
         <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
           <div className="max-h-60 overflow-y-auto">
             {visibleMarkets.map((market, index) => (
