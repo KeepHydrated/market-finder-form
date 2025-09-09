@@ -108,83 +108,93 @@ const Submissions = () => {
 
       {/* Main Content */}
       <main className="py-12">
-        <div className="container mx-auto px-4">
-          {submissions.length === 0 ? (
-            <div className="text-center">
-              <h2 className="text-3xl font-semibold mb-4">No Submissions Yet</h2>
-              <p className="text-muted-foreground">
-                Your submitted applications will appear here.
-              </p>
+        <div className="container mx-auto px-4 flex gap-6">
+          {/* Left Sidebar - Blank Box */}
+          <div className="w-64 flex-shrink-0">
+            <div className="bg-card border border-border rounded-lg p-6 h-64">
+              {/* Blank box content can be added here later */}
             </div>
-          ) : (
-            <div className="space-y-8">
-              {submissions.map((submission) => (
-                <div key={submission.id} className="border rounded-lg p-6 bg-card">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-semibold">Application #{submission.id.slice(-8)}</h3>
-                    <span className="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
-                      {submission.status}
-                    </span>
-                  </div>
-                  
-                  {/* Vendor Application */}
-                  <Card className="p-6">
-                    <div className="w-full max-w-2xl mx-auto">
-                      <div className="space-y-6">
-                        {/* Market Selection Info */}
-                        <div className="space-y-2">
-                          <Label className="text-lg font-medium text-foreground">
-                            Which farmers market do you want to join? *
-                          </Label>
-                          
-                          <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input
-                              type="text"
-                              placeholder="Search for a farmers market..."
-                              value={submission.selected_market || submission.search_term || ''}
-                              readOnly
-                              className={`pl-10 h-14 text-lg border-2 border-border rounded-xl ${
-                                submission.selected_market || submission.search_term || submission.market_address || submission.market_days || submission.market_hours 
-                                  ? 'cursor-pointer hover:bg-muted/50' 
-                                  : ''
-                              }`}
-                              onClick={() => {
-                                if (submission.selected_market || submission.search_term || submission.market_address || submission.market_days || submission.market_hours) {
-                                  setSelectedMarket(submission);
-                                }
+          </div>
+
+          {/* Main Content Area */}
+          <div className="flex-1">
+            {submissions.length === 0 ? (
+              <div className="text-center">
+                <h2 className="text-3xl font-semibold mb-4">No Submissions Yet</h2>
+                <p className="text-muted-foreground">
+                  Your submitted applications will appear here.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {submissions.map((submission) => (
+                  <div key={submission.id} className="border rounded-lg p-6 bg-card">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-xl font-semibold">Application #{submission.id.slice(-8)}</h3>
+                      <span className="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
+                        {submission.status}
+                      </span>
+                    </div>
+                    
+                    {/* Vendor Application */}
+                    <Card className="p-6">
+                      <div className="w-full max-w-2xl mx-auto">
+                        <div className="space-y-6">
+                          {/* Market Selection Info */}
+                          <div className="space-y-2">
+                            <Label className="text-lg font-medium text-foreground">
+                              Which farmers market do you want to join? *
+                            </Label>
+                            
+                            <div className="relative">
+                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                              <Input
+                                type="text"
+                                placeholder="Search for a farmers market..."
+                                value={submission.selected_market || submission.search_term || ''}
+                                readOnly
+                                className={`pl-10 h-14 text-lg border-2 border-border rounded-xl ${
+                                  submission.selected_market || submission.search_term || submission.market_address || submission.market_days || submission.market_hours 
+                                    ? 'cursor-pointer hover:bg-muted/50' 
+                                    : ''
+                                }`}
+                                onClick={() => {
+                                  if (submission.selected_market || submission.search_term || submission.market_address || submission.market_days || submission.market_hours) {
+                                    setSelectedMarket(submission);
+                                  }
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Vendor Application Form */}
+                          <div className="space-y-6">
+                            <VendorApplication 
+                              data={{
+                                storeName: submission.store_name,
+                                primarySpecialty: submission.primary_specialty,
+                                website: submission.website,
+                                description: submission.description
                               }}
+                              readOnly={true}
                             />
                           </div>
                         </div>
-
-                        {/* Vendor Application Form */}
-                        <div className="space-y-6">
-                          <VendorApplication 
-                            data={{
-                              storeName: submission.store_name,
-                              primarySpecialty: submission.primary_specialty,
-                              website: submission.website,
-                              description: submission.description
-                            }}
-                            readOnly={true}
-                          />
-                        </div>
                       </div>
-                    </div>
-                  </Card>
-
-                  {/* Products */}
-                  {submission.products && submission.products.length > 0 && (
-                    <Card className="p-6">
-                      <h4 className="text-lg font-semibold mb-4">Products</h4>
-                      <ProductGrid products={submission.products} />
                     </Card>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+
+                    {/* Products */}
+                    {submission.products && submission.products.length > 0 && (
+                      <Card className="p-6">
+                        <h4 className="text-lg font-semibold mb-4">Products</h4>
+                        <ProductGrid products={submission.products} />
+                      </Card>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </main>
 
