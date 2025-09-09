@@ -21,9 +21,10 @@ interface MarketSearchProps {
   onAddMarket: () => void;
   searchTerm: string;
   onSearchTermChange: (term: string) => void;
+  submittedMarketName?: string | null;
 }
 
-export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm, onSearchTermChange }: MarketSearchProps) => {
+export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm, onSearchTermChange, submittedMarketName }: MarketSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -39,9 +40,7 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
   const visibleMarkets = markets; // Always show all markets
   const totalItems = visibleMarkets.length + 1; // +1 for "Add Market" option
   const hasTextInSearch = searchTerm.trim().length > 0;
-  const searchMatchesExistingMarket = hasTextInSearch && markets.some(market => 
-    market.name.toLowerCase() === searchTerm.toLowerCase().trim()
-  );
+  const isEditingSubmittedMarket = submittedMarketName && searchTerm.toLowerCase().trim() === submittedMarketName.toLowerCase();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -143,7 +142,7 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
               selectedIndex === visibleMarkets.length && "bg-muted"
             )}
           >
-            {searchMatchesExistingMarket ? (
+            {isEditingSubmittedMarket ? (
               <>
                 <Edit className="h-4 w-4 text-success" />
                 <span className="text-success font-medium">Edit market</span>

@@ -66,6 +66,7 @@ const Index = () => {
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [submittedMarketName, setSubmittedMarketName] = useState<string | null>(null);
 
   const handleSelectMarket = (market: Market) => {
     setSelectedMarket(market);
@@ -85,6 +86,7 @@ const Index = () => {
 
   const handleMarketAdded = (marketName: string) => {
     setSearchTerm(marketName);
+    setSubmittedMarketName(marketName);
   };
 
   return (
@@ -116,6 +118,7 @@ const Index = () => {
               onAddMarket={handleAddMarket}
               searchTerm={searchTerm}
               onSearchTermChange={setSearchTerm}
+              submittedMarketName={submittedMarketName}
             />
           )}
         </div>
