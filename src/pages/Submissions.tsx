@@ -116,13 +116,25 @@ const Submissions = () => {
                     </span>
                   </div>
                   
-                  {/* Selected Market */}
-                  {submission.selected_market && (
-                    <Card className="mb-6 p-6">
-                      <h4 className="text-lg font-semibold mb-2">Selected Farmers Market</h4>
-                      <p className="text-foreground">{submission.selected_market}</p>
-                    </Card>
-                  )}
+                  {/* Market Selection Info */}
+                  <Card className="mb-6 p-6">
+                    <h4 className="text-lg font-semibold mb-4">Which farmers market do you want to join? *</h4>
+                    <div className="border rounded-lg p-4 bg-muted/10">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-6 h-6 rounded-full border-2 border-muted-foreground flex items-center justify-center">
+                          <div className="w-2 h-2 rounded-full bg-muted-foreground"></div>
+                        </div>
+                        <span className="text-foreground">
+                          {submission.selected_market || 'No market selected'}
+                        </span>
+                      </div>
+                      {submission.search_term && (
+                        <div className="mt-2 text-sm text-muted-foreground">
+                          Search term used: "{submission.search_term}"
+                        </div>
+                      )}
+                    </div>
+                  </Card>
 
                   {/* Vendor Application */}
                   <Card className="mb-6 p-6">
