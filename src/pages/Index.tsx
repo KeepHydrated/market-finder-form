@@ -6,12 +6,13 @@ import { AddProductForm } from "@/components/AddProductForm";
 import { ProductGrid } from "@/components/ProductGrid";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { VendorApplication } from "@/components/VendorApplication";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft, RotateCcw, Upload } from "lucide-react";
 
 // Sample data - in a real app, this would come from an API
 const sampleMarkets = [
@@ -308,9 +309,55 @@ const Index = () => {
                   )}
 
                   {activeTab === "profile" && (
-                    <div className="max-w-2xl mx-auto">
-                      <h2 className="text-2xl font-semibold mb-6">Profile Settings</h2>
-                      <p className="text-muted-foreground">Profile settings will be implemented here.</p>
+                    <div className="max-w-2xl mx-auto space-y-8">
+                      {/* Profile Picture */}
+                      <div>
+                        <h2 className="text-xl font-semibold mb-4">Profile Pic</h2>
+                        <div className="flex items-center gap-4">
+                          <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
+                            <Upload className="h-8 w-8 text-muted-foreground" />
+                          </div>
+                          <div className="text-muted-foreground">
+                            JPG, PNG or GIF (max 5MB)
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Username */}
+                      <div>
+                        <h2 className="text-xl font-semibold mb-4">Username</h2>
+                        <Input 
+                          value="nadiachibri" 
+                          className="bg-muted" 
+                          readOnly 
+                        />
+                      </div>
+
+                      {/* Location */}
+                      <div>
+                        <h2 className="text-xl font-semibold mb-4">Location</h2>
+                        <div className="flex gap-4 items-center mb-2">
+                          <Input 
+                            placeholder="GPS coordinates will appear here..." 
+                            className="bg-muted flex-1" 
+                            readOnly 
+                          />
+                          <Button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2">
+                            <RotateCcw className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Click the button to get your current GPS coordinates.
+                        </p>
+                      </div>
+
+                      {/* Edit Profile Button */}
+                      <div className="pt-4">
+                        <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3">
+                          <Upload className="h-4 w-4 mr-2" />
+                          Edit Profile
+                        </Button>
+                      </div>
                     </div>
                   )}
 
