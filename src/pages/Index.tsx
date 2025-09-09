@@ -6,6 +6,7 @@ import { AddProductForm } from "@/components/AddProductForm";
 import { ProductGrid } from "@/components/ProductGrid";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VendorApplication } from "@/components/VendorApplication";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { UserMenu } from "@/components/auth/UserMenu";
@@ -231,33 +232,42 @@ const Index = () => {
               onBack={handleBackToSearch} 
             />
           ) : (
-            <>
-              <MarketSearch 
-                markets={sampleMarkets}
-                onSelectMarket={handleSelectMarket}
-                onAddMarket={handleAddMarket}
-                searchTerm={searchTerm}
-                onSearchTermChange={setSearchTerm}
-                submittedMarketName={submittedMarketName}
-              />
+            <Tabs defaultValue="browse" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="submit">Submit</TabsTrigger>
+                <TabsTrigger value="browse">Browse</TabsTrigger>
+              </TabsList>
               
-              {/* Vendor Application Form */}
-              <Card className="mt-8 p-8 bg-card border-border">
-                <VendorApplication />
-              </Card>
+              <TabsContent value="submit" className="space-y-8">
+                {/* Vendor Application Form */}
+                <Card className="p-8 bg-card border-border">
+                  <VendorApplication />
+                </Card>
+                
+                {/* Products Section */}
+                <Card className="p-8 bg-card border-border">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-semibold text-foreground">Products</h2>
+                    <Button className="flex items-center gap-2" onClick={handleAddProduct}>
+                      <Plus className="h-4 w-4" />
+                      Add Product
+                    </Button>
+                  </div>
+                  <ProductGrid products={products} />
+                </Card>
+              </TabsContent>
               
-              {/* Products Section */}
-              <Card className="mt-8 p-8 bg-card border-border">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-foreground">Products</h2>
-                  <Button className="flex items-center gap-2" onClick={handleAddProduct}>
-                    <Plus className="h-4 w-4" />
-                    Add Product
-                  </Button>
-                </div>
-                <ProductGrid products={products} />
-              </Card>
-            </>
+              <TabsContent value="browse">
+                <MarketSearch 
+                  markets={sampleMarkets}
+                  onSelectMarket={handleSelectMarket}
+                  onAddMarket={handleAddMarket}
+                  searchTerm={searchTerm}
+                  onSearchTermChange={setSearchTerm}
+                  submittedMarketName={submittedMarketName}
+                />
+              </TabsContent>
+            </Tabs>
           )}
         </div>
       </main>
