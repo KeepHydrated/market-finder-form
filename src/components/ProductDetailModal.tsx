@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -69,27 +70,31 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   return (
     <>
-      {/* External navigation arrows - rendered outside Dialog */}
-      {open && hasPrevious && (
+      {/* External navigation arrows - rendered with portal to document.body */}
+      {open && hasPrevious && createPortal(
         <Button
           variant="secondary"
           size="lg"
           onClick={goToPrevious}
-          className="fixed left-4 top-1/2 transform -translate-y-1/2 z-[60] h-12 w-12 p-0 bg-white/90 hover:bg-white border-2 border-border shadow-lg"
+          className="fixed left-4 top-1/2 transform -translate-y-1/2 z-[9999] h-12 w-12 p-0 bg-white/90 hover:bg-white border-2 border-border shadow-lg"
+          style={{ zIndex: 9999 }}
         >
           <ChevronLeft className="h-6 w-6" />
-        </Button>
+        </Button>,
+        document.body
       )}
       
-      {open && hasNext && (
+      {open && hasNext && createPortal(
         <Button
           variant="secondary"
           size="lg"
           onClick={goToNext}
-          className="fixed right-4 top-1/2 transform -translate-y-1/2 z-[60] h-12 w-12 p-0 bg-white/90 hover:bg-white border-2 border-border shadow-lg"
+          className="fixed right-4 top-1/2 transform -translate-y-1/2 z-[9999] h-12 w-12 p-0 bg-white/90 hover:bg-white border-2 border-border shadow-lg"
+          style={{ zIndex: 9999 }}
         >
           <ChevronRight className="h-6 w-6" />
-        </Button>
+        </Button>,
+        document.body
       )}
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
