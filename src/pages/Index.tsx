@@ -393,12 +393,6 @@ const Index = () => {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              {!selectedMarket && (
-                <Button onClick={handleAddMarket}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Market
-                </Button>
-              )}
               <UserMenu user={user} profile={profile} />
             </div>
           </div>
