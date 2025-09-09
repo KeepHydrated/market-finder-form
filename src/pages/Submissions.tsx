@@ -141,25 +141,6 @@ const Submissions = () => {
                   {user?.email}
                 </p>
                 
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Total Submissions:</span>
-                    <span className="font-medium">{submissions.length}</span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Status:</span>
-                    <span className="font-medium">Active</span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Member Since:</span>
-                    <span className="font-medium">
-                      {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
-                    </span>
-                  </div>
-                </div>
-                
                 <div className="mt-4 text-xs text-muted-foreground">
                   Click to view profile
                 </div>
