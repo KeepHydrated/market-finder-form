@@ -309,13 +309,16 @@ const Index = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          user_id: user.id,
+        .update({
           full_name: profileData.username,
           avatar_url: profileData.avatarUrl
-        });
+        })
+        .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Profile update error:', error);
+        throw error;
+      }
 
       toast({
         title: "Profile updated",
@@ -324,6 +327,7 @@ const Index = () => {
       
       setIsEditing(false); // Exit edit mode after saving
     } catch (error) {
+      console.error('Save profile error:', error);
       toast({
         title: "Error",
         description: "Failed to update profile.",
