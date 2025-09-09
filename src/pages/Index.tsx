@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { MarketSearch } from "@/components/MarketSearch";
 import { MarketDetails } from "@/components/MarketDetails";
 import { AddMarketForm } from "@/components/AddMarketForm";
@@ -399,6 +400,13 @@ const Index = () => {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
+              {user?.email === 'nadiachibri@gmail.com' && (
+                <Link to="/submissions">
+                  <Button variant="outline">
+                    Submissions
+                  </Button>
+                </Link>
+              )}
               <UserMenu user={user} profile={profile} />
             </div>
           </div>

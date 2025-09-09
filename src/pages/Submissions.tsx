@@ -75,6 +75,18 @@ const Submissions = () => {
     );
   }
 
+  // Check if user has permission to view submissions
+  if (user.email !== 'nadiachibri@gmail.com') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
+          <p className="text-muted-foreground">You don't have permission to view this page.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
