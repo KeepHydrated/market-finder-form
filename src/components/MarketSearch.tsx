@@ -77,7 +77,7 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket }: MarketSea
   };
 
   const handleSelectMarket = (market: Market) => {
-    setSearchTerm("");
+    setSearchTerm(market.name);
     setIsOpen(false);
     setSelectedIndex(-1);
     onSelectMarket(market);
