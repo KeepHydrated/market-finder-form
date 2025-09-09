@@ -72,16 +72,10 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
               onChange={(e) => setAddress(e.target.value)}
               placeholder="Enter market address"
             />
-            <p className="text-sm text-muted-foreground">
-              Please include city and state in the address. This market will be created and reviewed when you submit your vendor application.
-            </p>
           </div>
 
           <div className="space-y-4">
             <Label>Market Days *</Label>
-            <p className="text-sm text-muted-foreground">
-              Select which days this market operates
-            </p>
             <div className="flex flex-wrap gap-2">
               {DAYS.map((day) => (
                 <Button
