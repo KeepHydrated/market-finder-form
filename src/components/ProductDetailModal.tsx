@@ -70,42 +70,43 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0 flex [&>button]:hidden">
+        {/* Navigation arrows positioned outside the modal content */}
+        {hasPrevious && (
+          <Button
+            variant="secondary"
+            size="lg"
+            onClick={goToPrevious}
+            className="absolute -left-20 top-1/2 transform -translate-y-1/2 z-50 h-12 w-12 p-0 bg-white hover:bg-gray-50 border-2 border-gray-200 shadow-lg rounded-full"
+            style={{ left: '-80px' }}
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+        )}
+        
+        {hasNext && (
+          <Button
+            variant="secondary"
+            size="lg" 
+            onClick={goToNext}
+            className="absolute -right-20 top-1/2 transform -translate-y-1/2 z-50 h-12 w-12 p-0 bg-white hover:bg-gray-50 border-2 border-gray-200 shadow-lg rounded-full"
+            style={{ right: '-80px' }}
+          >
+            <ChevronRight className="h-6 w-6" />
+          </Button>
+        )}
+
         <div className="flex flex-col md:flex-row min-h-0 w-full">
           {/* Left side - Images */}
           <div className="md:w-1/2 relative">
-            {/* Close button and navigation */}
-            <div className="absolute top-4 right-4 z-10 flex gap-2">
-              {hasPrevious && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={goToPrevious}
-                  className="h-8 w-8 p-0 bg-white/80 hover:bg-white"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-              )}
-              
-              {hasNext && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={goToNext}
-                  className="h-8 w-8 p-0 bg-white/80 hover:bg-white"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              )}
-              
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={onClose}
-                className="h-8 w-8 p-0 bg-white/80 hover:bg-white"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            {/* Close button */}
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onClose}
+              className="absolute top-4 right-4 z-10 h-8 w-8 p-0 bg-white/80 hover:bg-white"
+            >
+              <X className="h-4 w-4" />
+            </Button>
 
               <div className="aspect-square bg-muted relative group">
                 {product.images.length > 0 ? (
