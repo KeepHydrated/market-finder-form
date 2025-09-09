@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { VendorApplication, VendorApplicationData } from "@/components/VendorApplication";
 import { ProductGrid } from "@/components/ProductGrid";
 import { MarketDetails } from "@/components/MarketDetails";
+import { MarketDetailsModal } from "@/components/MarketDetailsModal";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,12 +26,16 @@ interface Submission {
   search_term: string;
   status: string;
   created_at: string;
+  market_address?: string;
+  market_days?: string[];
+  market_hours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
 }
 
 const Submissions = () => {
   const { user, profile, loading } = useAuth();
   const { toast } = useToast();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [selectedMarket, setSelectedMarket] = useState<Submission | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -50,7 +55,10 @@ const Submissions = () => {
       
       const parsedSubmissions = data?.map(sub => ({
         ...sub,
-        products: typeof sub.products === 'string' ? JSON.parse(sub.products) : sub.products
+        products: typeof sub.products === 'string' ? JSON.parse(sub.products) : sub.products,
+        market_hours: sub.market_hours && typeof sub.market_hours === 'object' && sub.market_hours !== null 
+          ? sub.market_hours as Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>
+          : undefined
       })) || [];
       
       setSubmissions(parsedSubmissions);
@@ -132,7 +140,16 @@ const Submissions = () => {
                           placeholder="Search for a farmers market..."
                           value={submission.selected_market || submission.search_term || ''}
                           readOnly
-                          className="pl-10 h-14 text-lg border-2 border-border rounded-xl"
+                          className={`pl-10 h-14 text-lg border-2 border-border rounded-xl ${
+                            submission.market_address || submission.market_days || submission.market_hours 
+                              ? 'cursor-pointer hover:bg-muted/50' 
+                              : ''
+                          }`}
+                          onClick={() => {
+                            if (submission.market_address || submission.market_days || submission.market_hours) {
+                              setSelectedMarket(submission);
+                            }
+                          }}
                         />
                       </div>
                     </div>
@@ -164,6 +181,18 @@ const Submissions = () => {
           )}
         </div>
       </main>
+
+      {/* Market Details Modal */}
+      {selectedMarket && (
+        <MarketDetailsModal
+          open={!!selectedMarket}
+          onClose={() => setSelectedMarket(null)}
+          marketName={selectedMarket.selected_market || 'Custom Market'}
+          marketAddress={selectedMarket.market_address}
+          marketDays={selectedMarket.market_days}
+          marketHours={selectedMarket.market_hours}
+        />
+      )}
     </div>
   );
 };

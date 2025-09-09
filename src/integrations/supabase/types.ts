@@ -46,6 +46,9 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          market_address: string | null
+          market_days: string[] | null
+          market_hours: Json | null
           primary_specialty: string | null
           products: Json | null
           search_term: string | null
@@ -60,6 +63,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          market_address?: string | null
+          market_days?: string[] | null
+          market_hours?: Json | null
           primary_specialty?: string | null
           products?: Json | null
           search_term?: string | null
@@ -74,6 +80,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          market_address?: string | null
+          market_days?: string[] | null
+          market_hours?: Json | null
           primary_specialty?: string | null
           products?: Json | null
           search_term?: string | null
