@@ -12,6 +12,7 @@ import { AuthForm } from "@/components/auth/AuthForm";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { Plus, ArrowLeft, RotateCcw, Upload, Edit } from "lucide-react";
 
 // Sample data - in a real app, this would come from an API
@@ -91,6 +92,12 @@ const Index = () => {
   const [submittedMarketName, setSubmittedMarketName] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [activeTab, setActiveTab] = useState<string>("submit");
+  const [profileData, setProfileData] = useState({
+    username: "",
+    zipcode: "",
+    avatarUrl: ""
+  });
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
   // Load products from localStorage on component mount
   useEffect(() => {
@@ -104,6 +111,17 @@ const Index = () => {
       }
     }
   }, []);
+
+  // Load profile data when user changes
+  useEffect(() => {
+    if (user && profile) {
+      setProfileData({
+        username: profile.full_name || user.email?.split('@')[0] || "",
+        zipcode: profileData.zipcode,
+        avatarUrl: profile.avatar_url || ""
+      });
+    }
+  }, [user, profile]);
 
   // Save products to localStorage whenever products change
   useEffect(() => {
@@ -167,6 +185,110 @@ const Index = () => {
       title: "Product Added",
       description: "Your product has been successfully added.",
     });
+  };
+
+  // Handle profile picture upload
+  const handleProfilePictureUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 5MB.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        setProfileData(prev => ({
+          ...prev,
+          avatarUrl: reader.result as string
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Get current location and convert to zipcode
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: "Geolocation not supported",
+        description: "Your browser doesn't support geolocation.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoadingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          // Using reverse geocoding to get zipcode (this is a simplified example)
+          // In a real app, you'd use a proper geocoding service
+          const { latitude, longitude } = position.coords;
+          
+          // Simulated zipcode based on coordinates (replace with actual API call)
+          const zipcode = `${Math.floor(latitude)}${Math.floor(Math.abs(longitude))}`.slice(0, 5);
+          
+          setProfileData(prev => ({
+            ...prev,
+            zipcode: zipcode
+          }));
+          
+          toast({
+            title: "Location found",
+            description: `Zipcode updated to ${zipcode}`,
+          });
+        } catch (error) {
+          toast({
+            title: "Error",
+            description: "Failed to get location information.",
+            variant: "destructive"
+          });
+        } finally {
+          setIsLoadingLocation(false);
+        }
+      },
+      (error) => {
+        setIsLoadingLocation(false);
+        toast({
+          title: "Location access denied",
+          description: "Please allow location access to get your zipcode.",
+          variant: "destructive"
+        });
+      }
+    );
+  };
+
+  // Save profile changes
+  const handleSaveProfile = async () => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          user_id: user.id,
+          full_name: profileData.username,
+          avatar_url: profileData.avatarUrl
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile.",
+        variant: "destructive"
+      });
+    }
   };
 
   if (loading) {
@@ -314,8 +436,24 @@ const Index = () => {
                       <div>
                         <h2 className="text-xl font-semibold mb-4">Profile Pic</h2>
                         <div className="flex items-center gap-4">
-                          <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
-                            <Upload className="h-8 w-8 text-muted-foreground" />
+                          <div className="relative">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleProfilePictureUpload}
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            />
+                            <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center border-2 border-dashed border-muted-foreground/30 overflow-hidden">
+                              {profileData.avatarUrl ? (
+                                <img 
+                                  src={profileData.avatarUrl} 
+                                  alt="Profile" 
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <Upload className="h-8 w-8 text-muted-foreground" />
+                              )}
+                            </div>
                           </div>
                           <div className="text-muted-foreground">
                             JPG, PNG or GIF (max 5MB)
@@ -327,9 +465,10 @@ const Index = () => {
                       <div>
                         <h2 className="text-xl font-semibold mb-4">Username</h2>
                         <Input 
-                          value="nadiachibri" 
-                          className="bg-muted" 
-                          readOnly 
+                          value={profileData.username} 
+                          onChange={(e) => setProfileData(prev => ({ ...prev, username: e.target.value }))}
+                          className="bg-background" 
+                          placeholder="Enter your username"
                         />
                       </div>
 
@@ -338,12 +477,17 @@ const Index = () => {
                         <h2 className="text-xl font-semibold mb-4">Location</h2>
                         <div className="flex gap-4 items-center mb-2">
                           <Input 
+                            value={profileData.zipcode}
+                            onChange={(e) => setProfileData(prev => ({ ...prev, zipcode: e.target.value }))}
                             placeholder="Zipcode will appear here..." 
-                            className="bg-muted flex-1" 
-                            readOnly 
+                            className="bg-background flex-1" 
                           />
-                          <Button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2">
-                            <RotateCcw className="h-4 w-4" />
+                          <Button 
+                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2"
+                            onClick={getCurrentLocation}
+                            disabled={isLoadingLocation}
+                          >
+                            <RotateCcw className={`h-4 w-4 ${isLoadingLocation ? 'animate-spin' : ''}`} />
                           </Button>
                         </div>
                         <p className="text-sm text-muted-foreground">
@@ -353,7 +497,10 @@ const Index = () => {
 
                       {/* Edit Profile Button */}
                       <div className="pt-4">
-                        <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3">
+                        <Button 
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3"
+                          onClick={handleSaveProfile}
+                        >
                           <Edit className="h-4 w-4 mr-2" />
                           Edit Profile
                         </Button>
