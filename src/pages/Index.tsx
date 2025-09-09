@@ -224,10 +224,16 @@ const Index = () => {
 
       {/* Sidebar and Main Content */}
       <div className="flex">
-        {/* Left Sidebar - Blank Box */}
+        {/* Left Sidebar - Navigation Tabs */}
         <div className="w-64 bg-card border-r border-border min-h-[calc(100vh-4rem)]">
-          <div className="p-4">
-            <div className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-center font-medium cursor-pointer hover:bg-primary/90 transition-colors">
+          <div className="p-4 space-y-2">
+            <div className="px-4 py-3 rounded-md text-muted-foreground hover:bg-muted cursor-pointer transition-colors">
+              Profile
+            </div>
+            <div className="px-4 py-3 rounded-md text-muted-foreground hover:bg-muted cursor-pointer transition-colors">
+              Account
+            </div>
+            <div className="px-4 py-3 rounded-md bg-primary/10 text-primary font-medium cursor-pointer transition-colors border border-primary/20">
               Submit
             </div>
           </div>
