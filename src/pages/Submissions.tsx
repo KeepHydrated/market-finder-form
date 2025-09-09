@@ -158,6 +158,34 @@ const Submissions = () => {
             {/* Navigation Controls */}
             {submissions.length > 0 && (
               <div className="bg-card border border-border rounded-lg p-4">
+                {/* Accept/Reject Buttons */}
+                <div className="flex gap-2 mb-4">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    onClick={() => {
+                      // TODO: Handle accept logic
+                      console.log('Accept clicked for submission:', currentSubmission?.id);
+                    }}
+                  >
+                    Accept
+                  </Button>
+                  
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => {
+                      // TODO: Handle reject logic
+                      console.log('Reject clicked for submission:', currentSubmission?.id);
+                    }}
+                  >
+                    Reject
+                  </Button>
+                </div>
+
+                {/* Navigation Arrows */}
                 <div className="flex items-center justify-between">
                   <Button
                     variant="outline"
