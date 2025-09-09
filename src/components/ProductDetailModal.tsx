@@ -43,7 +43,7 @@ export const ProductDetailModal = ({ product, open, onClose }: ProductDetailModa
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0">
         <div className="flex flex-col md:flex-row min-h-0">
           {/* Left side - Images */}
           <div className="md:w-1/2 relative">
