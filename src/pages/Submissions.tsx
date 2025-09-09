@@ -141,12 +141,12 @@ const Submissions = () => {
                           value={submission.selected_market || submission.search_term || ''}
                           readOnly
                           className={`pl-10 h-14 text-lg border-2 border-border rounded-xl ${
-                            submission.market_address || submission.market_days || submission.market_hours 
+                            submission.selected_market || submission.search_term || submission.market_address || submission.market_days || submission.market_hours 
                               ? 'cursor-pointer hover:bg-muted/50' 
                               : ''
                           }`}
                           onClick={() => {
-                            if (submission.market_address || submission.market_days || submission.market_hours) {
+                            if (submission.selected_market || submission.search_term || submission.market_address || submission.market_days || submission.market_hours) {
                               setSelectedMarket(submission);
                             }
                           }}
@@ -187,7 +187,7 @@ const Submissions = () => {
         <MarketDetailsModal
           open={!!selectedMarket}
           onClose={() => setSelectedMarket(null)}
-          marketName={selectedMarket.selected_market || 'Custom Market'}
+          marketName={selectedMarket.selected_market || selectedMarket.search_term || 'Custom Market'}
           marketAddress={selectedMarket.market_address}
           marketDays={selectedMarket.market_days}
           marketHours={selectedMarket.market_hours}
