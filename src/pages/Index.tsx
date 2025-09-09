@@ -590,6 +590,21 @@ const Index = () => {
                         </div>
                         <ProductGrid products={products} />
                       </Card>
+
+                      {/* Submit Button */}
+                      <div className="mt-8 flex justify-center">
+                        <Button 
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-12 py-3 text-lg"
+                          onClick={() => {
+                            toast({
+                              title: "Application Submitted",
+                              description: "Your vendor application has been submitted successfully!",
+                            });
+                          }}
+                        >
+                          Submit Application
+                        </Button>
+                      </div>
                     </>
                   )}
                 </>
