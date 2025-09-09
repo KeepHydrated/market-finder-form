@@ -2,6 +2,7 @@ import { useState } from "react";
 import { MarketSearch } from "@/components/MarketSearch";
 import { MarketDetails } from "@/components/MarketDetails";
 import { AddMarketForm } from "@/components/AddMarketForm";
+import { Card } from "@/components/ui/card";
 
 // Sample data - in a real app, this would come from an API
 const sampleMarkets = [
@@ -106,6 +107,11 @@ const Index = () => {
       {/* Main Content */}
       <main className="py-12">
         <div className="container mx-auto px-4">
+          {/* Blank Box */}
+          <Card className="mb-8 p-8 min-h-[200px] bg-card border-border">
+            {/* This is a blank box */}
+          </Card>
+
           {selectedMarket ? (
             <MarketDetails 
               market={selectedMarket} 
