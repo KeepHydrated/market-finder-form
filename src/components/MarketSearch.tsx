@@ -114,8 +114,8 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
       </div>
 
       {showResults && (
-        <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50 max-h-80 overflow-y-auto">
-          <div className="py-2">
+        <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
+          <div className="max-h-60 overflow-y-auto">
             {visibleMarkets.map((market, index) => (
               <button
                 key={market.id}
@@ -131,28 +131,27 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
                 </div>
               </button>
             ))}
-            
-            <button
-              onClick={onAddMarket}
-              className={cn(
-                "w-full px-4 py-3 text-left hover:bg-muted transition-colors flex items-center gap-2",
-                visibleMarkets.length > 0 && "border-t border-border mt-1",
-                selectedIndex === visibleMarkets.length && "bg-muted"
-              )}
-            >
-              {hasTextInSearch ? (
-                <>
-                  <Edit className="h-4 w-4 text-success" />
-                  <span className="text-success font-medium">Edit market</span>
-                </>
-              ) : (
-                <>
-                  <Plus className="h-4 w-4 text-success" />
-                  <span className="text-success font-medium">Add your market</span>
-                </>
-              )}
-            </button>
           </div>
+          
+          <button
+            onClick={onAddMarket}
+            className={cn(
+              "w-full px-4 py-3 text-left hover:bg-muted transition-colors flex items-center gap-2 border-t border-border",
+              selectedIndex === visibleMarkets.length && "bg-muted"
+            )}
+          >
+            {hasTextInSearch ? (
+              <>
+                <Edit className="h-4 w-4 text-success" />
+                <span className="text-success font-medium">Edit market</span>
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4 text-success" />
+                <span className="text-success font-medium">Add your market</span>
+              </>
+            )}
+          </button>
         </Card>
       )}
     </div>
