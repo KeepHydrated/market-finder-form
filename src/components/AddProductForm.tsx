@@ -24,16 +24,10 @@ export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductForm
     const files = Array.from(e.target.files || []);
     const remainingSlots = 5 - images.length;
     
-    if (files.length > remainingSlots) {
-      toast({
-        title: "Too many images",
-        description: `You can only add ${remainingSlots} more image(s). Maximum is 5 images total.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setImages(prev => [...prev, ...files]);
+    // Take only the first files that fit within the limit
+    const filesToAdd = files.slice(0, remainingSlots);
+    
+    setImages(prev => [...prev, ...filesToAdd]);
   };
 
   const removeImage = (index: number) => {
