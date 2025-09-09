@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
@@ -112,11 +112,9 @@ export const ProductDetailModal = ({ product, open, onClose }: ProductDetailModa
 
           {/* Right side - Product info */}
           <div className="md:w-1/2 p-6 flex flex-col justify-center">
-            <DialogHeader className="mb-0">
-              <DialogTitle className="text-2xl font-bold">{product.name}</DialogTitle>
-            </DialogHeader>
+            <h2 className="text-2xl font-bold mb-6">{product.name}</h2>
             
-            <div className="space-y-6 mt-6">
+            <div className="space-y-6">
               <div>
                 <span className="text-3xl font-bold text-primary">
                   ${product.price.toFixed(2)}
