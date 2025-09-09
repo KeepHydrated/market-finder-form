@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/Header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin } from "lucide-react";
+import { MapPin, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AcceptedSubmission {
@@ -132,7 +132,8 @@ const Homepage = () => {
                   )}
                   
                   {submission.market_hours && (
-                    <div className="text-sm text-muted-foreground">
+                    <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <Clock className="w-4 h-4 mt-0.5" />
                       {formatMarketHours(submission.market_hours)}
                     </div>
                   )}
