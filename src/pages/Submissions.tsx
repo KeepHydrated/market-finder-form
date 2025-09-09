@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { UserMenu } from "@/components/auth/UserMenu";
@@ -35,6 +35,7 @@ interface Submission {
 const Submissions = () => {
   const { user, profile, loading } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [selectedMarket, setSelectedMarket] = useState<Submission | null>(null);
 
@@ -113,10 +114,7 @@ const Submissions = () => {
           <div className="w-64 flex-shrink-0">
             <div 
               className="bg-card border border-border rounded-lg p-6 cursor-pointer hover:bg-muted/50 transition-colors"
-              onClick={() => {
-                // TODO: Navigate to profile page or open profile modal
-                console.log('Profile clicked');
-              }}
+              onClick={() => navigate('/')}
             >
               <div className="text-center">
                 <div className="w-16 h-16 bg-muted rounded-full mx-auto mb-4 flex items-center justify-center">
