@@ -118,7 +118,8 @@ const Homepage = () => {
                   </h3>
                   
                   {submission.market_address && (
-                    <div className="text-sm text-muted-foreground">
+                    <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <img src="/lovable-uploads/ca46fc05-9c4c-4370-a0c1-5a6dad09bae8.png" alt="Location" className="w-4 h-4 mt-0.5" />
                       {submission.market_address}
                     </div>
                   )}
