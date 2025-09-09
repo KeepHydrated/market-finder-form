@@ -155,11 +155,10 @@ const Submissions = () => {
               </div>
             </div>
 
-            {/* Navigation Controls */}
+            {/* Accept/Reject Buttons */}
             {submissions.length > 0 && (
-              <div className="bg-card border border-border rounded-lg p-4">
-                {/* Accept/Reject Buttons */}
-                <div className="flex gap-2 mb-4">
+              <div className="bg-card border border-border rounded-lg p-4 mb-4">
+                <div className="flex gap-2">
                   <Button
                     variant="default"
                     size="sm"
@@ -184,8 +183,12 @@ const Submissions = () => {
                     Reject
                   </Button>
                 </div>
+              </div>
+            )}
 
-                {/* Navigation Arrows */}
+            {/* Navigation Controls */}
+            {submissions.length > 0 && (
+              <div className="bg-card border border-border rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <Button
                     variant="outline"
