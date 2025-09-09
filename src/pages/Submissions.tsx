@@ -114,6 +114,14 @@ const Submissions = () => {
                     </span>
                   </div>
                   
+                  {/* Selected Market */}
+                  {submission.selected_market && (
+                    <Card className="mb-6 p-6">
+                      <h4 className="text-lg font-semibold mb-2">Selected Farmers Market</h4>
+                      <p className="text-foreground">{submission.selected_market}</p>
+                    </Card>
+                  )}
+
                   {/* Vendor Application */}
                   <Card className="mb-6 p-6">
                     <VendorApplication 
