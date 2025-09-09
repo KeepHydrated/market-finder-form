@@ -93,7 +93,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
 
           <div className="space-y-4">
             <Label>Market Days *</Label>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {DAYS.map((day) => (
                 <Button
                   key={day}
@@ -101,7 +101,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
                   variant={selectedDays.includes(day) ? "default" : "outline"}
                   onClick={() => toggleDay(day)}
                   className={cn(
-                    "h-12 px-6",
+                    "h-12 flex-1 min-w-[70px]",
                     selectedDays.includes(day) && "bg-earth text-earth-foreground hover:bg-earth/90"
                   )}
                 >
