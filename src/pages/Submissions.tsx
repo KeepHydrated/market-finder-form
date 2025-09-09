@@ -13,6 +13,7 @@ import { MarketDetailsModal } from "@/components/MarketDetailsModal";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Search } from "lucide-react";
 
 interface Submission {
@@ -128,43 +129,49 @@ const Submissions = () => {
                   
                   {/* Vendor Application */}
                   <Card className="p-6">
-                    {/* Market Selection Info */}
-                    <div className="space-y-2 mb-6">
-                      <label className="text-lg font-medium text-foreground">
-                        Which farmers market do you want to join? *
-                      </label>
-                      
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input
-                          type="text"
-                          placeholder="Search for a farmers market..."
-                          value={submission.selected_market || submission.search_term || ''}
-                          readOnly
-                          className={`pl-10 h-14 text-lg border-2 border-border rounded-xl ${
-                            submission.selected_market || submission.search_term || submission.market_address || submission.market_days || submission.market_hours 
-                              ? 'cursor-pointer hover:bg-muted/50' 
-                              : ''
-                          }`}
-                          onClick={() => {
-                            if (submission.selected_market || submission.search_term || submission.market_address || submission.market_days || submission.market_hours) {
-                              setSelectedMarket(submission);
-                            }
-                          }}
-                        />
+                    <div className="w-full max-w-2xl mx-auto">
+                      <div className="space-y-6">
+                        {/* Market Selection Info */}
+                        <div className="space-y-2">
+                          <Label className="text-lg font-medium text-foreground">
+                            Which farmers market do you want to join? *
+                          </Label>
+                          
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input
+                              type="text"
+                              placeholder="Search for a farmers market..."
+                              value={submission.selected_market || submission.search_term || ''}
+                              readOnly
+                              className={`pl-10 h-14 text-lg border-2 border-border rounded-xl ${
+                                submission.selected_market || submission.search_term || submission.market_address || submission.market_days || submission.market_hours 
+                                  ? 'cursor-pointer hover:bg-muted/50' 
+                                  : ''
+                              }`}
+                              onClick={() => {
+                                if (submission.selected_market || submission.search_term || submission.market_address || submission.market_days || submission.market_hours) {
+                                  setSelectedMarket(submission);
+                                }
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Vendor Application Form */}
+                        <div className="space-y-6">
+                          <VendorApplication 
+                            data={{
+                              storeName: submission.store_name,
+                              primarySpecialty: submission.primary_specialty,
+                              website: submission.website,
+                              description: submission.description
+                            }}
+                            readOnly={true}
+                          />
+                        </div>
                       </div>
                     </div>
-
-                    {/* Vendor Application Form */}
-                    <VendorApplication 
-                      data={{
-                        storeName: submission.store_name,
-                        primarySpecialty: submission.primary_specialty,
-                        website: submission.website,
-                        description: submission.description
-                      }}
-                      readOnly={true}
-                    />
                   </Card>
 
                   {/* Products */}
