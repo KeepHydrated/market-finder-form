@@ -39,6 +39,9 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
   const visibleMarkets = markets; // Always show all markets
   const totalItems = visibleMarkets.length + 1; // +1 for "Add Market" option
   const hasTextInSearch = searchTerm.trim().length > 0;
+  const searchMatchesExistingMarket = hasTextInSearch && markets.some(market => 
+    market.name.toLowerCase() === searchTerm.toLowerCase().trim()
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -140,7 +143,7 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
               selectedIndex === visibleMarkets.length && "bg-muted"
             )}
           >
-            {hasTextInSearch ? (
+            {searchMatchesExistingMarket ? (
               <>
                 <Edit className="h-4 w-4 text-success" />
                 <span className="text-success font-medium">Edit market</span>
@@ -148,7 +151,7 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
             ) : (
               <>
                 <Plus className="h-4 w-4 text-success" />
-                <span className="text-success font-medium">Add your market</span>
+                <span className="text-success font-medium">Add market</span>
               </>
             )}
           </button>
