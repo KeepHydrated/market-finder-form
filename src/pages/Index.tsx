@@ -3,7 +3,9 @@ import { MarketSearch } from "@/components/MarketSearch";
 import { MarketDetails } from "@/components/MarketDetails";
 import { AddMarketForm } from "@/components/AddMarketForm";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { VendorApplication } from "@/components/VendorApplication";
+import { Plus } from "lucide-react";
 
 // Sample data - in a real app, this would come from an API
 const sampleMarkets = [
@@ -117,9 +119,18 @@ const Index = () => {
                 <VendorApplication />
               </Card>
               
-              {/* Second Blank Box */}
-              <Card className="mt-8 p-8 min-h-[200px] bg-card border-border">
-                {/* This is another blank box */}
+              {/* Products Section */}
+              <Card className="mt-8 p-8 bg-card border-border">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold text-foreground">Products</h2>
+                  <Button className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add Product
+                  </Button>
+                </div>
+                <div className="min-h-[100px] flex items-center justify-center text-muted-foreground">
+                  {/* Products will be displayed here */}
+                </div>
               </Card>
             </>
           )}
