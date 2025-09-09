@@ -14,7 +14,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Search } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Submission {
   id: string;
@@ -38,6 +38,7 @@ const Submissions = () => {
   const navigate = useNavigate();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [selectedMarket, setSelectedMarket] = useState<Submission | null>(null);
+  const [currentSubmissionIndex, setCurrentSubmissionIndex] = useState(0);
 
   useEffect(() => {
     if (user) {
@@ -64,10 +65,21 @@ const Submissions = () => {
       })) || [];
       
       setSubmissions(parsedSubmissions);
+      setCurrentSubmissionIndex(0); // Reset to first submission when data changes
     } catch (error) {
       console.error('Error fetching submissions:', error);
     }
   };
+
+  const goToPreviousSubmission = () => {
+    setCurrentSubmissionIndex(prev => Math.max(0, prev - 1));
+  };
+
+  const goToNextSubmission = () => {
+    setCurrentSubmissionIndex(prev => Math.min(submissions.length - 1, prev + 1));
+  };
+
+  const currentSubmission = submissions[currentSubmissionIndex];
 
   if (loading) {
     return (
@@ -113,7 +125,7 @@ const Submissions = () => {
           {/* Left Sidebar - User Profile */}
           <div className="w-64 flex-shrink-0">
             <div 
-              className="bg-card border border-border rounded-lg p-6 cursor-pointer hover:bg-muted/50 transition-colors"
+              className="bg-card border border-border rounded-lg p-6 cursor-pointer hover:bg-muted/50 transition-colors mb-4"
               onClick={() => navigate('/')}
             >
               <div className="text-center">
@@ -142,6 +154,35 @@ const Submissions = () => {
                 </p>
               </div>
             </div>
+
+            {/* Navigation Controls */}
+            {submissions.length > 0 && (
+              <div className="bg-card border border-border rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToPreviousSubmission}
+                    disabled={currentSubmissionIndex === 0}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  
+                  <span className="text-sm text-muted-foreground">
+                    {currentSubmissionIndex + 1} of {submissions.length}
+                  </span>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToNextSubmission}
+                    disabled={currentSubmissionIndex === submissions.length - 1}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Main Content Area */}
@@ -153,69 +194,64 @@ const Submissions = () => {
                   Your submitted applications will appear here.
                 </p>
               </div>
-            ) : (
-              <div className="space-y-8">
-                {submissions.map((submission) => (
-                  <div key={submission.id} className="border rounded-lg p-6 bg-card">
-                    
-                    {/* Vendor Application */}
-                    <Card className="p-6">
-                      <div className="w-full max-w-2xl mx-auto">
-                        <div className="space-y-6">
-                          {/* Market Selection Info */}
-                          <div className="space-y-2">
-                            <Label className="text-lg font-medium text-foreground">
-                              Which farmers market do you want to join? *
-                            </Label>
-                            
-                            <div className="relative">
-                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                              <Input
-                                type="text"
-                                placeholder="Search for a farmers market..."
-                                value={submission.selected_market || submission.search_term || ''}
-                                readOnly
-                                className={`pl-10 h-14 text-lg border-2 border-border rounded-xl ${
-                                  submission.selected_market || submission.search_term || submission.market_address || submission.market_days || submission.market_hours 
-                                    ? 'cursor-pointer hover:bg-muted/50' 
-                                    : ''
-                                }`}
-                                onClick={() => {
-                                  if (submission.selected_market || submission.search_term || submission.market_address || submission.market_days || submission.market_hours) {
-                                    setSelectedMarket(submission);
-                                  }
-                                }}
-                              />
-                            </div>
-                          </div>
-
-                          {/* Vendor Application Form */}
-                          <div className="space-y-6">
-                            <VendorApplication 
-                              data={{
-                                storeName: submission.store_name,
-                                primarySpecialty: submission.primary_specialty,
-                                website: submission.website,
-                                description: submission.description
-                              }}
-                              readOnly={true}
-                            />
-                          </div>
+            ) : currentSubmission ? (
+              <div className="border rounded-lg p-6 bg-card">
+                {/* Vendor Application */}
+                <Card className="p-6">
+                  <div className="w-full max-w-2xl mx-auto">
+                    <div className="space-y-6">
+                      {/* Market Selection Info */}
+                      <div className="space-y-2">
+                        <Label className="text-lg font-medium text-foreground">
+                          Which farmers market do you want to join? *
+                        </Label>
+                        
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                          <Input
+                            type="text"
+                            placeholder="Search for a farmers market..."
+                            value={currentSubmission.selected_market || currentSubmission.search_term || ''}
+                            readOnly
+                            className={`pl-10 h-14 text-lg border-2 border-border rounded-xl ${
+                              currentSubmission.selected_market || currentSubmission.search_term || currentSubmission.market_address || currentSubmission.market_days || currentSubmission.market_hours 
+                                ? 'cursor-pointer hover:bg-muted/50' 
+                                : ''
+                            }`}
+                            onClick={() => {
+                              if (currentSubmission.selected_market || currentSubmission.search_term || currentSubmission.market_address || currentSubmission.market_days || currentSubmission.market_hours) {
+                                setSelectedMarket(currentSubmission);
+                              }
+                            }}
+                          />
                         </div>
                       </div>
-                    </Card>
 
-                    {/* Products */}
-                    {submission.products && submission.products.length > 0 && (
-                      <Card className="p-6">
-                        <h4 className="text-lg font-semibold mb-4">Products</h4>
-                        <ProductGrid products={submission.products} />
-                      </Card>
-                    )}
+                      {/* Vendor Application Form */}
+                      <div className="space-y-6">
+                        <VendorApplication 
+                          data={{
+                            storeName: currentSubmission.store_name,
+                            primarySpecialty: currentSubmission.primary_specialty,
+                            website: currentSubmission.website,
+                            description: currentSubmission.description
+                          }}
+                          readOnly={true}
+                        />
+                      </div>
+                    </div>
                   </div>
-                ))}
+                </Card>
+
+                {/* Products */}
+                {currentSubmission.products && currentSubmission.products.length > 0 && (
+                  <Card className="p-6 mt-6">
+                    <h4 className="text-lg font-semibold mb-4">Products</h4>
+                    <ProductGrid products={currentSubmission.products} />
+                  </Card>
+                )}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </main>
