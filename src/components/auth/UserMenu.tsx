@@ -30,7 +30,7 @@ export function UserMenu({ user, profile }: UserMenuProps) {
   };
 
   const getInitials = (name?: string) => {
-    if (!name) return user.email?.charAt(0).toUpperCase() || 'U';
+    if (!name) return user?.email?.charAt(0).toUpperCase() || 'U';
     return name
       .split(' ')
       .map((n) => n.charAt(0))
@@ -38,6 +38,11 @@ export function UserMenu({ user, profile }: UserMenuProps) {
       .toUpperCase()
       .slice(0, 2);
   };
+
+  // Don't render the menu if user is null
+  if (!user) {
+    return null;
+  }
 
   return (
     <DropdownMenu>
@@ -56,7 +61,7 @@ export function UserMenu({ user, profile }: UserMenuProps) {
               {profile?.full_name || 'User'}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {user.email}
+              {user?.email}
             </p>
           </div>
         </DropdownMenuLabel>
