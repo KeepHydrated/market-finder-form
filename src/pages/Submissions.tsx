@@ -245,12 +245,12 @@ const Submissions = () => {
                             value={currentSubmission.selected_market || currentSubmission.search_term || ''}
                             readOnly
                             className={`pl-10 h-14 text-lg border-2 border-border rounded-xl ${
-                              currentSubmission.selected_market || currentSubmission.search_term || currentSubmission.market_address || currentSubmission.market_days || currentSubmission.market_hours 
+                              (currentSubmission.market_address || currentSubmission.market_days || currentSubmission.market_hours) 
                                 ? 'cursor-pointer hover:bg-muted/50' 
                                 : ''
                             }`}
                             onClick={() => {
-                              if (currentSubmission.selected_market || currentSubmission.search_term || currentSubmission.market_address || currentSubmission.market_days || currentSubmission.market_hours) {
+                              if (currentSubmission.market_address || currentSubmission.market_days || currentSubmission.market_hours) {
                                 setSelectedMarket(currentSubmission);
                               }
                             }}
