@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/Header";
 import { Card } from "@/components/ui/card";
@@ -23,6 +24,7 @@ interface AcceptedSubmission {
 
 const Homepage = () => {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<AcceptedSubmission[]>([]);
 
   useEffect(() => {
@@ -96,7 +98,11 @@ const Homepage = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {acceptedSubmissions.map((submission) => (
-              <Card key={submission.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <Card 
+                key={submission.id} 
+                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
+                onClick={() => navigate(`/vendor/${submission.id}`)}
+              >
                 {/* Product Image */}
                 <div className="aspect-video bg-muted relative">
                   {submission.products && submission.products.length > 0 && submission.products[0].images && submission.products[0].images.length > 0 ? (
