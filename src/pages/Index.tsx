@@ -2,6 +2,7 @@ import { useState } from "react";
 import { MarketSearch } from "@/components/MarketSearch";
 import { MarketDetails } from "@/components/MarketDetails";
 import { AddMarketForm } from "@/components/AddMarketForm";
+import { AddProductForm } from "@/components/AddProductForm";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { VendorApplication } from "@/components/VendorApplication";
@@ -69,6 +70,7 @@ interface Market {
 const Index = () => {
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showAddProductForm, setShowAddProductForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedMarketName, setSubmittedMarketName] = useState<string | null>(null);
 
@@ -91,6 +93,18 @@ const Index = () => {
   const handleMarketAdded = (marketName: string) => {
     setSearchTerm(marketName);
     setSubmittedMarketName(marketName);
+  };
+
+  const handleAddProduct = () => {
+    setShowAddProductForm(true);
+  };
+
+  const handleCloseAddProductForm = () => {
+    setShowAddProductForm(false);
+  };
+
+  const handleProductAdded = (productName: string) => {
+    console.log('Product added:', productName);
   };
 
   return (
@@ -123,7 +137,7 @@ const Index = () => {
               <Card className="mt-8 p-8 bg-card border-border">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-semibold text-foreground">Products</h2>
-                  <Button className="flex items-center gap-2">
+                  <Button className="flex items-center gap-2" onClick={handleAddProduct}>
                     <Plus className="h-4 w-4" />
                     Add Product
                   </Button>
@@ -141,6 +155,12 @@ const Index = () => {
         open={showAddForm} 
         onClose={handleCloseAddForm}
         onMarketAdded={handleMarketAdded}
+      />
+      
+      <AddProductForm 
+        open={showAddProductForm} 
+        onClose={handleCloseAddProductForm}
+        onProductAdded={handleProductAdded}
       />
     </div>
   );
