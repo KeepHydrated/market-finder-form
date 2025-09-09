@@ -13,14 +13,36 @@ interface Product {
 
 interface ProductDetailModalProps {
   product: Product | null;
+  products: Product[];
   open: boolean;
   onClose: () => void;
+  onProductChange?: (product: Product) => void;
 }
 
-export const ProductDetailModal = ({ product, open, onClose }: ProductDetailModalProps) => {
+export const ProductDetailModal = ({ product, products, open, onClose, onProductChange }: ProductDetailModalProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   if (!product) return null;
+
+  const currentProductIndex = products.findIndex(p => p.id === product.id);
+  const hasPrevious = currentProductIndex > 0;
+  const hasNext = currentProductIndex < products.length - 1;
+
+  const goToPrevious = () => {
+    if (hasPrevious) {
+      const previousProduct = products[currentProductIndex - 1];
+      setCurrentImageIndex(0);
+      onProductChange?.(previousProduct);
+    }
+  };
+
+  const goToNext = () => {
+    if (hasNext) {
+      const nextProduct = products[currentProductIndex + 1];
+      setCurrentImageIndex(0);
+      onProductChange?.(nextProduct);
+    }
+  };
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => 
@@ -43,6 +65,29 @@ export const ProductDetailModal = ({ product, open, onClose }: ProductDetailModa
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
+      {/* External navigation arrows */}
+      {hasPrevious && (
+        <Button
+          variant="secondary"
+          size="lg"
+          onClick={goToPrevious}
+          className="fixed left-4 top-1/2 transform -translate-y-1/2 z-[60] h-12 w-12 p-0 bg-white/90 hover:bg-white border-2 border-border shadow-lg"
+        >
+          <ChevronLeft className="h-6 w-6" />
+        </Button>
+      )}
+      
+      {hasNext && (
+        <Button
+          variant="secondary"
+          size="lg"
+          onClick={goToNext}
+          className="fixed right-4 top-1/2 transform -translate-y-1/2 z-[60] h-12 w-12 p-0 bg-white/90 hover:bg-white border-2 border-border shadow-lg"
+        >
+          <ChevronRight className="h-6 w-6" />
+        </Button>
+      )}
+
       <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0 flex [&>button]:hidden">
         <div className="flex flex-col md:flex-row min-h-0 w-full">
           {/* Left side - Images */}

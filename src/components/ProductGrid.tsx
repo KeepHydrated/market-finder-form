@@ -147,8 +147,10 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
       
       <ProductDetailModal
         product={selectedProduct}
+        products={products}
         open={isModalOpen}
         onClose={handleCloseModal}
+        onProductChange={setSelectedProduct}
       />
     </>
   );
