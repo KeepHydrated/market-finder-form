@@ -189,85 +189,87 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Left Sidebar - Blank Box */}
-      <div className="w-64 bg-card border-r border-border">
-        {/* Blank sidebar content */}
-      </div>
-
-      {/* Main Content Area */}
-      <div className="flex-1">
-        {/* Header */}
-        <header className="bg-card shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              <div className="flex items-center">
-                {selectedMarket && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleBackToSearch}
-                    className="mr-4"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </Button>
-                )}
-                <h1 className="text-2xl font-bold">
-                  Farmer's Market Hub
-                </h1>
-              </div>
-              <div className="flex items-center space-x-4">
-                {!selectedMarket && (
-                  <Button onClick={handleAddMarket}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Market
-                  </Button>
-                )}
-                <UserMenu user={user} profile={profile} />
-              </div>
+    <div className="min-h-screen bg-background">
+      {/* Header spans full width */}
+      <header className="bg-card shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              {selectedMarket && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleBackToSearch}
+                  className="mr-4"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              )}
+              <h1 className="text-2xl font-bold">
+                Farmer's Market Hub
+              </h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              {!selectedMarket && (
+                <Button onClick={handleAddMarket}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Market
+                </Button>
+              )}
+              <UserMenu user={user} profile={profile} />
             </div>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* Main Content */}
-        <main className="py-12">
-          <div className="container mx-auto px-4">
-            {selectedMarket ? (
-              <MarketDetails 
-                market={selectedMarket} 
-                onBack={handleBackToSearch} 
-              />
-            ) : (
-              <>
-                <MarketSearch 
-                  markets={sampleMarkets}
-                  onSelectMarket={handleSelectMarket}
-                  onAddMarket={handleAddMarket}
-                  searchTerm={searchTerm}
-                  onSearchTermChange={setSearchTerm}
-                  submittedMarketName={submittedMarketName}
+      {/* Sidebar and Main Content */}
+      <div className="flex">
+        {/* Left Sidebar - Blank Box */}
+        <div className="w-64 bg-card border-r border-border min-h-[calc(100vh-4rem)]">
+          {/* Blank sidebar content */}
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1">
+          <main className="py-12">
+            <div className="container mx-auto px-4">
+              {selectedMarket ? (
+                <MarketDetails 
+                  market={selectedMarket} 
+                  onBack={handleBackToSearch} 
                 />
-                
-                {/* Vendor Application Form */}
-                <Card className="mt-8 p-8 bg-card border-border">
-                  <VendorApplication />
-                </Card>
-                
-                {/* Products Section */}
-                <Card className="mt-8 p-8 bg-card border-border">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-semibold text-foreground">Products</h2>
-                    <Button className="flex items-center gap-2" onClick={handleAddProduct}>
-                      <Plus className="h-4 w-4" />
-                      Add Product
-                    </Button>
-                  </div>
-                  <ProductGrid products={products} />
-                </Card>
-              </>
-            )}
-          </div>
-        </main>
+              ) : (
+                <>
+                  <MarketSearch 
+                    markets={sampleMarkets}
+                    onSelectMarket={handleSelectMarket}
+                    onAddMarket={handleAddMarket}
+                    searchTerm={searchTerm}
+                    onSearchTermChange={setSearchTerm}
+                    submittedMarketName={submittedMarketName}
+                  />
+                  
+                  {/* Vendor Application Form */}
+                  <Card className="mt-8 p-8 bg-card border-border">
+                    <VendorApplication />
+                  </Card>
+                  
+                  {/* Products Section */}
+                  <Card className="mt-8 p-8 bg-card border-border">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-semibold text-foreground">Products</h2>
+                      <Button className="flex items-center gap-2" onClick={handleAddProduct}>
+                        <Plus className="h-4 w-4" />
+                        Add Product
+                      </Button>
+                    </div>
+                    <ProductGrid products={products} />
+                  </Card>
+                </>
+              )}
+            </div>
+          </main>
+        </div>
       </div>
 
       <AddMarketForm 
