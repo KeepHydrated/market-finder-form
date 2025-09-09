@@ -35,8 +35,9 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
     market.state.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const showResults = isOpen && searchTerm.length > 0;
-  const totalItems = filteredMarkets.length + 1; // +1 for "Add Market" option
+  const showResults = isOpen;
+  const visibleMarkets = searchTerm.length > 0 ? filteredMarkets : [];
+  const totalItems = visibleMarkets.length + 1; // +1 for "Add Market" option
   const hasTextInSearch = searchTerm.trim().length > 0;
 
   useEffect(() => {
@@ -65,9 +66,9 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
         break;
       case 'Enter':
         e.preventDefault();
-        if (selectedIndex >= 0 && selectedIndex < filteredMarkets.length) {
-          handleSelectMarket(filteredMarkets[selectedIndex]);
-        } else if (selectedIndex === filteredMarkets.length) {
+        if (selectedIndex >= 0 && selectedIndex < visibleMarkets.length) {
+          handleSelectMarket(visibleMarkets[selectedIndex]);
+        } else if (selectedIndex === visibleMarkets.length) {
           onAddMarket();
         }
         break;
@@ -115,7 +116,7 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
       {showResults && (
         <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50 max-h-80 overflow-y-auto">
           <div className="py-2">
-            {filteredMarkets.map((market, index) => (
+            {visibleMarkets.map((market, index) => (
               <button
                 key={market.id}
                 onClick={() => handleSelectMarket(market)}
@@ -134,8 +135,9 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
             <button
               onClick={onAddMarket}
               className={cn(
-                "w-full px-4 py-3 text-left hover:bg-muted transition-colors flex items-center gap-2 border-t border-border mt-1",
-                selectedIndex === filteredMarkets.length && "bg-muted"
+                "w-full px-4 py-3 text-left hover:bg-muted transition-colors flex items-center gap-2",
+                visibleMarkets.length > 0 && "border-t border-border mt-1",
+                selectedIndex === visibleMarkets.length && "bg-muted"
               )}
             >
               {hasTextInSearch ? (
