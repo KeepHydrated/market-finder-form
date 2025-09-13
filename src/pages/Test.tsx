@@ -25,7 +25,15 @@ const Test = () => {
       
       {/* Main content */}
       <div className="flex-1">
-        {/* Blank main content */}
+        {/* Top row under header */}
+        <div className="bg-card border-b p-4">
+          {/* Top row content */}
+        </div>
+        
+        {/* Rest of main content */}
+        <div className="p-4">
+          {/* Main content area */}
+        </div>
       </div>
     </div>
   );
