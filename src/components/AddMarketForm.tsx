@@ -119,7 +119,6 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
 
           {selectedDays.length > 0 && (
             <div className="space-y-4">
-              <Label>Market Hours</Label>
               <div className="space-y-4">
                 {selectedDays.map((day) => (
                   <div key={day} className="space-y-3">
