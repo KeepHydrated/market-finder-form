@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, Star } from "lucide-react";
+import { Heart, Star, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AcceptedSubmission {
@@ -120,78 +120,88 @@ const Homepage = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="py-16"></div>
-      <div className="container mx-auto px-4 py-12 flex justify-center">
-
-        {acceptedSubmissions.length === 0 ? (
-          <div className="text-center">
-            <p className="text-muted-foreground">No featured vendors yet.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {acceptedSubmissions.map((submission) => (
-              <Card 
-                key={submission.id} 
-                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
-                onClick={() => navigate('/vendor')}
-              >
-                {/* Product Image */}
-                <div className="aspect-video bg-muted relative">
-                  {submission.products && submission.products.length > 0 && submission.products[0].images && submission.products[0].images.length > 0 ? (
-                    <img 
-                      src={submission.products[0].images[0]} 
-                      alt={submission.products[0].name || 'Product'} 
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                      No Image Available
-                    </div>
-                  )}
-                  
-                  {/* Like Button */}
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Handle like functionality here
-                    }}
-                  >
-                    <Heart className="h-4 w-4 text-gray-600" />
-                  </Button>
-                </div>
-                
-                {/* Store Information */}
-                <div className="p-4 space-y-2">
-                  <h3 className="text-lg font-semibold text-foreground text-left">
-                    {submission.store_name}
-                  </h3>
-                  
-                  {submission.primary_specialty && (
-                    <p className="text-sm text-muted-foreground text-left">
-                      {submission.primary_specialty}
-                    </p>
-                  )}
-
-                  {/* Rating */}
-                  <div className="flex items-center gap-1 pt-1">
-                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                    <span className="text-sm font-medium">
-                      {vendorRatings[submission.id]?.totalReviews > 0 
-                        ? vendorRatings[submission.id].averageRating.toFixed(1)
-                        : '0.0'
-                      }
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      ({vendorRatings[submission.id]?.totalReviews || 0} reviews)
-                    </span>
+      <div className="container mx-auto px-4 py-12">
+        
+        {/* Filter Button */}
+        <div className="flex justify-end mb-6">
+          <Button variant="outline" className="flex items-center gap-2">
+            <Filter className="h-4 w-4" />
+            Filter search results
+          </Button>
+        </div>
+        
+        <div className="flex justify-center">
+          {acceptedSubmissions.length === 0 ? (
+            <div className="text-center">
+              <p className="text-muted-foreground">No featured vendors yet.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {acceptedSubmissions.map((submission) => (
+                <Card 
+                  key={submission.id} 
+                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
+                  onClick={() => navigate('/vendor')}
+                >
+                  {/* Product Image */}
+                  <div className="aspect-video bg-muted relative">
+                    {submission.products && submission.products.length > 0 && submission.products[0].images && submission.products[0].images.length > 0 ? (
+                      <img 
+                        src={submission.products[0].images[0]} 
+                        alt={submission.products[0].name || 'Product'} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                        No Image Available
+                      </div>
+                    )}
+                    
+                    {/* Like Button */}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Handle like functionality here
+                      }}
+                    >
+                      <Heart className="h-4 w-4 text-gray-600" />
+                    </Button>
                   </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
+                  
+                  {/* Store Information */}
+                  <div className="p-4 space-y-2">
+                    <h3 className="text-lg font-semibold text-foreground text-left">
+                      {submission.store_name}
+                    </h3>
+                    
+                    {submission.primary_specialty && (
+                      <p className="text-sm text-muted-foreground text-left">
+                        {submission.primary_specialty}
+                      </p>
+                    )}
+
+                    {/* Rating */}
+                    <div className="flex items-center gap-1 pt-1">
+                      <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                      <span className="text-sm font-medium">
+                        {vendorRatings[submission.id]?.totalReviews > 0 
+                          ? vendorRatings[submission.id].averageRating.toFixed(1)
+                          : '0.0'
+                        }
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        ({vendorRatings[submission.id]?.totalReviews || 0} reviews)
+                      </span>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
