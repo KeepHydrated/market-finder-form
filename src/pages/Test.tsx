@@ -1,4 +1,8 @@
 import { Store, MapPin, Clock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 const Test = () => {
   return (
@@ -27,7 +31,43 @@ const Test = () => {
       <div className="flex-1">
         {/* Top row under header */}
         <div className="bg-card border-b p-8">
-          {/* Top row content */}
+          <div className="grid grid-cols-2 gap-6">
+            {/* Left column */}
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="store-name">Store Name *</Label>
+                <Input id="store-name" placeholder="hhhh" />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="website">Website (Optional)</Label>
+                <Input id="website" placeholder="bbbb" />
+              </div>
+            </div>
+            
+            {/* Right column */}
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="specialty">Primary Specialty</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Home Goods" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="home-goods">Home Goods</SelectItem>
+                    <SelectItem value="food-beverage">Food & Beverage</SelectItem>
+                    <SelectItem value="clothing">Clothing</SelectItem>
+                    <SelectItem value="crafts">Arts & Crafts</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="description">Description *</Label>
+                <Textarea id="description" placeholder="bbb" rows={3} />
+              </div>
+            </div>
+          </div>
         </div>
         
         {/* Rest of main content */}
