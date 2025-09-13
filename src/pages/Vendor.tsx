@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Store, MapPin, Clock, Star, Heart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -5,74 +6,103 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ProductGrid";
+import { useAuth } from "@/hooks/useAuth";
+import { AuthForm } from "@/components/auth/AuthForm";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
+interface AcceptedSubmission {
+  id: string;
+  store_name: string;
+  primary_specialty: string;
+  website: string;
+  description: string;
+  products: any[];
+  selected_market: string;
+  search_term: string;
+  market_address?: string;
+  market_days?: string[];
+  market_hours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
+  created_at: string;
+}
 
 const Vendor = () => {
-  // Sample product data that matches the Product interface
-  const sampleProducts = [
-    {
-      id: 1,
-      name: "Organic Tomatoes",
-      description: "Fresh, locally grown organic tomatoes perfect for salads and cooking.",
-      price: 4.50,
-      images: [
-        "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&h=300&fit=crop"
-      ]
-    },
-    {
-      id: 2,
-      name: "Fresh Carrots",
-      description: "Sweet and crunchy carrots harvested daily from our sustainable farm.",
-      price: 3.25,
-      images: [
-        "https://images.unsplash.com/photo-1445282768818-728615cc910a?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&h=300&fit=crop"
-      ]
-    },
-    {
-      id: 3,
-      name: "Seasonal Herbs",
-      description: "Mixed herbs including basil, parsley, and cilantro grown organically.",
-      price: 2.75,
-      images: [
-        "https://images.unsplash.com/photo-1462536943532-57a629f6cc60?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1515586838455-6483b7b2a6de?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1627664234230-00aaa4b78cb6?w=400&h=300&fit=crop"
-      ]
-    },
-    {
-      id: 4,
-      name: "Apple Variety Pack",
-      description: "A mix of our finest apples including Honeycrisp and Granny Smith.",
-      price: 6.00,
-      images: [
-        "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?w=400&h=300&fit=crop"
-      ]
-    },
-    {
-      id: 5,
-      name: "Leafy Greens Mix",
-      description: "Fresh salad mix with spinach, arugula, and mixed greens.",
-      price: 5.50,
-      images: [
-        "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop"
-      ]
-    },
-    {
-      id: 6,
-      name: "Bell Peppers",
-      description: "Colorful bell peppers in red, yellow, and green varieties.",
-      price: 4.00,
-      images: [
-        "https://images.unsplash.com/photo-1563777249-18556d3a7d5d?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1601001815894-4bb6c81416d2?w=400&h=300&fit=crop"
-      ]
+  const { user, profile, loading } = useAuth();
+  const { toast } = useToast();
+  const [acceptedSubmission, setAcceptedSubmission] = useState<AcceptedSubmission | null>(null);
+  const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    fetchAcceptedSubmission();
+  }, []);
+
+  const fetchAcceptedSubmission = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('*')
+        .eq('status', 'accepted')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+      
+      if (data) {
+        const parsedSubmission = {
+          ...data,
+          products: typeof data.products === 'string' ? JSON.parse(data.products) : data.products,
+          market_hours: data.market_hours && typeof data.market_hours === 'object' && data.market_hours !== null 
+            ? data.market_hours as Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>
+            : undefined
+        };
+        setAcceptedSubmission(parsedSubmission);
+      }
+    } catch (error) {
+      console.error('Error fetching accepted submission:', error);
+    } finally {
+      setLoadingData(false);
     }
-  ];
+  };
+
+  const formatSchedule = (marketDays?: string[], marketHours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>) => {
+    if (!marketDays || !marketHours) return "Schedule TBD";
+    
+    const firstDay = marketDays[0];
+    const hours = marketHours[firstDay];
+    if (!hours) return "Schedule TBD";
+    
+    const dayNames = {
+      'mon': 'Monday', 'tue': 'Tuesday', 'wed': 'Wednesday', 
+      'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday', 'sun': 'Sunday'
+    };
+    
+    const fullDayName = dayNames[firstDay.toLowerCase() as keyof typeof dayNames] || firstDay;
+    return `${fullDayName}, ${hours.start}:00 ${hours.startPeriod} - ${hours.end}:00 ${hours.endPeriod}`;
+  };
+
+  if (loading || loadingData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!acceptedSubmission) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold mb-4">No Vendor Profile Available</h2>
+          <p className="text-muted-foreground">
+            No accepted submissions found. Complete the application process to display your vendor profile.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -80,17 +110,23 @@ const Vendor = () => {
       <div className="w-64 bg-card border-r p-6">
         <div className="space-y-6">
           <div>
-            <span className="text-foreground text-xl font-bold">mmmmmm</span>
+            <span className="text-foreground text-xl font-bold">
+              {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
+            </span>
           </div>
 
           <div className="flex items-start gap-2">
             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <p className="text-muted-foreground text-base font-normal">mmmm</p>
+            <p className="text-muted-foreground text-base font-normal">
+              {acceptedSubmission.market_address || "Address TBD"}
+            </p>
           </div>
 
           <div className="flex items-start gap-2">
             <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <span className="text-muted-foreground text-base font-normal">Tuesday, 08:00 AM - 14:00 PM</span>
+            <span className="text-muted-foreground text-base font-normal">
+              {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours)}
+            </span>
           </div>
         </div>
       </div>
@@ -103,7 +139,7 @@ const Vendor = () => {
             {/* Title row with rating and heart icon */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <h1 className="text-4xl font-bold text-foreground">Farm Fresh Produce</h1>
+                <h1 className="text-4xl font-bold text-foreground">{acceptedSubmission.store_name}</h1>
                 <div className="flex items-center gap-2">
                   <Star className="h-5 w-5 text-yellow-500 fill-current" />
                   <span className="text-foreground font-medium">4.9</span>
@@ -115,15 +151,31 @@ const Vendor = () => {
             
             {/* Category badges */}
             <div className="flex gap-2">
-              <Badge variant="secondary">Organic Vegetables</Badge>
-              <Badge variant="secondary">Seasonal Fruits</Badge>
-              <Badge variant="secondary">Herbs</Badge>
+              {acceptedSubmission.primary_specialty && (
+                <Badge variant="secondary">{acceptedSubmission.primary_specialty}</Badge>
+              )}
+              <Badge variant="secondary">Fresh Produce</Badge>
+              <Badge variant="secondary">Local</Badge>
             </div>
             
             {/* Description */}
             <p className="text-muted-foreground">
-              Family-owned farm providing fresh, organic vegetables and fruits grown with sustainable practices.
+              {acceptedSubmission.description || "Quality produce from local farmers."}
             </p>
+
+            {/* Website */}
+            {acceptedSubmission.website && (
+              <div className="pt-2">
+                <a 
+                  href={acceptedSubmission.website} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  Visit Website
+                </a>
+              </div>
+            )}
           </div>
         </div>
         
@@ -134,7 +186,13 @@ const Vendor = () => {
             <h2 className="text-3xl font-bold text-foreground">Products</h2>
             
             {/* Product Grid */}
-            <ProductGrid products={sampleProducts} />
+            {acceptedSubmission.products && acceptedSubmission.products.length > 0 ? (
+              <ProductGrid products={acceptedSubmission.products} />
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No products available yet.
+              </div>
+            )}
           </div>
         </div>
       </div>
