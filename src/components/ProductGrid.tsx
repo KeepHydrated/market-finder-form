@@ -59,7 +59,7 @@ const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
                   variant="secondary"
                   size="sm"
                   onClick={prevImage}
-                  className="absolute left-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0 bg-white/80 hover:bg-white"
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0 bg-black/80 hover:bg-black text-white border border-white"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -68,7 +68,7 @@ const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
                   variant="secondary"
                   size="sm"
                   onClick={nextImage}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0 bg-white/80 hover:bg-white"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-8 w-8 p-0 bg-black/80 hover:bg-black text-white border border-white"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
