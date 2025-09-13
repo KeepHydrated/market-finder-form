@@ -11,9 +11,8 @@ const Test = () => {
       {/* Left column - narrow width */}
       <div className="w-64 bg-card border-r p-6">
         <div className="space-y-6">
-          <div className="flex items-center gap-2">
-            <Store className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground text-base font-normal">mmmmmm</span>
+          <div>
+            <span className="text-foreground text-xl font-bold">mmmmmm</span>
           </div>
 
           <div className="flex items-start gap-2">
