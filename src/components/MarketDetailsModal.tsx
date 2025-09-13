@@ -55,8 +55,8 @@ export const MarketDetailsModal = ({
               <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
               <div className="space-y-2">
                 {Object.entries(marketHours).map(([day, hours]) => (
-                  <div key={day} className="flex justify-between">
-                    <span className="text-muted-foreground text-base font-normal">{getDayFullName(day)}</span>
+                  <div key={day} className="flex">
+                    <span className="text-muted-foreground text-base font-normal">{getDayFullName(day)}, </span>
                     <span className="text-muted-foreground text-base font-normal">
                       {hours.start} {hours.startPeriod} - {hours.end} {hours.endPeriod}
                     </span>
