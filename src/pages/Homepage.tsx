@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AcceptedSubmission {
@@ -94,6 +96,19 @@ const Homepage = () => {
                       No Image Available
                     </div>
                   )}
+                  
+                  {/* Like Button */}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Handle like functionality here
+                    }}
+                  >
+                    <Heart className="h-4 w-4 text-gray-600" />
+                  </Button>
                 </div>
                 
                 {/* Store Information */}
