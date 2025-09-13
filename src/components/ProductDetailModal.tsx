@@ -76,7 +76,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
             variant="secondary"
             size="lg"
             onClick={goToPrevious}
-            className="fixed left-[calc(50vw-550px)] top-1/2 transform -translate-y-1/2 z-50 h-12 w-12 p-0 bg-white hover:bg-gray-50 border-2 border-gray-200 shadow-lg rounded-full"
+            className="fixed left-[calc(50vw-550px)] top-1/2 transform -translate-y-1/2 z-50 h-12 w-12 p-0 bg-black/80 hover:bg-black text-white border border-white shadow-lg rounded-full"
           >
             <ChevronLeft className="h-6 w-6" />
           </Button>
@@ -87,7 +87,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
             variant="secondary"
             size="lg" 
             onClick={goToNext}
-            className="fixed right-[calc(50vw-550px)] top-1/2 transform -translate-y-1/2 z-50 h-12 w-12 p-0 bg-white hover:bg-gray-50 border-2 border-gray-200 shadow-lg rounded-full"
+            className="fixed right-[calc(50vw-550px)] top-1/2 transform -translate-y-1/2 z-50 h-12 w-12 p-0 bg-black/80 hover:bg-black text-white border border-white shadow-lg rounded-full"
           >
             <ChevronRight className="h-6 w-6" />
           </Button>
@@ -101,7 +101,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
               variant="secondary"
               size="sm"
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 h-8 w-8 p-0 bg-white/80 hover:bg-white"
+              className="absolute top-4 right-4 z-10 h-8 w-8 p-0 bg-black/80 hover:bg-black text-white border border-white"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -122,7 +122,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
                           variant="secondary"
                           size="sm"
                           onClick={prevImage}
-                          className="absolute left-4 top-1/2 transform -translate-y-1/2 h-10 w-10 p-0 bg-white/80 hover:bg-white"
+                          className="absolute left-4 top-1/2 transform -translate-y-1/2 h-10 w-10 p-0 bg-black/80 hover:bg-black text-white border border-white"
                         >
                           <ChevronLeft className="h-5 w-5" />
                         </Button>
@@ -131,7 +131,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
                           variant="secondary"
                           size="sm"
                           onClick={nextImage}
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 h-10 w-10 p-0 bg-white/80 hover:bg-white"
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 h-10 w-10 p-0 bg-black/80 hover:bg-black text-white border border-white"
                         >
                           <ChevronRight className="h-5 w-5" />
                         </Button>
