@@ -548,7 +548,7 @@ const Vendor = () => {
                   {/* Photo Upload Area */}
                   <div className="space-y-3">
                     {selectedPhotos.length < 3 && (
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
                         <input
                           type="file"
                           accept="image/*"
