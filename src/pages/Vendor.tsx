@@ -537,7 +537,7 @@ const Vendor = () => {
                     value={newReview.comment}
                     onChange={(e) => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
                     placeholder={`Share your experience with ${acceptedSubmission.store_name}...`}
-                    className="min-h-[120px] resize-none"
+                    className="min-h-[80px] resize-none"
                   />
                 </div>
 
