@@ -43,17 +43,17 @@ export const MarketDetailsModal = ({
           </div>
 
           {marketAddress && (
-            <div className="space-y-2">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <p className="text-muted-foreground pl-6">{marketAddress}</p>
+            <div className="flex items-start gap-2">
+              <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+              <p className="text-muted-foreground">{marketAddress}</p>
             </div>
           )}
 
 
           {marketHours && Object.keys(marketHours).length > 0 && (
-            <div className="space-y-3">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <div className="space-y-2 pl-6">
+            <div className="flex items-start gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
+              <div className="space-y-2">
                 {Object.entries(marketHours).map(([day, hours]) => (
                   <div key={day} className="flex justify-between">
                     <span className="text-muted-foreground">{getDayFullName(day)}</span>
