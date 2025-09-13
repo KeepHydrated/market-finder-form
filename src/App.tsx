@@ -7,7 +7,6 @@ import { GlobalHeader } from "@/components/GlobalHeader";
 import Index from "./pages/Index";
 import Submissions from "./pages/Submissions";
 import Homepage from "./pages/Homepage";
-import VendorDetails from "./pages/VendorDetails";
 import Test from "./pages/Test";
 import NotFound from "./pages/NotFound";
 
@@ -25,7 +24,6 @@ const App = () => (
           <Route path="/profile" element={<Index />} />
           <Route path="/submissions" element={<Submissions />} />
           <Route path="/homepage" element={<Homepage />} />
-          <Route path="/vendor/:id" element={<VendorDetails />} />
           <Route path="/test" element={<Test />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
