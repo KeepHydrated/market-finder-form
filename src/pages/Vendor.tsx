@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Store, MapPin, Clock, Star, Heart } from "lucide-react";
+import { Store, MapPin, Clock, Star, Heart, Plus, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ProductGrid } from "@/components/ProductGrid";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/auth/AuthForm";
@@ -51,6 +52,7 @@ const Vendor = () => {
   const [reviewStats, setReviewStats] = useState<ReviewStats>({ averageRating: 0, totalReviews: 0 });
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   useEffect(() => {
     fetchAcceptedSubmission();
@@ -248,7 +250,10 @@ const Vendor = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <h1 className="text-4xl font-bold text-foreground">{acceptedSubmission.store_name}</h1>
-                <div className="flex items-center gap-2">
+                <div 
+                  className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
+                  onClick={() => setIsReviewModalOpen(true)}
+                >
                   <Star className="h-5 w-5 text-yellow-500 fill-current" />
                   <span className="text-foreground font-medium">
                     {reviewStats.totalReviews > 0 ? reviewStats.averageRating : 'No rating'}
@@ -306,15 +311,52 @@ const Vendor = () => {
               </div>
             )}
           </div>
+        </div>
+      </div>
 
-          {/* Reviews Section */}
-          <div className="space-y-6 mt-12">
-            <h2 className="text-3xl font-bold text-foreground">Reviews</h2>
-            
+      {/* Review Modal */}
+      <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="flex flex-row items-center justify-between pb-4">
+            <div className="flex items-center gap-3">
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star 
+                    key={star}
+                    className={`h-5 w-5 fill-current ${
+                      reviewStats.totalReviews > 0 && star <= reviewStats.averageRating 
+                        ? 'text-yellow-500' 
+                        : 'text-gray-300'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-lg font-medium">
+                {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'} ({reviewStats.totalReviews} reviews)
+              </span>
+            </div>
+            {user && (
+              <Button
+                className="bg-foreground text-background hover:bg-foreground/90 flex items-center gap-2"
+                onClick={() => {
+                  // Scroll to review form if it exists, or focus on it
+                  const reviewForm = document.getElementById('review-form');
+                  if (reviewForm) {
+                    reviewForm.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                <Plus className="h-4 w-4" />
+                Write Review
+              </Button>
+            )}
+          </DialogHeader>
+
+          <div className="space-y-6">
             {/* Review Form */}
             {user ? (
-              <Card className="p-6">
-                <h3 className="text-xl font-semibold mb-4">Leave a Review</h3>
+              <div id="review-form" className="border rounded-lg p-6">
+                <h3 className="text-lg font-semibold mb-4">Leave a Review</h3>
                 <div className="space-y-4">
                   <div>
                     <Label className="text-sm font-medium mb-2 block">Rating</Label>
@@ -323,18 +365,20 @@ const Vendor = () => {
                         <button
                           key={star}
                           onClick={() => setNewReview(prev => ({ ...prev, rating: star }))}
-                          className={`p-1 ${star <= newReview.rating ? 'text-yellow-500' : 'text-gray-300'}`}
+                          className={`p-1 hover:scale-110 transition-transform ${
+                            star <= newReview.rating ? 'text-yellow-500' : 'text-gray-300'
+                          }`}
                         >
-                          <Star className="h-5 w-5 fill-current" />
+                          <Star className="h-6 w-6 fill-current" />
                         </button>
                       ))}
                     </div>
                   </div>
                   
                   <div>
-                    <Label htmlFor="comment" className="text-sm font-medium mb-2 block">Comment</Label>
+                    <Label htmlFor="modal-comment" className="text-sm font-medium mb-2 block">Comment</Label>
                     <Textarea
-                      id="comment"
+                      id="modal-comment"
                       value={newReview.comment}
                       onChange={(e) => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
                       placeholder="Share your experience..."
@@ -343,25 +387,28 @@ const Vendor = () => {
                   </div>
                   
                   <Button 
-                    onClick={submitReview}
+                    onClick={async () => {
+                      await submitReview();
+                      setIsReviewModalOpen(false);
+                    }}
                     disabled={isSubmittingReview}
-                    className="bg-primary hover:bg-primary/90"
+                    className="bg-primary hover:bg-primary/90 w-full"
                   >
                     {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
                   </Button>
                 </div>
-              </Card>
+              </div>
             ) : (
-              <Card className="p-6 text-center">
+              <div className="text-center py-8">
                 <p className="text-muted-foreground">Please sign in to leave a review.</p>
-              </Card>
+              </div>
             )}
 
             {/* Reviews List */}
-            <div className="space-y-4">
-              {reviews.length > 0 ? (
-                reviews.map((review) => (
-                  <Card key={review.id} className="p-6">
+            {reviews.length > 0 ? (
+              <div className="space-y-4">
+                {reviews.map((review) => (
+                  <div key={review.id} className="border rounded-lg p-4">
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <div className="flex gap-1">
@@ -380,17 +427,18 @@ const Vendor = () => {
                       </div>
                       <p className="text-foreground">{review.comment}</p>
                     </div>
-                  </Card>
-                ))
-              ) : (
-                <Card className="p-6 text-center">
-                  <p className="text-muted-foreground">No reviews yet. Be the first to leave a review!</p>
-                </Card>
-              )}
-            </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground text-lg">No reviews yet.</p>
+                <p className="text-muted-foreground">Be the first to share your experience!</p>
+              </div>
+            )}
           </div>
-        </div>
-      </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
