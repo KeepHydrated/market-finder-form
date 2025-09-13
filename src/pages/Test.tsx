@@ -14,42 +14,63 @@ const Test = () => {
       name: "Organic Tomatoes",
       description: "Fresh, locally grown organic tomatoes perfect for salads and cooking.",
       price: 4.50,
-      images: []
+      images: [
+        "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&h=300&fit=crop"
+      ]
     },
     {
       id: 2,
       name: "Fresh Carrots",
       description: "Sweet and crunchy carrots harvested daily from our sustainable farm.",
       price: 3.25,
-      images: []
+      images: [
+        "https://images.unsplash.com/photo-1445282768818-728615cc910a?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&h=300&fit=crop"
+      ]
     },
     {
       id: 3,
       name: "Seasonal Herbs",
       description: "Mixed herbs including basil, parsley, and cilantro grown organically.",
       price: 2.75,
-      images: []
+      images: [
+        "https://images.unsplash.com/photo-1462536943532-57a629f6cc60?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1515586838455-6483b7b2a6de?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1627664234230-00aaa4b78cb6?w=400&h=300&fit=crop"
+      ]
     },
     {
       id: 4,
       name: "Apple Variety Pack",
       description: "A mix of our finest apples including Honeycrisp and Granny Smith.",
       price: 6.00,
-      images: []
+      images: [
+        "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?w=400&h=300&fit=crop"
+      ]
     },
     {
       id: 5,
       name: "Leafy Greens Mix",
       description: "Fresh salad mix with spinach, arugula, and mixed greens.",
       price: 5.50,
-      images: []
+      images: [
+        "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop"
+      ]
     },
     {
       id: 6,
       name: "Bell Peppers",
       description: "Colorful bell peppers in red, yellow, and green varieties.",
       price: 4.00,
-      images: []
+      images: [
+        "https://images.unsplash.com/photo-1563777249-18556d3a7d5d?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1601001815894-4bb6c81416d2?w=400&h=300&fit=crop"
+      ]
     }
   ];
 
