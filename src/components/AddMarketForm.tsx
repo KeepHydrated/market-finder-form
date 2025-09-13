@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AddMarketFormProps {
@@ -125,18 +124,14 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
                     <h4 className="font-medium">{day === 'Mon' ? 'Monday' : day === 'Tue' ? 'Tuesday' : day === 'Wed' ? 'Wednesday' : day === 'Thu' ? 'Thursday' : day === 'Fri' ? 'Friday' : day === 'Sat' ? 'Saturday' : 'Sunday'}</h4>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
-                        <div className="relative">
-                          <Input
-                            type="time"
-                            value={hours[day]?.start || '08:00'}
-                            onChange={(e) => setHours(prev => ({
-                              ...prev,
-                              [day]: { ...prev[day], start: e.target.value }
-                            }))}
-                            className="pr-8"
-                          />
-                          <Clock className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        </div>
+                        <Input
+                          type="time"
+                          value={hours[day]?.start || '08:00'}
+                          onChange={(e) => setHours(prev => ({
+                            ...prev,
+                            [day]: { ...prev[day], start: e.target.value }
+                          }))}
+                        />
                         <select
                           value={hours[day]?.startPeriod || 'AM'}
                           onChange={(e) => setHours(prev => ({
@@ -153,18 +148,14 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
                       <span className="text-muted-foreground">to</span>
 
                       <div className="flex items-center gap-2">
-                        <div className="relative">
-                          <Input
-                            type="time"
-                            value={hours[day]?.end || '14:00'}
-                            onChange={(e) => setHours(prev => ({
-                              ...prev,
-                              [day]: { ...prev[day], end: e.target.value }
-                            }))}
-                            className="pr-8"
-                          />
-                          <Clock className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        </div>
+                        <Input
+                          type="time"
+                          value={hours[day]?.end || '14:00'}
+                          onChange={(e) => setHours(prev => ({
+                            ...prev,
+                            [day]: { ...prev[day], end: e.target.value }
+                          }))}
+                        />
                         <select
                           value={hours[day]?.endPeriod || 'PM'}
                           onChange={(e) => setHours(prev => ({
