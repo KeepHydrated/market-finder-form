@@ -133,7 +133,7 @@ const Homepage = () => {
                 Filter search results
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80 p-0 bg-background border shadow-lg z-50" align="end">
+            <PopoverContent className="w-80 p-0 bg-background border shadow-lg z-50">
               <Tabs defaultValue="times" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
                   <TabsTrigger value="times">Times</TabsTrigger>
