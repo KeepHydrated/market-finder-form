@@ -401,7 +401,7 @@ const Vendor = () => {
             // Reviews List View
             <>
               <DialogHeader className="pb-6">
-                <div className="flex items-center justify-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-2">
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star 
@@ -418,7 +418,7 @@ const Vendor = () => {
                     {reviewStats.totalReviews > 0 ? reviewStats.averageRating.toFixed(1) : '0.0'}
                   </span>
                 </div>
-                <p className="text-center text-muted-foreground">
+                <p className="text-muted-foreground">
                   {reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''}
                 </p>
               </DialogHeader>
