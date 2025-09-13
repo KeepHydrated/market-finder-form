@@ -425,7 +425,7 @@ const Vendor = () => {
                         className="p-1 hover:scale-110 transition-transform"
                       >
                         <Star 
-                          className={`h-8 w-8 ${
+                          className={`h-6 w-6 ${
                             star <= newReview.rating 
                               ? 'text-yellow-500 fill-current' 
                               : 'text-gray-300 stroke-2'
