@@ -53,6 +53,7 @@ const Vendor = () => {
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   useEffect(() => {
     fetchAcceptedSubmission();
@@ -315,52 +316,107 @@ const Vendor = () => {
       </div>
 
       {/* Review Modal */}
-      <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
+      <Dialog open={isReviewModalOpen} onOpenChange={(open) => {
+        setIsReviewModalOpen(open);
+        if (!open) setShowReviewForm(false);
+      }}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="flex flex-row items-center justify-between pb-4">
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star 
-                    key={star}
-                    className={`h-5 w-5 fill-current ${
-                      reviewStats.totalReviews > 0 && star <= reviewStats.averageRating 
-                        ? 'text-yellow-500' 
-                        : 'text-gray-300'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-lg font-medium">
-                {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'} ({reviewStats.totalReviews} reviews)
-              </span>
-            </div>
-            {user && (
-              <Button
-                className="bg-foreground text-background hover:bg-foreground/90 flex items-center gap-2"
-                onClick={() => {
-                  // Scroll to review form if it exists, or focus on it
-                  const reviewForm = document.getElementById('review-form');
-                  if (reviewForm) {
-                    reviewForm.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-              >
-                <Plus className="h-4 w-4" />
-                Write Review
-              </Button>
-            )}
-          </DialogHeader>
+          {!showReviewForm ? (
+            // Reviews List View
+            <>
+              <DialogHeader className="flex flex-row items-center justify-between pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star 
+                        key={star}
+                        className={`h-5 w-5 fill-current ${
+                          reviewStats.totalReviews > 0 && star <= reviewStats.averageRating 
+                            ? 'text-yellow-500' 
+                            : 'text-gray-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-lg font-medium">
+                    {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'} ({reviewStats.totalReviews} reviews)
+                  </span>
+                </div>
+              </DialogHeader>
 
-          <div className="space-y-6">
-            {/* Review Form */}
-            {user ? (
-              <div id="review-form" className="border rounded-lg p-6">
-                <h3 className="text-lg font-semibold mb-4">Leave a Review</h3>
+              <div className="space-y-6">
+                {/* Reviews List */}
+                {reviews.length > 0 ? (
+                  <div className="space-y-4">
+                    {reviews.map((review) => (
+                      <div key={review.id} className="border rounded-lg p-4">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <div className="flex gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star 
+                                  key={star}
+                                  className={`h-4 w-4 fill-current ${
+                                    star <= review.rating ? 'text-yellow-500' : 'text-gray-300'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(review.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <p className="text-foreground">{review.comment}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground text-lg">No reviews yet.</p>
+                    <p className="text-muted-foreground">Be the first to share your experience!</p>
+                  </div>
+                )}
+
+                {/* Write Review Button */}
+                {user && (
+                  <div className="flex justify-center pt-4">
+                    <Button
+                      className="bg-foreground text-background hover:bg-foreground/90 px-8"
+                      onClick={() => setShowReviewForm(true)}
+                    >
+                      Write Review
+                    </Button>
+                  </div>
+                )}
+
+                {!user && (
+                  <div className="text-center py-4">
+                    <p className="text-muted-foreground">Please sign in to leave a review.</p>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            // Review Form View
+            <>
+              <DialogHeader className="flex flex-row items-center justify-between pb-4">
+                <DialogTitle>Write a Review</DialogTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowReviewForm(false)}
+                  className="h-8 w-8 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </DialogHeader>
+
+              <div className="space-y-6">
                 <div className="space-y-4">
                   <div>
                     <Label className="text-sm font-medium mb-2 block">Rating</Label>
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 justify-center">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
                           key={star}
@@ -369,20 +425,18 @@ const Vendor = () => {
                             star <= newReview.rating ? 'text-yellow-500' : 'text-gray-300'
                           }`}
                         >
-                          <Star className="h-6 w-6 fill-current" />
+                          <Star className="h-8 w-8 fill-current" />
                         </button>
                       ))}
                     </div>
                   </div>
                   
                   <div>
-                    <Label htmlFor="modal-comment" className="text-sm font-medium mb-2 block">Comment</Label>
                     <Textarea
-                      id="modal-comment"
                       value={newReview.comment}
                       onChange={(e) => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
                       placeholder="Share your experience..."
-                      className="min-h-[100px]"
+                      className="min-h-[120px]"
                     />
                   </div>
                   
@@ -390,6 +444,7 @@ const Vendor = () => {
                     onClick={async () => {
                       await submitReview();
                       setIsReviewModalOpen(false);
+                      setShowReviewForm(false);
                     }}
                     disabled={isSubmittingReview}
                     className="bg-primary hover:bg-primary/90 w-full"
@@ -398,45 +453,8 @@ const Vendor = () => {
                   </Button>
                 </div>
               </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">Please sign in to leave a review.</p>
-              </div>
-            )}
-
-            {/* Reviews List */}
-            {reviews.length > 0 ? (
-              <div className="space-y-4">
-                {reviews.map((review) => (
-                  <div key={review.id} className="border rounded-lg p-4">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <div className="flex gap-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star 
-                              key={star}
-                              className={`h-4 w-4 fill-current ${
-                                star <= review.rating ? 'text-yellow-500' : 'text-gray-300'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-sm text-muted-foreground">
-                          {new Date(review.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <p className="text-foreground">{review.comment}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground text-lg">No reviews yet.</p>
-                <p className="text-muted-foreground">Be the first to share your experience!</p>
-              </div>
-            )}
-          </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
