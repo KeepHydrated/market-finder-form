@@ -97,13 +97,13 @@ const Homepage = () => {
                 </div>
                 
                 {/* Store Information */}
-                <div className="p-4 text-center space-y-2">
-                  <h3 className="text-lg font-semibold text-foreground">
+                <div className="p-4 space-y-2">
+                  <h3 className="text-lg font-semibold text-foreground text-left">
                     {submission.store_name}
                   </h3>
                   
                   {submission.primary_specialty && (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground text-left">
                       {submission.primary_specialty}
                     </p>
                   )}
