@@ -625,6 +625,23 @@ const Index = () => {
                           {isEditing ? "Save" : "Edit Profile"}
                         </Button>
                       </div>
+
+                      {/* Products Section in Profile */}
+                      <Card className="mt-8 p-8 bg-card border-border">
+                        <div className="flex items-center justify-between mb-6">
+                          <h2 className="text-2xl font-semibold text-foreground">My Products</h2>
+                          <Button className="flex items-center gap-2" onClick={handleAddProduct}>
+                            <Plus className="h-4 w-4" />
+                            Add Product
+                          </Button>
+                        </div>
+                        <ProductGrid 
+                          products={products} 
+                          onDeleteProduct={handleDeleteProduct}
+                          onDuplicateProduct={handleDuplicateProduct}
+                          onEditProduct={handleEditProduct}
+                        />
+                      </Card>
                     </div>
                   )}
 
