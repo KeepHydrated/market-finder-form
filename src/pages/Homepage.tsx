@@ -120,10 +120,6 @@ const Homepage = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Featured Vendors</h1>
-          <p className="text-muted-foreground">Discover our approved farmers market vendors</p>
-        </div>
 
         {acceptedSubmissions.length === 0 ? (
           <div className="text-center">
