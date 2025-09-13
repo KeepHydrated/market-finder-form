@@ -100,11 +100,6 @@ const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
           <span className="text-2xl font-bold text-primary">
             ${product.price.toFixed(2)}
           </span>
-          {product.images.length > 1 && (
-            <span className="text-xs text-muted-foreground">
-              {currentImageIndex + 1}/{product.images.length}
-            </span>
-          )}
         </div>
       </CardContent>
     </Card>
