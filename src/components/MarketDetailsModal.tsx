@@ -34,7 +34,7 @@ export const MarketDetailsModal = ({
 }: MarketDetailsModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] p-6">
+      <DialogContent className="sm:max-w-[500px] p-6 [&>button]:hidden">
         <DialogHeader className="pb-4">
         </DialogHeader>
         
