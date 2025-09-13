@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, Star, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -126,14 +126,14 @@ const Homepage = () => {
         
         {/* Filter Button */}
         <div className="flex justify-end mb-6">
-          <Popover>
-            <PopoverTrigger asChild>
+          <Dialog>
+            <DialogTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
                 Filter search results
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80 p-0 bg-background border shadow-lg z-50 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            </DialogTrigger>
+            <DialogContent className="w-80 p-0 bg-background border shadow-lg">
               <Tabs defaultValue="times" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
                   <TabsTrigger value="times">Times</TabsTrigger>
@@ -150,8 +150,8 @@ const Homepage = () => {
                   </div>
                 </TabsContent>
               </Tabs>
-            </PopoverContent>
-          </Popover>
+            </DialogContent>
+          </Dialog>
         </div>
         
         <div className="flex justify-center">
