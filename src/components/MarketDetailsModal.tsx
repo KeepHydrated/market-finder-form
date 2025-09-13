@@ -54,18 +54,6 @@ export const MarketDetailsModal = ({
             </div>
           )}
 
-          {marketDays && marketDays.length > 0 && (
-            <div className="space-y-2">
-              <span className="font-medium">Market Days</span>
-              <div className="flex flex-wrap gap-2">
-                {marketDays.map((day) => (
-                  <Badge key={day} variant="secondary">
-                    {day}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
 
           {marketHours && Object.keys(marketHours).length > 0 && (
             <div className="space-y-3">
@@ -86,7 +74,7 @@ export const MarketDetailsModal = ({
             </div>
           )}
 
-          {!marketAddress && (!marketDays || marketDays.length === 0) && (!marketHours || Object.keys(marketHours).length === 0) && (
+          {!marketAddress && (!marketHours || Object.keys(marketHours).length === 0) && (
             <p className="text-muted-foreground text-sm">
               This appears to be a search result rather than a custom market submission.
             </p>
