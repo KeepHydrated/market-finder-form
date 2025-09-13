@@ -82,7 +82,7 @@ const Homepage = () => {
                 onClick={() => navigate('/vendor')}
               >
                 {/* Product Image */}
-                <div className="aspect-[4/3] bg-muted relative">
+                <div className="aspect-video bg-muted relative">
                   {submission.products && submission.products.length > 0 && submission.products[0].images && submission.products[0].images.length > 0 ? (
                     <img 
                       src={submission.products[0].images[0]} 
