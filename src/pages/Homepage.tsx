@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AcceptedSubmission {
@@ -20,14 +20,62 @@ interface AcceptedSubmission {
   created_at: string;
 }
 
+interface VendorRating {
+  vendorId: string;
+  averageRating: number;
+  totalReviews: number;
+}
+
 const Homepage = () => {
   const navigate = useNavigate();
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<AcceptedSubmission[]>([]);
+  const [vendorRatings, setVendorRatings] = useState<Record<string, VendorRating>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchAcceptedSubmissions();
   }, []);
+
+  const fetchVendorRatings = async (vendorIds: string[]) => {
+    if (vendorIds.length === 0) return;
+
+    try {
+      const { data: reviews, error } = await supabase
+        .from('reviews')
+        .select('vendor_id, rating')
+        .in('vendor_id', vendorIds);
+
+      if (error) throw error;
+
+      // Calculate ratings for each vendor
+      const ratingsMap: Record<string, VendorRating> = {};
+      
+      vendorIds.forEach(vendorId => {
+        const vendorReviews = reviews?.filter(review => review.vendor_id === vendorId) || [];
+        
+        if (vendorReviews.length > 0) {
+          const totalRating = vendorReviews.reduce((sum, review) => sum + review.rating, 0);
+          const averageRating = totalRating / vendorReviews.length;
+          
+          ratingsMap[vendorId] = {
+            vendorId,
+            averageRating: Math.round(averageRating * 10) / 10,
+            totalReviews: vendorReviews.length
+          };
+        } else {
+          ratingsMap[vendorId] = {
+            vendorId,
+            averageRating: 0,
+            totalReviews: 0
+          };
+        }
+      });
+
+      setVendorRatings(ratingsMap);
+    } catch (error) {
+      console.error('Error fetching vendor ratings:', error);
+    }
+  };
 
   const fetchAcceptedSubmissions = async () => {
     try {
@@ -48,6 +96,12 @@ const Homepage = () => {
       })) || [];
       
       setAcceptedSubmissions(parsedSubmissions);
+      
+      // Fetch ratings for all vendors
+      const vendorIds = parsedSubmissions.map(sub => sub.id);
+      if (vendorIds.length > 0) {
+        await fetchVendorRatings(vendorIds);
+      }
     } catch (error) {
       console.error('Error fetching accepted submissions:', error);
     } finally {
@@ -122,6 +176,20 @@ const Homepage = () => {
                       {submission.primary_specialty}
                     </p>
                   )}
+
+                  {/* Rating */}
+                  <div className="flex items-center gap-1 pt-1">
+                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                    <span className="text-sm font-medium">
+                      {vendorRatings[submission.id]?.totalReviews > 0 
+                        ? vendorRatings[submission.id].averageRating.toFixed(1)
+                        : '0.0'
+                      }
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      ({vendorRatings[submission.id]?.totalReviews || 0} reviews)
+                    </span>
+                  </div>
                 </div>
               </Card>
             ))}
