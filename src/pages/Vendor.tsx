@@ -491,20 +491,7 @@ const Vendor = () => {
             // Review Form View
             <>
               <DialogHeader className="pb-6">
-                <div className="flex items-center justify-between">
-                  <DialogTitle className="text-xl font-semibold">Write a Review for {acceptedSubmission.store_name}</DialogTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setShowReviewForm(false);
-                      setSelectedPhotos([]);
-                    }}
-                    className="h-8 w-8 p-0"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
+                <DialogTitle className="text-xl font-semibold">Write a Review for {acceptedSubmission.store_name}</DialogTitle>
               </DialogHeader>
 
               <div className="space-y-6">
