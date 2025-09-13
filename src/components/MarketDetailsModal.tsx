@@ -50,10 +50,7 @@ export const MarketDetailsModal = ({
 
           {marketAddress && (
             <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Address</span>
-              </div>
+              <MapPin className="h-4 w-4 text-muted-foreground" />
               <p className="text-muted-foreground pl-6">{marketAddress}</p>
             </div>
           )}
@@ -61,10 +58,7 @@ export const MarketDetailsModal = ({
 
           {marketHours && Object.keys(marketHours).length > 0 && (
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Market Hours</span>
-              </div>
+              <Clock className="h-4 w-4 text-muted-foreground" />
               <div className="space-y-2 pl-6">
                 {Object.entries(marketHours).map(([day, hours]) => (
                   <div key={day} className="flex justify-between">
