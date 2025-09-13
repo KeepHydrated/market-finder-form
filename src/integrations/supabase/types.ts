@@ -46,6 +46,7 @@ export type Database = {
           comment: string | null
           created_at: string
           id: string
+          photos: string[] | null
           rating: number
           updated_at: string
           user_id: string
@@ -55,6 +56,7 @@ export type Database = {
           comment?: string | null
           created_at?: string
           id?: string
+          photos?: string[] | null
           rating: number
           updated_at?: string
           user_id: string
@@ -64,6 +66,7 @@ export type Database = {
           comment?: string | null
           created_at?: string
           id?: string
+          photos?: string[] | null
           rating?: number
           updated_at?: string
           user_id?: string

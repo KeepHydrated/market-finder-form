@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Store, MapPin, Clock, Star, Heart, Plus, X } from "lucide-react";
+import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -36,6 +36,7 @@ interface Review {
   rating: number;
   comment: string;
   created_at: string;
+  photos?: string[];
 }
 
 interface ReviewStats {
@@ -54,6 +55,8 @@ const Vendor = () => {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
 
   useEffect(() => {
     fetchAcceptedSubmission();
@@ -148,13 +151,22 @@ const Vendor = () => {
     setIsSubmittingReview(true);
 
     try {
+      let photoUrls: string[] = [];
+
+      // Upload photos if any are selected
+      if (selectedPhotos.length > 0) {
+        setUploadingPhotos(true);
+        photoUrls = await uploadReviewPhotos(selectedPhotos);
+      }
+
       const { error } = await supabase
         .from('reviews')
         .insert({
           user_id: user.id,
           vendor_id: acceptedSubmission.id,
           rating: newReview.rating,
-          comment: newReview.comment.trim()
+          comment: newReview.comment.trim(),
+          photos: photoUrls
         });
 
       if (error) throw error;
@@ -165,6 +177,7 @@ const Vendor = () => {
       });
 
       setNewReview({ rating: 5, comment: '' });
+      setSelectedPhotos([]);
       fetchReviews(); // Refresh reviews
     } catch (error) {
       console.error('Error submitting review:', error);
@@ -175,7 +188,67 @@ const Vendor = () => {
       });
     } finally {
       setIsSubmittingReview(false);
+      setUploadingPhotos(false);
     }
+  };
+
+  const uploadReviewPhotos = async (photos: File[]): Promise<string[]> => {
+    const uploadPromises = photos.map(async (photo, index) => {
+      const fileExt = photo.name.split('.').pop();
+      const fileName = `${user!.id}/${Date.now()}-${index}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('review-photos')
+        .upload(fileName, photo);
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('review-photos')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    });
+
+    return Promise.all(uploadPromises);
+  };
+
+  const handlePhotoSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    const remainingSlots = 3 - selectedPhotos.length;
+    const filesToAdd = files.slice(0, remainingSlots);
+    
+    // Validate file types and sizes
+    const validFiles = filesToAdd.filter(file => {
+      const isValidType = file.type.startsWith('image/');
+      const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB limit
+      
+      if (!isValidType) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select image files only.",
+          variant: "destructive"
+        });
+        return false;
+      }
+      
+      if (!isValidSize) {
+        toast({
+          title: "File too large",
+          description: "Please select images smaller than 5MB.",
+          variant: "destructive"
+        });
+        return false;
+      }
+      
+      return true;
+    });
+
+    setSelectedPhotos(prev => [...prev, ...validFiles]);
+  };
+
+  const removePhoto = (index: number) => {
+    setSelectedPhotos(prev => prev.filter((_, i) => i !== index));
   };
 
   const formatSchedule = (marketDays?: string[], marketHours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>) => {
@@ -318,7 +391,10 @@ const Vendor = () => {
       {/* Review Modal */}
       <Dialog open={isReviewModalOpen} onOpenChange={(open) => {
         setIsReviewModalOpen(open);
-        if (!open) setShowReviewForm(false);
+        if (!open) {
+          setShowReviewForm(false);
+          setSelectedPhotos([]);
+        }
       }}>
         <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
           {!showReviewForm ? (
@@ -368,7 +444,22 @@ const Vendor = () => {
                             {new Date(review.created_at).toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="text-sm">{review.comment}</p>
+                        <p className="text-sm mb-3">{review.comment}</p>
+                        
+                        {/* Review Photos */}
+                        {review.photos && review.photos.length > 0 && (
+                          <div className="grid grid-cols-3 gap-2">
+                            {review.photos.map((photoUrl: string, photoIndex: number) => (
+                              <img
+                                key={photoIndex}
+                                src={photoUrl}
+                                alt={`Review photo ${photoIndex + 1}`}
+                                className="w-full h-16 object-cover rounded-lg border cursor-pointer hover:opacity-80"
+                                onClick={() => window.open(photoUrl, '_blank')}
+                              />
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -405,7 +496,10 @@ const Vendor = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setShowReviewForm(false)}
+                    onClick={() => {
+                      setShowReviewForm(false);
+                      setSelectedPhotos([]);
+                    }}
                     className="h-8 w-8 p-0"
                   >
                     <X className="h-4 w-4" />
@@ -450,13 +544,50 @@ const Vendor = () => {
                 {/* Photos Section */}
                 <div>
                   <Label className="text-base font-medium mb-3 block">Photos (Optional) - Max 3</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                    <div className="flex items-center justify-center gap-2 text-gray-500">
-                      <div className="w-6 h-6 border-2 border-gray-400 rounded flex items-center justify-center">
-                        <div className="w-3 h-3 border border-gray-400 rounded-sm"></div>
+                  
+                  {/* Photo Upload Area */}
+                  <div className="space-y-3">
+                    {selectedPhotos.length < 3 && (
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handlePhotoSelect}
+                          className="hidden"
+                          id="photo-upload"
+                        />
+                        <label
+                          htmlFor="photo-upload"
+                          className="cursor-pointer flex items-center justify-center gap-2 text-gray-500 hover:text-gray-700"
+                        >
+                          <Camera className="w-5 h-5" />
+                          <span>Add Photo</span>
+                        </label>
                       </div>
-                      <span>Add Photo</span>
-                    </div>
+                    )}
+                    
+                    {/* Photo Previews */}
+                    {selectedPhotos.length > 0 && (
+                      <div className="grid grid-cols-3 gap-2">
+                        {selectedPhotos.map((photo, index) => (
+                          <div key={index} className="relative">
+                            <img
+                              src={URL.createObjectURL(photo)}
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-20 object-cover rounded-lg border"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removePhoto(index)}
+                              className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
                 
@@ -465,7 +596,10 @@ const Vendor = () => {
                   <Button 
                     variant="outline" 
                     className="flex-1"
-                    onClick={() => setShowReviewForm(false)}
+                    onClick={() => {
+                      setShowReviewForm(false);
+                      setSelectedPhotos([]);
+                    }}
                   >
                     Cancel
                   </Button>
@@ -475,10 +609,10 @@ const Vendor = () => {
                       setIsReviewModalOpen(false);
                       setShowReviewForm(false);
                     }}
-                    disabled={isSubmittingReview || !newReview.comment.trim()}
+                    disabled={isSubmittingReview || uploadingPhotos || !newReview.comment.trim()}
                     className="flex-1 bg-gray-600 text-white hover:bg-gray-700"
                   >
-                    {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+                    {uploadingPhotos ? 'Uploading photos...' : isSubmittingReview ? 'Submitting...' : 'Submit Review'}
                   </Button>
                 </div>
               </div>
