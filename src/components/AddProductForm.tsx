@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,18 +11,38 @@ interface AddProductFormProps {
   open: boolean;
   onClose: () => void;
   onProductAdded: (product: { name: string; description: string; price: number; images: File[] }) => void;
+  editingProduct?: { id: number; name: string; description: string; price: number; images: string[] } | null;
 }
 
-export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductFormProps) => {
-  const [productName, setProductName] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
+export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }: AddProductFormProps) => {
+  const [productName, setProductName] = useState(editingProduct?.name || '');
+  const [description, setDescription] = useState(editingProduct?.description || '');
+  const [price, setPrice] = useState(editingProduct?.price?.toString() || '');
   const [images, setImages] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>(editingProduct?.images || []);
   const { toast } = useToast();
+
+  // Update form when editingProduct changes
+  useEffect(() => {
+    if (editingProduct) {
+      setProductName(editingProduct.name);
+      setDescription(editingProduct.description);
+      setPrice(editingProduct.price.toString());
+      setExistingImages(editingProduct.images);
+      setImages([]);
+    } else {
+      setProductName('');
+      setDescription('');
+      setPrice('');
+      setExistingImages([]);
+      setImages([]);
+    }
+  }, [editingProduct]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const remainingSlots = 5 - images.length;
+    const totalImages = images.length + existingImages.length;
+    const remainingSlots = 5 - totalImages;
     
     // Take only the first files that fit within the limit
     const filesToAdd = files.slice(0, remainingSlots);
@@ -32,6 +52,10 @@ export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductForm
 
   const removeImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (index: number) => {
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = () => {
@@ -44,24 +68,14 @@ export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductForm
       return;
     }
 
-    // In a real app, this would submit to an API
-    console.log({
-      productName,
-      description,
-      price,
-      images: images.map(img => img.name)
-    });
-    
-    toast({
-      title: "Product added successfully!",
-      description: `${productName} has been added to your products.`,
-    });
+    // Combine existing images (as base64) and new images (as Files)
+    const combinedImages = [...existingImages, ...images];
     
     onProductAdded({
       name: productName,
       description,
       price: parseFloat(price),
-      images
+      images: combinedImages as any // Mix of base64 strings and File objects
     });
     
     // Reset form
@@ -69,6 +83,7 @@ export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductForm
     setDescription('');
     setPrice('');
     setImages([]);
+    setExistingImages([]);
     onClose();
   };
 
@@ -76,7 +91,7 @@ export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductForm
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-6">
         <DialogHeader className="pb-4">
-          <DialogTitle>Add Product</DialogTitle>
+          <DialogTitle>{editingProduct ? 'Edit Product' : 'Add Product'}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -97,28 +112,50 @@ export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductForm
                   onChange={handleImageUpload}
                   className="hidden"
                   id="image-upload"
-                  disabled={images.length >= 5}
+                  disabled={images.length + existingImages.length >= 5}
                 />
                 <Label
                   htmlFor="image-upload"
                   className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium border border-border hover:bg-muted ${
-                    images.length >= 5 ? 'opacity-50 cursor-not-allowed' : ''
+                    images.length + existingImages.length >= 5 ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
                   <Upload className="h-4 w-4" />
                   Choose Images
                 </Label>
                 <p className="text-xs text-muted-foreground mt-2">
-                  {images.length}/5 images uploaded
+                  {images.length + existingImages.length}/5 images uploaded
                 </p>
               </div>
             </div>
 
             {/* Image Previews */}
-            {images.length > 0 && (
+            {(existingImages.length > 0 || images.length > 0) && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                {/* Existing images */}
+                {existingImages.map((image, index) => (
+                  <div key={`existing-${index}`} className="relative group">
+                    <div className="aspect-square rounded-lg border border-border overflow-hidden bg-muted">
+                      <img
+                        src={image}
+                        alt={`Existing product image ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                      onClick={() => removeExistingImage(index)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+                {/* New images */}
                 {images.map((image, index) => (
-                  <div key={index} className="relative group">
+                  <div key={`new-${index}`} className="relative group">
                     <div className="aspect-square rounded-lg border border-border overflow-hidden bg-muted">
                       <img
                         src={URL.createObjectURL(image)}
@@ -187,7 +224,7 @@ export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductForm
             Cancel
           </Button>
           <Button onClick={handleSubmit}>
-            Add Product
+            {editingProduct ? 'Update Product' : 'Add Product'}
           </Button>
         </div>
       </DialogContent>

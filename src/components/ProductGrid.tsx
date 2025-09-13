@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ChevronLeft, ChevronRight, MoreVertical, Edit, Copy, Trash2 } from "lucide-react";
 import { ProductDetailModal } from "./ProductDetailModal";
 
 interface Product {
@@ -14,14 +15,20 @@ interface Product {
 
 interface ProductGridProps {
   products: Product[];
+  onDeleteProduct?: (productId: number) => void;
+  onDuplicateProduct?: (product: Product) => void;
+  onEditProduct?: (product: Product) => void;
 }
 
 interface ProductCardProps {
   product: Product;
   onProductClick: (product: Product) => void;
+  onDeleteProduct?: (productId: number) => void;
+  onDuplicateProduct?: (product: Product) => void;
+  onEditProduct?: (product: Product) => void;
 }
 
-const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
+const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProduct, onEditProduct }: ProductCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const nextImage = (e: React.MouseEvent) => {
@@ -95,7 +102,61 @@ const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
       </div>
       
       <CardContent className="p-4">
-        <h3 className="font-normal text-sm mb-2">{product.name}</h3>
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="font-normal text-sm flex-1">{product.name}</h3>
+          {(onDeleteProduct || onDuplicateProduct || onEditProduct) && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 w-8 p-0 hover:bg-muted"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-32">
+                {onEditProduct && (
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditProduct(product);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit
+                  </DropdownMenuItem>
+                )}
+                {onDuplicateProduct && (
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDuplicateProduct(product);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    Duplicate
+                  </DropdownMenuItem>
+                )}
+                {onDeleteProduct && (
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteProduct(product.id);
+                    }}
+                    className="cursor-pointer text-red-600 focus:text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-muted-foreground">
             ${product.price.toFixed(2)}
@@ -106,7 +167,7 @@ const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
   );
 };
 
-export const ProductGrid = ({ products }: ProductGridProps) => {
+export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onEditProduct }: ProductGridProps) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -136,6 +197,9 @@ export const ProductGrid = ({ products }: ProductGridProps) => {
             key={product.id} 
             product={product} 
             onProductClick={handleProductClick}
+            onDeleteProduct={onDeleteProduct}
+            onDuplicateProduct={onDuplicateProduct}
+            onEditProduct={onEditProduct}
           />
         ))}
       </div>
