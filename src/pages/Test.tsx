@@ -60,8 +60,63 @@ const Test = () => {
         </div>
         
         {/* Rest of main content */}
-        <div className="p-4">
-          {/* Main content area */}
+        <div className="p-8">
+          {/* Products Section */}
+          <div className="space-y-6">
+            <h2 className="text-3xl font-bold text-foreground">Products</h2>
+            
+            {/* Product Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {/* Sample Products */}
+              <div className="bg-card rounded-lg border p-4 hover:shadow-lg transition-shadow">
+                <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center">
+                  <span className="text-muted-foreground">No Image</span>
+                </div>
+                <h3 className="font-medium text-foreground mb-2">Organic Tomatoes</h3>
+                <p className="text-muted-foreground text-xl font-medium">$4.50</p>
+              </div>
+              
+              <div className="bg-card rounded-lg border p-4 hover:shadow-lg transition-shadow">
+                <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center">
+                  <span className="text-muted-foreground">No Image</span>
+                </div>
+                <h3 className="font-medium text-foreground mb-2">Fresh Carrots</h3>
+                <p className="text-muted-foreground text-xl font-medium">$3.25</p>
+              </div>
+              
+              <div className="bg-card rounded-lg border p-4 hover:shadow-lg transition-shadow">
+                <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center">
+                  <span className="text-muted-foreground">No Image</span>
+                </div>
+                <h3 className="font-medium text-foreground mb-2">Seasonal Herbs</h3>
+                <p className="text-muted-foreground text-xl font-medium">$2.75</p>
+              </div>
+              
+              <div className="bg-card rounded-lg border p-4 hover:shadow-lg transition-shadow">
+                <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center">
+                  <span className="text-muted-foreground">No Image</span>
+                </div>
+                <h3 className="font-medium text-foreground mb-2">Apple Variety Pack</h3>
+                <p className="text-muted-foreground text-xl font-medium">$6.00</p>
+              </div>
+              
+              <div className="bg-card rounded-lg border p-4 hover:shadow-lg transition-shadow">
+                <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center">
+                  <span className="text-muted-foreground">No Image</span>
+                </div>
+                <h3 className="font-medium text-foreground mb-2">Leafy Greens Mix</h3>
+                <p className="text-muted-foreground text-xl font-medium">$5.50</p>
+              </div>
+              
+              <div className="bg-card rounded-lg border p-4 hover:shadow-lg transition-shadow">
+                <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center">
+                  <span className="text-muted-foreground">No Image</span>
+                </div>
+                <h3 className="font-medium text-foreground mb-2">Bell Peppers</h3>
+                <p className="text-muted-foreground text-xl font-medium">$4.00</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
