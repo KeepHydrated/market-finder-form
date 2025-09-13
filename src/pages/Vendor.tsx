@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { ProductGrid } from "@/components/ProductGrid";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/auth/AuthForm";
@@ -26,15 +28,39 @@ interface AcceptedSubmission {
   created_at: string;
 }
 
+interface Review {
+  id: string;
+  user_id: string;
+  vendor_id: string;
+  rating: number;
+  comment: string;
+  created_at: string;
+}
+
+interface ReviewStats {
+  averageRating: number;
+  totalReviews: number;
+}
+
 const Vendor = () => {
   const { user, profile, loading } = useAuth();
   const { toast } = useToast();
   const [acceptedSubmission, setAcceptedSubmission] = useState<AcceptedSubmission | null>(null);
   const [loadingData, setLoadingData] = useState(true);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewStats, setReviewStats] = useState<ReviewStats>({ averageRating: 0, totalReviews: 0 });
+  const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   useEffect(() => {
     fetchAcceptedSubmission();
   }, []);
+
+  useEffect(() => {
+    if (acceptedSubmission) {
+      fetchReviews();
+    }
+  }, [acceptedSubmission]);
 
   const fetchAcceptedSubmission = async () => {
     try {
@@ -64,6 +90,88 @@ const Vendor = () => {
       console.error('Error fetching accepted submission:', error);
     } finally {
       setLoadingData(false);
+    }
+  };
+
+  const fetchReviews = async () => {
+    if (!acceptedSubmission) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('vendor_id', acceptedSubmission.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setReviews(data || []);
+      
+      // Calculate review stats
+      if (data && data.length > 0) {
+        const totalRating = data.reduce((sum, review) => sum + review.rating, 0);
+        const averageRating = totalRating / data.length;
+        setReviewStats({
+          averageRating: Math.round(averageRating * 10) / 10,
+          totalReviews: data.length
+        });
+      } else {
+        setReviewStats({ averageRating: 0, totalReviews: 0 });
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    }
+  };
+
+  const submitReview = async () => {
+    if (!user || !acceptedSubmission) {
+      toast({
+        title: "Please sign in",
+        description: "You need to be signed in to leave a review.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!newReview.comment.trim()) {
+      toast({
+        title: "Comment required",
+        description: "Please enter a comment for your review.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmittingReview(true);
+
+    try {
+      const { error } = await supabase
+        .from('reviews')
+        .insert({
+          user_id: user.id,
+          vendor_id: acceptedSubmission.id,
+          rating: newReview.rating,
+          comment: newReview.comment.trim()
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Review submitted",
+        description: "Thank you for your review!",
+      });
+
+      setNewReview({ rating: 5, comment: '' });
+      fetchReviews(); // Refresh reviews
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit review. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmittingReview(false);
     }
   };
 
@@ -142,8 +250,12 @@ const Vendor = () => {
                 <h1 className="text-4xl font-bold text-foreground">{acceptedSubmission.store_name}</h1>
                 <div className="flex items-center gap-2">
                   <Star className="h-5 w-5 text-yellow-500 fill-current" />
-                  <span className="text-foreground font-medium">4.9</span>
-                  <span className="text-muted-foreground">(45 reviews)</span>
+                  <span className="text-foreground font-medium">
+                    {reviewStats.totalReviews > 0 ? reviewStats.averageRating : 'No rating'}
+                  </span>
+                  <span className="text-muted-foreground">
+                    ({reviewStats.totalReviews} reviews)
+                  </span>
                 </div>
               </div>
               <Heart className="h-6 w-6 text-muted-foreground" />
@@ -193,6 +305,89 @@ const Vendor = () => {
                 No products available yet.
               </div>
             )}
+          </div>
+
+          {/* Reviews Section */}
+          <div className="space-y-6 mt-12">
+            <h2 className="text-3xl font-bold text-foreground">Reviews</h2>
+            
+            {/* Review Form */}
+            {user ? (
+              <Card className="p-6">
+                <h3 className="text-xl font-semibold mb-4">Leave a Review</h3>
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Rating</Label>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          onClick={() => setNewReview(prev => ({ ...prev, rating: star }))}
+                          className={`p-1 ${star <= newReview.rating ? 'text-yellow-500' : 'text-gray-300'}`}
+                        >
+                          <Star className="h-5 w-5 fill-current" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="comment" className="text-sm font-medium mb-2 block">Comment</Label>
+                    <Textarea
+                      id="comment"
+                      value={newReview.comment}
+                      onChange={(e) => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
+                      placeholder="Share your experience..."
+                      className="min-h-[100px]"
+                    />
+                  </div>
+                  
+                  <Button 
+                    onClick={submitReview}
+                    disabled={isSubmittingReview}
+                    className="bg-primary hover:bg-primary/90"
+                  >
+                    {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+                  </Button>
+                </div>
+              </Card>
+            ) : (
+              <Card className="p-6 text-center">
+                <p className="text-muted-foreground">Please sign in to leave a review.</p>
+              </Card>
+            )}
+
+            {/* Reviews List */}
+            <div className="space-y-4">
+              {reviews.length > 0 ? (
+                reviews.map((review) => (
+                  <Card key={review.id} className="p-6">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star 
+                              key={star}
+                              className={`h-4 w-4 fill-current ${
+                                star <= review.rating ? 'text-yellow-500' : 'text-gray-300'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-muted-foreground">
+                          {new Date(review.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-foreground">{review.comment}</p>
+                    </div>
+                  </Card>
+                ))
+              ) : (
+                <Card className="p-6 text-center">
+                  <p className="text-muted-foreground">No reviews yet. Be the first to leave a review!</p>
+                </Card>
+              )}
+            </div>
           </div>
         </div>
       </div>
