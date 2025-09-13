@@ -34,25 +34,14 @@ const Test = () => {
           <div className="grid grid-cols-2 gap-6">
             {/* Left column */}
             <div className="space-y-6">
-              <Input placeholder="hhhh" />
-              <Input placeholder="bbbb" />
+              <p className="text-foreground">hhhh</p>
+              <p className="text-foreground">bbbb</p>
             </div>
             
             {/* Right column */}
             <div className="space-y-6">
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Home Goods" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="home-goods">Home Goods</SelectItem>
-                  <SelectItem value="food-beverage">Food & Beverage</SelectItem>
-                  <SelectItem value="clothing">Clothing</SelectItem>
-                  <SelectItem value="crafts">Arts & Crafts</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <Textarea placeholder="bbb" rows={3} />
+              <p className="text-foreground">Home Goods</p>
+              <p className="text-foreground">bbb</p>
             </div>
           </div>
         </div>
