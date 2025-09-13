@@ -33,17 +33,17 @@ const Test = () => {
         {/* Top row under header */}
         <div className="bg-card border-b p-8">
           <div className="space-y-4">
-            {/* Title row with heart icon */}
-            <div className="flex items-start justify-between">
-              <h1 className="text-4xl font-bold text-foreground">Farm Fresh Produce</h1>
+            {/* Title row with rating and heart icon */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <h1 className="text-4xl font-bold text-foreground">Farm Fresh Produce</h1>
+                <div className="flex items-center gap-2">
+                  <Star className="h-5 w-5 text-yellow-500 fill-current" />
+                  <span className="text-foreground font-medium">4.9</span>
+                  <span className="text-muted-foreground">(45 reviews)</span>
+                </div>
+              </div>
               <Heart className="h-6 w-6 text-muted-foreground" />
-            </div>
-            
-            {/* Rating row */}
-            <div className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-yellow-500 fill-current" />
-              <span className="text-foreground font-medium">4.9</span>
-              <span className="text-muted-foreground">(45 reviews)</span>
             </div>
             
             {/* Category badges */}
