@@ -165,13 +165,13 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
               
               <div className="space-y-6">
                 <div>
-                  <span className="text-xl font-medium text-muted-foreground">
+                  <span className="text-xl font-medium text-foreground">
                     ${product.price.toFixed(2)}
                   </span>
                 </div>
                 
                 <div>
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-foreground leading-relaxed">
                     {product.description}
                   </p>
                 </div>
