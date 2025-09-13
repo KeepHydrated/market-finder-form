@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, Star, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 interface AcceptedSubmission {
   id: string;
@@ -28,11 +29,22 @@ interface VendorRating {
   totalReviews: number;
 }
 
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
 const Homepage = () => {
   const navigate = useNavigate();
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<AcceptedSubmission[]>([]);
   const [vendorRatings, setVendorRatings] = useState<Record<string, VendorRating>>({});
   const [loading, setLoading] = useState(true);
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+
+  const toggleDay = (day: string) => {
+    setSelectedDays(prev => {
+      return prev.includes(day) 
+        ? prev.filter(d => d !== day)
+        : [...prev, day];
+    });
+  };
 
   useEffect(() => {
     fetchAcceptedSubmissions();
@@ -140,8 +152,24 @@ const Homepage = () => {
                   <TabsTrigger value="categories">Categories</TabsTrigger>
                 </TabsList>
                 <TabsContent value="times" className="p-4">
-                  <div className="text-sm text-muted-foreground">
-                    Time filters will go here
+                  <div className="space-y-4">
+                    <h4 className="font-medium">Time *</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {DAYS.map((day) => (
+                        <Button
+                          key={day}
+                          type="button"
+                          variant={selectedDays.includes(day) ? "default" : "outline"}
+                          onClick={() => toggleDay(day)}
+                          className={cn(
+                            "h-12 flex-1 min-w-[70px]",
+                            selectedDays.includes(day) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                          )}
+                        >
+                          {day}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </TabsContent>
                 <TabsContent value="categories" className="p-4">
