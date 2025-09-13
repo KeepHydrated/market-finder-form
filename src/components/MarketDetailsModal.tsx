@@ -36,10 +36,6 @@ export const MarketDetailsModal = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] p-6">
         <DialogHeader className="pb-4">
-          <DialogTitle className="flex items-center gap-2">
-            <Store className="h-5 w-5" />
-            Market Details
-          </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">
