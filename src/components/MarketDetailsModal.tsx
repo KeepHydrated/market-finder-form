@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, Store } from "lucide-react";
 
@@ -35,8 +35,6 @@ export const MarketDetailsModal = ({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] p-6 [&>button]:hidden">
-        <DialogHeader className="pb-4">
-        </DialogHeader>
         
         <div className="space-y-6">
           <div className="flex items-center gap-2">
