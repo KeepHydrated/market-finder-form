@@ -161,7 +161,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
             {/* Right side - Product info */}
             <div className="md:w-1/2 p-6 flex flex-col">
-              <h2 className="text-lg font-normal mb-6">{product.name}</h2>
+              <h2 className="text-2xl font-bold mb-6">{product.name}</h2>
               
               <div className="space-y-6">
                 <div>
