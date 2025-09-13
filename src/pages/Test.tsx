@@ -4,8 +4,55 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { ProductGrid } from "@/components/ProductGrid";
 
 const Test = () => {
+  // Sample product data that matches the Product interface
+  const sampleProducts = [
+    {
+      id: 1,
+      name: "Organic Tomatoes",
+      description: "Fresh, locally grown organic tomatoes perfect for salads and cooking.",
+      price: 4.50,
+      images: []
+    },
+    {
+      id: 2,
+      name: "Fresh Carrots",
+      description: "Sweet and crunchy carrots harvested daily from our sustainable farm.",
+      price: 3.25,
+      images: []
+    },
+    {
+      id: 3,
+      name: "Seasonal Herbs",
+      description: "Mixed herbs including basil, parsley, and cilantro grown organically.",
+      price: 2.75,
+      images: []
+    },
+    {
+      id: 4,
+      name: "Apple Variety Pack",
+      description: "A mix of our finest apples including Honeycrisp and Granny Smith.",
+      price: 6.00,
+      images: []
+    },
+    {
+      id: 5,
+      name: "Leafy Greens Mix",
+      description: "Fresh salad mix with spinach, arugula, and mixed greens.",
+      price: 5.50,
+      images: []
+    },
+    {
+      id: 6,
+      name: "Bell Peppers",
+      description: "Colorful bell peppers in red, yellow, and green varieties.",
+      price: 4.00,
+      images: []
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background flex">
       {/* Left column - narrow width */}
@@ -66,56 +113,7 @@ const Test = () => {
             <h2 className="text-3xl font-bold text-foreground">Products</h2>
             
             {/* Product Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {/* Sample Products */}
-              <div className="bg-card rounded-lg border p-4 hover:shadow-lg transition-shadow">
-                <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center">
-                  <span className="text-muted-foreground">No Image</span>
-                </div>
-                <h3 className="font-medium text-foreground mb-2">Organic Tomatoes</h3>
-                <p className="text-muted-foreground text-xl font-medium">$4.50</p>
-              </div>
-              
-              <div className="bg-card rounded-lg border p-4 hover:shadow-lg transition-shadow">
-                <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center">
-                  <span className="text-muted-foreground">No Image</span>
-                </div>
-                <h3 className="font-medium text-foreground mb-2">Fresh Carrots</h3>
-                <p className="text-muted-foreground text-xl font-medium">$3.25</p>
-              </div>
-              
-              <div className="bg-card rounded-lg border p-4 hover:shadow-lg transition-shadow">
-                <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center">
-                  <span className="text-muted-foreground">No Image</span>
-                </div>
-                <h3 className="font-medium text-foreground mb-2">Seasonal Herbs</h3>
-                <p className="text-muted-foreground text-xl font-medium">$2.75</p>
-              </div>
-              
-              <div className="bg-card rounded-lg border p-4 hover:shadow-lg transition-shadow">
-                <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center">
-                  <span className="text-muted-foreground">No Image</span>
-                </div>
-                <h3 className="font-medium text-foreground mb-2">Apple Variety Pack</h3>
-                <p className="text-muted-foreground text-xl font-medium">$6.00</p>
-              </div>
-              
-              <div className="bg-card rounded-lg border p-4 hover:shadow-lg transition-shadow">
-                <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center">
-                  <span className="text-muted-foreground">No Image</span>
-                </div>
-                <h3 className="font-medium text-foreground mb-2">Leafy Greens Mix</h3>
-                <p className="text-muted-foreground text-xl font-medium">$5.50</p>
-              </div>
-              
-              <div className="bg-card rounded-lg border p-4 hover:shadow-lg transition-shadow">
-                <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center">
-                  <span className="text-muted-foreground">No Image</span>
-                </div>
-                <h3 className="font-medium text-foreground mb-2">Bell Peppers</h3>
-                <p className="text-muted-foreground text-xl font-medium">$4.00</p>
-              </div>
-            </div>
+            <ProductGrid products={sampleProducts} />
           </div>
         </div>
       </div>
