@@ -401,7 +401,7 @@ const Vendor = () => {
             <>
               <DialogHeader className="pb-6">
                 <div className="flex items-center justify-between">
-                  <DialogTitle className="text-xl">Write a Review</DialogTitle>
+                  <DialogTitle className="text-xl font-semibold">Write a Review for {acceptedSubmission.store_name}</DialogTitle>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -414,45 +414,73 @@ const Vendor = () => {
               </DialogHeader>
 
               <div className="space-y-6">
-                {/* Star Rating */}
-                <div className="text-center">
-                  <div className="flex gap-2 justify-center mb-4">
+                {/* Rating Section */}
+                <div>
+                  <Label className="text-base font-medium mb-3 block">Rating *</Label>
+                  <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
                         key={star}
                         onClick={() => setNewReview(prev => ({ ...prev, rating: star }))}
-                        className={`p-1 hover:scale-110 transition-transform ${
-                          star <= newReview.rating ? 'text-yellow-500' : 'text-gray-300'
-                        }`}
+                        className="p-1 hover:scale-110 transition-transform"
                       >
-                        <Star className="h-10 w-10 fill-current" />
+                        <Star 
+                          className={`h-8 w-8 ${
+                            star <= newReview.rating 
+                              ? 'text-yellow-500 fill-current' 
+                              : 'text-gray-300 stroke-2'
+                          }`}
+                        />
                       </button>
                     ))}
                   </div>
                 </div>
                 
-                {/* Text Area */}
+                {/* Review Text Section */}
                 <div>
+                  <Label className="text-base font-medium mb-3 block">Your Review *</Label>
                   <Textarea
                     value={newReview.comment}
                     onChange={(e) => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
-                    placeholder="Share details of your own experience at this place"
-                    className="min-h-[140px] resize-none"
+                    placeholder={`Share your experience with ${acceptedSubmission.store_name}...`}
+                    className="min-h-[120px] resize-none"
                   />
                 </div>
+
+                {/* Photos Section */}
+                <div>
+                  <Label className="text-base font-medium mb-3 block">Photos (Optional) - Max 3</Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                    <div className="flex items-center justify-center gap-2 text-gray-500">
+                      <div className="w-6 h-6 border-2 border-gray-400 rounded flex items-center justify-center">
+                        <div className="w-3 h-3 border border-gray-400 rounded-sm"></div>
+                      </div>
+                      <span>Add Photo</span>
+                    </div>
+                  </div>
+                </div>
                 
-                {/* Submit Button */}
-                <Button 
-                  onClick={async () => {
-                    await submitReview();
-                    setIsReviewModalOpen(false);
-                    setShowReviewForm(false);
-                  }}
-                  disabled={isSubmittingReview || !newReview.comment.trim()}
-                  className="w-full bg-black text-white hover:bg-gray-800"
-                >
-                  {isSubmittingReview ? 'Posting...' : 'Post'}
-                </Button>
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => setShowReviewForm(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={async () => {
+                      await submitReview();
+                      setIsReviewModalOpen(false);
+                      setShowReviewForm(false);
+                    }}
+                    disabled={isSubmittingReview || !newReview.comment.trim()}
+                    className="flex-1 bg-gray-600 text-white hover:bg-gray-700"
+                  >
+                    {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+                  </Button>
+                </div>
               </div>
             </>
           )}
