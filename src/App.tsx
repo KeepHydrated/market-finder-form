@@ -7,7 +7,7 @@ import { GlobalHeader } from "@/components/GlobalHeader";
 import Index from "./pages/Index";
 import Submissions from "./pages/Submissions";
 import Homepage from "./pages/Homepage";
-import Test from "./pages/Test";
+import Vendor from "./pages/Vendor";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,7 +24,7 @@ const App = () => (
           <Route path="/profile" element={<Index />} />
           <Route path="/submissions" element={<Submissions />} />
           <Route path="/homepage" element={<Homepage />} />
-          <Route path="/test" element={<Test />} />
+          <Route path="/vendor" element={<Vendor />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ProductGrid";
 
-const Test = () => {
+const Vendor = () => {
   // Sample product data that matches the Product interface
   const sampleProducts = [
     {
@@ -142,4 +142,4 @@ const Test = () => {
   );
 };
 
-export default Test;
+export default Vendor;
