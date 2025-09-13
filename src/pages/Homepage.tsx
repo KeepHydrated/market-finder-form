@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, Star, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -124,10 +126,32 @@ const Homepage = () => {
         
         {/* Filter Button */}
         <div className="flex justify-end mb-6">
-          <Button variant="outline" className="flex items-center gap-2">
-            <Filter className="h-4 w-4" />
-            Filter search results
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                Filter search results
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-0 bg-background border shadow-lg z-50" align="end">
+              <Tabs defaultValue="times" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
+                  <TabsTrigger value="times">Times</TabsTrigger>
+                  <TabsTrigger value="categories">Categories</TabsTrigger>
+                </TabsList>
+                <TabsContent value="times" className="p-4">
+                  <div className="text-sm text-muted-foreground">
+                    Time filters will go here
+                  </div>
+                </TabsContent>
+                <TabsContent value="categories" className="p-4">
+                  <div className="text-sm text-muted-foreground">
+                    Category filters will go here
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </PopoverContent>
+          </Popover>
         </div>
         
         <div className="flex justify-center">
