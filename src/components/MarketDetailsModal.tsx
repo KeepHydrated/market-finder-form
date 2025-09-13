@@ -39,7 +39,7 @@ export const MarketDetailsModal = ({
         <div className="space-y-6">
           <div className="flex items-center gap-2">
             <Store className="h-5 w-5 text-muted-foreground" />
-            <h3 className="text-lg font-semibold">{marketName}</h3>
+            <h3 className="text-base font-normal">{marketName}</h3>
           </div>
 
           {marketAddress && (
@@ -57,7 +57,7 @@ export const MarketDetailsModal = ({
                 {Object.entries(marketHours).map(([day, hours]) => (
                   <div key={day} className="flex justify-between">
                     <span className="text-muted-foreground">{getDayFullName(day)}</span>
-                    <span className="text-sm">
+                    <span>
                       {hours.start} {hours.startPeriod} - {hours.end} {hours.endPeriod}
                     </span>
                   </div>
@@ -67,7 +67,7 @@ export const MarketDetailsModal = ({
           )}
 
           {!marketAddress && (!marketHours || Object.keys(marketHours).length === 0) && (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground">
               This appears to be a search result rather than a custom market submission.
             </p>
           )}
