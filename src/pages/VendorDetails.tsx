@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { Header } from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -88,7 +87,6 @@ const VendorDetails = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header user={user} profile={profile} />
         <div className="container mx-auto px-4 py-12">
           <div className="text-center">Loading...</div>
         </div>
@@ -99,7 +97,6 @@ const VendorDetails = () => {
   if (!submission) {
     return (
       <div className="min-h-screen bg-background">
-        <Header user={user} profile={profile} />
         <div className="container mx-auto px-4 py-12">
           <div className="text-center">
             <p className="text-muted-foreground">Vendor not found.</p>
@@ -114,7 +111,6 @@ const VendorDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} profile={profile} />
       <div className="container mx-auto px-4 py-12">
         <Button
           variant="outline"

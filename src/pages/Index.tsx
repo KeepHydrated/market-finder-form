@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { VendorApplication, VendorApplicationData } from "@/components/VendorApplication";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { UserMenu } from "@/components/auth/UserMenu";
-import { Header } from "@/components/Header";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -394,14 +393,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Universal Header */}
-      <Header 
-        user={user} 
-        profile={profile} 
-        showBackButton={!!selectedMarket}
-        onBackClick={handleBackToSearch}
-      />
-
       {/* Sidebar and Main Content */}
       <div className="flex">
         {/* Left Sidebar - Navigation Tabs */}

@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { UserMenu } from "@/components/auth/UserMenu";
-import { Header } from "@/components/Header";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { VendorApplication, VendorApplicationData } from "@/components/VendorApplication";
@@ -116,9 +115,6 @@ const Submissions = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Universal Header */}
-      <Header user={user} profile={profile} />
-
       {/* Main Content */}
       <main className="py-12">
         <div className="container mx-auto px-4 flex gap-6">
