@@ -125,7 +125,7 @@ const Homepage = () => {
       <div className="container mx-auto px-4 py-12">
         
         {/* Filter Button */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-end mb-6">
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
