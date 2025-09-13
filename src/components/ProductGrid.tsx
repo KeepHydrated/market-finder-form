@@ -95,9 +95,9 @@ const ProductCard = ({ product, onProductClick }: ProductCardProps) => {
       </div>
       
       <CardContent className="p-4">
-        <h3 className="font-semibold text-base mb-2">{product.name}</h3>
+        <h3 className="font-medium text-base mb-2">{product.name}</h3>
         <div className="flex items-center justify-between">
-          <span className="text-base font-bold text-muted-foreground">
+          <span className="text-base font-semibold text-muted-foreground">
             ${product.price.toFixed(2)}
           </span>
         </div>
