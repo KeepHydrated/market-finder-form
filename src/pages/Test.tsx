@@ -1,8 +1,9 @@
-import { Store, MapPin, Clock } from "lucide-react";
+import { Store, MapPin, Clock, Star, Heart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 
 const Test = () => {
   return (
@@ -31,18 +32,31 @@ const Test = () => {
       <div className="flex-1">
         {/* Top row under header */}
         <div className="bg-card border-b p-8">
-          <div className="grid grid-cols-2 gap-6">
-            {/* Left column */}
-            <div className="space-y-6">
-              <p className="text-foreground">hhhh</p>
-              <p className="text-foreground">bbbb</p>
+          <div className="space-y-4">
+            {/* Title row with heart icon */}
+            <div className="flex items-start justify-between">
+              <h1 className="text-4xl font-bold text-foreground">Farm Fresh Produce</h1>
+              <Heart className="h-6 w-6 text-muted-foreground" />
             </div>
             
-            {/* Right column */}
-            <div className="space-y-6">
-              <p className="text-foreground">Home Goods</p>
-              <p className="text-foreground">bbb</p>
+            {/* Rating row */}
+            <div className="flex items-center gap-2">
+              <Star className="h-5 w-5 text-yellow-500 fill-current" />
+              <span className="text-foreground font-medium">4.9</span>
+              <span className="text-muted-foreground">(45 reviews)</span>
             </div>
+            
+            {/* Category badges */}
+            <div className="flex gap-2">
+              <Badge variant="secondary">Organic Vegetables</Badge>
+              <Badge variant="secondary">Seasonal Fruits</Badge>
+              <Badge variant="secondary">Herbs</Badge>
+            </div>
+            
+            {/* Description */}
+            <p className="text-muted-foreground">
+              Family-owned farm providing fresh, organic vegetables and fruits grown with sustainable practices.
+            </p>
           </div>
         </div>
         
