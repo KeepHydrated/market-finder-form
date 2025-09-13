@@ -118,8 +118,8 @@ const Homepage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-12">
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="container mx-auto px-4">
 
         {acceptedSubmissions.length === 0 ? (
           <div className="text-center">
