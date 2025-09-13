@@ -415,12 +415,9 @@ const Vendor = () => {
                     ))}
                   </div>
                   <span className="text-lg font-medium ml-2">
-                    {reviewStats.totalReviews > 0 ? reviewStats.averageRating.toFixed(1) : '0.0'}
+                    {reviewStats.totalReviews > 0 ? reviewStats.averageRating.toFixed(1) : '0.0'} ({reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''})
                   </span>
                 </div>
-                <p className="text-muted-foreground">
-                  {reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''}
-                </p>
               </DialogHeader>
 
               <div className="space-y-4">
