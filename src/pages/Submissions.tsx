@@ -241,10 +241,6 @@ const Submissions = () => {
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
                   
-                  <span className="text-sm text-muted-foreground">
-                    {currentSubmissionIndex + 1} of {submissions.length}
-                  </span>
-                  
                   <Button
                     variant="outline"
                     size="sm"
