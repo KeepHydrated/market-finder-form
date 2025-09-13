@@ -43,8 +43,9 @@ export const MarketDetailsModal = ({
         </DialogHeader>
         
         <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold mb-2">{marketName}</h3>
+          <div className="flex items-center gap-2">
+            <Store className="h-5 w-5 text-muted-foreground" />
+            <h3 className="text-lg font-semibold">{marketName}</h3>
           </div>
 
           {marketAddress && (
