@@ -177,19 +177,6 @@ const Homepage = () => {
                     </p>
                   )}
 
-                  {/* Rating */}
-                  <div className="flex items-center gap-1 pt-1">
-                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                    <span className="text-sm font-medium">
-                      {vendorRatings[submission.id]?.totalReviews > 0 
-                        ? vendorRatings[submission.id].averageRating.toFixed(1)
-                        : '0.0'
-                      }
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      ({vendorRatings[submission.id]?.totalReviews || 0} reviews)
-                    </span>
-                  </div>
                 </div>
               </Card>
             ))}
