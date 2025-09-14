@@ -563,6 +563,22 @@ const Homepage = () => {
                         </div>
                       )}
                       
+                      {/* Rating - Top Left */}
+                      <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                        <div className="flex items-center gap-1">
+                          <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                          <span className="text-xs font-medium">
+                            {vendorRatings[submission.id]?.totalReviews > 0 
+                              ? vendorRatings[submission.id].averageRating.toFixed(1)
+                              : '0.0'
+                            }
+                          </span>
+                          <span className="text-xs text-gray-600">
+                            ({vendorRatings[submission.id]?.totalReviews || 0})
+                          </span>
+                        </div>
+                      </div>
+                      
                       {/* Like Button */}
                       <Button
                         variant="secondary"
@@ -598,20 +614,6 @@ const Homepage = () => {
                           {submission.primary_specialty}
                         </p>
                       )}
-
-                      {/* Rating */}
-                      <div className="flex items-center gap-1 pt-1">
-                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                        <span className="text-sm font-medium">
-                          {vendorRatings[submission.id]?.totalReviews > 0 
-                            ? vendorRatings[submission.id].averageRating.toFixed(1)
-                            : '0.0'
-                          }
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          ({vendorRatings[submission.id]?.totalReviews || 0} reviews)
-                        </span>
-                      </div>
                     </div>
                   </Card>
                 ))}
