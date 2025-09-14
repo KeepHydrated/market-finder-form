@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Heart, Star, Filter, MapPin, Loader2 } from "lucide-react";
+import { Heart, Star, Filter, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface AcceptedSubmission {
   id: string;
@@ -50,6 +51,7 @@ const SPECIALTY_CATEGORIES = [
 
 const Homepage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<AcceptedSubmission[]>([]);
   const [vendorRatings, setVendorRatings] = useState<Record<string, VendorRating>>({});
   const [loading, setLoading] = useState(true);
@@ -61,8 +63,8 @@ const Homepage = () => {
     endTime: string;
     endPeriod: 'AM' | 'PM';
   }>>({});
-  const [currentZipcode, setCurrentZipcode] = useState<string>('');
-  const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [locationZipcode, setLocationZipcode] = useState<string>('');
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
   const toggleDay = (day: string) => {
     setSelectedDays(prev => {
@@ -110,55 +112,82 @@ const Homepage = () => {
     return [`${hour.toString().padStart(2, '0')}:00`, `${hour.toString().padStart(2, '0')}:30`];
   }).flat();
 
-  const getCurrentZipcode = async () => {
-    setIsGettingLocation(true);
-    
+  // Get current location and convert to zipcode (same as /profile page)
+  const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by this browser.');
-      setIsGettingLocation(false);
+      toast({
+        title: "Geolocation not supported",
+        description: "Your browser doesn't support geolocation.",
+        variant: "destructive"
+      });
       return;
     }
 
+    setIsLoadingLocation(true);
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const { latitude, longitude } = position.coords;
-        
         try {
-          // For demo purposes, we'll simulate getting a zipcode
-          // In a real app, you'd use a reverse geocoding service like Google Maps API
-          await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
+          const { latitude, longitude } = position.coords;
           
-          // This is a placeholder - in reality you'd make an API call to convert lat/lng to zipcode
-          const simulatedZipcode = '90210'; // Placeholder zipcode
-          setCurrentZipcode(simulatedZipcode);
+          // Use a free reverse geocoding API to get actual zipcode
+          const response = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          );
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch location data');
+          }
+          
+          const data = await response.json();
+          const zipcode = data.postcode || data.postalCode || 'Unknown';
+          
+          if (zipcode === 'Unknown') {
+            throw new Error('Could not determine zipcode');
+          }
+          
+          setLocationZipcode(zipcode);
+          
+          toast({
+            title: "Location found",
+            description: `Zipcode updated to ${zipcode}`,
+          });
         } catch (error) {
-          console.error('Error getting zipcode:', error);
-          alert('Unable to get zipcode. Please try again.');
+          console.error('Geocoding error:', error);
+          toast({
+            title: "Error",
+            description: "Failed to get zipcode from your location. Please enter it manually.",
+            variant: "destructive"
+          });
         } finally {
-          setIsGettingLocation(false);
+          setIsLoadingLocation(false);
         }
       },
       (error) => {
-        console.error('Geolocation error:', error);
-        let errorMessage = 'Unable to get your location. ';
+        setIsLoadingLocation(false);
+        let errorMessage = "Please allow location access to get your zipcode.";
         
-        switch (error.code) {
+        switch(error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage += 'Please allow location access and try again.';
+            errorMessage = "Location access denied. Please enable location services and try again.";
             break;
           case error.POSITION_UNAVAILABLE:
-            errorMessage += 'Location information is unavailable.';
+            errorMessage = "Location information unavailable. Please enter your zipcode manually.";
             break;
           case error.TIMEOUT:
-            errorMessage += 'Location request timed out.';
-            break;
-          default:
-            errorMessage += 'An unknown error occurred.';
+            errorMessage = "Location request timed out. Please try again or enter manually.";
             break;
         }
         
-        alert(errorMessage);
-        setIsGettingLocation(false);
+        toast({
+          title: "Location Error",
+          description: errorMessage,
+          variant: "destructive"
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutes
       }
     );
   };
@@ -382,7 +411,7 @@ const Homepage = () => {
                   </div>
                 </TabsContent>
                 <TabsContent value="location" className="p-4">
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     <h4 className="font-medium">Location *</h4>
                     
                     {/* Manual Location Input */}
@@ -396,41 +425,27 @@ const Homepage = () => {
                       </div>
                     </div>
 
-                    {/* Divider */}
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1 h-px bg-border"></div>
-                      <span className="text-sm text-muted-foreground">OR</span>
-                      <div className="flex-1 h-px bg-border"></div>
-                    </div>
-
-                    {/* Zipcode Finder */}
-                    <div className="space-y-4">
-                      <h5 className="font-medium">Get Current Zipcode</h5>
-                      
-                      {/* Zipcode Display */}
-                      <div className="bg-muted rounded-lg p-4 min-h-[60px] flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
-                        <span className="text-lg font-medium text-muted-foreground">
-                          {currentZipcode || 'Zipcode will appear here...'}
-                        </span>
-                      </div>
-
-                      {/* Get Location Button */}
-                      <div className="text-center space-y-2">
-                        <Button
-                          onClick={getCurrentZipcode}
-                          disabled={isGettingLocation}
-                          className="bg-green-500 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-lg"
+                    {/* Location Section - Same as Profile Page */}
+                    <div>
+                      <h2 className="text-xl font-semibold mb-4">Location</h2>
+                      <div className="flex gap-4 items-center mb-2">
+                        <Input 
+                          value={locationZipcode}
+                          onChange={(e) => setLocationZipcode(e.target.value)}
+                          placeholder="Zipcode will appear here..." 
+                          className="bg-background"
+                        />
+                        <Button 
+                          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2"
+                          onClick={getCurrentLocation}
+                          disabled={isLoadingLocation}
                         >
-                          {isGettingLocation ? (
-                            <Loader2 className="h-5 w-5 animate-spin" />
-                          ) : (
-                            <MapPin className="h-5 w-5" />
-                          )}
+                          <RotateCcw className={`h-4 w-4 ${isLoadingLocation ? 'animate-spin' : ''}`} />
                         </Button>
-                        <p className="text-sm text-muted-foreground">
-                          Click the button to get your current zipcode.
-                        </p>
                       </div>
+                      <p className="text-sm text-muted-foreground">
+                        Click the button to get your current zipcode.
+                      </p>
                     </div>
                   </div>
                 </TabsContent>
