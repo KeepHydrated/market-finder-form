@@ -435,19 +435,19 @@ const Homepage = () => {
                     {/* Zipcode Section */}
                     <div className="space-y-4">
                       <h5 className="font-medium">Zipcode</h5>
-                      <div className="flex gap-4 items-center mb-2">
+                      <div className="relative">
                         <Input 
                           value={locationZipcode}
                           onChange={(e) => setLocationZipcode(e.target.value)}
                           placeholder="Zipcode will appear here..." 
-                          className="bg-background h-12 text-lg border-2 border-border rounded-xl"
+                          className="bg-background h-12 text-lg border-2 border-border rounded-xl pr-16"
                         />
                         <Button 
-                          className="bg-green-500 hover:bg-green-600 text-white h-12 w-12 p-0 rounded-xl"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-green-500 hover:bg-green-600 text-white h-8 w-8 p-0 rounded-lg"
                           onClick={getCurrentLocation}
                           disabled={isLoadingLocation}
                         >
-                          <RotateCcw className={`h-5 w-5 ${isLoadingLocation ? 'animate-spin' : ''}`} />
+                          <RotateCcw className={`h-4 w-4 ${isLoadingLocation ? 'animate-spin' : ''}`} />
                         </Button>
                       </div>
                       <p className="text-sm text-muted-foreground">
