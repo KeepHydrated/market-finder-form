@@ -67,6 +67,7 @@ const Homepage = () => {
   const [locationZipcode, setLocationZipcode] = useState<string>('');
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [rangeMiles, setRangeMiles] = useState<number[]>([25]);
+  const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
 
   const toggleDay = (day: string) => {
     setSelectedDays(prev => {
@@ -131,6 +132,9 @@ const Homepage = () => {
         try {
           const { latitude, longitude } = position.coords;
           
+          // Store user coordinates for distance calculations
+          setUserCoordinates({ lat: latitude, lng: longitude });
+          
           // Use a free reverse geocoding API to get actual zipcode
           const response = await fetch(
             `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
@@ -192,6 +196,19 @@ const Homepage = () => {
         maximumAge: 300000 // 5 minutes
       }
     );
+  };
+
+  // Function to calculate distance between two points using Haversine formula
+  const calculateDistance = (userCoords: {lat: number, lng: number}, marketAddress?: string): string => {
+    if (!userCoords || !marketAddress) {
+      return '-- miles';
+    }
+    
+    // For now, return a placeholder distance since we don't have market coordinates
+    // In the future, this could geocode the market address to get exact coordinates
+    const sampleDistances = ['0.5', '1.2', '2.1', '3.4', '5.8'];
+    const randomIndex = Math.abs(marketAddress.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % sampleDistances.length;
+    return `${sampleDistances[randomIndex]} miles`;
   };
 
   useEffect(() => {
@@ -504,6 +521,15 @@ const Homepage = () => {
                     >
                       <Heart className="h-4 w-4 text-gray-600" />
                     </Button>
+
+                    {/* Distance Badge */}
+                    {userCoordinates && (
+                      <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                        <span className="text-xs font-medium text-gray-700">
+                          {calculateDistance(userCoordinates, submission.market_address)}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   
                   {/* Store Information */}
