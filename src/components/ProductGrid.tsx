@@ -18,6 +18,8 @@ interface ProductGridProps {
   onDeleteProduct?: (productId: number) => void;
   onDuplicateProduct?: (product: Product) => void;
   onEditProduct?: (product: Product) => void;
+  vendorId?: string;
+  vendorName?: string;
 }
 
 interface ProductCardProps {
@@ -167,7 +169,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProd
   );
 };
 
-export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onEditProduct }: ProductGridProps) => {
+export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId, vendorName }: ProductGridProps) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -210,6 +212,8 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
         open={isModalOpen}
         onClose={handleCloseModal}
         onProductChange={setSelectedProduct}
+        vendorId={vendorId}
+        vendorName={vendorName}
       />
     </>
   );

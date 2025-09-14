@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ChevronLeft, ChevronRight, X, ShoppingCart, Plus, Minus } from "lucide-react";
+import { useShoppingCart } from "@/contexts/ShoppingCartContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface Product {
   id: number;
@@ -17,10 +21,15 @@ interface ProductDetailModalProps {
   open: boolean;
   onClose: () => void;
   onProductChange?: (product: Product) => void;
+  vendorId?: string;
+  vendorName?: string;
 }
 
-export const ProductDetailModal = ({ product, products = [], open, onClose, onProductChange }: ProductDetailModalProps) => {
+export const ProductDetailModal = ({ product, products = [], open, onClose, onProductChange, vendorId, vendorName }: ProductDetailModalProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const { addItem } = useShoppingCart();
+  const { toast } = useToast();
 
   if (!product || !products.length) return null;
 
@@ -63,8 +72,39 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
       setCurrentImageIndex(0); // Reset image index when closing
+      setQuantity(1); // Reset quantity when closing
       onClose();
     }
+  };
+
+  const handleAddToCart = () => {
+    if (!product || !vendorId || !vendorName) {
+      toast({
+        title: "Error",
+        description: "Unable to add item to cart. Missing product or vendor information.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const cartItem = {
+      id: `${vendorId}-${product.id}`,
+      product_name: product.name,
+      product_description: product.description,
+      unit_price: Math.round(product.price * 100), // Convert to cents
+      vendor_id: vendorId,
+      vendor_name: vendorName,
+    };
+
+    addItem({ ...cartItem, quantity });
+
+    toast({
+      title: "Added to Cart",
+      description: `${quantity} ${product.name} added to your cart`,
+    });
+
+    // Optionally close modal after adding to cart
+    // onClose();
   };
 
   return (
@@ -175,6 +215,48 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
                     {product.description}
                   </p>
                 </div>
+
+                {/* Add to Cart Section */}
+                {vendorId && vendorName && (
+                  <div className="space-y-4 pt-6 border-t">
+                    <div className="space-y-2">
+                      <Label htmlFor="quantity">Quantity</Label>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                          disabled={quantity <= 1}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <Input
+                          id="quantity"
+                          type="number"
+                          min="1"
+                          value={quantity}
+                          onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="w-20 text-center"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setQuantity(quantity + 1)}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Button
+                      className="w-full"
+                      onClick={handleAddToCart}
+                    >
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Add to Cart - ${(product.price * quantity).toFixed(2)}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

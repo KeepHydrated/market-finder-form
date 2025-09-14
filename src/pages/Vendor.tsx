@@ -378,7 +378,11 @@ const Vendor = () => {
             
             {/* Product Grid */}
             {acceptedSubmission.products && acceptedSubmission.products.length > 0 ? (
-              <ProductGrid products={acceptedSubmission.products} />
+              <ProductGrid 
+                products={acceptedSubmission.products} 
+                vendorId={acceptedSubmission.id}
+                vendorName={acceptedSubmission.store_name}
+              />
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 No products available yet.
