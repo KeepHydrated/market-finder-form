@@ -301,7 +301,6 @@ const Homepage = () => {
                 </TabsList>
                 <TabsContent value="times" className="p-4">
                   <div className="space-y-4">
-                    <h4 className="font-medium">Time *</h4>
                     <div className="flex flex-wrap gap-2">
                       {DAYS.map((day) => (
                         <Button
