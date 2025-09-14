@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Heart, Star, Filter } from "lucide-react";
+import { Heart, Star, Filter, MapPin, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -61,6 +61,8 @@ const Homepage = () => {
     endTime: string;
     endPeriod: 'AM' | 'PM';
   }>>({});
+  const [currentZipcode, setCurrentZipcode] = useState<string>('');
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
 
   const toggleDay = (day: string) => {
     setSelectedDays(prev => {
@@ -107,6 +109,59 @@ const Homepage = () => {
     const hour = i + 1;
     return [`${hour.toString().padStart(2, '0')}:00`, `${hour.toString().padStart(2, '0')}:30`];
   }).flat();
+
+  const getCurrentZipcode = async () => {
+    setIsGettingLocation(true);
+    
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by this browser.');
+      setIsGettingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        try {
+          // For demo purposes, we'll simulate getting a zipcode
+          // In a real app, you'd use a reverse geocoding service like Google Maps API
+          await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
+          
+          // This is a placeholder - in reality you'd make an API call to convert lat/lng to zipcode
+          const simulatedZipcode = '90210'; // Placeholder zipcode
+          setCurrentZipcode(simulatedZipcode);
+        } catch (error) {
+          console.error('Error getting zipcode:', error);
+          alert('Unable to get zipcode. Please try again.');
+        } finally {
+          setIsGettingLocation(false);
+        }
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        let errorMessage = 'Unable to get your location. ';
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage += 'Please allow location access and try again.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage += 'Location information is unavailable.';
+            break;
+          case error.TIMEOUT:
+            errorMessage += 'Location request timed out.';
+            break;
+          default:
+            errorMessage += 'An unknown error occurred.';
+            break;
+        }
+        
+        alert(errorMessage);
+        setIsGettingLocation(false);
+      }
+    );
+  };
 
   useEffect(() => {
     fetchAcceptedSubmissions();
@@ -327,8 +382,10 @@ const Homepage = () => {
                   </div>
                 </TabsContent>
                 <TabsContent value="location" className="p-4">
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <h4 className="font-medium">Location *</h4>
+                    
+                    {/* Manual Location Input */}
                     <div className="space-y-3">
                       <Input
                         placeholder="Enter city, state, or zip code"
@@ -336,6 +393,43 @@ const Homepage = () => {
                       />
                       <div className="text-sm text-muted-foreground">
                         Search for markets near your location
+                      </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1 h-px bg-border"></div>
+                      <span className="text-sm text-muted-foreground">OR</span>
+                      <div className="flex-1 h-px bg-border"></div>
+                    </div>
+
+                    {/* Zipcode Finder */}
+                    <div className="space-y-4">
+                      <h5 className="font-medium">Get Current Zipcode</h5>
+                      
+                      {/* Zipcode Display */}
+                      <div className="bg-muted rounded-lg p-4 min-h-[60px] flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
+                        <span className="text-lg font-medium text-muted-foreground">
+                          {currentZipcode || 'Zipcode will appear here...'}
+                        </span>
+                      </div>
+
+                      {/* Get Location Button */}
+                      <div className="text-center space-y-2">
+                        <Button
+                          onClick={getCurrentZipcode}
+                          disabled={isGettingLocation}
+                          className="bg-green-500 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-lg"
+                        >
+                          {isGettingLocation ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <MapPin className="h-5 w-5" />
+                          )}
+                        </Button>
+                        <p className="text-sm text-muted-foreground">
+                          Click the button to get your current zipcode.
+                        </p>
                       </div>
                     </div>
                   </div>
