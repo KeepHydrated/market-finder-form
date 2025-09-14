@@ -613,7 +613,7 @@ const Homepage = () => {
                     </div>
                     
                     {/* Store Information */}
-                    <div className="p-4 space-y-2">
+                    <div className="p-4 space-y-3">
                       <h3 className="text-lg font-semibold text-foreground text-left">
                         {submission.store_name}
                       </h3>
