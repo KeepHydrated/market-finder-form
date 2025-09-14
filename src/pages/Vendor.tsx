@@ -266,8 +266,27 @@ const Vendor = () => {
       'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday', 'sun': 'Sunday'
     };
     
+    const formatTime = (time: string, period: 'AM' | 'PM') => {
+      // Convert 24-hour format to 12-hour format
+      let hour = parseInt(time.split(':')[0]);
+      const minute = time.includes(':') ? time.split(':')[1] : '00';
+      
+      // Handle 24-hour format conversion
+      if (hour === 0) {
+        hour = 12;
+        period = 'AM';
+      } else if (hour > 12) {
+        hour = hour - 12;
+        period = 'PM';
+      } else if (hour === 12) {
+        period = 'PM';
+      }
+      
+      return `${hour}:${minute} ${period}`;
+    };
+    
     const fullDayName = dayNames[firstDay.toLowerCase() as keyof typeof dayNames] || firstDay;
-    return `${fullDayName}, ${hours.start}:00 ${hours.startPeriod} - ${hours.end}:00 ${hours.endPeriod}`;
+    return `${fullDayName}, ${formatTime(hours.start, hours.startPeriod)} - ${formatTime(hours.end, hours.endPeriod)}`;
   };
 
   if (loading || loadingData) {
