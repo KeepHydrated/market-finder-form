@@ -320,20 +320,45 @@ const Vendor = () => {
         {/* Left column - wider width */}
         <div className="w-96 bg-green-50 border-r">
         <div className="space-y-6 px-4 pt-6 pb-6">
-          <div className="flex items-center gap-3">
-            <span className="text-foreground text-xl font-bold">
-              {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
-            </span>
-            {/* Rating display */}
-            <div className="flex items-center gap-2">
-              <Star className="h-4 w-4 text-yellow-500 fill-current" />
-              <span className="text-foreground font-medium">
-                {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-foreground text-xl font-bold">
+                {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
               </span>
-              <span className="text-muted-foreground">
-                ({reviewStats.totalReviews})
-              </span>
+              {/* Rating display */}
+              <div className="flex items-center gap-2">
+                <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                <span className="text-foreground font-medium">
+                  {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'}
+                </span>
+                <span className="text-muted-foreground">
+                  ({reviewStats.totalReviews})
+                </span>
+              </div>
             </div>
+            {/* Heart icon */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={async () => {
+                if (acceptedSubmission) {
+                  await toggleLike(acceptedSubmission.id, 'vendor');
+                }
+              }}
+              className={cn(
+                "transition-colors",
+                acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor')
+                  ? "text-red-500 hover:text-red-600"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Heart 
+                className={cn(
+                  "h-5 w-5 transition-colors",
+                  acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') && "fill-current"
+                )} 
+              />
+            </Button>
           </div>
 
           <div className="flex items-start gap-2">
