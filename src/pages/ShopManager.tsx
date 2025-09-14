@@ -101,6 +101,8 @@ export default function ShopManager() {
         .select('*')
         .eq('user_id', user.id)
         .eq('status', 'accepted')
+        .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (error) {
