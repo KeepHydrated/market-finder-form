@@ -12,14 +12,14 @@ interface MarketCardProps {
 export const MarketCard = ({ name, address, days, hours }: MarketCardProps) => {
   return (
     <Card className="hover:shadow-lg transition-shadow">
-      <CardHeader>
+      <CardHeader className="space-y-2">
         <CardTitle className="text-lg text-foreground">{name}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
         <div className="flex items-start gap-2">
           <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
           <p className="text-sm text-muted-foreground">{address}</p>
         </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">{hours}</p>
