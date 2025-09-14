@@ -450,14 +450,14 @@ const Homepage = () => {
                         <Slider
                           value={rangeMiles}
                           onValueChange={setRangeMiles}
-                          max={100}
+                          max={25}
                           min={1}
                           step={1}
                           className="w-full"
                         />
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span>1 mile</span>
-                          <span>100 miles</span>
+                          <span>25 miles</span>
                         </div>
                       </div>
                     </div>
