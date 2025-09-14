@@ -331,17 +331,6 @@ const Homepage = () => {
         <div className="flex justify-between items-center mb-6">
           <div className="flex rounded-lg bg-muted p-1">
             <button
-              onClick={() => setViewMode('markets')}
-              className={cn(
-                "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                viewMode === 'markets'
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Markets
-            </button>
-            <button
               onClick={() => setViewMode('vendors')}
               className={cn(
                 "px-4 py-2 text-sm font-medium rounded-md transition-colors",
@@ -351,6 +340,17 @@ const Homepage = () => {
               )}
             >
               Vendors
+            </button>
+            <button
+              onClick={() => setViewMode('markets')}
+              className={cn(
+                "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                viewMode === 'markets'
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Markets
             </button>
           </div>
           
