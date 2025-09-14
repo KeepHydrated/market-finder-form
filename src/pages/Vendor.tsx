@@ -257,10 +257,6 @@ const Vendor = () => {
   const formatSchedule = (marketDays?: string[], marketHours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>) => {
     if (!marketDays || !marketHours) return "Schedule TBD";
     
-    const firstDay = marketDays[0];
-    const hours = marketHours[firstDay];
-    if (!hours) return "Schedule TBD";
-    
     const dayNames = {
       'mon': 'Monday', 'tue': 'Tuesday', 'wed': 'Wednesday', 
       'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday', 'sun': 'Sunday'
@@ -285,8 +281,16 @@ const Vendor = () => {
       return `${hour}:${minute} ${period}`;
     };
     
-    const fullDayName = dayNames[firstDay.toLowerCase() as keyof typeof dayNames] || firstDay;
-    return `${fullDayName}, ${formatTime(hours.start, hours.startPeriod)} - ${formatTime(hours.end, hours.endPeriod)}`;
+    // Format all days and times
+    const schedules = marketDays.map(day => {
+      const hours = marketHours[day];
+      if (!hours) return null;
+      
+      const fullDayName = dayNames[day.toLowerCase() as keyof typeof dayNames] || day;
+      return `${fullDayName}, ${formatTime(hours.start, hours.startPeriod)} - ${formatTime(hours.end, hours.endPeriod)}`;
+    }).filter(Boolean);
+    
+    return schedules.join('\n') || "Schedule TBD";
   };
 
   if (loading || loadingData) {
@@ -341,7 +345,7 @@ const Vendor = () => {
 
           <div className="flex items-start gap-2">
             <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <span className="text-muted-foreground text-base font-normal">
+            <span className="text-muted-foreground text-base font-normal whitespace-pre-line">
               {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours)}
             </span>
           </div>
