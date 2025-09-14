@@ -324,7 +324,7 @@ const Vendor = () => {
             {/* Title row with rating and heart icon */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <h1 className="text-4xl font-bold text-foreground">{acceptedSubmission.store_name}</h1>
+                <h1 className="text-2xl font-bold text-foreground">{acceptedSubmission.store_name}</h1>
                 <div 
                   className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
                   onClick={() => setIsReviewModalOpen(true)}
