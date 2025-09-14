@@ -13,6 +13,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useLikes } from "@/hooks/useLikes";
+import { cn } from "@/lib/utils";
 
 interface AcceptedSubmission {
   id: string;
@@ -47,6 +49,7 @@ interface ReviewStats {
 const Vendor = () => {
   const { user, profile, loading } = useAuth();
   const { toast } = useToast();
+  const { toggleLike, isLiked } = useLikes();
   const [acceptedSubmission, setAcceptedSubmission] = useState<AcceptedSubmission | null>(null);
   const [loadingData, setLoadingData] = useState(true);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -348,7 +351,28 @@ const Vendor = () => {
                   </span>
                 </div>
               </div>
-              <Heart className="h-6 w-6 text-muted-foreground" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={async () => {
+                  if (acceptedSubmission) {
+                    await toggleLike(acceptedSubmission.id, 'vendor');
+                  }
+                }}
+                className={cn(
+                  "transition-colors",
+                  acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor')
+                    ? "text-red-500 hover:text-red-600"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Heart 
+                  className={cn(
+                    "h-6 w-6 transition-colors",
+                    acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') && "fill-current"
+                  )} 
+                />
+              </Button>
             </div>
             
             {/* Category badges */}

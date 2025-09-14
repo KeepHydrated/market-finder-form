@@ -11,6 +11,7 @@ import { Heart, Star, Filter, RotateCcw, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useLikes } from "@/hooks/useLikes";
 
 interface AcceptedSubmission {
   id: string;
@@ -53,6 +54,7 @@ const SPECIALTY_CATEGORIES = [
 const Homepage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { toggleLike, isLiked } = useLikes();
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<AcceptedSubmission[]>([]);
   const [vendorRatings, setVendorRatings] = useState<Record<string, VendorRating>>({});
   const [loading, setLoading] = useState(true);
@@ -584,12 +586,19 @@ const Homepage = () => {
                         variant="secondary"
                         size="sm"
                         className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.stopPropagation();
-                          // Handle like functionality here
+                          await toggleLike(submission.id, 'vendor');
                         }}
                       >
-                        <Heart className="h-4 w-4 text-gray-600" />
+                        <Heart 
+                          className={cn(
+                            "h-4 w-4 transition-colors",
+                            isLiked(submission.id, 'vendor') 
+                              ? "text-red-500 fill-current" 
+                              : "text-gray-600"
+                          )} 
+                        />
                       </Button>
 
                       {/* Distance Badge */}
@@ -794,12 +803,24 @@ const Homepage = () => {
                         variant="secondary"
                         size="sm"
                         className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.stopPropagation();
-                          // Add to favorites logic
+                          // Create a unique market ID by combining market name and address
+                          const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+                          await toggleLike(marketId, 'market');
                         }}
                       >
-                        <Heart className="h-4 w-4 text-gray-600" />
+                        <Heart 
+                          className={cn(
+                            "h-4 w-4 transition-colors",
+                            (() => {
+                              const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+                              return isLiked(marketId, 'market');
+                            })()
+                              ? "text-red-500 fill-current" 
+                              : "text-gray-600"
+                          )} 
+                        />
                       </Button>
                       
                       {/* Distance Badge - Bottom Right */}
