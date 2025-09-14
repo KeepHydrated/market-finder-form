@@ -789,20 +789,20 @@ const Homepage = () => {
                         </div>
                       </div>
 
-                      {/* Heart icon */}
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="absolute top-3 right-3 h-8 w-8 p-0 bg-white/80 hover:bg-white/90"
+                      {/* Heart Button - Top Right */}
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           // Add to favorites logic
                         }}
                       >
-                        <Heart className="h-4 w-4" />
+                        <Heart className="h-4 w-4 text-gray-600" />
                       </Button>
                       
-                      {/* Vendor count badge */}
+                      {/* Vendor count badge - Bottom Right */}
                       <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
                         <span className="text-xs font-medium text-gray-700">
                           {market.vendors.length} vendor{market.vendors.length !== 1 ? 's' : ''}
