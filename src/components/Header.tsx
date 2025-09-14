@@ -46,7 +46,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
 
   return (
     <header className="bg-card shadow-sm border-b sticky top-0 z-50">
-      <div className="mx-8">
+      <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             {showBackButton && onBackClick && (

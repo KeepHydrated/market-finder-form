@@ -290,7 +290,8 @@ const Vendor = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="flex mx-8">
+      <div className="container mx-auto px-4">
+        <div className="flex">
         {/* Left column - wider width */}
         <div className="w-96 bg-green-50 border-r p-6">
         <div className="space-y-6">
@@ -617,6 +618,7 @@ const Vendor = () => {
           )}
         </DialogContent>
       </Dialog>
+        </div>
       </div>
     </div>
   );
