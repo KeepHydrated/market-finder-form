@@ -3,9 +3,11 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChevronLeft, ChevronRight, X, ShoppingCart, Plus, Minus } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ShoppingCart, Plus, Minus, Heart } from "lucide-react";
 import { useShoppingCart } from "@/contexts/ShoppingCartContext";
 import { useToast } from "@/hooks/use-toast";
+import { useLikes } from "@/hooks/useLikes";
+import { cn } from "@/lib/utils";
 
 interface Product {
   id: number;
@@ -30,6 +32,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useShoppingCart();
   const { toast } = useToast();
+  const { toggleLike, isLiked } = useLikes();
 
   if (!product || !products.length) return null;
 
@@ -136,15 +139,42 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         <div className="flex flex-col md:flex-row min-h-0 w-full">
           {/* Left side - Images */}
           <div className="md:w-1/2 relative">
-            {/* Close button */}
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={onClose}
-              className="absolute top-4 right-4 z-10 h-8 w-8 p-0 bg-black/80 hover:bg-black text-white"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            {/* Top right buttons */}
+            <div className="absolute top-4 right-4 z-10 flex gap-2">
+              {/* Heart button */}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={async () => {
+                  if (product && vendorId) {
+                    await toggleLike(`${vendorId}-${product.id}`, 'product');
+                  }
+                }}
+                className={cn(
+                  "h-8 w-8 p-0 bg-black/80 hover:bg-black transition-colors",
+                  product && vendorId && isLiked(`${vendorId}-${product.id}`, 'product')
+                    ? "text-red-500 hover:text-red-600"
+                    : "text-white"
+                )}
+              >
+                <Heart 
+                  className={cn(
+                    "h-4 w-4 transition-colors",
+                    product && vendorId && isLiked(`${vendorId}-${product.id}`, 'product') && "fill-current"
+                  )} 
+                />
+              </Button>
+              
+              {/* Close button */}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={onClose}
+                className="h-8 w-8 p-0 bg-black/80 hover:bg-black text-white"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
 
               <div className="aspect-square bg-muted relative group">
                 {product.images.length > 0 ? (
