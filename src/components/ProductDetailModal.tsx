@@ -112,10 +112,10 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0 flex [&>button]:hidden">
+      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0 flex [&>button:first-child]:hidden relative">
         {/* Heart button positioned at top right of entire modal */}
         <Button
-          variant="secondary"
+          variant="ghost"
           size="sm"
           onClick={async () => {
             if (product && vendorId) {
@@ -123,15 +123,15 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
             }
           }}
           className={cn(
-            "absolute top-4 right-4 z-50 h-8 w-8 p-0 bg-black/80 hover:bg-black transition-colors",
+            "absolute top-3 right-3 z-[60] h-10 w-10 p-0 rounded-full bg-white/90 hover:bg-white border border-gray-200 shadow-sm transition-all",
             product && vendorId && isLiked(`${vendorId}-${product.id}`, 'product')
               ? "text-red-500 hover:text-red-600"
-              : "text-white"
+              : "text-gray-600 hover:text-gray-800"
           )}
         >
           <Heart 
             className={cn(
-              "h-4 w-4 transition-colors",
+              "h-5 w-5 transition-colors",
               product && vendorId && isLiked(`${vendorId}-${product.id}`, 'product') && "fill-current"
             )} 
           />
