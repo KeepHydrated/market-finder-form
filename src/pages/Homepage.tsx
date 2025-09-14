@@ -760,6 +760,35 @@ const Homepage = () => {
                         </div>
                       )}
 
+                      {/* Market Rating - Top Left */}
+                      <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                        <div className="flex items-center gap-1">
+                          <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                          <span className="text-xs font-medium">
+                            {(() => {
+                              const marketVendorRatings = market.vendors
+                                .map(vendor => vendorRatings[vendor.id])
+                                .filter(rating => rating && rating.totalReviews > 0);
+                              
+                              if (marketVendorRatings.length === 0) return '0.0';
+                              
+                              const totalRating = marketVendorRatings.reduce((sum, rating) => sum + rating.averageRating, 0);
+                              const averageRating = totalRating / marketVendorRatings.length;
+                              return averageRating.toFixed(1);
+                            })()}
+                          </span>
+                          <span className="text-xs text-gray-600">
+                            ({(() => {
+                              const totalReviews = market.vendors.reduce((sum, vendor) => {
+                                const rating = vendorRatings[vendor.id];
+                                return sum + (rating ? rating.totalReviews : 0);
+                              }, 0);
+                              return totalReviews;
+                            })()})
+                          </span>
+                        </div>
+                      </div>
+
                       {/* Heart icon */}
                       <Button 
                         variant="ghost" 
