@@ -289,9 +289,10 @@ const Vendor = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Left column - wider width */}
-      <div className="w-96 bg-card border-r p-6">
+    <div className="min-h-screen bg-background">
+      <div className="flex mx-8">
+        {/* Left column - wider width */}
+        <div className="w-96 bg-card border-r p-6">
         <div className="space-y-6">
           <div>
             <span className="text-foreground text-xl font-bold">
@@ -606,6 +607,7 @@ const Vendor = () => {
           )}
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 };
