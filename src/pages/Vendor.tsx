@@ -293,7 +293,7 @@ const Vendor = () => {
       <div className="flex">
         {/* Left column - wider width */}
         <div className="w-96 bg-green-50 border-r py-6">
-        <div className="space-y-6 px-6">
+        <div className="space-y-6 pl-4 pr-6">
           <div className="flex items-center justify-between">
             <span className="text-foreground text-xl font-bold">
               {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
