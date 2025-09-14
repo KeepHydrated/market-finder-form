@@ -14,6 +14,7 @@ import Likes from "./pages/Likes";
 import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
 import ShopManager from "./pages/ShopManager";
+import Markets from "./pages/Markets";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/likes" element={<Likes />} />
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/shop-manager" element={<ShopManager />} />
+            <Route path="/markets" element={<Markets />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
