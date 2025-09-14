@@ -436,11 +436,11 @@ const Homepage = () => {
                           className="bg-background"
                         />
                         <Button 
-                          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2"
+                          className="bg-green-500 hover:bg-green-600 text-white h-12 w-12 p-0 rounded-xl"
                           onClick={getCurrentLocation}
                           disabled={isLoadingLocation}
                         >
-                          <RotateCcw className={`h-4 w-4 ${isLoadingLocation ? 'animate-spin' : ''}`} />
+                          <RotateCcw className={`h-5 w-5 ${isLoadingLocation ? 'animate-spin' : ''}`} />
                         </Button>
                       </div>
                       <p className="text-sm text-muted-foreground">
