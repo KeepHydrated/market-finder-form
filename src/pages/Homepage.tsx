@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -208,9 +209,10 @@ const Homepage = () => {
             </DialogTrigger>
             <DialogContent className="w-[800px] max-w-none p-0 bg-background border shadow-lg">
               <Tabs defaultValue="times" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
+                <TabsList className="grid w-full grid-cols-3 rounded-none border-b">
                   <TabsTrigger value="times">Times</TabsTrigger>
                   <TabsTrigger value="categories">Categories</TabsTrigger>
+                  <TabsTrigger value="location">Location</TabsTrigger>
                 </TabsList>
                 <TabsContent value="times" className="p-4">
                   <div className="space-y-4">
@@ -322,6 +324,20 @@ const Homepage = () => {
                           {category}
                         </Button>
                       ))}
+                    </div>
+                  </div>
+                </TabsContent>
+                <TabsContent value="location" className="p-4">
+                  <div className="space-y-4">
+                    <h4 className="font-medium">Location *</h4>
+                    <div className="space-y-3">
+                      <Input
+                        placeholder="Enter city, state, or zip code"
+                        className="h-12 text-lg border-2 border-border rounded-xl"
+                      />
+                      <div className="text-sm text-muted-foreground">
+                        Search for markets near your location
+                      </div>
                     </div>
                   </div>
                 </TabsContent>
