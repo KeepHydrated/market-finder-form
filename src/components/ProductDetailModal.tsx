@@ -140,7 +140,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
           {/* Left side - Images */}
           <div className="md:w-1/2 relative">
             {/* Top right buttons */}
-            <div className="absolute top-4 right-4 z-10 flex gap-2">
+            <div className="absolute top-4 right-4 z-10">
               {/* Heart button */}
               <Button
                 variant="secondary"
@@ -163,16 +163,6 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
                     product && vendorId && isLiked(`${vendorId}-${product.id}`, 'product') && "fill-current"
                   )} 
                 />
-              </Button>
-              
-              {/* Close button */}
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={onClose}
-                className="h-8 w-8 p-0 bg-black/80 hover:bg-black text-white"
-              >
-                <X className="h-4 w-4" />
               </Button>
             </div>
 
