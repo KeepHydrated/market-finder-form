@@ -29,7 +29,6 @@ interface ProductDetailModalProps {
 
 export const ProductDetailModal = ({ product, products = [], open, onClose, onProductChange, vendorId, vendorName }: ProductDetailModalProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [quantity, setQuantity] = useState(1);
   const { addItem } = useShoppingCart();
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
@@ -75,7 +74,6 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
       setCurrentImageIndex(0); // Reset image index when closing
-      setQuantity(1); // Reset quantity when closing
       onClose();
     }
   };
@@ -99,11 +97,11 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
       vendor_name: vendorName,
     };
 
-    addItem({ ...cartItem, quantity });
+    addItem({ ...cartItem, quantity: 1 });
 
     toast({
       title: "Added to Cart",
-      description: `${quantity} ${product.name} added to your cart`,
+      description: `${product.name} added to your cart`,
     });
 
     // Optionally close modal after adding to cart
@@ -236,41 +234,12 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
                 {/* Add to Cart Section */}
                 {vendorId && vendorName && (
                   <div className="space-y-4 pt-6 border-t">
-                    <div className="space-y-2">
-                      <Label htmlFor="quantity">Quantity</Label>
-                      <div className="flex items-center gap-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                          disabled={quantity <= 1}
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <Input
-                          id="quantity"
-                          type="number"
-                          min="1"
-                          value={quantity}
-                          onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                          className="w-20 text-center"
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setQuantity(quantity + 1)}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-
                     <Button
                       className="w-full"
                       onClick={handleAddToCart}
                     >
                       <ShoppingCart className="h-4 w-4 mr-2" />
-                      Add to Cart - ${(product.price * quantity).toFixed(2)}
+                      Add to Cart - ${product.price.toFixed(2)}
                     </Button>
                   </div>
                 )}
