@@ -411,7 +411,7 @@ const Homepage = () => {
                   </div>
                 </TabsContent>
                 <TabsContent value="location" className="p-4">
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <h4 className="font-medium">Location *</h4>
                     
                     {/* Manual Location Input */}
@@ -425,15 +425,22 @@ const Homepage = () => {
                       </div>
                     </div>
 
-                    {/* Location Section - Same as Profile Page */}
-                    <div>
-                      <h2 className="text-xl font-semibold mb-4">Location</h2>
+                    {/* Divider */}
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1 h-px bg-border"></div>
+                      <span className="text-sm text-muted-foreground">OR</span>
+                      <div className="flex-1 h-px bg-border"></div>
+                    </div>
+
+                    {/* Zipcode Section */}
+                    <div className="space-y-4">
+                      <h5 className="font-medium">Zipcode</h5>
                       <div className="flex gap-4 items-center mb-2">
                         <Input 
                           value={locationZipcode}
                           onChange={(e) => setLocationZipcode(e.target.value)}
                           placeholder="Zipcode will appear here..." 
-                          className="bg-background"
+                          className="bg-background h-12 text-lg border-2 border-border rounded-xl"
                         />
                         <Button 
                           className="bg-green-500 hover:bg-green-600 text-white h-12 w-12 p-0 rounded-xl"
