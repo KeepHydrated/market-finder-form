@@ -412,7 +412,6 @@ const Homepage = () => {
                 </TabsContent>
                 <TabsContent value="location" className="p-4">
                   <div className="space-y-6">
-                    <h4 className="font-medium">Location *</h4>
                     
 
                     {/* Zipcode Section */}
