@@ -329,7 +329,7 @@ const Vendor = () => {
       {/* Main content */}
       <div className="flex-1 px-4">
         {/* Top row under header */}
-        <div className="bg-card border-b p-8">
+        <div className="bg-card border-b pt-6 pb-8 px-8">
           <div className="space-y-4">
             {/* Title row with rating and heart icon */}
             <div className="flex items-center justify-between">
