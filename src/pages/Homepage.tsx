@@ -416,7 +416,6 @@ const Homepage = () => {
 
                     {/* Zipcode Section */}
                     <div className="space-y-4">
-                      <h5 className="font-medium">Zipcode</h5>
                       <div className="relative">
                         <Input 
                           value={locationZipcode}
