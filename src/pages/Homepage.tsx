@@ -619,14 +619,14 @@ const Homepage = () => {
                       </h3>
                       
                       <div className="flex items-start gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                        <p className="text-sm text-muted-foreground text-left">
+                        <MapPin className="h-4 w-4 text-foreground mt-0.5 flex-shrink-0" />
+                        <p className="text-sm text-foreground text-left">
                           {submission.market_address || submission.selected_market || submission.search_term || "Location TBD"}
                         </p>
                       </div>
                       
                       {submission.primary_specialty && (
-                        <p className="text-sm text-muted-foreground text-left">
+                        <p className="text-sm text-foreground text-left">
                           {submission.primary_specialty}
                         </p>
                       )}
@@ -848,13 +848,13 @@ const Homepage = () => {
                       </h3>
                       
                       <div className="flex items-start gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                        <p className="text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4 text-foreground mt-0.5 flex-shrink-0" />
+                        <p className="text-sm text-foreground">
                           {market.address}
                         </p>
                       </div>
                       
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-foreground">
                         {market.vendors.length} vendor{market.vendors.length !== 1 ? 's' : ''}
                       </p>
                     </div>
