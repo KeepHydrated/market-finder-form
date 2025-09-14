@@ -294,21 +294,20 @@ const Vendor = () => {
         {/* Left column - wider width */}
         <div className="w-96 bg-card border-r p-6">
         <div className="space-y-6">
-          <div>
+          <div className="flex items-center justify-between">
             <span className="text-foreground text-xl font-bold">
               {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
             </span>
-          </div>
-
-          {/* Rating display */}
-          <div className="flex items-center gap-2">
-            <Star className="h-4 w-4 text-yellow-500 fill-current" />
-            <span className="text-foreground font-medium">
-              {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'}
-            </span>
-            <span className="text-muted-foreground">
-              ({reviewStats.totalReviews})
-            </span>
+            {/* Rating display */}
+            <div className="flex items-center gap-2">
+              <Star className="h-4 w-4 text-yellow-500 fill-current" />
+              <span className="text-foreground font-medium">
+                {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'}
+              </span>
+              <span className="text-muted-foreground">
+                ({reviewStats.totalReviews})
+              </span>
+            </div>
           </div>
 
           <div className="flex items-start gap-2">
