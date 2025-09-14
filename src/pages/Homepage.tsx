@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { Heart, Star, Filter, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -65,6 +66,7 @@ const Homepage = () => {
   }>>({});
   const [locationZipcode, setLocationZipcode] = useState<string>('');
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [rangeMiles, setRangeMiles] = useState<number[]>([25]);
 
   const toggleDay = (day: string) => {
     setSelectedDays(prev => {
@@ -435,6 +437,29 @@ const Homepage = () => {
                       <p className="text-sm text-muted-foreground">
                         Click the button to get your current zipcode.
                       </p>
+                    </div>
+                    
+                    {/* Range Slider */}
+                    <div className="space-y-4">
+                      <h5 className="font-medium">Search Radius</h5>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Distance</span>
+                          <span className="text-sm font-medium">{rangeMiles[0]} miles</span>
+                        </div>
+                        <Slider
+                          value={rangeMiles}
+                          onValueChange={setRangeMiles}
+                          max={100}
+                          min={1}
+                          step={1}
+                          className="w-full"
+                        />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>1 mile</span>
+                          <span>100 miles</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </TabsContent>
