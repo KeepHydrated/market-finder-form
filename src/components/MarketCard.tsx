@@ -15,8 +15,8 @@ export const MarketCard = ({ name, address, days, hours }: MarketCardProps) => {
       <CardHeader className="space-y-2">
         <CardTitle className="text-lg text-foreground">{name}</CardTitle>
         <div className="flex items-start gap-2">
-          <MapPin className="h-4 w-4 text-foreground mt-0.5" />
-          <p className="text-sm text-foreground">{address}</p>
+          <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+          <p className="text-sm text-muted-foreground">{address}</p>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
