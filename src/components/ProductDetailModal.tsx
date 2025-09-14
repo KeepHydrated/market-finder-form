@@ -239,7 +239,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
                       onClick={handleAddToCart}
                     >
                       <ShoppingCart className="h-4 w-4 mr-2" />
-                      Add to Cart - ${product.price.toFixed(2)}
+                      Add to Cart
                     </Button>
                   </div>
                 )}
