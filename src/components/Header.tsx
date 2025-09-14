@@ -85,6 +85,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 <Heart className="h-5 w-5" />
               </Button>
             </Link>
+            <CartButton />
             {hasAcceptedSubmission && (
               <Link to="/shop-manager">
                 <Button variant="ghost" size="sm">
@@ -92,7 +93,6 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 </Button>
               </Link>
             )}
-            <CartButton />
             <UserMenu user={user} profile={profile} />
           </div>
         </div>
