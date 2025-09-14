@@ -414,23 +414,6 @@ const Homepage = () => {
                   <div className="space-y-6">
                     <h4 className="font-medium">Location *</h4>
                     
-                    {/* Manual Location Input */}
-                    <div className="space-y-3">
-                      <Input
-                        placeholder="Enter city, state, or zip code"
-                        className="h-12 text-lg border-2 border-border rounded-xl"
-                      />
-                      <div className="text-sm text-muted-foreground">
-                        Search for markets near your location
-                      </div>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1 h-px bg-border"></div>
-                      <span className="text-sm text-muted-foreground">OR</span>
-                      <div className="flex-1 h-px bg-border"></div>
-                    </div>
 
                     {/* Zipcode Section */}
                     <div className="space-y-4">
