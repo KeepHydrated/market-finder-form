@@ -300,6 +300,17 @@ const Vendor = () => {
             </span>
           </div>
 
+          {/* Rating display */}
+          <div className="flex items-center gap-2">
+            <Star className="h-4 w-4 text-yellow-500 fill-current" />
+            <span className="text-foreground font-medium">
+              {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'}
+            </span>
+            <span className="text-muted-foreground">
+              ({reviewStats.totalReviews})
+            </span>
+          </div>
+
           <div className="flex items-start gap-2">
             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
             <p className="text-muted-foreground text-base font-normal">
