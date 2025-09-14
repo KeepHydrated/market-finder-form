@@ -370,7 +370,7 @@ const Vendor = () => {
                     {reviewStats.totalReviews > 0 ? reviewStats.averageRating : 'No rating'}
                   </span>
                   <span className="text-muted-foreground">
-                    ({reviewStats.totalReviews} reviews)
+                    ({reviewStats.totalReviews})
                   </span>
                 </div>
               </div>
