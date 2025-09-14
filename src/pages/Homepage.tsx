@@ -32,12 +32,28 @@ interface VendorRating {
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+const SPECIALTY_CATEGORIES = [
+  "Fresh Flowers & Plants",
+  "Bakery", 
+  "Dairy",
+  "Rancher",
+  "Beverages",
+  "Seasonings & Spices",
+  "Pets",
+  "Home Goods",
+  "Farmers",
+  "Ready to Eat",
+  "Packaged Goods & Snacks",
+  "Artisan"
+];
+
 const Homepage = () => {
   const navigate = useNavigate();
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<AcceptedSubmission[]>([]);
   const [vendorRatings, setVendorRatings] = useState<Record<string, VendorRating>>({});
   const [loading, setLoading] = useState(true);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [dayTimeSelections, setDayTimeSelections] = useState<Record<string, {
     startTime: string;
     startPeriod: 'AM' | 'PM';
@@ -76,6 +92,14 @@ const Homepage = () => {
         [field]: value
       }
     }));
+  };
+
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev => {
+      return prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category];
+    });
   };
 
   const timeOptions = Array.from({ length: 12 }, (_, i) => {
@@ -281,8 +305,24 @@ const Homepage = () => {
                   </div>
                 </TabsContent>
                 <TabsContent value="categories" className="p-4">
-                  <div className="text-sm text-muted-foreground">
-                    Category filters will go here
+                  <div className="space-y-4">
+                    <h4 className="font-medium">Categories *</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {SPECIALTY_CATEGORIES.map((category) => (
+                        <Button
+                          key={category}
+                          type="button"
+                          variant={selectedCategories.includes(category) ? "default" : "outline"}
+                          onClick={() => toggleCategory(category)}
+                          className={cn(
+                            "h-12 text-sm justify-start",
+                            selectedCategories.includes(category) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                          )}
+                        >
+                          {category}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </TabsContent>
               </Tabs>
