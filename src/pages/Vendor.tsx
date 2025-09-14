@@ -374,8 +374,6 @@ const Vendor = () => {
         <div className="p-8">
           {/* Products Section */}
           <div className="space-y-6">
-            <h2 className="text-3xl font-bold text-foreground">Products</h2>
-            
             {/* Product Grid */}
             {acceptedSubmission.products && acceptedSubmission.products.length > 0 ? (
               <ProductGrid 
