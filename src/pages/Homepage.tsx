@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Heart, Star, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -37,14 +38,50 @@ const Homepage = () => {
   const [vendorRatings, setVendorRatings] = useState<Record<string, VendorRating>>({});
   const [loading, setLoading] = useState(true);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [dayTimeSelections, setDayTimeSelections] = useState<Record<string, {
+    startTime: string;
+    startPeriod: 'AM' | 'PM';
+    endTime: string;
+    endPeriod: 'AM' | 'PM';
+  }>>({});
 
   const toggleDay = (day: string) => {
     setSelectedDays(prev => {
-      return prev.includes(day) 
+      const newSelected = prev.includes(day) 
         ? prev.filter(d => d !== day)
         : [...prev, day];
+      
+      // Initialize time selection for newly selected day
+      if (!prev.includes(day)) {
+        setDayTimeSelections(prevTimes => ({
+          ...prevTimes,
+          [day]: {
+            startTime: '08:00',
+            startPeriod: 'AM',
+            endTime: '02:00',
+            endPeriod: 'PM'
+          }
+        }));
+      }
+      
+      return newSelected;
     });
   };
+
+  const updateTimeSelection = (day: string, field: string, value: string) => {
+    setDayTimeSelections(prev => ({
+      ...prev,
+      [day]: {
+        ...prev[day],
+        [field]: value
+      }
+    }));
+  };
+
+  const timeOptions = Array.from({ length: 12 }, (_, i) => {
+    const hour = i + 1;
+    return [`${hour.toString().padStart(2, '0')}:00`, `${hour.toString().padStart(2, '0')}:30`];
+  }).flat();
 
   useEffect(() => {
     fetchAcceptedSubmissions();
@@ -170,6 +207,77 @@ const Homepage = () => {
                         </Button>
                       ))}
                     </div>
+                    
+                    {/* Time selectors for each selected day */}
+                    {selectedDays.map((day) => (
+                      <div key={day} className="space-y-3 border-t pt-4">
+                        <h5 className="font-medium capitalize">
+                          {day === 'Mon' ? 'Monday' : 
+                           day === 'Tue' ? 'Tuesday' :
+                           day === 'Wed' ? 'Wednesday' :
+                           day === 'Thu' ? 'Thursday' :
+                           day === 'Fri' ? 'Friday' :
+                           day === 'Sat' ? 'Saturday' : 'Sunday'}
+                        </h5>
+                        <div className="flex items-center gap-3">
+                          <Select 
+                            value={dayTimeSelections[day]?.startTime || '08:00'}
+                            onValueChange={(value) => updateTimeSelection(day, 'startTime', value)}
+                          >
+                            <SelectTrigger className="w-24">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {timeOptions.map((time) => (
+                                <SelectItem key={time} value={time}>{time}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          
+                          <Select
+                            value={dayTimeSelections[day]?.startPeriod || 'AM'}
+                            onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'startPeriod', value)}
+                          >
+                            <SelectTrigger className="w-16">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="AM">AM</SelectItem>
+                              <SelectItem value="PM">PM</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          
+                          <span className="text-muted-foreground">to</span>
+                          
+                          <Select
+                            value={dayTimeSelections[day]?.endTime || '02:00'}
+                            onValueChange={(value) => updateTimeSelection(day, 'endTime', value)}
+                          >
+                            <SelectTrigger className="w-24">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {timeOptions.map((time) => (
+                                <SelectItem key={time} value={time}>{time}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          
+                          <Select
+                            value={dayTimeSelections[day]?.endPeriod || 'PM'}
+                            onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'endPeriod', value)}
+                          >
+                            <SelectTrigger className="w-16">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="AM">AM</SelectItem>
+                              <SelectItem value="PM">PM</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </TabsContent>
                 <TabsContent value="categories" className="p-4">
