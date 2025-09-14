@@ -357,9 +357,23 @@ const Vendor = () => {
         {/* Top row under header */}
         <div className="bg-card border-b pt-6 pb-8 px-8">
           <div className="space-y-4">
-            {/* Title row with heart icon */}
+            {/* Title row with reviews and heart icon */}
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold text-foreground">{acceptedSubmission.store_name}</h1>
+              <div className="flex items-center gap-4">
+                <h1 className="text-2xl font-bold text-foreground">{acceptedSubmission.store_name}</h1>
+                <div 
+                  className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
+                  onClick={() => setIsReviewModalOpen(true)}
+                >
+                  <Star className="h-5 w-5 text-yellow-500 fill-current" />
+                  <span className="text-foreground font-medium">
+                    {reviewStats.totalReviews > 0 ? reviewStats.averageRating : 'No rating'}
+                  </span>
+                  <span className="text-muted-foreground">
+                    ({reviewStats.totalReviews} reviews)
+                  </span>
+                </div>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -382,20 +396,6 @@ const Vendor = () => {
                   )} 
                 />
               </Button>
-            </div>
-            
-            {/* Reviews row */}
-            <div 
-              className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors w-fit"
-              onClick={() => setIsReviewModalOpen(true)}
-            >
-              <Star className="h-5 w-5 text-yellow-500 fill-current" />
-              <span className="text-foreground font-medium">
-                {reviewStats.totalReviews > 0 ? reviewStats.averageRating : 'No rating'}
-              </span>
-              <span className="text-muted-foreground">
-                ({reviewStats.totalReviews} reviews)
-              </span>
             </div>
             
             {/* Category badges */}
