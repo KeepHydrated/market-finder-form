@@ -145,7 +145,7 @@ const Homepage = () => {
                 Filter search results
               </Button>
             </DialogTrigger>
-            <DialogContent className="w-[800px] p-0 bg-background border shadow-lg">
+            <DialogContent className="w-[1000px] p-0 bg-background border shadow-lg">
               <Tabs defaultValue="times" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
                   <TabsTrigger value="times">Times</TabsTrigger>
