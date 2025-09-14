@@ -357,9 +357,9 @@ const Vendor = () => {
         {/* Top row under header */}
         <div className="bg-card border-b pt-6 pb-8 px-8">
           <div className="space-y-4">
-            {/* Title row with heart icon */}
-            <div className="flex items-start justify-between">
-              <div className="space-y-2">
+            {/* Title row with rating and heart icon */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
                 <h1 className="text-2xl font-bold text-foreground">{acceptedSubmission.store_name}</h1>
                 <div 
                   className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
