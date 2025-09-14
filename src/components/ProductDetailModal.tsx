@@ -112,7 +112,30 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0 flex [&>button]:hidden">
+      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0 flex [&>button]:hidden relative">
+        {/* Heart button positioned at top right of entire modal */}
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={async () => {
+            if (product && vendorId) {
+              await toggleLike(`${vendorId}-${product.id}`, 'product');
+            }
+          }}
+          className={cn(
+            "absolute top-4 right-4 z-50 h-8 w-8 p-0 bg-black/80 hover:bg-black transition-colors",
+            product && vendorId && isLiked(`${vendorId}-${product.id}`, 'product')
+              ? "text-red-500 hover:text-red-600"
+              : "text-white"
+          )}
+        >
+          <Heart 
+            className={cn(
+              "h-4 w-4 transition-colors",
+              product && vendorId && isLiked(`${vendorId}-${product.id}`, 'product') && "fill-current"
+            )} 
+          />
+        </Button>
         {/* Navigation arrows positioned outside the modal content */}
         {hasPrevious && (
           <Button
@@ -139,32 +162,6 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         <div className="flex flex-col md:flex-row min-h-0 w-full">
           {/* Left side - Images */}
           <div className="md:w-1/2 relative">
-            {/* Top right buttons */}
-            <div className="absolute top-4 right-4 z-10">
-              {/* Heart button */}
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={async () => {
-                  if (product && vendorId) {
-                    await toggleLike(`${vendorId}-${product.id}`, 'product');
-                  }
-                }}
-                className={cn(
-                  "h-8 w-8 p-0 bg-black/80 hover:bg-black transition-colors",
-                  product && vendorId && isLiked(`${vendorId}-${product.id}`, 'product')
-                    ? "text-red-500 hover:text-red-600"
-                    : "text-white"
-                )}
-              >
-                <Heart 
-                  className={cn(
-                    "h-4 w-4 transition-colors",
-                    product && vendorId && isLiked(`${vendorId}-${product.id}`, 'product') && "fill-current"
-                  )} 
-                />
-              </Button>
-            </div>
 
               <div className="aspect-square bg-muted relative group">
                 {product.images.length > 0 ? (
