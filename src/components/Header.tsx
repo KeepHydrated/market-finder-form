@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "@/components/auth/UserMenu";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Heart } from "lucide-react";
 
 interface HeaderProps {
   user: any;
@@ -49,6 +49,11 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 </Link>
               </>
             )}
+            <Link to="/likes">
+              <Button variant="ghost" size="sm">
+                <Heart className="h-5 w-5" />
+              </Button>
+            </Link>
             <UserMenu user={user} profile={profile} />
           </div>
         </div>
