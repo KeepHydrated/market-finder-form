@@ -290,11 +290,10 @@ const Vendor = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4">
-        <div className="flex">
+      <div className="flex">
         {/* Left column - wider width */}
-        <div className="w-96 bg-green-50 border-r p-6">
-        <div className="space-y-6">
+        <div className="w-96 bg-green-50 border-r py-6">
+        <div className="space-y-6 px-6">
           <div className="flex items-center justify-between">
             <span className="text-foreground text-xl font-bold">
               {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
@@ -328,7 +327,7 @@ const Vendor = () => {
       </div>
       
       {/* Main content */}
-      <div className="flex-1">
+      <div className="flex-1 px-4">
         {/* Top row under header */}
         <div className="bg-card border-b p-8">
           <div className="space-y-4">
@@ -618,7 +617,6 @@ const Vendor = () => {
           )}
         </DialogContent>
       </Dialog>
-        </div>
       </div>
     </div>
   );
