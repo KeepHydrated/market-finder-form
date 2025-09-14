@@ -112,7 +112,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0 flex relative">
+      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0 flex relative [&>button[data-dialog-close]]:hidden">
         {/* Heart button positioned at top right of entire modal */}
         <Button
           variant="secondary"
