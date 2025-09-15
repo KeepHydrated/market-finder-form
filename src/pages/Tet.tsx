@@ -65,6 +65,8 @@ const Tet = () => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
+  const [vendorRatings, setVendorRatings] = useState<Record<string, { vendorId: string; averageRating: number; totalReviews: number }>>({});
 
   useEffect(() => {
     fetchAcceptedSubmission();
@@ -110,6 +112,44 @@ const Tet = () => {
     } finally {
       setLoadingData(false);
     }
+  };
+
+  // Group vendors by market (same function from Homepage)
+  const groupVendorsByMarket = () => {
+    const markets: Record<string, {
+      name: string;
+      address: string;
+      vendors: AcceptedSubmission[];
+    }> = {};
+
+    acceptedSubmissions.forEach(submission => {
+      const marketKey = submission.selected_market || submission.search_term || 'Unknown Market';
+      const marketAddress = submission.market_address || 'Address not available';
+      
+      if (!markets[marketKey]) {
+        markets[marketKey] = {
+          name: marketKey,
+          address: marketAddress,
+          vendors: []
+        };
+      }
+      
+      markets[marketKey].vendors.push(submission);
+    });
+
+    return Object.values(markets);
+  };
+
+  // Function to calculate distance (same as Homepage)
+  const calculateDistance = (userCoords: {lat: number, lng: number}, marketAddress?: string): string => {
+    if (!userCoords || !marketAddress) {
+      return '-- miles';
+    }
+    
+    // For now, return a placeholder distance
+    const sampleDistances = ['0.5', '1.2', '2.1', '3.4', '5.8'];
+    const randomIndex = Math.abs(marketAddress.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % sampleDistances.length;
+    return `${sampleDistances[randomIndex]} miles`;
   };
 
   const fetchAllAcceptedSubmissions = async () => {
@@ -416,107 +456,221 @@ const Tet = () => {
       
       {/* Main content */}
       <div className="flex-1 px-4">
-        {/* Vendor Cards Grid */}
+        {/* Market Cards Grid */}
         <div className="p-8">
-          <div className="grid grid-cols-2 gap-6">
-            {acceptedSubmissions.map((vendor) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {groupVendorsByMarket().map((market, index) => (
               <Card 
-                key={vendor.id} 
+                key={index}
                 className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigate(`/vendor/${vendor.id}`)}
+                onClick={() => {
+                  navigate('/market');
+                }}
               >
-                {/* Social Media Post Section - Dark Theme */}
-                <div className="bg-black text-white p-4 relative aspect-video">
-                  {/* Rating - Top Left */}
+                {/* Vendor Images Collage */}
+                <div className="aspect-video bg-muted relative overflow-hidden">
+                  {market.vendors.length === 1 ? (
+                    // Single vendor - show their product image or placeholder
+                    <div className="w-full h-full">
+                      {market.vendors[0].products && 
+                       market.vendors[0].products.length > 0 && 
+                       market.vendors[0].products[0].images && 
+                       market.vendors[0].products[0].images.length > 0 ? (
+                        <img 
+                          src={market.vendors[0].products[0].images[0]}
+                          alt={market.vendors[0].store_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
+                          <div className="text-green-600 text-lg font-medium">
+                            {market.vendors[0].store_name}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : market.vendors.length === 2 ? (
+                    // Two vendors - split layout
+                    <div className="grid grid-cols-2 h-full gap-0.5">
+                      {market.vendors.slice(0, 2).map((vendor, vendorIndex) => (
+                        <div key={vendorIndex} className="relative overflow-hidden">
+                          {vendor.products && 
+                           vendor.products.length > 0 && 
+                           vendor.products[0].images && 
+                           vendor.products[0].images.length > 0 ? (
+                            <img 
+                              src={vendor.products[0].images[0]}
+                              alt={vendor.store_name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
+                              <div className="text-green-600 text-sm font-medium text-center">
+                                {vendor.store_name}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : market.vendors.length === 3 ? (
+                    // Three vendors - one large, two small
+                    <div className="grid grid-cols-2 h-full gap-0.5">
+                      <div className="relative overflow-hidden">
+                        {market.vendors[0].products && 
+                         market.vendors[0].products.length > 0 && 
+                         market.vendors[0].products[0].images && 
+                         market.vendors[0].products[0].images.length > 0 ? (
+                          <img 
+                            src={market.vendors[0].products[0].images[0]}
+                            alt={market.vendors[0].store_name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
+                            <div className="text-green-600 text-sm font-medium text-center">
+                              {market.vendors[0].store_name}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="grid grid-rows-2 gap-0.5">
+                        {market.vendors.slice(1, 3).map((vendor, vendorIndex) => (
+                          <div key={vendorIndex} className="relative overflow-hidden">
+                            {vendor.products && 
+                             vendor.products.length > 0 && 
+                             vendor.products[0].images && 
+                             vendor.products[0].images.length > 0 ? (
+                              <img 
+                                src={vendor.products[0].images[0]}
+                                alt={vendor.store_name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
+                                <div className="text-green-600 text-xs font-medium text-center p-1">
+                                  {vendor.store_name}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    // Four or more vendors - 2x2 grid
+                    <div className="grid grid-cols-2 grid-rows-2 h-full gap-0.5">
+                      {market.vendors.slice(0, 4).map((vendor, vendorIndex) => (
+                        <div key={vendorIndex} className="relative overflow-hidden">
+                          {vendor.products && 
+                           vendor.products.length > 0 && 
+                           vendor.products[0].images && 
+                           vendor.products[0].images.length > 0 ? (
+                            <img 
+                              src={vendor.products[0].images[0]}
+                              alt={vendor.store_name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
+                              <div className="text-green-600 text-xs font-medium text-center p-1">
+                                {vendor.store_name}
+                              </div>
+                            </div>
+                          )}
+                          {vendorIndex === 3 && market.vendors.length > 4 && (
+                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                              <span className="text-white text-sm font-medium">
+                                +{market.vendors.length - 4} more
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Market Rating - Top Left */}
                   <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
                     <div className="flex items-center gap-1">
                       <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                      <span className="text-xs font-medium text-black">
-                        {vendor.averageRating?.toFixed(1) || '0.0'}
+                      <span className="text-xs font-medium">
+                        {(() => {
+                          const marketVendorRatings = market.vendors
+                            .map(vendor => vendorRatings[vendor.id])
+                            .filter(rating => rating && rating.totalReviews > 0);
+                          
+                          if (marketVendorRatings.length === 0) return '0.0';
+                          
+                          const totalRating = marketVendorRatings.reduce((sum, rating) => sum + rating.averageRating, 0);
+                          const averageRating = totalRating / marketVendorRatings.length;
+                          return averageRating.toFixed(1);
+                        })()}
                       </span>
                       <span className="text-xs text-gray-600">
-                        ({vendor.totalReviews || 0})
+                        ({(() => {
+                          const totalReviews = market.vendors.reduce((sum, vendor) => {
+                            const rating = vendorRatings[vendor.id];
+                            return sum + (rating ? rating.totalReviews : 0);
+                          }, 0);
+                          return totalReviews;
+                        })()})
                       </span>
                     </div>
                   </div>
-                  
-                  {/* Like Button - Top Right */}
+
+                  {/* Heart Button - Top Right */}
                   <Button
                     variant="secondary"
                     size="sm"
                     className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
                     onClick={async (e) => {
                       e.stopPropagation();
-                      await toggleLike(vendor.id, 'vendor');
+                      // Create a unique market ID by combining market name and address
+                      const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+                      await toggleLike(marketId, 'market');
                     }}
                   >
                     <Heart 
                       className={cn(
                         "h-4 w-4 transition-colors",
-                        isLiked(vendor.id, 'vendor') 
+                        (() => {
+                          const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+                          return isLiked(marketId, 'market');
+                        })()
                           ? "text-red-500 fill-current" 
                           : "text-gray-600"
                       )} 
                     />
                   </Button>
-
-                  {/* Mock Social Media Content */}
-                  <div className="space-y-3 mt-8">
-                    <div className="text-xs text-gray-300">
-                      <span className="text-white">woman.</span> • probably a garbage person to begin with.
-                    </div>
-                    <div className="text-xs text-gray-300">
-                      Women, on the other hand, don't usually have that same general respect for each other, at least, not as consistently as men do. Especially for strangers.
-                    </div>
-                    
-                    {/* Mock engagement buttons */}
-                    <div className="flex items-center gap-4 text-xs text-gray-400 mt-4">
-                      <div className="flex items-center gap-1">
-                        <span>33</span>
-                        <span>↑</span>
-                      </div>
-                      <span>Reply</span>
-                      <span>Award</span>
-                      <span>Share</span>
-                    </div>
-                    
-                    {/* Mock user comment */}
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
-                        <span className="text-xs text-blue-400">TruthCultural9952</span>
-                        <span className="text-xs text-gray-500">• 7h ago</span>
-                      </div>
-                      <div className="text-xs text-gray-300 ml-6">
-                        The respect men have for complete strangers they've met 5 mins ago is YUGE
-                      </div>
-                    </div>
-                  </div>
-
+                  
                   {/* Distance Badge - Bottom Right */}
-                  <div className="absolute bottom-2 right-2 bg-white/90 px-3 py-1 rounded-full shadow-sm">
-                    <span className="text-sm font-medium text-gray-700">
-                      {Math.floor(Math.random() * 4) + 1}.{Math.floor(Math.random() * 9)} miles
+                  <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                    <span className="text-xs font-medium text-gray-700">
+                      {userCoordinates 
+                        ? calculateDistance(userCoordinates, market.address)
+                        : `${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 9)} miles`
+                      }
                     </span>
                   </div>
                 </div>
-                
-                {/* Vendor Information - White Section */}
-                <div className="bg-white p-4 space-y-2">
-                  <h3 className="text-xl font-semibold text-black">
-                    {vendor.store_name}
+
+                {/* Market Information */}
+                <div className="p-4 space-y-3">
+                  <h3 className="text-lg font-semibold text-foreground">
+                    {market.name}
                   </h3>
                   
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <span className="text-gray-600 text-sm">
-                      {vendor.selected_market || vendor.search_term || "Market Location"}
-                    </span>
+                  <div className="flex items-start gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-muted-foreground">
+                      {market.address}
+                    </p>
                   </div>
                   
-                  <div className="text-black font-medium">
-                    {vendor.primary_specialty || "Fresh Produce"}
-                  </div>
+                  <p className="text-sm text-foreground">
+                    {market.vendors.length} vendor{market.vendors.length !== 1 ? 's' : ''}
+                  </p>
                 </div>
               </Card>
             ))}
