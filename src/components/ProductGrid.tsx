@@ -56,14 +56,14 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProd
       className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200"
       onClick={() => onProductClick(product)}
     >
-      <div className="aspect-[4/3] overflow-hidden bg-muted relative group">
+      <div className="aspect-[4/3] overflow-hidden bg-muted relative group rounded-t-lg">
         {product.images.length > 0 ? (
           <>
-            <img
-              src={product.images[currentImageIndex]}
-              alt={`${product.name} - Image ${currentImageIndex + 1}`}
-              className="w-full h-full object-cover transition-opacity duration-200"
-            />
+             <img
+               src={product.images[currentImageIndex]}
+               alt={`${product.name} - Image ${currentImageIndex + 1}`}
+               className="w-full h-full object-cover transition-opacity duration-200 rounded-t-lg"
+             />
             
             {/* Like Button */}
             {vendorId && (
