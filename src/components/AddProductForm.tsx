@@ -71,12 +71,19 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
     // Combine existing images (as base64) and new images (as Files)
     const combinedImages = [...existingImages, ...images];
     
-    onProductAdded({
+    const productData = {
       name: productName,
       description,
       price: parseFloat(price),
       images: combinedImages as any // Mix of base64 strings and File objects
-    });
+    };
+
+    // Include the ID when editing an existing product
+    if (editingProduct) {
+      (productData as any).id = editingProduct.id;
+    }
+    
+    onProductAdded(productData);
     
     // Reset form
     setProductName('');
