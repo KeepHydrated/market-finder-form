@@ -92,11 +92,17 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
             <Label htmlFor="name">Market Name *</Label>
             <Input
               id="name"
+              name={`market-name-${Math.random().toString(36).substr(2, 9)}`}
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="e.g. Downtown Farmers Market"
               autoComplete="new-password"
+              autoCorrect="off"
+              autoCapitalize="off"
               spellCheck="false"
+              data-form-type="other"
+              data-lpignore="true"
+              role="textbox"
               required
             />
           </div>
