@@ -67,6 +67,7 @@ const Tet = () => {
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
   const [vendorRatings, setVendorRatings] = useState<Record<string, { vendorId: string; averageRating: number; totalReviews: number }>>({});
+  const [selectedVendor, setSelectedVendor] = useState<AcceptedSubmission | null>(null);
 
   useEffect(() => {
     fetchAcceptedSubmission();
@@ -455,98 +456,196 @@ const Tet = () => {
       
       {/* Main content */}
       <div className="flex-1 px-4">
-        {/* Vendor Cards Grid */}
-        <div className="p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-            {acceptedSubmissions.filter(vendor => {
-              const vendorMarket = vendor.selected_market || vendor.search_term || 'Unknown Market';
-              const currentMarket = acceptedSubmission.selected_market || acceptedSubmission.search_term || 'Unknown Market';
-              return vendorMarket === currentMarket;
-            }).map((vendor, index) => (
-              <Card 
-                key={vendor.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => {
-                  navigate(`/vendor/${vendor.id}`);
-                }}
-              >
-                {/* Vendor Image */}
-                <div className="aspect-video bg-muted relative overflow-hidden">
-                  {vendor.products && 
-                   vendor.products.length > 0 && 
-                   vendor.products[0].images && 
-                   vendor.products[0].images.length > 0 ? (
-                    <img 
-                      src={vendor.products[0].images[0]}
-                      alt={vendor.store_name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
-                      <div className="text-green-600 text-lg font-medium">
-                        {vendor.store_name}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Rating Badge */}
-                  <div className="absolute top-3 left-3 flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
-                    <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                    <span className="text-xs font-medium">
-                      {vendorRatings[vendor.id]?.averageRating || '0.0'}
+        {selectedVendor ? (
+          /* Vendor Detail View */
+          <div className="p-8">
+            <div className="max-w-4xl mx-auto">
+              {/* Vendor Header */}
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h1 className="text-3xl font-bold text-foreground mb-2">
+                    {selectedVendor.store_name}
+                  </h1>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Star className="h-5 w-5 text-yellow-500 fill-current" />
+                    <span className="text-foreground font-medium">
+                      {vendorRatings[selectedVendor.id]?.averageRating || '0.0'}
+                    </span>
+                    <span className="text-muted-foreground">
+                      ({vendorRatings[selectedVendor.id]?.totalReviews || 0})
                     </span>
                   </div>
-
-                  {/* Like Button */}
+                </div>
+                <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      await toggleLike(vendor.id, 'vendor');
+                    onClick={async () => {
+                      await toggleLike(selectedVendor.id, 'vendor');
                     }}
                     className={cn(
-                      "absolute top-3 right-3 h-8 w-8 rounded-full bg-white/90 backdrop-blur-sm transition-colors hover:bg-white",
-                      isLiked(vendor.id, 'vendor')
+                      "transition-colors",
+                      isLiked(selectedVendor.id, 'vendor')
                         ? "text-red-500 hover:text-red-600"
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     <Heart 
                       className={cn(
-                        "h-4 w-4 transition-colors",
-                        isLiked(vendor.id, 'vendor') && "fill-current"
+                        "h-5 w-5 transition-colors",
+                        isLiked(selectedVendor.id, 'vendor') && "fill-current"
                       )} 
                     />
                   </Button>
-
-                  {/* Distance Badge */}
-                  <div className="absolute bottom-3 right-3 bg-green-600 text-white text-xs px-2 py-1 rounded-full">
-                    {calculateDistance(userCoordinates || {lat: 0, lng: 0}, vendor.market_address)}
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedVendor(null)}
+                  >
+                    Back to Vendors
+                  </Button>
                 </div>
+              </div>
 
-                {/* Vendor Info */}
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-foreground text-lg leading-tight">
-                      {vendor.store_name}
-                    </h3>
-                  </div>
-                  
-                  <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
-                    {vendor.description || vendor.primary_specialty}
-                  </p>
-                  
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Store className="h-3 w-3" />
-                    <span>{vendor.primary_specialty}</span>
-                  </div>
+              {/* Category Badges */}
+              <div className="flex flex-wrap gap-2 mb-6">
+                {selectedVendor.primary_specialty && (
+                  <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200">
+                    {selectedVendor.primary_specialty}
+                  </Badge>
+                )}
+                <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200">
+                  Fresh Produce
+                </Badge>
+                <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200">
+                  Local
+                </Badge>
+              </div>
+
+              {/* Description */}
+              {selectedVendor.description && (
+                <p className="text-muted-foreground mb-6">
+                  {selectedVendor.description}
+                </p>
+              )}
+
+              {/* Website Link */}
+              {selectedVendor.website && (
+                <div className="mb-8">
+                  <a 
+                    href={selectedVendor.website} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-green-600 hover:text-green-700 font-medium"
+                  >
+                    Visit Website
+                  </a>
                 </div>
-              </Card>
-            ))}
+              )}
+
+              {/* Products Grid */}
+              {selectedVendor.products && selectedVendor.products.length > 0 && (
+                <div>
+                  <h2 className="text-2xl font-semibold mb-6">Products</h2>
+                  <ProductGrid products={selectedVendor.products} vendorId={selectedVendor.id} />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        ) : (
+          /* Vendor Cards Grid */
+          <div className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+              {acceptedSubmissions.filter(vendor => {
+                const vendorMarket = vendor.selected_market || vendor.search_term || 'Unknown Market';
+                const currentMarket = acceptedSubmission.selected_market || acceptedSubmission.search_term || 'Unknown Market';
+                return vendorMarket === currentMarket;
+              }).map((vendor, index) => (
+                <Card 
+                  key={vendor.id}
+                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => {
+                    setSelectedVendor(vendor);
+                  }}
+                >
+                  {/* Vendor Image */}
+                  <div className="aspect-video bg-muted relative overflow-hidden">
+                    {vendor.products && 
+                     vendor.products.length > 0 && 
+                     vendor.products[0].images && 
+                     vendor.products[0].images.length > 0 ? (
+                      <img 
+                        src={vendor.products[0].images[0]}
+                        alt={vendor.store_name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
+                        <div className="text-green-600 text-lg font-medium">
+                          {vendor.store_name}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Rating Badge */}
+                    <div className="absolute top-3 left-3 flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
+                      <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                      <span className="text-xs font-medium">
+                        {vendorRatings[vendor.id]?.averageRating || '0.0'}
+                      </span>
+                    </div>
+
+                    {/* Like Button */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        await toggleLike(vendor.id, 'vendor');
+                      }}
+                      className={cn(
+                        "absolute top-3 right-3 h-8 w-8 rounded-full bg-white/90 backdrop-blur-sm transition-colors hover:bg-white",
+                        isLiked(vendor.id, 'vendor')
+                          ? "text-red-500 hover:text-red-600"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <Heart 
+                        className={cn(
+                          "h-4 w-4 transition-colors",
+                          isLiked(vendor.id, 'vendor') && "fill-current"
+                        )} 
+                      />
+                    </Button>
+
+                    {/* Distance Badge */}
+                    <div className="absolute bottom-3 right-3 bg-green-600 text-white text-xs px-2 py-1 rounded-full">
+                      {calculateDistance(userCoordinates || {lat: 0, lng: 0}, vendor.market_address)}
+                    </div>
+                  </div>
+
+                  {/* Vendor Info */}
+                  <div className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold text-foreground text-lg leading-tight">
+                        {vendor.store_name}
+                      </h3>
+                    </div>
+                    
+                    <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+                      {vendor.description || vendor.primary_specialty}
+                    </p>
+                    
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Store className="h-3 w-3" />
+                      <span>{vendor.primary_specialty}</span>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Review Modal */}
