@@ -384,22 +384,6 @@ export default function ShopManager() {
               </Card>
             </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Shop Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold">{shopData.store_name}</h3>
-                  <Badge variant="secondary" className="mt-1">{shopData.primary_specialty}</Badge>
-                </div>
-                <p className="text-muted-foreground">{shopData.description}</p>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Store className="h-4 w-4" />
-                  <span>{shopData.selected_market || shopData.search_term}</span>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
 
           <TabsContent value="shop" className="space-y-6">
