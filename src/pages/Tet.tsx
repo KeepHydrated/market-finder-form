@@ -68,11 +68,33 @@ const Tet = () => {
   const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
   const [vendorRatings, setVendorRatings] = useState<Record<string, { vendorId: string; averageRating: number; totalReviews: number }>>({});
   const [selectedVendor, setSelectedVendor] = useState<AcceptedSubmission | null>(null);
+  const [marketInfo, setMarketInfo] = useState<{
+    name: string;
+    address: string;
+    days?: string[];
+    hours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
+    averageRating: number;
+    totalReviews: number;
+  } | null>(null);
 
   useEffect(() => {
     fetchAcceptedSubmission();
     fetchAllAcceptedSubmissions();
   }, []);
+
+  useEffect(() => {
+    if (acceptedSubmission && !marketInfo) {
+      // Set market info once and don't change it
+      setMarketInfo({
+        name: acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location",
+        address: acceptedSubmission.market_address || "Address TBD",
+        days: acceptedSubmission.market_days,
+        hours: acceptedSubmission.market_hours,
+        averageRating: 0,
+        totalReviews: 0
+      });
+    }
+  }, [acceptedSubmission, marketInfo]);
 
   useEffect(() => {
     if (acceptedSubmission) {
@@ -400,16 +422,16 @@ const Tet = () => {
               <span 
                 className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors"
               >
-                {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
+                {marketInfo?.name || "Market Location"}
               </span>
               {/* Rating display */}
               <div className="flex items-center gap-2">
                 <Star className="h-4 w-4 text-yellow-500 fill-current" />
                 <span className="text-foreground font-medium">
-                  {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'}
+                  {marketInfo?.averageRating || '0.0'}
                 </span>
                 <span className="text-muted-foreground">
-                  ({reviewStats.totalReviews})
+                  ({marketInfo?.totalReviews || 0})
                 </span>
               </div>
             </div>
@@ -441,14 +463,14 @@ const Tet = () => {
           <div className="flex items-start gap-2 pt-2">
             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
             <p className="text-muted-foreground text-sm">
-              {acceptedSubmission.market_address || "Address TBD"}
+              {marketInfo?.address || "Address TBD"}
             </p>
           </div>
 
           <div className="flex items-start gap-2">
             <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
             <span className="text-muted-foreground text-sm whitespace-pre-line">
-              {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours)}
+              {formatSchedule(marketInfo?.days, marketInfo?.hours)}
             </span>
           </div>
         </div>
