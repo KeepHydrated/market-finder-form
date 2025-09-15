@@ -649,8 +649,7 @@ const Homepage = () => {
                     key={index}
                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                     onClick={() => {
-                      // Navigate to market detail page in the future
-                      console.log(`Navigate to ${market.name}`);
+                      navigate('/market');
                     }}
                   >
                     {/* Vendor Images Collage */}
