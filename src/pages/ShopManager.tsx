@@ -555,22 +555,22 @@ export default function ShopManager() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="store_name">Store Name</Label>
-                  <Input
-                    id="store_name"
-                    value={formData.store_name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, store_name: e.target.value }))}
-                    disabled={!isEditing}
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <MarketSearch
                     markets={markets}
                     searchTerm={marketSearchTerm}
                     onSearchTermChange={setMarketSearchTerm}
                     onSelectMarket={handleMarketSelect}
                     onAddMarket={() => setShowAddMarket(true)}
+                    disabled={!isEditing}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="store_name">Store Name</Label>
+                  <Input
+                    id="store_name"
+                    value={formData.store_name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, store_name: e.target.value }))}
                     disabled={!isEditing}
                   />
                 </div>
