@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AddressAutocomplete } from './AddressAutocomplete';
 
 const DAYS_OF_WEEK = [
   'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
@@ -73,12 +74,19 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
 
           <div className="space-y-2">
             <Label htmlFor="address">Address *</Label>
-            <Input
+            <AddressAutocomplete
               id="address"
               value={formData.address}
-              onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-              placeholder="e.g. 123 Main St"
-              autoComplete="street-address"
+              onChange={(value) => setFormData(prev => ({ ...prev, address: value }))}
+              onPlaceSelected={(place) => {
+                setFormData(prev => ({
+                  ...prev,
+                  address: place.address,
+                  city: place.city,
+                  state: place.state
+                }));
+              }}
+              placeholder="Start typing an address..."
               required
             />
           </div>
