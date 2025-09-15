@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Submissions from "./pages/Submissions";
 import Homepage from "./pages/Homepage";
 import Vendor from "./pages/Vendor";
+import VendorDuplicate from "./pages/VendorDuplicate";
 import Likes from "./pages/Likes";
 import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/submissions" element={<Submissions />} />
             <Route path="/homepage" element={<Homepage />} />
             <Route path="/vendor" element={<Vendor />} />
+            <Route path="/vendor-duplicate" element={<VendorDuplicate />} />
             <Route path="/likes" element={<Likes />} />
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/shop-manager" element={<ShopManager />} />
