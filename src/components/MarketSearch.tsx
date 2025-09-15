@@ -95,12 +95,12 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
   };
 
   return (
-    <div className="relative w-full" ref={dropdownRef}>
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">
-          Which farmers market do you want to join? *
-        </label>
-        
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-foreground">
+        Which farmers market do you want to join? *
+      </label>
+      
+      <div className="relative w-full" ref={dropdownRef}>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
@@ -115,49 +115,49 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
             disabled={disabled}
           />
         </div>
-      </div>
 
-      {showResults && !disabled && (
-        <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
-          <div className="max-h-60 overflow-y-auto">
-            {visibleMarkets.map((market, index) => (
-              <button
-                key={market.id}
-                onClick={() => handleSelectMarket(market)}
-                className={cn(
-                  "w-full px-4 py-3 text-left hover:bg-muted transition-colors",
-                  selectedIndex === index && "bg-muted"
-                )}
-              >
-                <div className="font-medium text-foreground">{market.name}</div>
-                <div className="text-sm text-muted-foreground">
-                  {market.city}, {market.state}
-                </div>
-              </button>
-            ))}
-          </div>
-          
-          <button
-            onClick={onAddMarket}
-            className={cn(
-              "w-full px-4 py-3 text-left hover:bg-muted transition-colors flex items-center gap-2 border-t border-border",
-              selectedIndex === visibleMarkets.length && "bg-muted"
-            )}
-          >
-            {isEditingSubmittedMarket ? (
-              <>
-                <Edit className="h-4 w-4 text-success" />
-                <span className="text-success font-medium">Edit market</span>
-              </>
-            ) : (
-              <>
-                <Plus className="h-4 w-4 text-success" />
-                <span className="text-success font-medium">Add market</span>
-              </>
-            )}
-          </button>
-        </Card>
-      )}
+        {showResults && !disabled && (
+          <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
+            <div className="max-h-60 overflow-y-auto">
+              {visibleMarkets.map((market, index) => (
+                <button
+                  key={market.id}
+                  onClick={() => handleSelectMarket(market)}
+                  className={cn(
+                    "w-full px-4 py-3 text-left hover:bg-muted transition-colors",
+                    selectedIndex === index && "bg-muted"
+                  )}
+                >
+                  <div className="font-medium text-foreground">{market.name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {market.city}, {market.state}
+                  </div>
+                </button>
+              ))}
+            </div>
+            
+            <button
+              onClick={onAddMarket}
+              className={cn(
+                "w-full px-4 py-3 text-left hover:bg-muted transition-colors flex items-center gap-2 border-t border-border",
+                selectedIndex === visibleMarkets.length && "bg-muted"
+              )}
+            >
+              {isEditingSubmittedMarket ? (
+                <>
+                  <Edit className="h-4 w-4 text-success" />
+                  <span className="text-success font-medium">Edit market</span>
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 text-success" />
+                  <span className="text-success font-medium">Add market</span>
+                </>
+              )}
+            </button>
+          </Card>
+        )}
+      </div>
     </div>
   );
 };
