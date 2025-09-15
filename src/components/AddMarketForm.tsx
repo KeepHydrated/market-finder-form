@@ -100,18 +100,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address">Address (Manual Entry) *</Label>
-            <Input
-              id="address-manual"
-              value={formData.address}
-              onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-              placeholder="e.g. 123 Main St"
-              autoComplete="off"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="address-google">Address (Google Places) *</Label>
+            <Label htmlFor="address-google">Address *</Label>
             <AddressAutocomplete
               id="address-google"
               value={formData.address}
