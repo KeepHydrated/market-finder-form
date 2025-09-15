@@ -318,7 +318,7 @@ const VendorDuplicate = () => {
     <div className="min-h-screen bg-background">
       <div className="flex">
         {/* Left column - wider width */}
-        <div className="w-96 bg-green-50 border-r">
+        <div className="w-96 min-h-screen bg-green-50 border-r">
         <div className="space-y-6 px-4 pt-6 pb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
