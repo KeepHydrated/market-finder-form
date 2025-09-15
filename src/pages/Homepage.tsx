@@ -286,12 +286,16 @@ const Homepage = () => {
   };
 
   const fetchAcceptedSubmissions = async () => {
+    console.log('Fetching accepted submissions...');
     try {
       const { data, error } = await supabase
         .from('submissions')
         .select('*')
         .eq('status', 'accepted')
         .order('created_at', { ascending: false });
+
+      console.log('Raw data from database:', data);
+      console.log('Error from database:', error);
 
       if (error) throw error;
       
@@ -303,6 +307,7 @@ const Homepage = () => {
           : undefined
       })) || [];
       
+      console.log('Parsed submissions:', parsedSubmissions);
       setAcceptedSubmissions(parsedSubmissions);
       
       // Fetch ratings for all vendors
