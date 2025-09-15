@@ -420,71 +420,105 @@ const Tet = () => {
         <div className="p-8">
           <div className="grid grid-cols-2 gap-6">
             {acceptedSubmissions.map((vendor) => (
-              <div key={vendor.id} className="bg-white rounded-lg border shadow-sm hover:shadow-md transition-shadow cursor-pointer p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <h3 className="font-semibold text-lg">{vendor.store_name}</h3>
-                    <div className="flex items-center gap-2">
-                      <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                      <span className="text-sm text-muted-foreground">
-                        {vendor.averageRating || '0.0'} ({vendor.totalReviews || 0})
+              <Card 
+                key={vendor.id} 
+                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => navigate(`/vendor/${vendor.id}`)}
+              >
+                {/* Social Media Post Section - Dark Theme */}
+                <div className="bg-black text-white p-4 relative aspect-video">
+                  {/* Rating - Top Left */}
+                  <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                    <div className="flex items-center gap-1">
+                      <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                      <span className="text-xs font-medium text-black">
+                        {vendor.averageRating?.toFixed(1) || '0.0'}
+                      </span>
+                      <span className="text-xs text-gray-600">
+                        ({vendor.totalReviews || 0})
                       </span>
                     </div>
                   </div>
+                  
+                  {/* Like Button - Top Right */}
                   <Button
-                    variant="ghost"
+                    variant="secondary"
                     size="sm"
+                    className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
                     onClick={async (e) => {
                       e.stopPropagation();
                       await toggleLike(vendor.id, 'vendor');
                     }}
-                    className={cn(
-                      "transition-colors",
-                      isLiked(vendor.id, 'vendor')
-                        ? "text-red-500 hover:text-red-600"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
                   >
                     <Heart 
                       className={cn(
-                        "h-5 w-5 transition-colors",
-                        isLiked(vendor.id, 'vendor') && "fill-current"
+                        "h-4 w-4 transition-colors",
+                        isLiked(vendor.id, 'vendor') 
+                          ? "text-red-500 fill-current" 
+                          : "text-gray-600"
                       )} 
                     />
                   </Button>
+
+                  {/* Mock Social Media Content */}
+                  <div className="space-y-3 mt-8">
+                    <div className="text-xs text-gray-300">
+                      <span className="text-white">woman.</span> • probably a garbage person to begin with.
+                    </div>
+                    <div className="text-xs text-gray-300">
+                      Women, on the other hand, don't usually have that same general respect for each other, at least, not as consistently as men do. Especially for strangers.
+                    </div>
+                    
+                    {/* Mock engagement buttons */}
+                    <div className="flex items-center gap-4 text-xs text-gray-400 mt-4">
+                      <div className="flex items-center gap-1">
+                        <span>33</span>
+                        <span>↑</span>
+                      </div>
+                      <span>Reply</span>
+                      <span>Award</span>
+                      <span>Share</span>
+                    </div>
+                    
+                    {/* Mock user comment */}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                        <span className="text-xs text-blue-400">TruthCultural9952</span>
+                        <span className="text-xs text-gray-500">• 7h ago</span>
+                      </div>
+                      <div className="text-xs text-gray-300 ml-6">
+                        The respect men have for complete strangers they've met 5 mins ago is YUGE
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Distance Badge - Bottom Right */}
+                  <div className="absolute bottom-2 right-2 bg-white/90 px-3 py-1 rounded-full shadow-sm">
+                    <span className="text-sm font-medium text-gray-700">
+                      {Math.floor(Math.random() * 4) + 1}.{Math.floor(Math.random() * 9)} miles
+                    </span>
+                  </div>
                 </div>
                 
-                {/* Category badges */}
-                <div className="flex gap-2 mb-3">
-                  {vendor.primary_specialty && (
-                    <Badge variant="secondary">{vendor.primary_specialty}</Badge>
-                  )}
-                  <Badge variant="secondary">Fresh Produce</Badge>
-                  <Badge variant="secondary">Local</Badge>
+                {/* Vendor Information - White Section */}
+                <div className="bg-white p-4 space-y-2">
+                  <h3 className="text-xl font-semibold text-black">
+                    {vendor.store_name}
+                  </h3>
+                  
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-gray-500" />
+                    <span className="text-gray-600 text-sm">
+                      {vendor.selected_market || vendor.search_term || "Market Location"}
+                    </span>
+                  </div>
+                  
+                  <div className="text-black font-medium">
+                    {vendor.primary_specialty || "Fresh Produce"}
+                  </div>
                 </div>
-                
-                {/* Description */}
-                <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-                  {vendor.description || "Quality produce from local farmers."}
-                </p>
-
-                {/* Location */}
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                  <MapPin className="h-4 w-4" />
-                  <span>{vendor.selected_market || vendor.search_term || "Market Location"}</span>
-                </div>
-
-                {/* Schedule */}
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>
-                    {vendor.market_days && vendor.market_days.length > 0 
-                      ? `${vendor.market_days.join(', ')}`
-                      : "Schedule TBD"
-                    }
-                  </span>
-                </div>
-              </div>
+              </Card>
             ))}
           </div>
         </div>
