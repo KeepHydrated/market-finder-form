@@ -114,13 +114,18 @@ export const AddressAutocomplete = ({
     <Input
       ref={inputRef}
       id={id}
-      name="autocomplete-disabled"
+      name="address-field-unique"
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       className={className}
-      autoComplete="new-password"
+      autoComplete="nope"
+      autoCorrect="off"
+      autoCapitalize="off"
       spellCheck={false}
+      data-form-type="other"
+      data-lpignore="true"
+      style={{ WebkitAppearance: 'none' } as React.CSSProperties}
       required={required}
     />
   );
