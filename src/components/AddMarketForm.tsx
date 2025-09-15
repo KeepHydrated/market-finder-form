@@ -4,10 +4,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AddressAutocomplete } from './AddressAutocomplete';
 
 const DAYS_OF_WEEK = [
   'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+];
+
+const timeOptions = [
+  '01:00', '02:00', '03:00', '04:00', '05:00', '06:00',
+  '07:00', '08:00', '09:00', '10:00', '11:00', '12:00'
 ];
 
 interface AddMarketFormProps {
@@ -23,8 +29,40 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
     city: '',
     state: '',
     days: [] as string[],
-    hours: ''
+    hours: {} as Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>
   });
+
+  const [dayTimeSelections, setDayTimeSelections] = useState<Record<string, {
+    startTime: string;
+    startPeriod: 'AM' | 'PM';
+    endTime: string;
+    endPeriod: 'AM' | 'PM';
+  }>>({});
+
+  const updateTimeSelection = (day: string, field: string, value: string) => {
+    setDayTimeSelections(prev => ({
+      ...prev,
+      [day]: {
+        ...prev[day],
+        [field]: value
+      }
+    }));
+
+    // Update formData hours
+    const updatedSelection = { ...dayTimeSelections[day], [field]: value };
+    setFormData(prev => ({
+      ...prev,
+      hours: {
+        ...prev.hours,
+        [day]: {
+          start: updatedSelection.startTime || '08:00',
+          end: updatedSelection.endTime || '02:00',
+          startPeriod: updatedSelection.startPeriod || 'AM',
+          endPeriod: updatedSelection.endPeriod || 'PM'
+        }
+      }
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,8 +78,9 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
       city: '',
       state: '',
       days: [],
-      hours: ''
+      hours: {}
     });
+    setDayTimeSelections({});
   };
 
   const handleDayToggle = (day: string) => {
@@ -51,6 +90,26 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
         ? prev.days.filter(d => d !== day)
         : [...prev.days, day]
     }));
+
+    // Initialize time selection for newly selected day
+    if (!formData.days.includes(day)) {
+      setDayTimeSelections(prevTimes => ({
+        ...prevTimes,
+        [day]: {
+          startTime: '08:00',
+          startPeriod: 'AM',
+          endTime: '02:00',
+          endPeriod: 'PM'
+        }
+      }));
+    } else {
+      // Remove time selection when day is deselected
+      setDayTimeSelections(prevTimes => {
+        const newTimes = { ...prevTimes };
+        delete newTimes[day];
+        return newTimes;
+      });
+    }
   };
 
   const [isGooglePlacesActive, setIsGooglePlacesActive] = useState(false);
@@ -150,15 +209,77 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="hours">Hours</Label>
-            <Input
-              id="hours"
-              value={formData.hours}
-              onChange={(e) => setFormData(prev => ({ ...prev, hours: e.target.value }))}
-              placeholder="e.g. 8:00 AM - 2:00 PM"
-            />
-          </div>
+          {formData.days.length > 0 && (
+            <div className="space-y-4">
+              <Label>Hours</Label>
+              {formData.days.map((day) => (
+                <div key={day} className="space-y-3 border-t pt-4">
+                  <h5 className="font-medium">{day}</h5>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <Select 
+                        value={dayTimeSelections[day]?.startTime || '08:00'}
+                        onValueChange={(value) => updateTimeSelection(day, 'startTime', value)}
+                      >
+                        <SelectTrigger className="w-20 bg-background">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border shadow-md z-50">
+                          {timeOptions.map((time) => (
+                            <SelectItem key={time} value={time}>{time}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      <Select
+                        value={dayTimeSelections[day]?.startPeriod || 'AM'}
+                        onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'startPeriod', value)}
+                      >
+                        <SelectTrigger className="w-16 bg-background">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border shadow-md z-50">
+                          <SelectItem value="AM">AM</SelectItem>
+                          <SelectItem value="PM">PM</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <span className="text-muted-foreground text-sm">to</span>
+                    
+                    <div className="flex items-center gap-1">
+                      <Select
+                        value={dayTimeSelections[day]?.endTime || '02:00'}
+                        onValueChange={(value) => updateTimeSelection(day, 'endTime', value)}
+                      >
+                        <SelectTrigger className="w-20 bg-background">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border shadow-md z-50">
+                          {timeOptions.map((time) => (
+                            <SelectItem key={time} value={time}>{time}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      <Select
+                        value={dayTimeSelections[day]?.endPeriod || 'PM'}
+                        onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'endPeriod', value)}
+                      >
+                        <SelectTrigger className="w-16 bg-background">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border shadow-md z-50">
+                          <SelectItem value="AM">AM</SelectItem>
+                          <SelectItem value="PM">PM</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="flex gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
