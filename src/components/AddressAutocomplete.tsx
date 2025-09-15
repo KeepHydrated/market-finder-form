@@ -238,17 +238,20 @@ export const AddressAutocomplete = ({
       <Input
         ref={inputRef}
         id={id}
-        name={`address-field-${id || 'unique'}`}
+        name={`address-field-${Math.random().toString(36).substr(2, 9)}`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={className}
-        autoComplete="new-address"
+        autoComplete="new-password"
         autoCorrect="off"
         autoCapitalize="off"
         spellCheck={false}
         data-form-type="other"
         data-lpignore="true"
+        role="combobox"
+        aria-expanded="false"
+        aria-autocomplete="list"
         required={required}
       />
     </div>

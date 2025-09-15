@@ -95,7 +95,8 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="e.g. Downtown Farmers Market"
-              autoComplete="off"
+              autoComplete="new-password"
+              spellCheck="false"
               required
             />
           </div>
