@@ -54,7 +54,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Add New Farmers Market</DialogTitle>
         </DialogHeader>
