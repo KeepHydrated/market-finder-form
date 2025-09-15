@@ -241,7 +241,7 @@ export default function ShopManager() {
       id: Date.now(),
       name: `${product.name} (Copy)`
     };
-    const updatedProducts = [...shopData.products, newProduct];
+    const updatedProducts = [newProduct, ...shopData.products];
     updateProducts(updatedProducts);
   };
 
