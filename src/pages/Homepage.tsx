@@ -555,7 +555,7 @@ const Homepage = () => {
                   <Card 
                     key={submission.id} 
                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
-                    onClick={() => navigate('/vendor')}
+                    onClick={() => navigate(`/vendor/${submission.id}`)}
                   >
                     {/* Product Image */}
                     <div className="aspect-video bg-muted relative">
