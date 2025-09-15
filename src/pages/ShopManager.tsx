@@ -616,14 +616,6 @@ export default function ShopManager() {
                     onAddMarket={() => setShowAddMarket(true)}
                     disabled={!isEditing}
                   />
-                  {shopData.selected_market && (
-                    <div className="mt-2 p-3 bg-muted rounded-md">
-                      <p className="text-sm font-medium">Currently joined: {shopData.selected_market}</p>
-                      {shopData.market_address && (
-                        <p className="text-sm text-muted-foreground">{shopData.market_address}</p>
-                      )}
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>
