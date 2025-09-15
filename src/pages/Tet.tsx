@@ -30,6 +30,8 @@ interface AcceptedSubmission {
   market_days?: string[];
   market_hours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
   created_at: string;
+  averageRating?: number;
+  totalReviews?: number;
 }
 
 interface Review {
@@ -53,6 +55,7 @@ const Tet = () => {
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
   const [acceptedSubmission, setAcceptedSubmission] = useState<AcceptedSubmission | null>(null);
+  const [acceptedSubmissions, setAcceptedSubmissions] = useState<AcceptedSubmission[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewStats, setReviewStats] = useState<ReviewStats>({ averageRating: 0, totalReviews: 0 });
@@ -65,6 +68,7 @@ const Tet = () => {
 
   useEffect(() => {
     fetchAcceptedSubmission();
+    fetchAllAcceptedSubmissions();
   }, []);
 
   useEffect(() => {
@@ -105,6 +109,30 @@ const Tet = () => {
       console.error('Error fetching vendor:', error);
     } finally {
       setLoadingData(false);
+    }
+  };
+
+  const fetchAllAcceptedSubmissions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('*')
+        .eq('status', 'accepted');
+
+      if (error) throw error;
+      
+      if (data) {
+        const parsedSubmissions = data.map(submission => ({
+          ...submission,
+          products: typeof submission.products === 'string' ? JSON.parse(submission.products) : submission.products,
+          market_hours: submission.market_hours && typeof submission.market_hours === 'object' && submission.market_hours !== null 
+            ? submission.market_hours as Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>
+            : undefined
+        }));
+        setAcceptedSubmissions(parsedSubmissions);
+      }
+    } catch (error) {
+      console.error('Error fetching all vendors:', error);
     }
   };
 
@@ -388,7 +416,78 @@ const Tet = () => {
       
       {/* Main content */}
       <div className="flex-1 px-4">
-        {/* Main content area - blank */}
+        {/* Vendor Cards Grid */}
+        <div className="p-8">
+          <div className="grid grid-cols-2 gap-6">
+            {acceptedSubmissions.map((vendor) => (
+              <div key={vendor.id} className="bg-white rounded-lg border shadow-sm hover:shadow-md transition-shadow cursor-pointer p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <h3 className="font-semibold text-lg">{vendor.store_name}</h3>
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                      <span className="text-sm text-muted-foreground">
+                        {vendor.averageRating || '0.0'} ({vendor.totalReviews || 0})
+                      </span>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      await toggleLike(vendor.id, 'vendor');
+                    }}
+                    className={cn(
+                      "transition-colors",
+                      isLiked(vendor.id, 'vendor')
+                        ? "text-red-500 hover:text-red-600"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Heart 
+                      className={cn(
+                        "h-5 w-5 transition-colors",
+                        isLiked(vendor.id, 'vendor') && "fill-current"
+                      )} 
+                    />
+                  </Button>
+                </div>
+                
+                {/* Category badges */}
+                <div className="flex gap-2 mb-3">
+                  {vendor.primary_specialty && (
+                    <Badge variant="secondary">{vendor.primary_specialty}</Badge>
+                  )}
+                  <Badge variant="secondary">Fresh Produce</Badge>
+                  <Badge variant="secondary">Local</Badge>
+                </div>
+                
+                {/* Description */}
+                <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+                  {vendor.description || "Quality produce from local farmers."}
+                </p>
+
+                {/* Location */}
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                  <MapPin className="h-4 w-4" />
+                  <span>{vendor.selected_market || vendor.search_term || "Market Location"}</span>
+                </div>
+
+                {/* Schedule */}
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  <span>
+                    {vendor.market_days && vendor.market_days.length > 0 
+                      ? `${vendor.market_days.join(', ')}`
+                      : "Schedule TBD"
+                    }
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Review Modal */}
