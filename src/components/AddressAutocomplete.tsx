@@ -67,7 +67,7 @@ export const AddressAutocomplete = ({
           });
 
           autocompleteRef.current = new google.maps.places.Autocomplete(input, {
-            types: ['address'],
+            types: ['address', 'establishment'],
             componentRestrictions: { country: 'us' }
           });
 
