@@ -389,7 +389,7 @@ const VendorDuplicate = () => {
           {acceptedSubmission && (
             <Card 
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
-              onClick={() => console.log('Navigate to vendor')}
+              onClick={() => navigate(`/vendor/${acceptedSubmission.id}`)}
             >
               {/* Product Image */}
               <div className="aspect-video bg-muted relative">
