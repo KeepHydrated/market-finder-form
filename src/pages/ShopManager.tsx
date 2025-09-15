@@ -565,6 +565,17 @@ export default function ShopManager() {
                 </div>
 
                 <div className="space-y-2">
+                  <MarketSearch
+                    markets={markets}
+                    searchTerm={marketSearchTerm}
+                    onSearchTermChange={setMarketSearchTerm}
+                    onSelectMarket={handleMarketSelect}
+                    onAddMarket={() => setShowAddMarket(true)}
+                    disabled={!isEditing}
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="specialty">Primary Specialty</Label>
                   <Select
                     value={formData.primary_specialty}
@@ -604,17 +615,6 @@ export default function ShopManager() {
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     disabled={!isEditing}
                     rows={4}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <MarketSearch
-                    markets={markets}
-                    searchTerm={marketSearchTerm}
-                    onSearchTermChange={setMarketSearchTerm}
-                    onSelectMarket={handleMarketSelect}
-                    onAddMarket={() => setShowAddMarket(true)}
-                    disabled={!isEditing}
                   />
                 </div>
               </CardContent>
