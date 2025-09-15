@@ -114,11 +114,13 @@ export const AddressAutocomplete = ({
     <Input
       ref={inputRef}
       id={id}
+      name="autocomplete-disabled"
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       className={className}
-      autoComplete="off"
+      autoComplete="new-password"
+      spellCheck={false}
       required={required}
     />
   );
