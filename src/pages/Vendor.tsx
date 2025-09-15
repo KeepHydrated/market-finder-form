@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,6 +48,7 @@ interface ReviewStats {
 }
 
 const Vendor = () => {
+  const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
@@ -322,7 +324,10 @@ const Vendor = () => {
         <div className="space-y-6 px-4 pt-6 pb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-foreground text-xl font-bold">
+              <span 
+                className="text-foreground text-xl font-bold cursor-pointer hover:text-primary transition-colors"
+                onClick={() => navigate('/market')}
+              >
                 {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
               </span>
               {/* Rating display */}
