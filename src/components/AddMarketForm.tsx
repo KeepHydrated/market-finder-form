@@ -53,17 +53,12 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
     }));
   };
 
+  const [isGooglePlacesActive, setIsGooglePlacesActive] = useState(false);
+
   const handleCloseModal = (open: boolean) => {
-    // Check if the event target is a Google Places element
-    const target = document.activeElement || document.querySelector(':hover');
-    if (target) {
-      const isGooglePlaces = target.closest('.pac-container') || 
-                           target.hasAttribute?.('data-google-places') ||
-                           target.hasAttribute?.('data-google-places-item');
-      
-      if (isGooglePlaces) {
-        return; // Don't close modal if clicking on Google Places
-      }
+    // Don't close if Google Places is active
+    if (isGooglePlacesActive) {
+      return;
     }
     
     if (!open) {
@@ -73,7 +68,21 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
 
   return (
     <Dialog open={open} onOpenChange={handleCloseModal}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent 
+        className="max-w-2xl"
+        onInteractOutside={(e) => {
+          // Check if the interaction is with Google Places elements
+          const target = e.target as Element;
+          if (target && (
+            target.closest('.pac-container') ||
+            target.classList.contains('pac-item') ||
+            target.classList.contains('pac-item-query') ||
+            target.getAttribute('data-google-places') ||
+            target.getAttribute('data-google-places-item')
+          )) {
+            e.preventDefault();
+          }
+        }}>
         <DialogHeader>
           <DialogTitle>Add New Farmers Market</DialogTitle>
         </DialogHeader>
@@ -115,6 +124,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
                   state: place.state
                 }));
               }}
+              onGooglePlacesActiveChange={setIsGooglePlacesActive}
               placeholder="Start typing an address..."
               required
             />

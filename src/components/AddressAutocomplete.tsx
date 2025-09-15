@@ -13,6 +13,7 @@ interface AddressAutocompleteProps {
     city: string;
     state: string;
   }) => void;
+  onGooglePlacesActiveChange?: (isActive: boolean) => void;
   placeholder?: string;
   className?: string;
   id?: string;
@@ -23,6 +24,7 @@ export const AddressAutocomplete = ({
   value,
   onChange,
   onPlaceSelected,
+  onGooglePlacesActiveChange,
   placeholder = "Start typing an address...",
   className,
   id,
@@ -74,6 +76,12 @@ export const AddressAutocomplete = ({
             const target = e.target as Element;
             if (target && (target.closest('.pac-container') || target.classList.contains('pac-item'))) {
               e.stopImmediatePropagation();
+              onGooglePlacesActiveChange?.(true);
+              
+              // Reset after a short delay
+              setTimeout(() => {
+                onGooglePlacesActiveChange?.(false);
+              }, 100);
             }
           };
 
@@ -223,7 +231,7 @@ export const AddressAutocomplete = ({
     if (!isLoaded) {
       initializeAutocomplete();
     }
-  }, [isLoaded, onChange, onPlaceSelected]);
+  }, [isLoaded, onChange, onPlaceSelected, onGooglePlacesActiveChange]);
 
   return (
     <div style={{ position: 'relative', zIndex: 1 }}>
