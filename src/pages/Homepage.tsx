@@ -390,7 +390,7 @@ const Homepage = () => {
                     </div>
                     
                     {/* Time selectors for each selected day */}
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-2 gap-12">
                       {selectedDays.map((day) => (
                         <div key={day} className="space-y-3 border-t pt-4">
                           <h5 className="font-medium capitalize">
