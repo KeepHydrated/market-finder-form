@@ -398,7 +398,6 @@ const Tet = () => {
             <div className="flex items-center gap-3">
               <span 
                 className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors"
-                onClick={() => navigate('/market')}
               >
                 {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
               </span>
