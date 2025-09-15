@@ -707,10 +707,6 @@ const Likes = () => {
         <Sidebar className="w-60" collapsible="none">
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel className="flex items-center gap-2 px-4 py-3">
-                <Heart className="w-5 h-5" />
-                Your Likes
-              </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {tabs.map((tab) => (
