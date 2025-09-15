@@ -69,6 +69,18 @@ export const AddressAutocomplete = ({
             componentRestrictions: { country: 'us' }
           });
 
+          // Global click handler to prevent modal closing
+          const handleGlobalClick = (e: MouseEvent) => {
+            const target = e.target as Element;
+            if (target && (target.closest('.pac-container') || target.classList.contains('pac-item'))) {
+              e.stopImmediatePropagation();
+            }
+          };
+
+          // Add global event listener with high priority
+          document.addEventListener('mousedown', handleGlobalClick, true);
+          document.addEventListener('click', handleGlobalClick, true);
+
           autocompleteRef.current.addListener('place_changed', () => {
             const place = autocompleteRef.current?.getPlace();
             
@@ -158,18 +170,32 @@ export const AddressAutocomplete = ({
             `;
             document.head.appendChild(style);
 
-            // Add event listeners to prevent dropdown from closing
+            // Prevent modal from closing when clicking on Google Places dropdown
             setTimeout(() => {
               const pacContainer = document.querySelector('.pac-container');
               if (pacContainer) {
+                // Add data attribute to identify Google Places elements
+                pacContainer.setAttribute('data-google-places', 'true');
+                
+                // Prevent default mousedown behavior that might close modal
                 pacContainer.addEventListener('mousedown', (e) => {
-                  e.preventDefault();
+                  e.stopPropagation();
+                });
+
+                pacContainer.addEventListener('click', (e) => {
+                  e.stopPropagation();
                 });
                 
                 const pacItems = pacContainer.querySelectorAll('.pac-item');
                 pacItems.forEach(item => {
+                  item.setAttribute('data-google-places-item', 'true');
+                  
                   item.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
+                    e.stopPropagation();
+                  });
+
+                  item.addEventListener('click', (e) => {
+                    e.stopPropagation();
                   });
                 });
               }
@@ -180,6 +206,12 @@ export const AddressAutocomplete = ({
           addGlobalStyles();
           setTimeout(addGlobalStyles, 100);
           setTimeout(addGlobalStyles, 500);
+
+          // Cleanup function
+          return () => {
+            document.removeEventListener('mousedown', handleGlobalClick, true);
+            document.removeEventListener('click', handleGlobalClick, true);
+          };
         }
         
         setIsLoaded(true);

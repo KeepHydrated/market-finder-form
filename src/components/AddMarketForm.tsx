@@ -53,8 +53,26 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
     }));
   };
 
+  const handleCloseModal = (open: boolean) => {
+    // Check if the event target is a Google Places element
+    const target = document.activeElement || document.querySelector(':hover');
+    if (target) {
+      const isGooglePlaces = target.closest('.pac-container') || 
+                           target.hasAttribute?.('data-google-places') ||
+                           target.hasAttribute?.('data-google-places-item');
+      
+      if (isGooglePlaces) {
+        return; // Don't close modal if clicking on Google Places
+      }
+    }
+    
+    if (!open) {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={handleCloseModal}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Add New Farmers Market</DialogTitle>
