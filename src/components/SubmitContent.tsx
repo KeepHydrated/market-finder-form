@@ -1,0 +1,353 @@
+import { useState, useEffect, useCallback } from "react";
+import { MarketSearch } from "@/components/MarketSearch";
+import { MarketDetails } from "@/components/MarketDetails";
+import { AddMarketForm } from "@/components/AddMarketForm";
+import { AddProductForm } from "@/components/AddProductForm";
+import { ProductGrid } from "@/components/ProductGrid";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { VendorApplication, VendorApplicationData } from "@/components/VendorApplication";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Plus } from "lucide-react";
+
+const sampleMarkets = [
+  {
+    id: 1,
+    name: "Downtown Farmers Market",
+    address: "123 Main Street",
+    city: "Springfield",
+    state: "IL",
+    days: ["Wed", "Sat"],
+    hours: "8:00 AM - 2:00 PM"
+  },
+  {
+    id: 2,
+    name: "Riverside Community Market", 
+    address: "456 River Road",
+    city: "Madison",
+    state: "WI",
+    days: ["Thu", "Sun"],
+    hours: "9:00 AM - 3:00 PM"
+  },
+  {
+    id: 3,
+    name: "Sunset Valley Market",
+    address: "789 Valley Ave",
+    city: "Portland", 
+    state: "OR",
+    days: ["Fri", "Sat", "Sun"],
+    hours: "7:00 AM - 1:00 PM"
+  },
+  {
+    id: 4,
+    name: "Green Hills Market",
+    address: "321 Oak Street",
+    city: "Austin",
+    state: "TX", 
+    days: ["Sat"],
+    hours: "8:00 AM - 2:00 PM"
+  },
+  {
+    id: 5,
+    name: "Valley Fresh Market",
+    address: "654 Pine Avenue",
+    city: "Denver",
+    state: "CO",
+    days: ["Wed", "Fri", "Sat"],
+    hours: "9:00 AM - 4:00 PM"
+  }
+];
+
+interface Market {
+  id: number;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  days: string[];
+  hours: string;
+}
+
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  images: string[];
+}
+
+interface SubmitContentProps {
+  user: any;
+}
+
+export const SubmitContent = ({ user }: SubmitContentProps) => {
+  const { toast } = useToast();
+  const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [showAddProductForm, setShowAddProductForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [submittedMarketName, setSubmittedMarketName] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [vendorApplicationData, setVendorApplicationData] = useState<VendorApplicationData>({
+    storeName: "",
+    primarySpecialty: "",
+    website: "",
+    description: ""
+  });
+  const [customMarketData, setCustomMarketData] = useState<any>(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // Memoize localStorage operations
+  const loadProducts = useCallback(() => {
+    try {
+      const savedProducts = localStorage.getItem('farmer-market-products');
+      if (savedProducts) {
+        const parsedProducts = JSON.parse(savedProducts);
+        setProducts(parsedProducts);
+      }
+    } catch (error) {
+      console.error('Failed to parse saved products:', error);
+    }
+  }, []);
+
+  const saveProducts = useCallback((productsToSave: Product[]) => {
+    if (productsToSave.length > 0) {
+      localStorage.setItem('farmer-market-products', JSON.stringify(productsToSave));
+    }
+  }, []);
+
+  // Load products once on mount
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
+
+  // Save products when they change
+  useEffect(() => {
+    if (products.length > 0) {
+      saveProducts(products);
+    }
+  }, [products, saveProducts]);
+
+  const handleSelectMarket = useCallback((market: Market) => {
+    setSelectedMarket(market);
+  }, []);
+
+  const handleBackToSearch = useCallback(() => {
+    setSelectedMarket(null);
+  }, []);
+
+  const handleAddMarket = useCallback(() => {
+    setShowAddForm(true);
+  }, []);
+
+  const handleMarketAdded = useCallback((marketData: any) => {
+    setSearchTerm(marketData.name);
+    setSubmittedMarketName(marketData.name);
+    setCustomMarketData(marketData);
+    setShowAddForm(false);
+  }, []);
+
+  const handleAddProduct = useCallback(() => {
+    setShowAddProductForm(true);
+  }, []);
+
+  const handleProductAdded = useCallback(async (product: { name: string; description: string; price: number; images: File[] }) => {
+    const imagePromises = product.images.map(file => {
+      return new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
+    });
+
+    const imageBase64Array = await Promise.all(imagePromises);
+    const newProduct: Product = {
+      id: Date.now(),
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      images: imageBase64Array
+    };
+    
+    setProducts(prev => [...prev, newProduct]);
+    setShowAddProductForm(false);
+    toast({
+      title: "Product Added",
+      description: "Your product has been successfully added.",
+    });
+  }, [toast]);
+
+  const handleDeleteProduct = useCallback((productId: number) => {
+    setProducts(prev => prev.filter(product => product.id !== productId));
+    toast({
+      title: "Product Deleted", 
+      description: "The product has been successfully deleted.",
+    });
+  }, [toast]);
+
+  const handleDuplicateProduct = useCallback((product: Product) => {
+    const duplicatedProduct: Product = {
+      ...product,
+      id: Date.now(),
+      name: `${product.name} (Copy)`
+    };
+    setProducts(prev => [...prev, duplicatedProduct]);
+    toast({
+      title: "Product Duplicated",
+      description: "The product has been successfully duplicated.",
+    });
+  }, [toast]);
+
+  const handleEditProduct = useCallback((product: Product) => {
+    setEditingProduct(product);
+    setShowAddProductForm(true);
+  }, []);
+
+  const handleSubmit = useCallback(async () => {
+    if (!user || !vendorApplicationData.storeName.trim() || !vendorApplicationData.description.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('submissions')
+        .insert({
+          user_id: user.id,
+          store_name: vendorApplicationData.storeName,
+          primary_specialty: vendorApplicationData.primarySpecialty,
+          website: vendorApplicationData.website,
+          description: vendorApplicationData.description,
+          products: JSON.stringify(products),
+          selected_market: selectedMarket?.name || customMarketData?.name || null,
+          search_term: selectedMarket ? null : searchTerm,
+          market_address: customMarketData?.address || null,
+          market_days: customMarketData?.days || null,
+          market_hours: customMarketData?.hours || null,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+      
+      setIsSubmitted(true);
+      toast({
+        title: "Application Submitted",
+        description: "Your vendor application has been submitted successfully!",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: `Failed to submit application: ${error.message || 'Unknown error'}`,
+        variant: "destructive"
+      });
+    }
+  }, [user, vendorApplicationData, products, selectedMarket, customMarketData, searchTerm, toast]);
+
+  if (selectedMarket) {
+    return (
+      <MarketDetails 
+        market={selectedMarket} 
+        onBack={handleBackToSearch} 
+      />
+    );
+  }
+
+  return (
+    <>
+      {isSubmitted && (
+        <div className="mb-8 p-6 bg-green-50 border border-green-200 rounded-lg">
+          <div className="flex items-center justify-center gap-2 text-green-700">
+            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-sm">✓</span>
+            </div>
+            <h3 className="text-lg font-semibold">Application Submitted Successfully!</h3>
+          </div>
+          <p className="text-center text-green-600 mt-2">
+            Your vendor application has been submitted and is being reviewed.
+          </p>
+        </div>
+      )}
+
+      <MarketSearch 
+        markets={sampleMarkets}
+        onSelectMarket={handleSelectMarket}
+        onAddMarket={handleAddMarket}
+        searchTerm={searchTerm}
+        onSearchTermChange={setSearchTerm}
+        submittedMarketName={submittedMarketName}
+        disabled={isSubmitted}
+      />
+      
+      <Card className="mt-8 p-8 bg-card border-border">
+        <VendorApplication 
+          data={vendorApplicationData}
+          onChange={setVendorApplicationData}
+          readOnly={isSubmitted}
+        />
+      </Card>
+      
+      <Card className="mt-8 p-8 bg-card border-border">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold text-foreground">Products</h2>
+          {!isSubmitted && (
+            <Button className="flex items-center gap-2" onClick={handleAddProduct}>
+              <Plus className="h-4 w-4" />
+              Add Product
+            </Button>
+          )}
+        </div>
+        <ProductGrid 
+          products={products} 
+          onDeleteProduct={handleDeleteProduct}
+          onDuplicateProduct={handleDuplicateProduct}
+          onEditProduct={handleEditProduct}
+        />
+      </Card>
+
+      <div className="mt-8 flex justify-center">
+        {!isSubmitted ? (
+          <Button 
+            className="bg-blue-500 hover:bg-blue-600 text-white px-12 py-3 text-lg"
+            onClick={handleSubmit}
+          >
+            Submit Application
+          </Button>
+        ) : (
+          <div className="flex items-center gap-3 px-12 py-3 bg-green-100 text-green-700 rounded-md">
+            <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs">✓</span>
+            </div>
+            <span className="text-lg font-medium">Application Submitted</span>
+          </div>
+        )}
+      </div>
+
+      <AddMarketForm 
+        open={showAddForm} 
+        onClose={() => setShowAddForm(false)}
+        onMarketAdded={handleMarketAdded}
+      />
+      
+      <AddProductForm 
+        open={showAddProductForm} 
+        onClose={() => {
+          setShowAddProductForm(false);
+          setEditingProduct(null);
+        }}
+        onProductAdded={editingProduct ? async (productData: any) => {
+          if (!editingProduct) return;
+          // Handle product update logic here
+          setShowAddProductForm(false);
+          setEditingProduct(null);
+        } : handleProductAdded}
+        editingProduct={editingProduct}
+      />
+    </>
+  );
+};
