@@ -342,7 +342,7 @@ export default function ShopManager() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="w-auto">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="shop">Shop Details</TabsTrigger>
             <TabsTrigger value="products">Products</TabsTrigger>
