@@ -95,7 +95,7 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
   };
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto" ref={dropdownRef}>
+    <div className="relative w-full" ref={dropdownRef}>
       <div className="space-y-2">
         <label className="text-lg font-medium text-foreground">
           Which farmers market do you want to join? *
