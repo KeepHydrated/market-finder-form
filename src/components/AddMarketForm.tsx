@@ -119,30 +119,6 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="city">City *</Label>
-              <Input
-                id="city"
-                value={formData.city}
-                onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                placeholder="Springfield"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="state">State *</Label>
-              <Input
-                id="state"
-                value={formData.state}
-                onChange={(e) => setFormData(prev => ({ ...prev, state: e.target.value }))}
-                placeholder="IL"
-                maxLength={2}
-                required
-              />
-            </div>
-          </div>
 
           <div className="space-y-2">
             <Label>Days Open *</Label>
