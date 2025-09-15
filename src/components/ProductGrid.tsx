@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ChevronLeft, ChevronRight, MoreVertical, Edit, Copy, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, MoreVertical, Edit, Copy, Trash2, Heart } from "lucide-react";
 import { ProductDetailModal } from "./ProductDetailModal";
+import { useLikes } from "@/hooks/useLikes";
+import { cn } from "@/lib/utils";
 
 interface Product {
   id: number;
@@ -28,10 +30,12 @@ interface ProductCardProps {
   onDeleteProduct?: (productId: number) => void;
   onDuplicateProduct?: (product: Product) => void;
   onEditProduct?: (product: Product) => void;
+  vendorId?: string;
 }
 
-const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProduct, onEditProduct }: ProductCardProps) => {
+const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId }: ProductCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { toggleLike, isLiked } = useLikes();
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering the card click
@@ -60,6 +64,28 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProd
               alt={`${product.name} - Image ${currentImageIndex + 1}`}
               className="w-full h-full object-cover transition-opacity duration-200"
             />
+            
+            {/* Like Button */}
+            {vendorId && (
+              <Button
+                variant="secondary"
+                size="sm"
+                className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm z-10"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  await toggleLike(`${vendorId}-${product.id}`, 'product');
+                }}
+              >
+                <Heart 
+                  className={cn(
+                    "h-4 w-4 transition-colors",
+                    isLiked(`${vendorId}-${product.id}`, 'product')
+                      ? "text-red-500 fill-current" 
+                      : "text-gray-600"
+                  )} 
+                />
+              </Button>
+            )}
             
             {/* Navigation arrows - only show if more than 1 image */}
             {product.images.length > 1 && (
@@ -202,6 +228,7 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
             onDeleteProduct={onDeleteProduct}
             onDuplicateProduct={onDuplicateProduct}
             onEditProduct={onEditProduct}
+            vendorId={vendorId}
           />
         ))}
       </div>

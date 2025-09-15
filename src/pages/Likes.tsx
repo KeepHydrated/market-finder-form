@@ -234,14 +234,16 @@ const Likes = () => {
           allProducts.push({
             ...product,
             vendorName: vendor.store_name,
-            vendorId: vendor.id
+            vendorId: vendor.id,
+            // Create the same ID format used in ProductDetailModal
+            likeId: `${vendor.id}-${product.id}`
           });
         });
       }
     });
     
     const likedProducts = allProducts.filter(product => 
-      likedProductIds.includes(product.id?.toString() || product.name)
+      likedProductIds.includes(product.likeId)
     );
 
     if (likedProducts.length === 0) {
@@ -283,17 +285,13 @@ const Likes = () => {
                 className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
                 onClick={async (e) => {
                   e.stopPropagation();
-                  const productId = product.id?.toString() || product.name;
-                  await toggleLike(productId, 'product');
+                  await toggleLike(product.likeId, 'product');
                 }}
               >
                 <Heart 
                   className={cn(
                     "h-4 w-4 transition-colors",
-                    (() => {
-                      const productId = product.id?.toString() || product.name;
-                      return isLiked(productId, 'product');
-                    })()
+                    isLiked(product.likeId, 'product')
                       ? "text-red-500 fill-current" 
                       : "text-gray-600"
                   )} 
