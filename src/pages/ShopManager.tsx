@@ -550,7 +550,7 @@ export default function ShopManager() {
                   }}
                 >
                   <Edit className="h-4 w-4 mr-2" />
-                  {isEditing ? 'Cancel' : 'Edit'}
+                  {isEditing ? 'Save' : 'Edit'}
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
