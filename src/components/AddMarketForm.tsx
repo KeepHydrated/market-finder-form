@@ -29,7 +29,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.address || !formData.city || !formData.state || formData.days.length === 0) {
+    if (!formData.name || !formData.address || formData.days.length === 0) {
       return;
     }
 
@@ -95,6 +95,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="e.g. Downtown Farmers Market"
+              autoComplete="off"
               required
             />
           </div>
