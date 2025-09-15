@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { GlobalHeader } from "@/components/GlobalHeader";
+import { Footer } from "@/components/Footer";
 import { ShoppingCartProvider } from "@/contexts/ShoppingCartContext";
 import { ShoppingCart } from "@/components/shopping/ShoppingCart";
 import Index from "./pages/Index";
@@ -26,22 +27,27 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <GlobalHeader />
-          <ShoppingCart />
-          <Routes>
-            <Route path="/" element={<Navigate to="/profile" replace />} />
-            <Route path="/profile" element={<Index />} />
-            <Route path="/submissions" element={<Submissions />} />
-            <Route path="/homepage" element={<Homepage />} />
-            <Route path="/vendor" element={<Vendor />} />
-            <Route path="/market" element={<VendorDuplicate />} />
-            <Route path="/likes" element={<Likes />} />
-            <Route path="/order-success" element={<OrderSuccess />} />
-            <Route path="/shop-manager" element={<ShopManager />} />
-            <Route path="/markets" element={<Markets />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <div className="min-h-screen flex flex-col">
+            <GlobalHeader />
+            <ShoppingCart />
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<Navigate to="/profile" replace />} />
+                <Route path="/profile" element={<Index />} />
+                <Route path="/submissions" element={<Submissions />} />
+                <Route path="/homepage" element={<Homepage />} />
+                <Route path="/vendor" element={<Vendor />} />
+                <Route path="/market" element={<VendorDuplicate />} />
+                <Route path="/likes" element={<Likes />} />
+                <Route path="/order-success" element={<OrderSuccess />} />
+                <Route path="/shop-manager" element={<ShopManager />} />
+                <Route path="/markets" element={<Markets />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
         </BrowserRouter>
       </ShoppingCartProvider>
     </TooltipProvider>
