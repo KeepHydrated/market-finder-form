@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,6 +49,7 @@ interface ReviewStats {
 
 const Vendor = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const { user, profile, loading } = useAuth();
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
@@ -74,17 +75,25 @@ const Vendor = () => {
   }, [acceptedSubmission]);
 
   const fetchAcceptedSubmission = async () => {
+    if (!id) {
+      setLoadingData(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('submissions')
         .select('*')
+        .eq('id', id)
         .eq('status', 'accepted')
-        .order('created_at', { ascending: false })
-        .limit(1)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
-        throw error;
+      if (error) {
+        if (error.code === 'PGRST116') {
+          console.log('No vendor found with this ID');
+        } else {
+          throw error;
+        }
       }
       
       if (data) {
@@ -98,7 +107,7 @@ const Vendor = () => {
         setAcceptedSubmission(parsedSubmission);
       }
     } catch (error) {
-      console.error('Error fetching accepted submission:', error);
+      console.error('Error fetching vendor:', error);
     } finally {
       setLoadingData(false);
     }

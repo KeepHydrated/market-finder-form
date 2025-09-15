@@ -38,7 +38,7 @@ const App = () => (
                 <Route path="/submissions" element={<Submissions />} />
                 <Route path="/submit" element={<Submit />} />
                 <Route path="/homepage" element={<Homepage />} />
-                <Route path="/vendor" element={<Vendor />} />
+                <Route path="/vendor/:id" element={<Vendor />} />
                 <Route path="/market" element={<VendorDuplicate />} />
                 <Route path="/likes" element={<Likes />} />
                 <Route path="/order-success" element={<OrderSuccess />} />
