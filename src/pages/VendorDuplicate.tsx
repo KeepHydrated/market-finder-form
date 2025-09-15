@@ -378,8 +378,93 @@ const VendorDuplicate = () => {
       </div>
       
       {/* Main content */}
-      <div className="flex-1 px-4">
-        {/* Empty right column */}
+      <div className="flex-1 px-4 py-6">
+        {/* Vendor Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {acceptedSubmission && (
+            <Card 
+              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
+              onClick={() => console.log('Navigate to vendor')}
+            >
+              {/* Product Image */}
+              <div className="aspect-video bg-muted relative">
+                {acceptedSubmission.products && acceptedSubmission.products.length > 0 && acceptedSubmission.products[0].images && acceptedSubmission.products[0].images.length > 0 ? (
+                  <img 
+                    src={acceptedSubmission.products[0].images[0]} 
+                    alt={acceptedSubmission.products[0].name || 'Product'} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                    No Image Available
+                  </div>
+                )}
+                
+                {/* Rating - Top Left */}
+                <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                  <div className="flex items-center gap-1">
+                    <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                    <span className="text-xs font-medium">
+                      {reviewStats.totalReviews > 0 ? reviewStats.averageRating.toFixed(1) : '0.0'}
+                    </span>
+                    <span className="text-xs text-gray-600">
+                      ({reviewStats.totalReviews})
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Like Button */}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    if (acceptedSubmission) {
+                      await toggleLike(acceptedSubmission.id, 'vendor');
+                    }
+                  }}
+                >
+                  <Heart 
+                    className={cn(
+                      "h-4 w-4 transition-colors",
+                      acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') 
+                        ? "text-red-500 fill-current" 
+                        : "text-gray-600"
+                    )} 
+                  />
+                </Button>
+
+                {/* Distance Badge */}
+                <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                  <span className="text-xs font-medium text-gray-700">
+                    {`${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 9)} miles`}
+                  </span>
+                </div>
+              </div>
+              
+              {/* Store Information */}
+              <div className="p-4 space-y-3">
+                <h3 className="text-lg font-semibold text-foreground text-left">
+                  {acceptedSubmission.store_name}
+                </h3>
+                
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-muted-foreground text-left">
+                    {acceptedSubmission.market_address || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Location TBD"}
+                  </p>
+                </div>
+                
+                {acceptedSubmission.primary_specialty && (
+                  <p className="text-sm text-foreground text-left">
+                    {acceptedSubmission.primary_specialty}
+                  </p>
+                )}
+              </div>
+            </Card>
+          )}
+        </div>
       </div>
 
       {/* Review Modal */}
