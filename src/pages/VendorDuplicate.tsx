@@ -53,6 +53,8 @@ const VendorDuplicate = () => {
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
   const [acceptedSubmission, setAcceptedSubmission] = useState<AcceptedSubmission | null>(null);
+  const [selectedVendor, setSelectedVendor] = useState<AcceptedSubmission | null>(null);
+  const [allVendors, setAllVendors] = useState<AcceptedSubmission[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewStats, setReviewStats] = useState<ReviewStats>({ averageRating: 0, totalReviews: 0 });
@@ -64,54 +66,54 @@ const VendorDuplicate = () => {
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
 
   useEffect(() => {
-    fetchAcceptedSubmission();
+    fetchAllVendors();
   }, []);
 
   useEffect(() => {
-    if (acceptedSubmission) {
+    if (selectedVendor) {
       fetchReviews();
     }
-  }, [acceptedSubmission]);
+  }, [selectedVendor]);
 
-  const fetchAcceptedSubmission = async () => {
+  const fetchAllVendors = async () => {
     try {
       const { data, error } = await supabase
         .from('submissions')
         .select('*')
         .eq('status', 'accepted')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+        .order('created_at', { ascending: false });
 
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
+      if (error) throw error;
       
-      if (data) {
-        const parsedSubmission = {
-          ...data,
-          products: typeof data.products === 'string' ? JSON.parse(data.products) : data.products,
-          market_hours: data.market_hours && typeof data.market_hours === 'object' && data.market_hours !== null 
-            ? data.market_hours as Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>
-            : undefined
-        };
-        setAcceptedSubmission(parsedSubmission);
+      const parsedSubmissions = data?.map(sub => ({
+        ...sub,
+        products: typeof sub.products === 'string' ? JSON.parse(sub.products) : sub.products,
+        market_hours: sub.market_hours && typeof sub.market_hours === 'object' && sub.market_hours !== null 
+          ? sub.market_hours as Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>
+          : undefined
+      })) || [];
+      
+      setAllVendors(parsedSubmissions);
+      // Set the first vendor as the market representative and selected vendor
+      if (parsedSubmissions.length > 0) {
+        setAcceptedSubmission(parsedSubmissions[0]);
+        setSelectedVendor(parsedSubmissions[0]);
       }
     } catch (error) {
-      console.error('Error fetching accepted submission:', error);
+      console.error('Error fetching vendors:', error);
     } finally {
       setLoadingData(false);
     }
   };
 
   const fetchReviews = async () => {
-    if (!acceptedSubmission) return;
+    if (!selectedVendor) return;
 
     try {
       const { data, error } = await supabase
         .from('reviews')
         .select('*')
-        .eq('vendor_id', acceptedSubmission.id)
+        .eq('vendor_id', selectedVendor.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -135,7 +137,7 @@ const VendorDuplicate = () => {
   };
 
   const submitReview = async () => {
-    if (!user || !acceptedSubmission) {
+    if (!user || !selectedVendor) {
       toast({
         title: "Please sign in",
         description: "You need to be signed in to leave a review.",
@@ -168,7 +170,7 @@ const VendorDuplicate = () => {
         .from('reviews')
         .insert({
           user_id: user.id,
-          vendor_id: acceptedSubmission.id,
+          vendor_id: selectedVendor.id,
           rating: newReview.rating,
           comment: newReview.comment.trim(),
           photos: photoUrls
@@ -384,92 +386,193 @@ const VendorDuplicate = () => {
       
       {/* Main content */}
       <div className="flex-1 px-4 py-6">
-        {/* Vendor Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {acceptedSubmission && (
-            <Card 
-              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
-              onClick={() => navigate(`/vendor/${acceptedSubmission.id}`)}
-            >
-              {/* Product Image */}
-              <div className="aspect-video bg-muted relative">
-                {acceptedSubmission.products && acceptedSubmission.products.length > 0 && acceptedSubmission.products[0].images && acceptedSubmission.products[0].images.length > 0 ? (
-                  <img 
-                    src={acceptedSubmission.products[0].images[0]} 
-                    alt={acceptedSubmission.products[0].name || 'Product'} 
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                    No Image Available
-                  </div>
-                )}
-                
-                {/* Rating - Top Left */}
-                <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                  <div className="flex items-center gap-1">
-                    <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                    <span className="text-xs font-medium">
-                      {reviewStats.totalReviews > 0 ? reviewStats.averageRating.toFixed(1) : '0.0'}
+        {selectedVendor ? (
+          // Show selected vendor details
+          <div className="space-y-6">
+            {/* Vendor Header */}
+            <div className="flex items-center gap-4 mb-6">
+              <Button
+                variant="ghost"
+                onClick={() => setSelectedVendor(null)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                ← Back to all vendors
+              </Button>
+            </div>
+
+            {/* Vendor Details */}
+            <div className="bg-card border rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <h1 className="text-2xl font-bold text-foreground">{selectedVendor.store_name}</h1>
+                  <div 
+                    className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
+                    onClick={() => setIsReviewModalOpen(true)}
+                  >
+                    <Star className="h-5 w-5 text-yellow-500 fill-current" />
+                    <span className="text-foreground font-medium">
+                      {reviewStats.totalReviews > 0 ? reviewStats.averageRating : 'No rating'}
                     </span>
-                    <span className="text-xs text-gray-600">
+                    <span className="text-muted-foreground">
                       ({reviewStats.totalReviews})
                     </span>
                   </div>
                 </div>
-                
-                {/* Like Button */}
                 <Button
-                  variant="secondary"
+                  variant="ghost"
                   size="sm"
-                  className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    if (acceptedSubmission) {
-                      await toggleLike(acceptedSubmission.id, 'vendor');
+                  onClick={async () => {
+                    if (selectedVendor) {
+                      await toggleLike(selectedVendor.id, 'vendor');
                     }
                   }}
+                  className={cn(
+                    "transition-colors",
+                    selectedVendor && isLiked(selectedVendor.id, 'vendor')
+                      ? "text-red-500 hover:text-red-600"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
                 >
                   <Heart 
                     className={cn(
-                      "h-4 w-4 transition-colors",
-                      acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') 
-                        ? "text-red-500 fill-current" 
-                        : "text-gray-600"
+                      "h-6 w-6 transition-colors",
+                      selectedVendor && isLiked(selectedVendor.id, 'vendor') && "fill-current"
                     )} 
                   />
                 </Button>
+              </div>
 
-                {/* Distance Badge */}
-                <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                  <span className="text-xs font-medium text-gray-700">
-                    {`${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 9)} miles`}
-                  </span>
-                </div>
+              {/* Category badges */}
+              <div className="flex gap-2 mb-4">
+                {selectedVendor.primary_specialty && (
+                  <Badge variant="secondary">{selectedVendor.primary_specialty}</Badge>
+                )}
+                <Badge variant="secondary">Fresh Produce</Badge>
+                <Badge variant="secondary">Local</Badge>
               </div>
               
-              {/* Store Information */}
-              <div className="p-4 space-y-3">
-                <h3 className="text-lg font-semibold text-foreground text-left">
-                  {acceptedSubmission.store_name}
-                </h3>
-                
-                <div className="flex items-start gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-muted-foreground text-left">
-                    {acceptedSubmission.market_address || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Location TBD"}
-                  </p>
+              {/* Description */}
+              <p className="text-muted-foreground mb-4">
+                {selectedVendor.description || "Quality produce from local farmers."}
+              </p>
+
+              {/* Website */}
+              {selectedVendor.website && (
+                <div className="mb-4">
+                  <a 
+                    href={selectedVendor.website} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    Visit Website
+                  </a>
+                </div>
+              )}
+            </div>
+
+            {/* Products Section */}
+            <div className="space-y-6">
+              {selectedVendor.products && selectedVendor.products.length > 0 ? (
+                <ProductGrid 
+                  products={selectedVendor.products} 
+                  vendorId={selectedVendor.id}
+                  vendorName={selectedVendor.store_name}
+                />
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  No products available yet.
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          // Show vendor cards grid
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {allVendors.map((vendor) => (
+              <Card 
+                key={vendor.id}
+                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
+                onClick={() => setSelectedVendor(vendor)}
+              >
+                {/* Product Image */}
+                <div className="aspect-video bg-muted relative">
+                  {vendor.products && vendor.products.length > 0 && vendor.products[0].images && vendor.products[0].images.length > 0 ? (
+                    <img 
+                      src={vendor.products[0].images[0]} 
+                      alt={vendor.products[0].name || 'Product'} 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                      No Image Available
+                    </div>
+                  )}
+                  
+                  {/* Rating - Top Left */}
+                  <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                    <div className="flex items-center gap-1">
+                      <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                      <span className="text-xs font-medium">
+                        {Math.floor(Math.random() * 2) + 4}.{Math.floor(Math.random() * 9)}
+                      </span>
+                      <span className="text-xs text-gray-600">
+                        ({Math.floor(Math.random() * 50) + 10})
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Like Button */}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      await toggleLike(vendor.id, 'vendor');
+                    }}
+                  >
+                    <Heart 
+                      className={cn(
+                        "h-4 w-4 transition-colors",
+                        isLiked(vendor.id, 'vendor') 
+                          ? "text-red-500 fill-current" 
+                          : "text-gray-600"
+                      )} 
+                    />
+                  </Button>
+
+                  {/* Distance Badge */}
+                  <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                    <span className="text-xs font-medium text-gray-700">
+                      {`${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 9)} miles`}
+                    </span>
+                  </div>
                 </div>
                 
-                {acceptedSubmission.primary_specialty && (
-                  <p className="text-sm text-foreground text-left">
-                    {acceptedSubmission.primary_specialty}
-                  </p>
-                )}
-              </div>
-            </Card>
-          )}
-        </div>
+                {/* Store Information */}
+                <div className="p-4 space-y-3">
+                  <h3 className="text-lg font-semibold text-foreground text-left">
+                    {vendor.store_name}
+                  </h3>
+                  
+                  <div className="flex items-start gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-muted-foreground text-left">
+                      {vendor.market_address || vendor.selected_market || vendor.search_term || "Location TBD"}
+                    </p>
+                  </div>
+                  
+                  {vendor.primary_specialty && (
+                    <p className="text-sm text-foreground text-left">
+                      {vendor.primary_specialty}
+                    </p>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Review Modal */}
