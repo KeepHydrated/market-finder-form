@@ -625,14 +625,6 @@ export default function ShopManager() {
                     </div>
                   )}
                 </div>
-
-                {isEditing && (
-                  <div className="flex gap-2 pt-4">
-                    <Button onClick={handleSaveShop} disabled={isSaving}>
-                      {isSaving ? 'Saving...' : 'Save Changes'}
-                    </Button>
-                  </div>
-                )}
               </CardContent>
             </Card>
           </TabsContent>
