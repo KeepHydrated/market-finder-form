@@ -71,6 +71,11 @@ const Homepage = () => {
   const [rangeMiles, setRangeMiles] = useState<number[]>([25]);
   const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
   const [viewMode, setViewMode] = useState<'markets' | 'vendors'>('vendors');
+  const [selectedMarket, setSelectedMarket] = useState<{
+    name: string;
+    address: string;
+    vendors: AcceptedSubmission[];
+  } | null>(null);
 
   const toggleDay = (day: string) => {
     setSelectedDays(prev => {
@@ -338,10 +343,13 @@ const Homepage = () => {
         <div className="flex justify-between items-center mb-6">
           <div className="flex rounded-lg bg-muted p-1">
             <button
-              onClick={() => setViewMode('vendors')}
+              onClick={() => {
+                setViewMode('vendors');
+                setSelectedMarket(null);
+              }}
               className={cn(
                 "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                viewMode === 'vendors'
+                viewMode === 'vendors' && !selectedMarket
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               )}
@@ -349,7 +357,10 @@ const Homepage = () => {
               Vendors
             </button>
             <button
-              onClick={() => setViewMode('markets')}
+              onClick={() => {
+                setViewMode('markets');
+                setSelectedMarket(null);
+              }}
               className={cn(
                 "px-4 py-2 text-sm font-medium rounded-md transition-colors",
                 viewMode === 'markets'
@@ -550,13 +561,34 @@ const Homepage = () => {
         {/* Content based on view mode */}
         {viewMode === 'vendors' ? (
           <div className="flex justify-center">
-            {acceptedSubmissions.length === 0 ? (
+            {/* Show selected market header if a market is selected */}
+            {selectedMarket && (
+              <div className="w-full mb-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-semibold">{selectedMarket.name}</h2>
+                    <p className="text-muted-foreground text-sm">{selectedMarket.address}</p>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setSelectedMarket(null)}
+                  >
+                    View All Vendors
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {(selectedMarket ? selectedMarket.vendors : acceptedSubmissions).length === 0 ? (
               <div className="text-center">
-                <p className="text-muted-foreground">No featured vendors yet.</p>
+                <p className="text-muted-foreground">
+                  {selectedMarket ? 'No vendors in this market yet.' : 'No featured vendors yet.'}
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {acceptedSubmissions.map((submission) => (
+                {(selectedMarket ? selectedMarket.vendors : acceptedSubmissions).map((submission) => (
                   <Card 
                     key={submission.id} 
                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
@@ -657,11 +689,12 @@ const Homepage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {groupVendorsByMarket().map((market, index) => (
                   <Card 
-                    key={index}
-                    className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => {
-                      navigate('/market');
-                    }}
+                     key={index}
+                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                     onClick={() => {
+                       setSelectedMarket(market);
+                       setViewMode('vendors');
+                     }}
                   >
                     {/* Vendor Images Collage */}
                     <div className="aspect-video bg-muted relative overflow-hidden">
