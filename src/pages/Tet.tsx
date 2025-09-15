@@ -486,17 +486,19 @@ const Tet = () => {
               {/* Vendor Header */}
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h1 className="text-3xl font-bold text-foreground mb-2">
-                    {selectedVendor.store_name}
-                  </h1>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Star className="h-5 w-5 text-yellow-500 fill-current" />
-                    <span className="text-foreground font-medium">
-                      {vendorRatings[selectedVendor.id]?.averageRating || '0.0'}
-                    </span>
-                    <span className="text-muted-foreground">
-                      ({vendorRatings[selectedVendor.id]?.totalReviews || 0})
-                    </span>
+                  <div className="flex items-center gap-4 mb-4">
+                    <h1 className="text-3xl font-bold text-foreground">
+                      {selectedVendor.store_name}
+                    </h1>
+                    <div className="flex items-center gap-2">
+                      <Star className="h-5 w-5 text-yellow-500 fill-current" />
+                      <span className="text-foreground font-medium">
+                        {vendorRatings[selectedVendor.id]?.averageRating || '0.0'}
+                      </span>
+                      <span className="text-muted-foreground">
+                        ({vendorRatings[selectedVendor.id]?.totalReviews || 0})
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
