@@ -341,12 +341,14 @@ export default function ShopManager() {
         <div className="mb-8">
         </div>
 
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="w-auto">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="shop">Shop Details</TabsTrigger>
-            <TabsTrigger value="products">Products</TabsTrigger>
+        <Tabs defaultValue="overview" className="flex gap-6">
+          <TabsList className="flex flex-col h-fit w-48 space-y-1 p-1">
+            <TabsTrigger value="overview" className="w-full justify-start">Overview</TabsTrigger>
+            <TabsTrigger value="shop" className="w-full justify-start">Shop Details</TabsTrigger>
+            <TabsTrigger value="products" className="w-full justify-start">Products</TabsTrigger>
           </TabsList>
+
+          <div className="flex-1 space-y-6">
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -543,6 +545,7 @@ export default function ShopManager() {
             </Card>
           </TabsContent>
 
+          </div>
         </Tabs>
       </div>
 
