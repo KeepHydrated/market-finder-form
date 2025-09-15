@@ -705,7 +705,7 @@ const Likes = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         <Sidebar className="w-60" collapsible="none">
-          <SidebarContent>
+          <SidebarContent className="pt-6">
             <SidebarGroup>
               <SidebarGroupContent>
                 <SidebarMenu>
