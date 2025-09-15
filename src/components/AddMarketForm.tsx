@@ -128,7 +128,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
   return (
     <Dialog open={open} onOpenChange={handleCloseModal}>
       <DialogContent 
-        className="max-w-2xl"
+        className="max-w-2xl max-h-[90vh] overflow-y-auto"
         onInteractOutside={(e) => {
           // Check if the interaction is with Google Places elements
           const target = e.target as Element;
