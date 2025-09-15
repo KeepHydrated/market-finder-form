@@ -78,6 +78,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
               value={formData.address}
               onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
               placeholder="e.g. 123 Main St"
+              autoComplete="street-address"
               required
             />
           </div>
