@@ -344,11 +344,10 @@ export default function ShopManager() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="shop">Shop Details</TabsTrigger>
             <TabsTrigger value="products">Products</TabsTrigger>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -383,6 +382,57 @@ export default function ShopManager() {
                 </CardContent>
               </Card>
             </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Orders</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingOrders ? (
+                  <div className="text-center py-8">Loading orders...</div>
+                ) : orders.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No orders yet. Orders will appear here once customers start purchasing your products.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {orders.map((order) => (
+                      <Card key={order.id}>
+                        <CardContent className="pt-6">
+                          <div className="flex justify-between items-start mb-4">
+                            <div>
+                              <p className="font-medium">Order #{order.id.slice(0, 8)}...</p>
+                              <p className="text-sm text-muted-foreground">{order.email}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {new Date(order.created_at).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-semibold">{formatPrice(order.total_amount)}</p>
+                              <Badge variant={order.status === 'completed' ? 'default' : 'secondary'}>
+                                {order.status}
+                              </Badge>
+                            </div>
+                          </div>
+                          
+                          <Separator className="my-3" />
+                          
+                          <div className="space-y-2">
+                            <p className="text-sm font-medium">Items:</p>
+                            {order.order_items.map((item, index) => (
+                              <div key={index} className="flex justify-between text-sm">
+                                <span>{item.quantity}x {item.product_name}</span>
+                                <span>{formatPrice(item.total_price)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
           </TabsContent>
 
@@ -495,58 +545,6 @@ export default function ShopManager() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="orders" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Orders</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loadingOrders ? (
-                  <div className="text-center py-8">Loading orders...</div>
-                ) : orders.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No orders yet. Orders will appear here once customers start purchasing your products.
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {orders.map((order) => (
-                      <Card key={order.id}>
-                        <CardContent className="pt-6">
-                          <div className="flex justify-between items-start mb-4">
-                            <div>
-                              <p className="font-medium">Order #{order.id.slice(0, 8)}...</p>
-                              <p className="text-sm text-muted-foreground">{order.email}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {new Date(order.created_at).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="font-semibold">{formatPrice(order.total_amount)}</p>
-                              <Badge variant={order.status === 'completed' ? 'default' : 'secondary'}>
-                                {order.status}
-                              </Badge>
-                            </div>
-                          </div>
-                          
-                          <Separator className="my-3" />
-                          
-                          <div className="space-y-2">
-                            <p className="text-sm font-medium">Items:</p>
-                            {order.order_items.map((item, index) => (
-                              <div key={index} className="flex justify-between text-sm">
-                                <span>{item.quantity}x {item.product_name}</span>
-                                <span>{formatPrice(item.total_price)}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
         </Tabs>
       </div>
 
