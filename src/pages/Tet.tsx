@@ -323,71 +323,13 @@ const Tet = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="flex">
-        {/* Left column - wider width */}
+        {/* Left column - blank */}
         <div className="w-96 bg-green-50 border-r">
-        <div className="space-y-4 px-6 pt-8 pb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span 
-                className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors"
-                onClick={() => navigate('/market')}
-              >
-                {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
-              </span>
-              {/* Rating display */}
-              <div className="flex items-center gap-2">
-                <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                <span className="text-foreground font-medium">
-                  {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'}
-                </span>
-                <span className="text-muted-foreground">
-                  ({reviewStats.totalReviews})
-                </span>
-              </div>
-            </div>
-            {/* Heart icon */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={async () => {
-                if (acceptedSubmission) {
-                  await toggleLike(acceptedSubmission.id, 'vendor');
-                }
-              }}
-              className={cn(
-                "transition-colors",
-                acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor')
-                  ? "text-red-500 hover:text-red-600"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <Heart 
-                className={cn(
-                  "h-5 w-5 transition-colors",
-                  acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') && "fill-current"
-                )} 
-              />
-            </Button>
-          </div>
-
-          <div className="flex items-start gap-2 pt-2">
-            <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <p className="text-muted-foreground text-sm">
-              {acceptedSubmission.market_address || "Address TBD"}
-            </p>
-          </div>
-
-          <div className="flex items-start gap-2">
-            <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <span className="text-muted-foreground text-sm whitespace-pre-line">
-              {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours)}
-            </span>
-          </div>
+          {/* Blank column */}
         </div>
-      </div>
-      
-      {/* Main content */}
-      <div className="flex-1 px-4">
+        
+        {/* Main content */}
+        <div className="flex-1 px-4">
         {/* Top row under header */}
         <div className="bg-card border-b pt-6 pb-8 px-8">
           <div className="space-y-4">
@@ -482,7 +424,11 @@ const Tet = () => {
         </div>
       </div>
 
-      {/* Review Modal */}
+        {/* Right column - blank */}
+        <div className="w-96 bg-green-50 border-l">
+          {/* Blank column */}
+        </div>
+      </div>
       <Dialog open={isReviewModalOpen} onOpenChange={(open) => {
         setIsReviewModalOpen(open);
         if (!open) {
@@ -698,7 +644,6 @@ const Tet = () => {
           )}
         </DialogContent>
       </Dialog>
-      </div>
     </div>
   );
 };
