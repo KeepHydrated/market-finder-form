@@ -380,7 +380,7 @@ const VendorDuplicate = () => {
       {/* Main content */}
       <div className="flex-1 px-4 py-6">
         {/* Vendor Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {acceptedSubmission && (
             <Card 
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
