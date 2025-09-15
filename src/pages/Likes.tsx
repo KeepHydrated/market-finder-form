@@ -67,7 +67,7 @@ const Likes = () => {
   ];
 
   useEffect(() => {
-    if (user && activeTab === "markets") {
+    if (user && (activeTab === "markets" || activeTab === "vendors")) {
       fetchAcceptedSubmissions();
     }
   }, [user, activeTab]);
@@ -190,6 +190,8 @@ const Likes = () => {
   const renderLikedItems = (tabType: TabType) => {
     if (tabType === "markets") {
       return renderLikedMarkets();
+    } else if (tabType === "vendors") {
+      return renderLikedVendors();
     }
     
     const filteredLikes = getFilteredLikes(tabType);
@@ -264,6 +266,136 @@ const Likes = () => {
                 Liked on {new Date(like.created_at).toLocaleDateString()}
               </p>
             </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  };
+
+  const renderLikedVendors = () => {
+    if (loading || loadingSubmissions) {
+      return (
+        <div className="text-center py-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground mt-4">Loading your liked vendors...</p>
+        </div>
+      );
+    }
+
+    if (!user) {
+      return (
+        <div className="text-center py-16">
+          <Heart className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+          <h2 className="text-2xl font-bold mb-2">Sign In Required</h2>
+          <p className="text-muted-foreground">
+            Please sign in to view your liked vendors
+          </p>
+        </div>
+      );
+    }
+
+    const likedVendorIds = likes
+      .filter(like => like.item_type === 'vendor')
+      .map(like => like.item_id);
+    
+    const likedVendors = acceptedSubmissions.filter(vendor => 
+      likedVendorIds.includes(vendor.id)
+    );
+
+    if (likedVendors.length === 0) {
+      return (
+        <div className="text-center py-16">
+          <Store className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+          <h2 className="text-2xl font-bold mb-2">No Liked Vendors</h2>
+          <p className="text-muted-foreground">
+            Vendors you like will appear here
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {likedVendors.map((vendor) => (
+          <Card 
+            key={vendor.id}
+            className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
+            onClick={() => navigate('/vendor')}
+          >
+            {/* Product Image */}
+            <div className="aspect-video bg-muted relative">
+              {vendor.products && vendor.products.length > 0 && vendor.products[0].images && vendor.products[0].images.length > 0 ? (
+                <img 
+                  src={vendor.products[0].images[0]} 
+                  alt={vendor.products[0].name || 'Product'} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                  No Image Available
+                </div>
+              )}
+              
+              {/* Rating - Top Left */}
+              <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                <div className="flex items-center gap-1">
+                  <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                  <span className="text-xs font-medium">
+                    {vendorRatings[vendor.id]?.totalReviews > 0 ? vendorRatings[vendor.id]?.averageRating.toFixed(1) : '0.0'}
+                  </span>
+                  <span className="text-xs text-gray-600">
+                    ({vendorRatings[vendor.id]?.totalReviews || 0})
+                  </span>
+                </div>
+              </div>
+              
+              {/* Like Button */}
+              <Button
+                variant="secondary"
+                size="sm"
+                className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  await toggleLike(vendor.id, 'vendor');
+                }}
+              >
+                <Heart 
+                  className={cn(
+                    "h-4 w-4 transition-colors",
+                    isLiked(vendor.id, 'vendor') 
+                      ? "text-red-500 fill-current" 
+                      : "text-gray-600"
+                  )} 
+                />
+              </Button>
+
+              {/* Distance Badge */}
+              <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                <span className="text-xs font-medium text-gray-700">
+                  {`${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 9)} miles`}
+                </span>
+              </div>
+            </div>
+            
+            {/* Store Information */}
+            <div className="p-4 space-y-3">
+              <h3 className="text-lg font-semibold text-black text-left">
+                {vendor.store_name}
+              </h3>
+              
+              <div className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-muted-foreground text-left">
+                  {vendor.market_address || vendor.selected_market || vendor.search_term || "Location TBD"}
+                </p>
+              </div>
+              
+              {vendor.primary_specialty && (
+                <p className="text-sm text-black text-left">
+                  {vendor.primary_specialty}
+                </p>
+              )}
+            </div>
           </Card>
         ))}
       </div>
