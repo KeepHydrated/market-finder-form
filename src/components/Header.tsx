@@ -68,11 +68,6 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
           <div className="flex items-center space-x-4">
             {user?.email === 'nadiachibri@gmail.com' && (
               <>
-                <Link to="/profile">
-                  <Button variant={location.pathname === '/profile' ? "default" : "outline"}>
-                    Home
-                  </Button>
-                </Link>
                 <Link to="/submissions">
                   <Button variant={location.pathname === '/submissions' ? "default" : "outline"}>
                     Submissions
