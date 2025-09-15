@@ -12,7 +12,7 @@ export const Footer = () => {
             Want to list your farmers market?
           </h3>
           <Button 
-            onClick={() => navigate('/submissions')} 
+            onClick={() => navigate('/submit')} 
             variant="default"
             size="lg"
             className="font-medium"

@@ -9,6 +9,7 @@ import { ShoppingCartProvider } from "@/contexts/ShoppingCartContext";
 import { ShoppingCart } from "@/components/shopping/ShoppingCart";
 import Index from "./pages/Index";
 import Submissions from "./pages/Submissions";
+import Submit from "./pages/Submit";
 import Homepage from "./pages/Homepage";
 import Vendor from "./pages/Vendor";
 import VendorDuplicate from "./pages/VendorDuplicate";
@@ -35,6 +36,7 @@ const App = () => (
                 <Route path="/" element={<Navigate to="/profile" replace />} />
                 <Route path="/profile" element={<Index />} />
                 <Route path="/submissions" element={<Submissions />} />
+                <Route path="/submit" element={<Submit />} />
                 <Route path="/homepage" element={<Homepage />} />
                 <Route path="/vendor" element={<Vendor />} />
                 <Route path="/market" element={<VendorDuplicate />} />

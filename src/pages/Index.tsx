@@ -92,7 +92,7 @@ const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedMarketName, setSubmittedMarketName] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
-  const [activeTab, setActiveTab] = useState<string>("submit");
+  const [activeTab, setActiveTab] = useState<string>("profile");
   const [profileData, setProfileData] = useState({
     username: "",
     zipcode: "",
@@ -489,16 +489,6 @@ const Index = () => {
             >
               Account
             </div>
-            <div 
-              className={`px-4 py-3 rounded-md cursor-pointer transition-colors ${
-                activeTab === "submit" 
-                  ? "bg-primary/10 text-primary font-medium border border-primary/20" 
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
-              onClick={() => setActiveTab("submit")}
-            >
-              Submit
-            </div>
           </div>
         </div>
 
@@ -645,155 +635,6 @@ const Index = () => {
                     </div>
                   )}
 
-                  {activeTab === "submit" && (
-                    <>
-                      {isSubmitted && (
-                        <div className="mb-8 p-6 bg-green-50 border border-green-200 rounded-lg">
-                          <div className="flex items-center justify-center gap-2 text-green-700">
-                            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                              <span className="text-white text-sm">✓</span>
-                            </div>
-                            <h3 className="text-lg font-semibold">Application Submitted Successfully!</h3>
-                          </div>
-                          <p className="text-center text-green-600 mt-2">
-                            Your vendor application has been submitted and is being reviewed.
-                          </p>
-                        </div>
-                      )}
-
-                      <MarketSearch 
-                        markets={sampleMarkets}
-                        onSelectMarket={handleSelectMarket}
-                        onAddMarket={handleAddMarket}
-                        searchTerm={searchTerm}
-                        onSearchTermChange={setSearchTerm}
-                        submittedMarketName={submittedMarketName}
-                        disabled={isSubmitted}
-                      />
-                      
-                      {/* Vendor Application Form */}
-                      <Card className="mt-8 p-8 bg-card border-border">
-                        <VendorApplication 
-                          data={vendorApplicationData}
-                          onChange={setVendorApplicationData}
-                          readOnly={isSubmitted}
-                        />
-                      </Card>
-                      
-                      {/* Products Section */}
-                      <Card className="mt-8 p-8 bg-card border-border">
-                        <div className="flex items-center justify-between mb-6">
-                          <h2 className="text-2xl font-semibold text-foreground">Products</h2>
-                          {!isSubmitted && (
-                            <Button className="flex items-center gap-2" onClick={handleAddProduct}>
-                              <Plus className="h-4 w-4" />
-                              Add Product
-                            </Button>
-                          )}
-                        </div>
-                        <ProductGrid 
-                          products={products} 
-                          onDeleteProduct={handleDeleteProduct}
-                          onDuplicateProduct={handleDuplicateProduct}
-                          onEditProduct={handleEditProduct}
-                        />
-                      </Card>
-
-                      {/* Submit Button */}
-                      <div className="mt-8 flex justify-center">
-                        {!isSubmitted ? (
-                          <Button 
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-12 py-3 text-lg"
-                            onClick={async () => {
-                              console.log('Submit button clicked!');
-                              console.log('User:', user);
-                              console.log('Vendor data:', vendorApplicationData);
-                              console.log('Products:', products);
-                              
-                              if (!user) {
-                                console.error('No user found');
-                                return;
-                              }
-                              
-                              // Validate required fields
-                              if (!vendorApplicationData.storeName.trim()) {
-                                toast({
-                                  title: "Missing Information",
-                                  description: "Please fill in the store name.",
-                                  variant: "destructive"
-                                });
-                                return;
-                              }
-                              
-                              if (!vendorApplicationData.description.trim()) {
-                                toast({
-                                  title: "Missing Information",
-                                  description: "Please fill in the description.",
-                                  variant: "destructive"
-                                });
-                                return;
-                              }
-                              
-                              try {
-                                console.log('Attempting to submit to database...');
-                                const insertData = {
-                                  user_id: user.id,
-                                  store_name: vendorApplicationData.storeName,
-                                  primary_specialty: vendorApplicationData.primarySpecialty,
-                                  website: vendorApplicationData.website,
-                                  description: vendorApplicationData.description,
-                                  products: JSON.stringify(products),
-                                  selected_market: selectedMarket?.name || customMarketData?.name || null,
-                                  search_term: selectedMarket ? null : searchTerm,
-                                  market_address: customMarketData?.address || null,
-                                  market_days: customMarketData?.days || null,
-                                  market_hours: customMarketData?.hours || null,
-                                  status: 'pending'
-                                };
-                                console.log('Data to insert:', insertData);
-                                
-                                const { error } = await supabase
-                                  .from('submissions')
-                                  .insert(insertData);
-
-                                if (error) {
-                                  console.error('Database error:', error);
-                                  throw error;
-                                }
-
-                                console.log('Submission successful!');
-                                
-                                // Set submitted state instead of resetting form
-                                setIsSubmitted(true);
-                                
-                                toast({
-                                  title: "Application Submitted",
-                                  description: "Your vendor application has been submitted successfully!",
-                                });
-
-                              } catch (error) {
-                                console.error('Submission error:', error);
-                                toast({
-                                  title: "Error",
-                                  description: `Failed to submit application: ${error.message || 'Unknown error'}`,
-                                  variant: "destructive"
-                                });
-                              }
-                            }}
-                          >
-                            Submit Application
-                          </Button>
-                        ) : (
-                          <div className="flex items-center gap-3 px-12 py-3 bg-green-100 text-green-700 rounded-md">
-                            <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                              <span className="text-white text-xs">✓</span>
-                            </div>
-                            <span className="text-lg font-medium">Application Submitted</span>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
                 </>
               )}
             </div>
