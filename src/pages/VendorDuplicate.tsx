@@ -328,7 +328,7 @@ const VendorDuplicate = () => {
             <div className="flex items-center gap-3">
               <span 
                 className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors"
-                onClick={() => navigate('/market')}
+                onClick={() => setSelectedVendor(null)}
               >
                 {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
               </span>
@@ -389,17 +389,6 @@ const VendorDuplicate = () => {
         {selectedVendor ? (
           // Show selected vendor details
           <div className="space-y-6">
-            {/* Vendor Header */}
-            <div className="flex items-center gap-4 mb-6">
-              <Button
-                variant="ghost"
-                onClick={() => setSelectedVendor(null)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                ← Back to all vendors
-              </Button>
-            </div>
-
             {/* Vendor Details */}
             <div className="bg-card border rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
