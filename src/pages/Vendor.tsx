@@ -330,7 +330,7 @@ const Vendor = () => {
       <div className="flex">
         {/* Left column - wider width */}
         <div className="w-96 bg-green-50 border-r">
-        <div className="space-y-6 px-4 pt-6 pb-6">
+        <div className="space-y-4 px-6 pt-8 pb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span 
@@ -375,16 +375,16 @@ const Vendor = () => {
             </Button>
           </div>
 
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-2 pt-2">
             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <p className="text-muted-foreground text-base font-normal">
+            <p className="text-muted-foreground text-sm">
               {acceptedSubmission.market_address || "Address TBD"}
             </p>
           </div>
 
           <div className="flex items-start gap-2">
             <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <span className="text-muted-foreground text-base font-normal whitespace-pre-line">
+            <span className="text-muted-foreground text-sm whitespace-pre-line">
               {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours)}
             </span>
           </div>
