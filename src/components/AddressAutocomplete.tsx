@@ -52,7 +52,19 @@ export const AddressAutocomplete = ({
         await loader.load();
         
         if (inputRef.current && !autocompleteRef.current) {
-          autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
+          // Prevent the input from losing focus when clicking on dropdown
+          const input = inputRef.current;
+          
+          input.addEventListener('blur', (e) => {
+            // Prevent blur if clicking on pac-container
+            const pacContainer = document.querySelector('.pac-container');
+            if (pacContainer && pacContainer.contains(e.relatedTarget as Node)) {
+              e.preventDefault();
+              input.focus();
+            }
+          });
+
+          autocompleteRef.current = new google.maps.places.Autocomplete(input, {
             types: ['address'],
             componentRestrictions: { country: 'us' }
           });
@@ -99,7 +111,7 @@ export const AddressAutocomplete = ({
             }
           });
 
-          // Apply styles to fix z-index and interaction issues
+          // Apply styles and prevent dropdown from closing
           const addGlobalStyles = () => {
             // Remove existing styles if any
             const existingStyle = document.getElementById('google-places-styles');
@@ -128,6 +140,7 @@ export const AddressAutocomplete = ({
                 font-size: 14px !important;
                 line-height: 1.5 !important;
                 pointer-events: auto !important;
+                user-select: none !important;
               }
               .pac-item:last-child {
                 border-bottom: none !important;
@@ -144,9 +157,26 @@ export const AddressAutocomplete = ({
               }
             `;
             document.head.appendChild(style);
+
+            // Add event listeners to prevent dropdown from closing
+            setTimeout(() => {
+              const pacContainer = document.querySelector('.pac-container');
+              if (pacContainer) {
+                pacContainer.addEventListener('mousedown', (e) => {
+                  e.preventDefault();
+                });
+                
+                const pacItems = pacContainer.querySelectorAll('.pac-item');
+                pacItems.forEach(item => {
+                  item.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                  });
+                });
+              }
+            }, 50);
           };
 
-          // Add styles immediately and also with a delay
+          // Add styles multiple times to ensure they apply
           addGlobalStyles();
           setTimeout(addGlobalStyles, 100);
           setTimeout(addGlobalStyles, 500);
