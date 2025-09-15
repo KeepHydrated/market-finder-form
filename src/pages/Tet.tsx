@@ -322,9 +322,9 @@ const Tet = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="flex">
+      <div className="flex min-h-screen">
         {/* Left column - wider width */}
-        <div className="w-96 bg-green-50 border-r">
+        <div className="w-96 bg-green-50 border-r min-h-screen">
         <div className="space-y-4 px-6 pt-8 pb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
