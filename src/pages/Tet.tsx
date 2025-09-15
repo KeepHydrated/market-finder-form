@@ -520,13 +520,6 @@ const Tet = () => {
                       )} 
                     />
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedVendor(null)}
-                  >
-                    Back to Vendors
-                  </Button>
                 </div>
               </div>
 
