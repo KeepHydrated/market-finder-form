@@ -41,6 +41,42 @@ export type Database = {
         }
         Relationships: []
       }
+      markets: {
+        Row: {
+          address: string
+          city: string
+          created_at: string
+          days: string[]
+          hours: string | null
+          id: number
+          name: string
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          city: string
+          created_at?: string
+          days?: string[]
+          hours?: string | null
+          id?: number
+          name: string
+          state: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          created_at?: string
+          days?: string[]
+          hours?: string | null
+          id?: number
+          name?: string
+          state?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string

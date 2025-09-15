@@ -13,6 +13,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { ProductGrid } from '@/components/ProductGrid';
 import { AddProductForm } from '@/components/AddProductForm';
+import { AddMarketForm } from '@/components/AddMarketForm';
+import { MarketSearch } from '@/components/MarketSearch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -71,6 +73,9 @@ export default function ShopManager() {
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [markets, setMarkets] = useState<any[]>([]);
+  const [marketSearchTerm, setMarketSearchTerm] = useState('');
+  const [showAddMarket, setShowAddMarket] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -83,6 +88,7 @@ export default function ShopManager() {
   useEffect(() => {
     if (user) {
       fetchShopData();
+      fetchMarkets();
     }
   }, [user]);
 
@@ -122,11 +128,30 @@ export default function ShopManager() {
           website: parsedData.website || '',
           description: parsedData.description || '',
         });
+        setMarketSearchTerm(parsedData.search_term || '');
       }
     } catch (error) {
       console.error('Error fetching shop data:', error);
     } finally {
       setLoadingShop(false);
+    }
+  };
+
+  const fetchMarkets = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('markets')
+        .select('*')
+        .order('name');
+
+      if (error) {
+        console.error('Error fetching markets:', error);
+        return;
+      }
+
+      setMarkets(data || []);
+    } catch (error) {
+      console.error('Error fetching markets:', error);
     }
   };
 
@@ -270,6 +295,76 @@ export default function ShopManager() {
       toast({
         title: "Update Failed",
         description: "Failed to update products.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleMarketSelect = async (market: any) => {
+    if (!shopData) return;
+
+    try {
+      const { error } = await supabase
+        .from('submissions')
+        .update({
+          selected_market: market.name,
+          search_term: market.name,
+          market_address: market.address,
+          market_days: market.days,
+          market_hours: market.hours,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', shopData.id);
+
+      if (error) throw error;
+
+      setMarketSearchTerm(market.name);
+      setShopData(prev => prev ? {
+        ...prev,
+        selected_market: market.name,
+        search_term: market.name,
+        market_address: market.address,
+        market_days: market.days,
+        market_hours: market.hours,
+      } : null);
+
+      toast({
+        title: "Market Selected",
+        description: `You've joined ${market.name}.`,
+      });
+    } catch (error: any) {
+      console.error('Error selecting market:', error);
+      toast({
+        title: "Selection Failed",
+        description: error.message || "Failed to select market.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddMarket = async (marketData: any) => {
+    try {
+      const { data, error } = await supabase
+        .from('markets')
+        .insert([marketData])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setMarkets(prev => [...prev, data]);
+      await handleMarketSelect(data);
+      setShowAddMarket(false);
+
+      toast({
+        title: "Market Added",
+        description: `${marketData.name} has been added and selected.`,
+      });
+    } catch (error: any) {
+      console.error('Error adding market:', error);
+      toast({
+        title: "Add Failed",
+        description: error.message || "Failed to add market.",
         variant: "destructive",
       });
     }
@@ -512,6 +607,25 @@ export default function ShopManager() {
                   />
                 </div>
 
+                <div className="space-y-2">
+                  <MarketSearch
+                    markets={markets}
+                    searchTerm={marketSearchTerm}
+                    onSearchTermChange={setMarketSearchTerm}
+                    onSelectMarket={handleMarketSelect}
+                    onAddMarket={() => setShowAddMarket(true)}
+                    disabled={!isEditing}
+                  />
+                  {shopData.selected_market && (
+                    <div className="mt-2 p-3 bg-muted rounded-md">
+                      <p className="text-sm font-medium">Currently joined: {shopData.selected_market}</p>
+                      {shopData.market_address && (
+                        <p className="text-sm text-muted-foreground">{shopData.market_address}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 {isEditing && (
                   <div className="flex gap-2 pt-4">
                     <Button onClick={handleSaveShop} disabled={isSaving}>
@@ -557,6 +671,12 @@ export default function ShopManager() {
         }}
         onProductAdded={editingProduct ? handleUpdateProduct : handleAddProduct}
         editingProduct={editingProduct}
+      />
+
+      <AddMarketForm
+        open={showAddMarket}
+        onClose={() => setShowAddMarket(false)}
+        onMarketAdded={handleAddMarket}
       />
     </div>
   );

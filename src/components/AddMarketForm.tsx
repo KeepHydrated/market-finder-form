@@ -1,88 +1,73 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+
+const DAYS_OF_WEEK = [
+  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+];
 
 interface AddMarketFormProps {
   open: boolean;
   onClose: () => void;
-  onMarketAdded: (marketData: {
-    name: string;
-    address: string;
-    days: string[];
-    hours: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
-  }) => void;
+  onMarketAdded: (market: any) => void;
 }
 
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
 export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormProps) => {
-  const [marketName, setMarketName] = useState('');
-  const [address, setAddress] = useState('');
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
-  const [hours, setHours] = useState<Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>>({});
+  const [formData, setFormData] = useState({
+    name: '',
+    address: '',
+    city: '',
+    state: '',
+    days: [] as string[],
+    hours: ''
+  });
 
-  const toggleDay = (day: string) => {
-    setSelectedDays(prev => {
-      const newDays = prev.includes(day) 
-        ? prev.filter(d => d !== day)
-        : [...prev, day];
-      
-      // Add default hours for newly selected days
-      if (!prev.includes(day) && newDays.includes(day)) {
-        setHours(prevHours => ({
-          ...prevHours,
-          [day]: {
-            start: '08:00',
-            end: '14:00',
-            startPeriod: 'AM' as 'AM' | 'PM',
-            endPeriod: 'PM' as 'AM' | 'PM',
-          }
-        }));
-      }
-      // Remove hours for deselected days
-      else if (prev.includes(day) && !newDays.includes(day)) {
-        setHours(prevHours => {
-          const { [day]: removed, ...rest } = prevHours;
-          return rest;
-        });
-      }
-      
-      return newDays;
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.address || !formData.city || !formData.state || formData.days.length === 0) {
+      return;
+    }
+
+    onMarketAdded(formData);
+    setFormData({
+      name: '',
+      address: '',
+      city: '',
+      state: '',
+      days: [],
+      hours: ''
     });
   };
 
-  const handleSubmit = () => {
-    // In a real app, this would submit to an API
-    const marketData = {
-      name: marketName,
-      address,
-      days: selectedDays,
-      hours
-    };
-    console.log(marketData);
-    onMarketAdded(marketData);
-    onClose();
+  const handleDayToggle = (day: string) => {
+    setFormData(prev => ({
+      ...prev,
+      days: prev.days.includes(day) 
+        ? prev.days.filter(d => d !== day)
+        : [...prev.days, day]
+    }));
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-6">
-        <DialogHeader className="pb-4">
-          <DialogTitle>Add Farmers Market</DialogTitle>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add New Farmers Market</DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="market-name">Market Name *</Label>
+            <Label htmlFor="name">Market Name *</Label>
             <Input
-              id="market-name"
-              value={marketName}
-              onChange={(e) => setMarketName(e.target.value)}
-              placeholder="Enter market name"
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              placeholder="e.g. Downtown Farmers Market"
+              required
             />
           </div>
 
@@ -90,104 +75,75 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
             <Label htmlFor="address">Address *</Label>
             <Input
               id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Enter market address"
+              value={formData.address}
+              onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+              placeholder="e.g. 123 Main St"
+              required
             />
           </div>
 
-          <div className="space-y-4">
-            <Label>Time *</Label>
-            <div className="flex flex-wrap gap-2">
-              {DAYS.map((day) => (
-                <Button
-                  key={day}
-                  type="button"
-                  variant={selectedDays.includes(day) ? "default" : "outline"}
-                  onClick={() => toggleDay(day)}
-                  className={cn(
-                    "h-12 flex-1 min-w-[70px]",
-                    selectedDays.includes(day) && "bg-earth text-earth-foreground hover:bg-earth/90"
-                  )}
-                >
-                  {day}
-                </Button>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="city">City *</Label>
+              <Input
+                id="city"
+                value={formData.city}
+                onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                placeholder="Springfield"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="state">State *</Label>
+              <Input
+                id="state"
+                value={formData.state}
+                onChange={(e) => setFormData(prev => ({ ...prev, state: e.target.value }))}
+                placeholder="IL"
+                maxLength={2}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Days Open *</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {DAYS_OF_WEEK.map((day) => (
+                <div key={day} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={day}
+                    checked={formData.days.includes(day)}
+                    onCheckedChange={() => handleDayToggle(day)}
+                  />
+                  <Label htmlFor={day} className="text-sm font-normal">
+                    {day}
+                  </Label>
+                </div>
               ))}
             </div>
           </div>
 
-          {selectedDays.length > 0 && (
-            <div className="space-y-4">
-              <div className="space-y-4">
-                {selectedDays.map((day) => (
-                  <div key={day} className="space-y-3">
-                    <h4 className="font-medium">{day === 'Mon' ? 'Monday' : day === 'Tue' ? 'Tuesday' : day === 'Wed' ? 'Wednesday' : day === 'Thu' ? 'Thursday' : day === 'Fri' ? 'Friday' : day === 'Sat' ? 'Saturday' : 'Sunday'}</h4>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <Input
-                          type="time"
-                          value={hours[day]?.start || '08:00'}
-                          onChange={(e) => setHours(prev => ({
-                            ...prev,
-                            [day]: { ...prev[day], start: e.target.value }
-                          }))}
-                        />
-                        <select
-                          value={hours[day]?.startPeriod || 'AM'}
-                          onChange={(e) => setHours(prev => ({
-                            ...prev,
-                            [day]: { ...prev[day], startPeriod: e.target.value as 'AM' | 'PM' }
-                          }))}
-                          className="border rounded px-2 py-1 text-sm"
-                        >
-                          <option value="AM">AM</option>
-                          <option value="PM">PM</option>
-                        </select>
-                      </div>
+          <div className="space-y-2">
+            <Label htmlFor="hours">Hours</Label>
+            <Input
+              id="hours"
+              value={formData.hours}
+              onChange={(e) => setFormData(prev => ({ ...prev, hours: e.target.value }))}
+              placeholder="e.g. 8:00 AM - 2:00 PM"
+            />
+          </div>
 
-                      <span className="text-muted-foreground">to</span>
-
-                      <div className="flex items-center gap-2">
-                        <Input
-                          type="time"
-                          value={hours[day]?.end || '14:00'}
-                          onChange={(e) => setHours(prev => ({
-                            ...prev,
-                            [day]: { ...prev[day], end: e.target.value }
-                          }))}
-                        />
-                        <select
-                          value={hours[day]?.endPeriod || 'PM'}
-                          onChange={(e) => setHours(prev => ({
-                            ...prev,
-                            [day]: { ...prev[day], endPeriod: e.target.value as 'AM' | 'PM' }
-                          }))}
-                          className="border rounded px-2 py-1 text-sm"
-                        >
-                          <option value="AM">AM</option>
-                          <option value="PM">PM</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="flex justify-end gap-3 pt-6 border-t mt-6">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleSubmit}
-            disabled={!marketName || !address || selectedDays.length === 0}
-            className="bg-earth text-earth-foreground hover:bg-earth/90"
-          >
-            Add Market
-          </Button>
-        </div>
+          <div className="flex gap-2 pt-4">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit">
+              Add Market
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
