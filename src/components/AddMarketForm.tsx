@@ -211,7 +211,6 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
 
           {formData.days.length > 0 && (
             <div className="space-y-4">
-              <Label>Hours</Label>
               <div className="grid grid-cols-2 gap-12">
                 {formData.days.map((day) => (
                   <div key={day} className="space-y-3 border-t pt-4">
