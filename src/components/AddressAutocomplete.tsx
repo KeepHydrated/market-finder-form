@@ -53,10 +53,21 @@ export const AddressAutocomplete = ({
         setIsLoaded(true);
 
         if (inputRef.current && !autocompleteRef.current) {
+          // Create a container for the autocomplete
+          const container = document.createElement('div');
+          container.style.position = 'relative';
+          container.style.zIndex = '9999';
+          
           autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
             types: ['address'],
             componentRestrictions: { country: 'us' }
           });
+
+          // Ensure the dropdown has proper z-index
+          const pacContainer = document.querySelector('.pac-container');
+          if (pacContainer) {
+            (pacContainer as HTMLElement).style.zIndex = '99999';
+          }
 
           autocompleteRef.current.addListener('place_changed', () => {
             const place = autocompleteRef.current?.getPlace();
@@ -99,6 +110,29 @@ export const AddressAutocomplete = ({
               }
             }
           });
+
+          // Add styles to ensure dropdown is visible
+          setTimeout(() => {
+            const style = document.createElement('style');
+            style.textContent = `
+              .pac-container {
+                z-index: 99999 !important;
+                background: white !important;
+                border: 1px solid #ccc !important;
+                border-radius: 4px !important;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
+              }
+              .pac-item {
+                padding: 10px !important;
+                cursor: pointer !important;
+                border-bottom: 1px solid #eee !important;
+              }
+              .pac-item:hover {
+                background-color: #f0f0f0 !important;
+              }
+            `;
+            document.head.appendChild(style);
+          }, 100);
         }
       } catch (error) {
         console.error('Error loading Google Places API:', error);
