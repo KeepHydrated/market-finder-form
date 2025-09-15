@@ -109,19 +109,23 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
 
           <div className="space-y-2">
             <Label>Days Open *</Label>
-            <div className="grid grid-cols-2 gap-2">
-              {DAYS_OF_WEEK.map((day) => (
-                <div key={day} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={day}
-                    checked={formData.days.includes(day)}
-                    onCheckedChange={() => handleDayToggle(day)}
-                  />
-                  <Label htmlFor={day} className="text-sm font-normal">
-                    {day}
-                  </Label>
-                </div>
-              ))}
+            <div className="flex flex-wrap gap-2">
+              {DAYS_OF_WEEK.map((day) => {
+                const shortDay = day.slice(0, 3);
+                const isSelected = formData.days.includes(day);
+                return (
+                  <Button
+                    key={day}
+                    type="button"
+                    variant={isSelected ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleDayToggle(day)}
+                    className="min-w-[60px] px-3 py-2"
+                  >
+                    {shortDay}
+                  </Button>
+                );
+              })}
             </div>
           </div>
 
