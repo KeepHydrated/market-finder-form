@@ -212,72 +212,74 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
           {formData.days.length > 0 && (
             <div className="space-y-4">
               <Label>Hours</Label>
-              {formData.days.map((day) => (
-                <div key={day} className="space-y-3 border-t pt-4">
-                  <h5 className="font-medium">{day}</h5>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <Select 
-                        value={dayTimeSelections[day]?.startTime || '08:00'}
-                        onValueChange={(value) => updateTimeSelection(day, 'startTime', value)}
-                      >
-                        <SelectTrigger className="w-20 bg-background">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background border shadow-md z-50">
-                          {timeOptions.map((time) => (
-                            <SelectItem key={time} value={time}>{time}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+              <div className="grid grid-cols-2 gap-12">
+                {formData.days.map((day) => (
+                  <div key={day} className="space-y-3 border-t pt-4">
+                    <h5 className="font-medium">{day}</h5>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <Select 
+                          value={dayTimeSelections[day]?.startTime || '08:00'}
+                          onValueChange={(value) => updateTimeSelection(day, 'startTime', value)}
+                        >
+                          <SelectTrigger className="w-20 bg-background">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background border shadow-md z-50">
+                            {timeOptions.map((time) => (
+                              <SelectItem key={time} value={time}>{time}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        
+                        <Select
+                          value={dayTimeSelections[day]?.startPeriod || 'AM'}
+                          onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'startPeriod', value)}
+                        >
+                          <SelectTrigger className="w-16 bg-background">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background border shadow-md z-50">
+                            <SelectItem value="AM">AM</SelectItem>
+                            <SelectItem value="PM">PM</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                       
-                      <Select
-                        value={dayTimeSelections[day]?.startPeriod || 'AM'}
-                        onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'startPeriod', value)}
-                      >
-                        <SelectTrigger className="w-16 bg-background">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background border shadow-md z-50">
-                          <SelectItem value="AM">AM</SelectItem>
-                          <SelectItem value="PM">PM</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <span className="text-muted-foreground text-sm">to</span>
-                    
-                    <div className="flex items-center gap-1">
-                      <Select
-                        value={dayTimeSelections[day]?.endTime || '02:00'}
-                        onValueChange={(value) => updateTimeSelection(day, 'endTime', value)}
-                      >
-                        <SelectTrigger className="w-20 bg-background">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background border shadow-md z-50">
-                          {timeOptions.map((time) => (
-                            <SelectItem key={time} value={time}>{time}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <span className="text-muted-foreground text-sm">to</span>
                       
-                      <Select
-                        value={dayTimeSelections[day]?.endPeriod || 'PM'}
-                        onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'endPeriod', value)}
-                      >
-                        <SelectTrigger className="w-16 bg-background">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background border shadow-md z-50">
-                          <SelectItem value="AM">AM</SelectItem>
-                          <SelectItem value="PM">PM</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center gap-1">
+                        <Select
+                          value={dayTimeSelections[day]?.endTime || '02:00'}
+                          onValueChange={(value) => updateTimeSelection(day, 'endTime', value)}
+                        >
+                          <SelectTrigger className="w-20 bg-background">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background border shadow-md z-50">
+                            {timeOptions.map((time) => (
+                              <SelectItem key={time} value={time}>{time}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        
+                        <Select
+                          value={dayTimeSelections[day]?.endPeriod || 'PM'}
+                          onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'endPeriod', value)}
+                        >
+                          <SelectTrigger className="w-16 bg-background">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background border shadow-md z-50">
+                            <SelectItem value="AM">AM</SelectItem>
+                            <SelectItem value="PM">PM</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
 
