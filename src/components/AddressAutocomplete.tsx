@@ -50,24 +50,12 @@ export const AddressAutocomplete = ({
         });
 
         await loader.load();
-        setIsLoaded(true);
-
+        
         if (inputRef.current && !autocompleteRef.current) {
-          // Create a container for the autocomplete
-          const container = document.createElement('div');
-          container.style.position = 'relative';
-          container.style.zIndex = '9999';
-          
           autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
             types: ['address'],
             componentRestrictions: { country: 'us' }
           });
-
-          // Ensure the dropdown has proper z-index
-          const pacContainer = document.querySelector('.pac-container');
-          if (pacContainer) {
-            (pacContainer as HTMLElement).style.zIndex = '99999';
-          }
 
           autocompleteRef.current.addListener('place_changed', () => {
             const place = autocompleteRef.current?.getPlace();
@@ -111,29 +99,60 @@ export const AddressAutocomplete = ({
             }
           });
 
-          // Add styles to ensure dropdown is visible
-          setTimeout(() => {
+          // Apply styles to fix z-index and interaction issues
+          const addGlobalStyles = () => {
+            // Remove existing styles if any
+            const existingStyle = document.getElementById('google-places-styles');
+            if (existingStyle) {
+              existingStyle.remove();
+            }
+
             const style = document.createElement('style');
-            style.textContent = `
+            style.id = 'google-places-styles';
+            style.innerHTML = `
               .pac-container {
-                z-index: 99999 !important;
+                z-index: 999999 !important;
                 background: white !important;
-                border: 1px solid #ccc !important;
-                border-radius: 4px !important;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
+                border: 1px solid hsl(var(--border)) !important;
+                border-radius: 6px !important;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+                margin-top: 2px !important;
+                position: absolute !important;
+                overflow: visible !important;
               }
               .pac-item {
-                padding: 10px !important;
+                padding: 8px 12px !important;
                 cursor: pointer !important;
-                border-bottom: 1px solid #eee !important;
+                border-bottom: 1px solid hsl(var(--border)) !important;
+                color: hsl(var(--foreground)) !important;
+                font-size: 14px !important;
+                line-height: 1.5 !important;
+                pointer-events: auto !important;
               }
-              .pac-item:hover {
-                background-color: #f0f0f0 !important;
+              .pac-item:last-child {
+                border-bottom: none !important;
+              }
+              .pac-item:hover, .pac-item-selected {
+                background-color: hsl(var(--muted)) !important;
+              }
+              .pac-item-query {
+                font-weight: 500 !important;
+              }
+              .pac-matched {
+                font-weight: 600 !important;
+                color: hsl(var(--primary)) !important;
               }
             `;
             document.head.appendChild(style);
-          }, 100);
+          };
+
+          // Add styles immediately and also with a delay
+          addGlobalStyles();
+          setTimeout(addGlobalStyles, 100);
+          setTimeout(addGlobalStyles, 500);
         }
+        
+        setIsLoaded(true);
       } catch (error) {
         console.error('Error loading Google Places API:', error);
       }
@@ -145,22 +164,23 @@ export const AddressAutocomplete = ({
   }, [isLoaded, onChange, onPlaceSelected]);
 
   return (
-    <Input
-      ref={inputRef}
-      id={id}
-      name="address-field-unique"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className={className}
-      autoComplete="nope"
-      autoCorrect="off"
-      autoCapitalize="off"
-      spellCheck={false}
-      data-form-type="other"
-      data-lpignore="true"
-      style={{ WebkitAppearance: 'none' } as React.CSSProperties}
-      required={required}
-    />
+    <div style={{ position: 'relative', zIndex: 1 }}>
+      <Input
+        ref={inputRef}
+        id={id}
+        name={`address-field-${id || 'unique'}`}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={className}
+        autoComplete="new-address"
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck={false}
+        data-form-type="other"
+        data-lpignore="true"
+        required={required}
+      />
+    </div>
   );
 };
