@@ -325,7 +325,7 @@ const VendorDuplicate = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span 
-                className="text-foreground text-xl font-bold cursor-pointer hover:text-primary transition-colors"
+                className="text-black text-xl font-bold cursor-pointer hover:text-primary transition-colors"
                 onClick={() => navigate('/market')}
               >
                 {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
