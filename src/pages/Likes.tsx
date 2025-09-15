@@ -67,7 +67,7 @@ const Likes = () => {
   ];
 
   useEffect(() => {
-    if (user && (activeTab === "markets" || activeTab === "vendors")) {
+    if (user && (activeTab === "markets" || activeTab === "vendors" || activeTab === "products")) {
       fetchAcceptedSubmissions();
     }
   }, [user, activeTab]);
@@ -192,16 +192,20 @@ const Likes = () => {
       return renderLikedMarkets();
     } else if (tabType === "vendors") {
       return renderLikedVendors();
+    } else if (tabType === "products") {
+      return renderLikedProducts();
     }
     
-    const filteredLikes = getFilteredLikes(tabType);
-    const likeType = tabToLikeType(tabType);
-    
-    if (loading) {
+    // Fallback for unexpected tab types
+    return null;
+  };
+
+  const renderLikedProducts = () => {
+    if (loading || loadingSubmissions) {
       return (
         <div className="text-center py-16">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground mt-4">Loading your likes...</p>
+          <p className="text-muted-foreground mt-4">Loading your liked products...</p>
         </div>
       );
     }
@@ -212,58 +216,102 @@ const Likes = () => {
           <Heart className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
           <h2 className="text-2xl font-bold mb-2">Sign In Required</h2>
           <p className="text-muted-foreground">
-            Please sign in to view your liked items
+            Please sign in to view your liked products
           </p>
         </div>
       );
     }
 
-    if (filteredLikes.length === 0) {
-      const icons = {
-        markets: MapPin,
-        vendors: Store,
-        products: Package
-      };
-      const Icon = icons[tabType];
-      
+    const likedProductIds = likes
+      .filter(like => like.item_type === 'product')
+      .map(like => like.item_id);
+    
+    // Get all products from all vendors and filter by liked IDs
+    const allProducts: any[] = [];
+    acceptedSubmissions.forEach(vendor => {
+      if (vendor.products && Array.isArray(vendor.products)) {
+        vendor.products.forEach((product: any) => {
+          allProducts.push({
+            ...product,
+            vendorName: vendor.store_name,
+            vendorId: vendor.id
+          });
+        });
+      }
+    });
+    
+    const likedProducts = allProducts.filter(product => 
+      likedProductIds.includes(product.id?.toString() || product.name)
+    );
+
+    if (likedProducts.length === 0) {
       return (
         <div className="text-center py-16">
-          <Icon className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-          <h2 className="text-2xl font-bold mb-2">No Liked {tabType.charAt(0).toUpperCase() + tabType.slice(1)}</h2>
+          <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+          <h2 className="text-2xl font-bold mb-2">No Liked Products</h2>
           <p className="text-muted-foreground">
-            {tabType.charAt(0).toUpperCase() + tabType.slice(1)} you like will appear here
+            Products you like will appear here
           </p>
         </div>
       );
     }
 
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredLikes.map((like) => (
-          <Card key={like.id} className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">
-                  {likeType === 'market' && 'Market'}
-                  {likeType === 'vendor' && 'Vendor'}
-                  {likeType === 'product' && 'Product'}
-                </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => toggleLike(like.item_id, like.item_type)}
-                  className="text-red-500 hover:text-red-600"
-                >
-                  <Heart className="h-4 w-4 fill-current" />
-                </Button>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {likedProducts.map((product, index) => (
+          <Card 
+            key={index}
+            className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          >
+            <div className="aspect-[4/3] overflow-hidden bg-muted relative group">
+              {product.images && product.images.length > 0 ? (
+                <img
+                  src={product.images[0]}
+                  alt={product.name}
+                  className="w-full h-full object-cover transition-opacity duration-200"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                  No Image
+                </div>
+              )}
+              
+              {/* Like Button */}
+              <Button
+                variant="secondary"
+                size="sm"
+                className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  const productId = product.id?.toString() || product.name;
+                  await toggleLike(productId, 'product');
+                }}
+              >
+                <Heart 
+                  className={cn(
+                    "h-4 w-4 transition-colors",
+                    (() => {
+                      const productId = product.id?.toString() || product.name;
+                      return isLiked(productId, 'product');
+                    })()
+                      ? "text-red-500 fill-current" 
+                      : "text-gray-600"
+                  )} 
+                />
+              </Button>
+            </div>
+            
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between mb-2">
+                <h3 className="font-normal text-sm flex-1 text-black">{product.name}</h3>
               </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-2">
-                ID: {like.item_id}
-              </p>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-muted-foreground">
+                  ${product.price ? product.price.toFixed(2) : '0.00'}
+                </span>
+              </div>
               <p className="text-xs text-muted-foreground">
-                Liked on {new Date(like.created_at).toLocaleDateString()}
+                From {product.vendorName}
               </p>
             </CardContent>
           </Card>
