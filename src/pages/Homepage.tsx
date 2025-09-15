@@ -587,12 +587,7 @@ const Homepage = () => {
                 </p>
               </div>
             ) : (
-              <div className={cn(
-                "grid gap-6",
-                (selectedMarket ? selectedMarket.vendors : acceptedSubmissions).length === 1 
-                  ? "grid-cols-1 max-w-md mx-auto" 
-                  : "grid-cols-1 md:grid-cols-2 lg:grid-cols-2"
-              )}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(selectedMarket ? selectedMarket.vendors : acceptedSubmissions).map((submission) => (
                   <Card 
                     key={submission.id} 
