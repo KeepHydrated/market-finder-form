@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,7 +49,6 @@ interface ReviewStats {
 
 const Tet = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
   const { user, profile, loading } = useAuth();
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
@@ -75,16 +74,12 @@ const Tet = () => {
   }, [acceptedSubmission]);
 
   const fetchAcceptedSubmission = async () => {
-    if (!id) {
-      setLoadingData(false);
-      return;
-    }
-
     try {
+      // Hardcoded to fetch Sprout & Harvest vendor
       const { data, error } = await supabase
         .from('submissions')
         .select('*')
-        .eq('id', id)
+        .eq('id', '78c551ca-5271-4a26-a682-4a75a132bf89')
         .eq('status', 'accepted')
         .single();
 
