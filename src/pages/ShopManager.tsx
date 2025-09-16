@@ -726,7 +726,7 @@ export default function ShopManager() {
 
           </TabsContent>
 
-          <TabsContent value="shop" className="space-y-6">
+          <TabsContent value="shop" className="space-y-6 max-w-2xl">
             <Card>
               <CardContent className="space-y-4 pt-4">
                 <MarketSearch
