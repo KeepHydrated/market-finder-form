@@ -286,6 +286,13 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
                 value={googlePlacesData.isSelected ? googlePlacesData.address : formData.address}
                 onChange={(address) => {
                   console.log('📍 AddressAutocomplete onChange called with:', `"${address}"`);
+                  
+                  // If we get an empty string but have a Google selection, ignore it
+                  if (!address && googlePlacesData.isSelected) {
+                    console.log('🚫 Ignoring empty onChange - Google Places selection is active');
+                    return;
+                  }
+                  
                   // When user types manually in Google Places field, clear the "selected" state
                   if (!address) {
                     setGooglePlacesData({

@@ -32,7 +32,7 @@ export const AddressAutocomplete = ({
   const elementRef = useRef<HTMLElement | null>(null);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastKnownValueRef = useRef<string>('');
-  const disablePollingUntilRef = useRef<number>(0);
+  const hasGoogleSelectionRef = useRef<boolean>(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export const AddressAutocomplete = ({
           
           // Set attributes
           placeAutocomplete.setAttribute('type', 'address');
-          placeAutocomplete.setAttribute('country-restriction', 'us');
+          // Removed country restriction to allow global address search
           if (placeholder) {
             placeAutocomplete.setAttribute('placeholder', placeholder);
           }
@@ -96,9 +96,9 @@ export const AddressAutocomplete = ({
             // Update the internal tracking immediately to prevent polling conflicts
             lastKnownValueRef.current = selectedAddress;
             
-            // Disable polling for 1 second to prevent interference
-            disablePollingUntilRef.current = Date.now() + 1000;
-            console.log('🚫 Polling disabled until:', new Date(disablePollingUntilRef.current));
+            // Mark that we have a Google selection to prevent empty onChange from clearing it
+            hasGoogleSelectionRef.current = true;
+            console.log('🔒 Google selection locked to prevent clearing');
             
             // Update the input element value immediately to stay in sync
             const inputElement = placeAutocomplete.querySelector('input');
@@ -149,28 +149,36 @@ export const AddressAutocomplete = ({
             
             console.log('Final input value captured:', inputValue);
             
-            // Always call onChange with the current value, even if empty
-            onChange(inputValue);
-          };
-
-          // Add a polling mechanism to continuously check for input changes
-          const pollForChanges = () => {
-            // Check if polling is temporarily disabled
-            if (Date.now() < disablePollingUntilRef.current) {
-              console.log('⏸️ Polling temporarily disabled to prevent conflicts');
+            // Prevent empty onChange from clearing Google selection
+            if (!inputValue && hasGoogleSelectionRef.current) {
+              console.log('🚫 Ignoring empty onChange - Google selection is locked');
               return;
             }
             
+            // If user actually starts typing, unlock Google selection
+            if (inputValue && hasGoogleSelectionRef.current) {
+              console.log('🔓 Unlocking Google selection - user is typing');
+              hasGoogleSelectionRef.current = false;
+            }
+            
+            onChange(inputValue);
+          };
+
+          // Minimal polling for edge cases - much less aggressive
+          const pollForChanges = () => {
             const inputElement = placeAutocomplete.querySelector('input');
             if (inputElement) {
               const currentValue = inputElement.value || '';
               
-              // Only trigger onChange if the value actually changed from our last known value
+              // Only trigger onChange if the value actually changed and it's not an empty value when Google selection is locked
               if (currentValue !== lastKnownValueRef.current) {
-                console.log('📊 Polling detected real change:');
-                console.log('  - Current input value:', `"${currentValue}"`);
-                console.log('  - Last known value:', `"${lastKnownValueRef.current}"`);
-                console.log('  - Prop value:', `"${value}"`);
+                // Prevent empty onChange from clearing Google selection
+                if (!currentValue && hasGoogleSelectionRef.current) {
+                  console.log('🚫 Polling: Ignoring empty change - Google selection is locked');
+                  return;
+                }
+                
+                console.log('📊 Polling detected real change:', `"${currentValue}"`);
                 
                 // Update our tracking
                 lastKnownValueRef.current = currentValue;
@@ -186,8 +194,8 @@ export const AddressAutocomplete = ({
             clearInterval(pollIntervalRef.current);
           }
 
-          // Poll every 200ms for changes
-          const pollInterval = setInterval(pollForChanges, 200);
+          // Poll much less aggressively - every 1 second
+          const pollInterval = setInterval(pollForChanges, 1000);
 
           // Store the interval reference for cleanup
           pollIntervalRef.current = pollInterval;
