@@ -132,6 +132,14 @@ export default function Test() {
   };
 
   const handleSubmitMarket = async () => {
+    console.log('Add Market button clicked');
+    console.log('Form data:', {
+      marketName,
+      marketAddress,
+      selectedDays,
+      formValid: !(!marketName || !marketAddress || selectedDays.length === 0)
+    });
+
     try {
       // Parse the Google Places address to extract city and state
       const addressParts = marketAddress.split(', ');
@@ -142,6 +150,8 @@ export default function Test() {
         city = addressParts[addressParts.length - 3];
         state = addressParts[addressParts.length - 2];
       }
+
+      console.log('Parsed address:', { city, state });
 
       // Format the hours data
       const hoursData = selectedDays.reduce((acc, dayObj) => {
@@ -156,21 +166,27 @@ export default function Test() {
         return acc;
       }, {} as Record<string, string>);
 
+      console.log('Hours data:', hoursData);
+
+      const marketData = {
+        name: marketName,
+        address: marketAddress,
+        city: city,
+        state: state,
+        days: selectedDays.map(d => d.day),
+        hours: JSON.stringify(hoursData)
+      };
+
+      console.log('Inserting market data:', marketData);
+
       const { data, error } = await supabase
         .from('markets')
-        .insert({
-          name: marketName,
-          address: marketAddress,
-          city: city,
-          state: state,
-          days: selectedDays.map(d => d.day),
-          hours: JSON.stringify(hoursData)
-        })
+        .insert(marketData)
         .select()
         .single();
 
       if (error) {
-        console.error('Error adding market:', error);
+        console.error('Supabase error:', error);
         alert('Failed to add market. Please try again.');
         return;
       }
@@ -185,7 +201,7 @@ export default function Test() {
       
       alert('Market added successfully!');
     } catch (error) {
-      console.error('Error adding market:', error);
+      console.error('Catch error:', error);
       alert('Failed to add market. Please try again.');
     }
   };
