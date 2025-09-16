@@ -67,12 +67,29 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Ensure address is a string
-    const addressString = typeof formData.address === 'string' ? formData.address : '';
+    // Ensure address is a string and trim whitespace
+    const addressString = typeof formData.address === 'string' ? formData.address.trim() : '';
+    const name = formData.name.trim();
     
-    if (!formData.name || !addressString || formData.days.length === 0) {
+    console.log('🔍 Form validation check:');
+    console.log('  - Name:', `"${name}"`);
+    console.log('  - Address:', `"${addressString}"`);
+    console.log('  - Days:', formData.days);
+    console.log('  - Form data:', formData);
+    
+    // Enhanced validation with specific error messages
+    const missingFields = [];
+    if (!name) missingFields.push('Market name');
+    if (!addressString) missingFields.push('Address');
+    if (formData.days.length === 0) missingFields.push('Operating days');
+    
+    if (missingFields.length > 0) {
+      console.log('❌ Validation failed - Missing:', missingFields);
+      alert(`Please fill in the following required fields: ${missingFields.join(', ')}`);
       return;
     }
+    
+    console.log('✅ Validation passed - submitting form');
 
     // Format hours object into readable string
     const formatHours = () => {
@@ -116,7 +133,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
     
     // Create clean form data with formatted hours and days
     const cleanFormData = {
-      name: formData.name,
+      name: name,
       address: addressString,
       days: formattedDays,
       hours: formatHours()
@@ -377,6 +394,12 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
             <Button 
               type="submit"
               onClick={() => console.log('Add Market button clicked!')}
+              disabled={!formData.name.trim() || !formData.address.trim() || formData.days.length === 0}
+              className={`${
+                (!formData.name.trim() || !formData.address.trim() || formData.days.length === 0)
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:bg-primary/90'
+              }`}
             >
               Add Market
             </Button>
