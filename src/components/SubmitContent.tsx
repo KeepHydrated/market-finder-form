@@ -142,12 +142,63 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
     setShowAddForm(true);
   }, []);
 
-  const handleMarketAdded = useCallback((marketData: any) => {
-    setSearchTerm(marketData.name);
-    setSubmittedMarketName(marketData.name);
-    setCustomMarketData(marketData);
-    setShowAddForm(false);
-  }, []);
+  const handleMarketAdded = useCallback(async (marketData: any) => {
+    try {
+      // Extract city and state from address
+      const addressParts = marketData.address.split(',').map((part: string) => part.trim());
+      let city = '';
+      let state = '';
+      
+      if (addressParts.length >= 2) {
+        // Assume format: "Street, City, State" or similar
+        city = addressParts[addressParts.length - 2] || '';
+        const lastPart = addressParts[addressParts.length - 1] || '';
+        // Extract state (first 2 chars if it contains state abbreviation)
+        const stateMatch = lastPart.match(/\b[A-Z]{2}\b/);
+        state = stateMatch ? stateMatch[0] : lastPart.substring(0, 2).toUpperCase();
+      }
+      
+      // Normalize days array (ensure it's an array)
+      const normalizedDays = Array.isArray(marketData.days) ? marketData.days : 
+                            marketData.days ? [marketData.days] : [];
+      
+      // Insert market into database
+      const { error } = await supabase
+        .from('markets')
+        .insert({
+          name: marketData.name,
+          address: marketData.address,
+          city: city || 'Unknown',
+          state: state || 'Unknown',
+          days: normalizedDays,
+          hours: marketData.hours || null
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      // Update local state only on successful insertion
+      setSearchTerm(marketData.name);
+      setSubmittedMarketName(marketData.name);
+      setCustomMarketData(marketData);
+      setShowAddForm(false);
+      
+      toast({
+        title: "Market Added",
+        description: "Your market has been successfully added to the database.",
+      });
+
+    } catch (error: any) {
+      console.error('Error adding market:', error);
+      toast({
+        title: "Error Adding Market",
+        description: `Failed to add market: ${error.message || 'Unknown error'}`,
+        variant: "destructive"
+      });
+      // Don't close the modal on error so user can try again
+    }
+  }, [toast]);
 
   const handleAddProduct = useCallback(() => {
     setShowAddProductForm(true);
