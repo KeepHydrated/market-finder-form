@@ -17,6 +17,7 @@ import Likes from "./pages/Likes";
 import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
 import ShopManager from "./pages/ShopManager";
+import ShopManagerCopy from "./pages/ShopManagerCopy";
 import Markets from "./pages/Markets";
 import Tet from "./pages/Tet";
 import PlacesDemo from "./pages/PlacesDemo";
@@ -46,6 +47,7 @@ const App = () => (
                 <Route path="/likes" element={<Likes />} />
                 <Route path="/order-success" element={<OrderSuccess />} />
                 <Route path="/shop-manager" element={<ShopManager />} />
+                <Route path="/shop-manager-copy" element={<ShopManagerCopy />} />
                 <Route path="/markets" element={<Markets />} />
                 <Route path="/places-demo" element={<PlacesDemo />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
