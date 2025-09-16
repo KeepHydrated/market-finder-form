@@ -50,8 +50,10 @@ export const AddressAutocomplete = ({
         });
 
         await loader.load();
+        console.log('✅ Google Maps API loaded successfully');
         
         if (!elementRef.current) {
+          console.log('🔧 Creating Google Places autocomplete element...');
           // Create the new PlaceAutocompleteElement
           const placeAutocomplete = document.createElement('gmp-place-autocomplete') as any;
           
@@ -216,6 +218,7 @@ export const AddressAutocomplete = ({
         }
         
         setIsLoaded(true);
+        console.log('✅ Google Places autocomplete fully initialized and ready to use!');
       } catch (error) {
         console.error('Error loading Google Places API:', error);
       }

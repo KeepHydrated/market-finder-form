@@ -342,6 +342,9 @@ export default function Test() {
                   <Label htmlFor="market-address" className="text-base font-medium">
                     Address *
                   </Label>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Start typing an address, then <strong>click on a suggestion</strong> from the dropdown that appears
+                  </p>
                   <AddressAutocomplete
                     value={marketAddress}
                     onChange={(value) => {
@@ -349,9 +352,14 @@ export default function Test() {
                       setMarketAddress(value);
                       console.log('📍 marketAddress state updated to:', `"${value}"`);
                     }}
-                    placeholder="Enter market address..."
+                    placeholder="Start typing an address..."
                     className="text-base py-3"
                   />
+                  {marketAddress && (
+                    <p className="text-sm text-green-600">
+                      ✅ Address selected: {marketAddress}
+                    </p>
+                  )}
                 </div>
                 
                  {/* Days Open */}
