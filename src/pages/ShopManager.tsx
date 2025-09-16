@@ -728,19 +728,15 @@ export default function ShopManager() {
 
           <TabsContent value="shop" className="space-y-6">
             <Card>
-              <CardHeader>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <MarketSearch
-                    markets={markets}
-                    searchTerm={marketSearchTerm}
-                    onSearchTermChange={setMarketSearchTerm}
-                    onSelectMarket={handleMarketSelect}
-                    onAddMarket={() => setShowAddMarket(true)}
-                    disabled={!isEditing}
-                  />
-                </div>
+              <CardContent className="space-y-2 pt-4">
+                <MarketSearch
+                  markets={markets}
+                  searchTerm={marketSearchTerm}
+                  onSearchTermChange={setMarketSearchTerm}
+                  onSelectMarket={handleMarketSelect}
+                  onAddMarket={() => setShowAddMarket(true)}
+                  disabled={!isEditing}
+                />
 
                 <div className="space-y-2">
                   <Label htmlFor="store_name">Store Name</Label>
