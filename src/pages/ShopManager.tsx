@@ -916,29 +916,25 @@ export default function ShopManager() {
                             className="w-fit"
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
-                            Delete Account
+                            Delete Shop
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Account</AlertDialogTitle>
+                            <AlertDialogTitle>Delete Shop</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete your account, 
-                              shop, products, and all associated data from our servers.
+                              This action cannot be undone. This will permanently delete your shop 
+                              "{shopData.store_name}" and remove all of your products, orders, and shop data from our servers.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction 
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              onClick={() => {
-                                toast({
-                                  title: "Feature Coming Soon",
-                                  description: "Account deletion will be available in a future update.",
-                                });
-                              }}
+                              onClick={handleDeleteShop}
+                              disabled={isDeleting}
                             >
-                              Delete Account
+                              {isDeleting ? "Deleting..." : "Yes, delete shop"}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
