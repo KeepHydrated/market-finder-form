@@ -81,63 +81,27 @@ export const AddressAutocomplete = ({
             console.log('=== GOOGLE PLACES SELECTION EVENT FIRED ===');
             const place = event.detail.place;
             console.log('Place selected event:', place);
+            console.log('Place formattedAddress:', place.formattedAddress);
+            console.log('Place displayName:', place.displayName);
             
-            if (place && place.addressComponents) {
-              let streetNumber = '';
-              let streetName = '';
-              let city = '';
-              let state = '';
-              
-              place.addressComponents.forEach((component: any) => {
-                const types = component.types;
-                
-                if (types.includes('street_number')) {
-                  streetNumber = component.longText;
-                }
-                if (types.includes('route')) {
-                  streetName = component.longText;
-                }
-                if (types.includes('locality')) {
-                  city = component.longText;
-                }
-                if (types.includes('administrative_area_level_1')) {
-                  state = component.shortText;
-                }
+            // Try the simplest approach first - just use formattedAddress
+            const selectedAddress = place.formattedAddress || place.displayName || '';
+            console.log('Selected address to use:', selectedAddress);
+            
+            // Update immediately
+            onChange(selectedAddress);
+            console.log('Called onChange with address:', selectedAddress);
+            
+            if (onPlaceSelected) {
+              console.log('Calling onPlaceSelected');
+              onPlaceSelected({
+                address: selectedAddress,
+                city: '',
+                state: ''
               });
-              
-              const fullAddress = place.formattedAddress || place.displayName || `${streetNumber} ${streetName}, ${city}, ${state}`.trim();
-              console.log('Full address extracted:', fullAddress);
-              console.log('City extracted:', city);
-              console.log('State extracted:', state);
-              
-              // Update the form immediately
-              onChange(fullAddress);
-              console.log('Called onChange with:', fullAddress);
-              
-              if (onPlaceSelected) {
-                console.log('Calling onPlaceSelected with place data');
-                onPlaceSelected({
-                  address: fullAddress,
-                  city,
-                  state
-                });
-              }
-            } else if (place && place.displayName) {
-              // Fallback: use display name if address components aren't available
-              const displayAddress = place.displayName;
-              console.log('Using display name as address:', displayAddress);
-              onChange(displayAddress);
-              
-              if (onPlaceSelected) {
-                onPlaceSelected({
-                  address: displayAddress,
-                  city: '',
-                  state: ''
-                });
-              }
-            } else {
-              console.log('No valid place data found:', place);
             }
+            
+            console.log('=== END GOOGLE PLACES SELECTION ===');
           });
 
           // Handle input changes - multiple event types for Google Places

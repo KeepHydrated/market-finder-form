@@ -345,13 +345,9 @@ export default function Test() {
                   <AddressAutocomplete
                     value={marketAddress}
                     onChange={(value) => {
-                      console.log('Address changing to:', value);
+                      console.log('📍 AddressAutocomplete onChange called with:', `"${value}"`);
                       setMarketAddress(value);
-                    }}
-                    onPlaceSelected={(place) => {
-                      console.log('Place selected:', place);
-                      console.log('Setting address to:', place.address);
-                      setMarketAddress(place.address);
+                      console.log('📍 marketAddress state updated to:', `"${value}"`);
                     }}
                     placeholder="Enter market address..."
                     className="text-base py-3"
