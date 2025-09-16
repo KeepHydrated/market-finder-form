@@ -157,6 +157,30 @@ export default function PlacesDemo() {
               <Button onClick={handleClear} variant="outline" className="w-full">
                 Clear All
               </Button>
+              
+              {/* Temporary save button for manual input */}
+              {(selectedAddress || manualAddress) && !selectedPlace && (
+                <Button 
+                  onClick={() => {
+                    const inputText = selectedAddress || manualAddress;
+                    const parts = inputText.split(', ');
+                    const mockPlace = {
+                      address: inputText,
+                      city: parts.length > 1 ? parts[parts.length - 2] : 'Unknown',
+                      state: parts.length > 0 ? parts[parts.length - 1] : 'Unknown'
+                    };
+                    setSelectedPlace(mockPlace);
+                    toast({
+                      title: "Manual Input Converted",
+                      description: `Created place from: ${inputText}`,
+                    });
+                  }}
+                  variant="secondary" 
+                  className="w-full"
+                >
+                  Convert to Place (for testing)
+                </Button>
+              )}
             </CardContent>
           </Card>
 
