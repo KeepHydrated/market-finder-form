@@ -328,7 +328,10 @@ export default function Test() {
                   <Input
                     id="market-name"
                     value={marketName}
-                    onChange={(e) => setMarketName(e.target.value)}
+                    onChange={(e) => {
+                      console.log('Market name changing to:', e.target.value);
+                      setMarketName(e.target.value);
+                    }}
                     placeholder="e.g. Downtown Farmers Market"
                     className="text-base py-3"
                   />
@@ -341,9 +344,14 @@ export default function Test() {
                   </Label>
                   <AddressAutocomplete
                     value={marketAddress}
-                    onChange={setMarketAddress}
+                    onChange={(value) => {
+                      console.log('Address changing to:', value);
+                      setMarketAddress(value);
+                    }}
                     onPlaceSelected={(place) => {
+                      console.log('Place selected:', place);
                       if (place.address) {
+                        console.log('Setting address to:', place.address);
                         setMarketAddress(place.address);
                       }
                     }}
@@ -451,10 +459,10 @@ export default function Test() {
                   <Button
                     type="button"
                     onClick={handleSubmitMarket}
-                    disabled={!marketName || !marketAddress || selectedDays.length === 0}
+                    disabled={false}
                     className="px-6 bg-green-600 hover:bg-green-700"
                   >
-                    Add Market
+                    Add Market (Debug Mode)
                   </Button>
                 </div>
               </div>
