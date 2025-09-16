@@ -158,6 +158,28 @@ export const AddressAutocomplete = ({
             gmp-place-autocomplete input::placeholder {
               color: #6b7280 !important;
             }
+            /* Additional overrides for Google Places suggestions */
+            .pac-container {
+              background-color: white !important;
+              border: 1px solid #d1d5db !important;
+              border-radius: 6px !important;
+              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+            }
+            .pac-item {
+              background-color: white !important;
+              color: black !important;
+              border-bottom: 1px solid #f3f4f6 !important;
+            }
+            .pac-item:hover {
+              background-color: #f9fafb !important;
+            }
+            .pac-item-selected {
+              background-color: #f3f4f6 !important;
+            }
+            .pac-matched {
+              color: #1f2937 !important;
+              font-weight: 600 !important;
+            }
             .gm-style .gm-style-iw-c {
               z-index: 999999 !important;
             }
