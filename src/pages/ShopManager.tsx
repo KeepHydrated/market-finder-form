@@ -879,7 +879,8 @@ export default function ShopManager() {
                   Account Information
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              {/* Reduced spacing in Account tab content */}
+              <CardContent>
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="space-y-1">
                     <div className="font-medium">Vacation Mode</div>
@@ -897,57 +898,53 @@ export default function ShopManager() {
                   />
                 </div>
 
-                <Separator />
-
                 {!isPublicAccess && (
-                  <>
-                    <Separator />
-                    <div className="pt-4 border-t border-destructive/20">
-                      <div className="space-y-4">
-                        <div>
-                          <h3 className="text-lg font-semibold text-destructive">Account Danger Zone</h3>
-                          <p className="text-sm text-muted-foreground">
-                            These actions cannot be undone. Please be careful.
-                          </p>
-                        </div>
-                        
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button 
-                              variant="destructive" 
-                              className="w-fit"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete Account
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Account</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete your account, 
-                                shop, products, and all associated data from our servers.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction 
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                onClick={() => {
-                                  toast({
-                                    title: "Feature Coming Soon",
-                                    description: "Account deletion will be available in a future update.",
-                                  });
-                                }}
-                              >
-                                Delete Account
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                  <div className="pt-6">
+                    <Separator className="mb-4" />
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-destructive">Account Danger Zone</h3>
+                        <p className="text-sm text-muted-foreground">
+                          These actions cannot be undone. Please be careful.
+                        </p>
                       </div>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            variant="destructive" 
+                            className="w-fit"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete Account
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Account</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete your account, 
+                              shop, products, and all associated data from our servers.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction 
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              onClick={() => {
+                                toast({
+                                  title: "Feature Coming Soon",
+                                  description: "Account deletion will be available in a future update.",
+                                });
+                              }}
+                            >
+                              Delete Account
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
-                  </>
+                  </div>
                 )}
               </CardContent>
             </Card>
