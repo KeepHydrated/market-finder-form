@@ -80,6 +80,7 @@ export default function ShopManager() {
   const [marketSearchTerm, setMarketSearchTerm] = useState('');
   const [showAddMarket, setShowAddMarket] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [vacationMode, setVacationMode] = useState(false);
 
   // Check for public access via URL parameter
@@ -490,6 +491,52 @@ export default function ShopManager() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+
+    setIsDeletingAccount(true);
+    try {
+      // First delete user's profile and related data
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (profileError) throw profileError;
+
+      // Delete user's submissions (shops)
+      const { error: submissionsError } = await supabase
+        .from('submissions')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (submissionsError) throw submissionsError;
+
+      // Delete the auth user account
+      const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
+      
+      if (authError) throw authError;
+
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been permanently deleted.",
+      });
+
+      // Sign out and redirect to homepage
+      await supabase.auth.signOut();
+      window.location.href = '/';
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete account.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeletingAccount(false);
+    }
+  };
+
   const handleDeleteShop = async () => {
     if (!user || !shopData) return;
 
@@ -867,45 +914,85 @@ export default function ShopManager() {
                 {!isPublicAccess && !isEditing && (
                   <div className="pt-6">
                     <Separator className="mb-4" />
-                    <div className="space-y-4">
-                      <div>
-                        <h3 className="text-lg font-semibold text-destructive">Shop Danger Zone</h3>
-                        <p className="text-sm text-muted-foreground">
-                          These actions cannot be undone. Please be careful.
-                        </p>
-                      </div>
-                      
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button 
-                            variant="destructive" 
-                            className="w-fit"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete Shop
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Shop</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete your shop 
-                              "{shopData.store_name}" and remove all of your products, orders, and shop data from our servers.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction 
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              onClick={handleDeleteShop}
-                              disabled={isDeleting}
-                            >
-                              {isDeleting ? "Deleting..." : "Yes, delete shop"}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
+                        <div className="space-y-4">
+                          <div>
+                            <h3 className="text-lg font-semibold text-destructive">Delete Shop</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Delete your shop and all associated products and orders.
+                            </p>
+                          </div>
+                          
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button 
+                                variant="destructive" 
+                                className="w-fit"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete Shop
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Shop</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently delete your shop 
+                                  "{shopData.store_name}" and remove all of your products, orders, and shop data from our servers.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction 
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  onClick={handleDeleteShop}
+                                  disabled={isDeleting}
+                                >
+                                  {isDeleting ? "Deleting..." : "Yes, delete shop"}
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div>
+                            <h3 className="text-lg font-semibold text-destructive">Delete Account</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Permanently delete your entire account, including all shops, products, and personal data.
+                            </p>
+                          </div>
+                          
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button 
+                                variant="destructive" 
+                                className="w-fit"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete Account
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Account</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently delete your entire account, 
+                                  including all shops, products, orders, and personal data from our servers.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction 
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  onClick={handleDeleteAccount}
+                                  disabled={isDeletingAccount}
+                                >
+                                  {isDeletingAccount ? "Deleting..." : "Yes, delete account"}
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                   </div>
                 )}
               </CardContent>
