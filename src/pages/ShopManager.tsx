@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Store, Package, ShoppingCart, DollarSign, Edit, Plus, Calendar } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Store, Package, ShoppingCart, DollarSign, Edit, Plus, Calendar, Trash2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { ProductGrid } from '@/components/ProductGrid';
@@ -76,6 +77,7 @@ export default function ShopManager() {
   const [markets, setMarkets] = useState<any[]>([]);
   const [marketSearchTerm, setMarketSearchTerm] = useState('');
   const [showAddMarket, setShowAddMarket] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Check for public access via URL parameter
   const isPublicAccess = new URLSearchParams(window.location.search).get('demo') === 'true';
@@ -470,6 +472,37 @@ export default function ShopManager() {
     }
   };
 
+  const handleDeleteShop = async () => {
+    if (!user || !shopData) return;
+
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('submissions')
+        .delete()
+        .eq('id', shopData.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Shop Deleted",
+        description: "Your shop has been permanently deleted.",
+      });
+
+      // Navigate to homepage after deletion
+      window.location.href = '/';
+    } catch (error: any) {
+      console.error('Error deleting shop:', error);
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete shop.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const formatPrice = (cents: number) => {
     return `$${(cents / 100).toFixed(2)}`;
   };
@@ -727,6 +760,51 @@ export default function ShopManager() {
                     rows={4}
                   />
                 </div>
+
+                {isEditing && (
+                  <div className="pt-6 border-t border-destructive/20">
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-destructive">Danger Zone</h3>
+                        <p className="text-sm text-muted-foreground">
+                          This action cannot be undone. This will permanently delete your shop and all associated data.
+                        </p>
+                      </div>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            variant="destructive" 
+                            disabled={isDeleting || isPublicAccess}
+                            className="w-fit"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete Shop
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete your shop 
+                              "{shopData.store_name}" and remove all of your products, orders, and shop data from our servers.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={handleDeleteShop}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              disabled={isDeleting}
+                            >
+                              {isDeleting ? "Deleting..." : "Yes, delete shop"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
