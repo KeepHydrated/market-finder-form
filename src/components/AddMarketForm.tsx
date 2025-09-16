@@ -212,12 +212,18 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
               }}
               onPlaceSelected={(place) => {
                 console.log('Place selected:', place);
+                console.log('Setting form data with place info');
                 setFormData(prev => ({
                   ...prev,
                   address: place.address || '',
                   city: place.city || '',
                   state: place.state || ''
                 }));
+                console.log('Form data updated with:', {
+                  address: place.address || '',
+                  city: place.city || '',
+                  state: place.state || ''
+                });
               }}
               onGooglePlacesActiveChange={setIsGooglePlacesActive}
               placeholder="Start typing an address..."

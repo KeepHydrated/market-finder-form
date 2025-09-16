@@ -78,6 +78,7 @@ export const AddressAutocomplete = ({
 
           // Add event listeners
           placeAutocomplete.addEventListener('gmp-placeselect', (event: any) => {
+            console.log('=== GOOGLE PLACES SELECTION EVENT FIRED ===');
             const place = event.detail.place;
             console.log('Place selected event:', place);
             
@@ -106,11 +107,15 @@ export const AddressAutocomplete = ({
               
               const fullAddress = `${streetNumber} ${streetName}`.trim();
               console.log('Full address extracted:', fullAddress);
+              console.log('City extracted:', city);
+              console.log('State extracted:', state);
               
               // Update the form immediately
               onChange(fullAddress);
+              console.log('Called onChange with:', fullAddress);
               
               if (onPlaceSelected) {
+                console.log('Calling onPlaceSelected with place data');
                 onPlaceSelected({
                   address: fullAddress,
                   city,
@@ -130,6 +135,8 @@ export const AddressAutocomplete = ({
                   state: ''
                 });
               }
+            } else {
+              console.log('No valid place data found:', place);
             }
           });
 
