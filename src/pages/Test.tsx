@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, MapPin, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { AddressAutocomplete } from '@/components/AddressAutocomplete';
@@ -28,9 +29,17 @@ export default function Test() {
   // Add Market Form State
   const [marketName, setMarketName] = useState('');
   const [marketAddress, setMarketAddress] = useState('');
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [selectedDays, setSelectedDays] = useState<Array<{
+    day: string;
+    startHour: string;
+    startPeriod: string;
+    endHour: string;
+    endPeriod: string;
+  }>>([]);
 
   const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const hours = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+  const periods = ['AM', 'PM'];
 
   // Fetch all markets on component mount
   useEffect(() => {
@@ -86,11 +95,28 @@ export default function Test() {
   };
 
   const handleDayToggle = (day: string) => {
-    setSelectedDays(prev => 
-      prev.includes(day) 
-        ? prev.filter(d => d !== day)
-        : [...prev, day]
-    );
+    setSelectedDays(prev => {
+      const existingDay = prev.find(d => d.day === day);
+      if (existingDay) {
+        // Remove the day
+        return prev.filter(d => d.day !== day);
+      } else {
+        // Add the day with default times
+        return [...prev, {
+          day,
+          startHour: '08',
+          startPeriod: 'AM',
+          endHour: '02',
+          endPeriod: 'PM'
+        }];
+      }
+    });
+  };
+
+  const updateDayTime = (day: string, field: 'startHour' | 'startPeriod' | 'endHour' | 'endPeriod', value: string) => {
+    setSelectedDays(prev => prev.map(d => 
+      d.day === day ? { ...d, [field]: value } : d
+    ));
   };
 
   const handleAddMarket = () => {
@@ -243,25 +269,91 @@ export default function Test() {
                   />
                 </div>
                 
-                {/* Days Open */}
-                <div className="space-y-3">
-                  <Label className="text-base font-medium">
-                    Days Open *
-                  </Label>
-                  <div className="flex flex-wrap gap-3">
-                    {daysOfWeek.map((day) => (
-                      <Button
-                        key={day}
-                        type="button"
-                        variant={selectedDays.includes(day) ? "default" : "outline"}
-                        onClick={() => handleDayToggle(day)}
-                        className="min-w-[60px] px-4 py-2"
-                      >
-                        {day}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
+                 {/* Days Open */}
+                 <div className="space-y-3">
+                   <Label className="text-base font-medium">
+                     Days Open *
+                   </Label>
+                   <div className="flex flex-wrap gap-3">
+                     {daysOfWeek.map((day) => (
+                       <Button
+                         key={day}
+                         type="button"
+                         variant={selectedDays.some(d => d.day === day) ? "default" : "outline"}
+                         onClick={() => handleDayToggle(day)}
+                         className="min-w-[60px] px-4 py-2"
+                       >
+                         {day}
+                       </Button>
+                     ))}
+                   </div>
+                   
+                   {/* Time pickers for selected days */}
+                   {selectedDays.length > 0 && (
+                     <div className="space-y-4 mt-4">
+                       {selectedDays.map((dayObj) => (
+                         <div key={dayObj.day} className="flex items-center gap-4">
+                           <div className="min-w-[80px] font-medium text-sm">
+                             {dayObj.day === 'Mon' ? 'Monday' : 
+                              dayObj.day === 'Tue' ? 'Tuesday' :
+                              dayObj.day === 'Wed' ? 'Wednesday' :
+                              dayObj.day === 'Thu' ? 'Thursday' :
+                              dayObj.day === 'Fri' ? 'Friday' :
+                              dayObj.day === 'Sat' ? 'Saturday' : 'Sunday'}
+                           </div>
+                           
+                           {/* Start time */}
+                           <Select value={dayObj.startHour} onValueChange={(value) => updateDayTime(dayObj.day, 'startHour', value)}>
+                             <SelectTrigger className="w-20">
+                               <SelectValue />
+                             </SelectTrigger>
+                             <SelectContent>
+                               {hours.map(hour => (
+                                 <SelectItem key={hour} value={hour}>{hour}</SelectItem>
+                               ))}
+                             </SelectContent>
+                           </Select>
+                           
+                           <Select value={dayObj.startPeriod} onValueChange={(value) => updateDayTime(dayObj.day, 'startPeriod', value)}>
+                             <SelectTrigger className="w-16">
+                               <SelectValue />
+                             </SelectTrigger>
+                             <SelectContent>
+                               {periods.map(period => (
+                                 <SelectItem key={period} value={period}>{period}</SelectItem>
+                               ))}
+                             </SelectContent>
+                           </Select>
+                           
+                           <span className="text-muted-foreground">to</span>
+                           
+                           {/* End time */}
+                           <Select value={dayObj.endHour} onValueChange={(value) => updateDayTime(dayObj.day, 'endHour', value)}>
+                             <SelectTrigger className="w-20">
+                               <SelectValue />
+                             </SelectTrigger>
+                             <SelectContent>
+                               {hours.map(hour => (
+                                 <SelectItem key={hour} value={hour}>{hour}</SelectItem>
+                               ))}
+                             </SelectContent>
+                           </Select>
+                           
+                           <Select value={dayObj.endPeriod} onValueChange={(value) => updateDayTime(dayObj.day, 'endPeriod', value)}>
+                             <SelectTrigger className="w-16">
+                               <SelectValue />
+                             </SelectTrigger>
+                             <SelectContent>
+                               {periods.map(period => (
+                                 <SelectItem key={period} value={period}>{period}</SelectItem>
+                               ))}
+                             </SelectContent>
+                           </Select>
+                         </div>
+                       ))}
+                     </div>
+                   )}
+                 </div>
                 
                 {/* Action Buttons */}
                 <div className="flex gap-3 pt-6">
