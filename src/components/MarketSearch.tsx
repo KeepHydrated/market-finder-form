@@ -86,6 +86,7 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
     onSearchTermChange(market.name);
     setIsOpen(false);
     setSelectedIndex(-1);
+    onSelectMarket(market);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

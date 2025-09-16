@@ -11,53 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus } from "lucide-react";
 
-const sampleMarkets = [
-  {
-    id: 1,
-    name: "Downtown Farmers Market",
-    address: "123 Main Street",
-    city: "Springfield",
-    state: "IL",
-    days: ["Wed", "Sat"],
-    hours: "8:00 AM - 2:00 PM"
-  },
-  {
-    id: 2,
-    name: "Riverside Community Market", 
-    address: "456 River Road",
-    city: "Madison",
-    state: "WI",
-    days: ["Thu", "Sun"],
-    hours: "9:00 AM - 3:00 PM"
-  },
-  {
-    id: 3,
-    name: "Sunset Valley Market",
-    address: "789 Valley Ave",
-    city: "Portland", 
-    state: "OR",
-    days: ["Fri", "Sat", "Sun"],
-    hours: "7:00 AM - 1:00 PM"
-  },
-  {
-    id: 4,
-    name: "Green Hills Market",
-    address: "321 Oak Street",
-    city: "Austin",
-    state: "TX", 
-    days: ["Sat"],
-    hours: "8:00 AM - 2:00 PM"
-  },
-  {
-    id: 5,
-    name: "Valley Fresh Market",
-    address: "654 Pine Avenue",
-    city: "Denver",
-    state: "CO",
-    days: ["Wed", "Fri", "Sat"],
-    hours: "9:00 AM - 4:00 PM"
-  }
-];
 
 interface Market {
   id: number;
@@ -83,6 +36,7 @@ interface SubmitContentProps {
 
 export const SubmitContent = ({ user }: SubmitContentProps) => {
   const { toast } = useToast();
+  const [markets, setMarkets] = useState<Market[]>([]);
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAddProductForm, setShowAddProductForm] = useState(false);
@@ -118,10 +72,26 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
     }
   }, []);
 
+  // Load markets from database
+  const loadMarkets = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('markets')
+        .select('*')
+        .order('name');
+      
+      if (error) throw error;
+      setMarkets(data || []);
+    } catch (error) {
+      console.error('Error loading markets:', error);
+    }
+  }, []);
+
   // Load products once on mount
   useEffect(() => {
     loadProducts();
-  }, [loadProducts]);
+    loadMarkets();
+  }, [loadProducts, loadMarkets]);
 
   // Save products when they change
   useEffect(() => {
@@ -163,7 +133,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
                             marketData.days ? [marketData.days] : [];
       
       // Insert market into database
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('markets')
         .insert({
           name: marketData.name,
@@ -172,21 +142,34 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
           state: state || 'Unknown',
           days: normalizedDays,
           hours: marketData.hours || null
-        });
+        })
+        .select()
+        .single();
 
       if (error) {
         throw error;
       }
 
-      // Update local state only on successful insertion
+      // Add new market to local state
+      const newMarket: Market = {
+        id: data.id,
+        name: data.name,
+        address: data.address,
+        city: data.city,
+        state: data.state,
+        days: data.days,
+        hours: data.hours || ''
+      };
+      
+      setMarkets(prev => [...prev, newMarket]);
       setSearchTerm(marketData.name);
       setSubmittedMarketName(marketData.name);
       setCustomMarketData(marketData);
       setShowAddForm(false);
       
       toast({
-        title: "Market Added",
-        description: "Your market has been successfully added to the database.",
+        title: "Market Created Successfully",
+        description: "Your market has been added and is now available in the list.",
       });
 
     } catch (error: any) {
@@ -326,7 +309,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
       )}
 
       <MarketSearch 
-        markets={sampleMarkets}
+        markets={markets}
         onSelectMarket={handleSelectMarket}
         onAddMarket={handleAddMarket}
         searchTerm={searchTerm}
