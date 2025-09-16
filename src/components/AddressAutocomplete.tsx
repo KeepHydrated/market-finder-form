@@ -31,6 +31,8 @@ export const AddressAutocomplete = ({
 }: AddressAutocompleteProps) => {
   const elementRef = useRef<HTMLElement | null>(null);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastKnownValueRef = useRef<string>('');
+  const disablePollingUntilRef = useRef<number>(0);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -91,6 +93,19 @@ export const AddressAutocomplete = ({
             const selectedAddress = place.formattedAddress || place.displayName || '';
             console.log('Selected address to use:', selectedAddress);
             
+            // Update the internal tracking immediately to prevent polling conflicts
+            lastKnownValueRef.current = selectedAddress;
+            
+            // Disable polling for 1 second to prevent interference
+            disablePollingUntilRef.current = Date.now() + 1000;
+            console.log('🚫 Polling disabled until:', new Date(disablePollingUntilRef.current));
+            
+            // Update the input element value immediately to stay in sync
+            const inputElement = placeAutocomplete.querySelector('input');
+            if (inputElement) {
+              inputElement.value = selectedAddress;
+            }
+            
             // Update immediately
             onChange(selectedAddress);
             console.log('Called onChange with address:', selectedAddress);
@@ -140,11 +155,27 @@ export const AddressAutocomplete = ({
 
           // Add a polling mechanism to continuously check for input changes
           const pollForChanges = () => {
+            // Check if polling is temporarily disabled
+            if (Date.now() < disablePollingUntilRef.current) {
+              console.log('⏸️ Polling temporarily disabled to prevent conflicts');
+              return;
+            }
+            
             const inputElement = placeAutocomplete.querySelector('input');
             if (inputElement) {
               const currentValue = inputElement.value || '';
-              if (currentValue !== value) {
-                console.log('Polling detected change:', currentValue);
+              
+              // Only trigger onChange if the value actually changed from our last known value
+              if (currentValue !== lastKnownValueRef.current) {
+                console.log('📊 Polling detected real change:');
+                console.log('  - Current input value:', `"${currentValue}"`);
+                console.log('  - Last known value:', `"${lastKnownValueRef.current}"`);
+                console.log('  - Prop value:', `"${value}"`);
+                
+                // Update our tracking
+                lastKnownValueRef.current = currentValue;
+                
+                // Call onChange
                 onChange(currentValue);
               }
             }
@@ -283,7 +314,14 @@ export const AddressAutocomplete = ({
   useEffect(() => {
     if (elementRef.current && (elementRef.current as any).value !== value) {
       (elementRef.current as any).value = value;
+      // Also update the input element if it exists
+      const inputElement = (elementRef.current as any).querySelector('input');
+      if (inputElement) {
+        inputElement.value = value;
+      }
     }
+    // Update our internal tracking when the prop changes
+    lastKnownValueRef.current = value;
   }, [value]);
 
   return (
