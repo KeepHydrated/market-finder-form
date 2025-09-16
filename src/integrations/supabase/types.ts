@@ -236,6 +236,7 @@ export type Database = {
           store_name: string
           updated_at: string
           user_id: string
+          vacation_mode: boolean | null
           website: string | null
         }
         Insert: {
@@ -253,6 +254,7 @@ export type Database = {
           store_name: string
           updated_at?: string
           user_id: string
+          vacation_mode?: boolean | null
           website?: string | null
         }
         Update: {
@@ -270,6 +272,7 @@ export type Database = {
           store_name?: string
           updated_at?: string
           user_id?: string
+          vacation_mode?: boolean | null
           website?: string | null
         }
         Relationships: []

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -32,6 +33,7 @@ interface ShopData {
   market_days?: string[];
   market_hours?: any; // Changed from Record to any for flexibility
   status: string;
+  vacation_mode?: boolean;
 }
 
 interface Order {
@@ -78,6 +80,7 @@ export default function ShopManager() {
   const [marketSearchTerm, setMarketSearchTerm] = useState('');
   const [showAddMarket, setShowAddMarket] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [vacationMode, setVacationMode] = useState(false);
 
   // Check for public access via URL parameter
   const isPublicAccess = new URLSearchParams(window.location.search).get('demo') === 'true';
@@ -137,6 +140,7 @@ export default function ShopManager() {
           description: parsedData.description || '',
         });
         setMarketSearchTerm(parsedData.search_term || '');
+        setVacationMode(parsedData.vacation_mode ?? false);
       }
     } catch (error) {
       console.error('Error fetching shop data:', error);
@@ -183,7 +187,8 @@ export default function ShopManager() {
       market_address: '123 Main St, Downtown',
       market_days: ['Saturday', 'Sunday'],
       market_hours: { saturday: '8AM-2PM', sunday: '9AM-1PM' },
-      status: 'accepted'
+      status: 'accepted',
+      vacation_mode: false
     };
 
     const demoOrders: Order[] = [
@@ -234,6 +239,7 @@ export default function ShopManager() {
       description: demoShop.description,
     });
     setMarketSearchTerm(demoShop.search_term);
+    setVacationMode(demoShop.vacation_mode || false);
     setLoadingShop(false);
     setLoadingOrders(false);
   };
@@ -500,6 +506,39 @@ export default function ShopManager() {
       });
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleVacationModeToggle = async (enabled: boolean) => {
+    if (!user || !shopData || isPublicAccess) return;
+
+    try {
+      const { error } = await supabase
+        .from('submissions')
+        .update({
+          vacation_mode: enabled,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', shopData.id);
+
+      if (error) throw error;
+
+      setVacationMode(enabled);
+      setShopData(prev => prev ? { ...prev, vacation_mode: enabled } : null);
+
+      toast({
+        title: enabled ? "Vacation Mode Enabled" : "Vacation Mode Disabled",
+        description: enabled 
+          ? "Your shop is now marked as on vacation and won't appear in search results." 
+          : "Your shop is now active and visible to customers.",
+      });
+    } catch (error: any) {
+      console.error('Error updating vacation mode:', error);
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update vacation mode.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -841,6 +880,29 @@ export default function ShopManager() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Store Settings</h3>
+                    
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="space-y-1">
+                        <div className="font-medium">Vacation Mode</div>
+                        <p className="text-sm text-muted-foreground">
+                          {vacationMode 
+                            ? "Your store is currently on vacation and hidden from customers" 
+                            : "Your store is active and visible to customers"
+                          }
+                        </p>
+                      </div>
+                      <Switch
+                        checked={vacationMode}
+                        onCheckedChange={handleVacationModeToggle}
+                        disabled={isPublicAccess}
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <Separator />
 
                 {!isPublicAccess && (
