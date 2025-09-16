@@ -79,6 +79,7 @@ export const AddressAutocomplete = ({
           // Add event listeners
           placeAutocomplete.addEventListener('gmp-placeselect', (event: any) => {
             const place = event.detail.place;
+            console.log('Place selected event:', place);
             
             if (place && place.addressComponents) {
               let streetNumber = '';
@@ -104,7 +105,9 @@ export const AddressAutocomplete = ({
               });
               
               const fullAddress = `${streetNumber} ${streetName}`.trim();
+              console.log('Full address extracted:', fullAddress);
               
+              // Update the form immediately
               onChange(fullAddress);
               
               if (onPlaceSelected) {
@@ -112,6 +115,19 @@ export const AddressAutocomplete = ({
                   address: fullAddress,
                   city,
                   state
+                });
+              }
+            } else if (place && place.displayName) {
+              // Fallback: use display name if address components aren't available
+              const displayAddress = place.displayName;
+              console.log('Using display name as address:', displayAddress);
+              onChange(displayAddress);
+              
+              if (onPlaceSelected) {
+                onPlaceSelected({
+                  address: displayAddress,
+                  city: '',
+                  state: ''
                 });
               }
             }
