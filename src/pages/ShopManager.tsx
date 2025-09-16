@@ -916,46 +916,6 @@ export default function ShopManager() {
                     <Separator className="mb-4" />
                         <div className="space-y-4">
                           <div>
-                            <h3 className="text-lg font-semibold text-destructive">Delete Shop</h3>
-                            <p className="text-sm text-muted-foreground">
-                              Delete your shop and all associated products and orders.
-                            </p>
-                          </div>
-                          
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button 
-                                variant="destructive" 
-                                className="w-fit"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete Shop
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete Shop</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently delete your shop 
-                                  "{shopData.store_name}" and remove all of your products, orders, and shop data from our servers.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction 
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                  onClick={handleDeleteShop}
-                                  disabled={isDeleting}
-                                >
-                                  {isDeleting ? "Deleting..." : "Yes, delete shop"}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-
-                        <div className="space-y-4">
-                          <div>
                             <h3 className="text-lg font-semibold text-destructive">Delete Account</h3>
                             <p className="text-sm text-muted-foreground">
                               Permanently delete your entire account, including all shops, products, and personal data.
