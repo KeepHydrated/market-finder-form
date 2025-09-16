@@ -112,6 +112,49 @@ export const AddressAutocomplete = ({
                   border: none !important;
                   cursor: pointer !important;
                 }
+
+                /* Style the dropdown/suggestions container */
+                .dropdown {
+                  background-color: white !important;
+                  border: 1px solid #d1d5db !important;
+                  border-radius: 6px !important;
+                  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+                  overflow: hidden !important;
+                }
+
+                /* Style individual prediction items */
+                .prediction {
+                  background-color: white !important;
+                  color: black !important;
+                  border-bottom: 1px solid #f3f4f6 !important;
+                  padding: 12px 16px !important;
+                  cursor: pointer !important;
+                }
+
+                .prediction:hover {
+                  background-color: #f9fafb !important;
+                }
+
+                .prediction:last-child {
+                  border-bottom: none !important;
+                }
+
+                /* Style the prediction text */
+                .prediction .main-text {
+                  color: black !important;
+                  font-weight: 500 !important;
+                }
+
+                .prediction .secondary-text {
+                  color: #6b7280 !important;
+                  font-size: 14px !important;
+                }
+
+                /* Additional fallback styles for any dark elements */
+                [class*="dark"], [class*="black"] {
+                  background-color: white !important;
+                  color: black !important;
+                }
               `;
 
               shadow.appendChild(style);
