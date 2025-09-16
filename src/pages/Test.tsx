@@ -122,11 +122,6 @@ export default function Test() {
                                   <p className="text-sm text-muted-foreground">
                                     {market.address}, {market.city}, {market.state}
                                   </p>
-                                  {market.days && market.days.length > 0 && (
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                      Open: {market.days.join(', ')}
-                                    </p>
-                                  )}
                                 </div>
                               </div>
                             </div>
