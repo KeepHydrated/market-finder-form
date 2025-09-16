@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Search, MapPin, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { AddressAutocomplete } from '@/components/AddressAutocomplete';
 
 interface Market {
   id: number;
@@ -229,26 +230,17 @@ export default function Test() {
                   <Label htmlFor="market-address" className="text-base font-medium">
                     Address *
                   </Label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
-                      id="market-address"
-                      value={marketAddress}
-                      onChange={(e) => setMarketAddress(e.target.value)}
-                      className="pl-10 pr-10 text-base py-3"
-                    />
-                    {marketAddress && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setMarketAddress('')}
-                        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
+                  <AddressAutocomplete
+                    value={marketAddress}
+                    onChange={setMarketAddress}
+                    onPlaceSelected={(place) => {
+                      if (place.address) {
+                        setMarketAddress(place.address);
+                      }
+                    }}
+                    placeholder="Enter market address..."
+                    className="text-base py-3"
+                  />
                 </div>
                 
                 {/* Days Open */}
