@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Label } from '../components/ui/label';
 import { Input } from '../components/ui/input';
 import { useToast } from '../hooks/use-toast';
+import { supabase } from '../integrations/supabase/client';
+import { useAuth } from '../hooks/useAuth';
 
 export default function PlacesDemo() {
   const [selectedAddress, setSelectedAddress] = useState('');
@@ -14,7 +16,9 @@ export default function PlacesDemo() {
     city: string;
     state: string;
   } | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handlePlaceSelected = (place: { address: string; city: string; state: string }) => {
     console.log('Place selected:', place);
@@ -23,6 +27,70 @@ export default function PlacesDemo() {
       title: "Place Selected!",
       description: `Selected: ${place.address}`,
     });
+  };
+
+  const handleSave = async () => {
+    if (!selectedPlace) {
+      toast({
+        title: "Error",
+        description: "No place selected to save",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to save places",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const { data, error } = await supabase
+        .from('markets')
+        .insert({
+          name: `Location at ${selectedPlace.city}`,
+          address: selectedPlace.address,
+          city: selectedPlace.city,
+          state: selectedPlace.state,
+          days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] // Default days
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error saving place:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save the place. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log('Place saved successfully:', data);
+      toast({
+        title: "Success!",
+        description: `Saved "${selectedPlace.address}" to your locations`,
+      });
+
+      // Clear the form after successful save
+      handleClear();
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleClear = () => {
@@ -115,6 +183,22 @@ export default function PlacesDemo() {
                         <span className="font-medium">State:</span>
                         <p className="text-green-700">{selectedPlace.state}</p>
                       </div>
+                    </div>
+                    
+                    {/* Save Button */}
+                    <div className="mt-4 pt-3 border-t border-green-200">
+                      <Button 
+                        onClick={handleSave}
+                        disabled={isSaving || !user}
+                        className="w-full"
+                      >
+                        {isSaving ? 'Saving...' : 'Save to Database'}
+                      </Button>
+                      {!user && (
+                        <p className="text-xs text-green-600 mt-2 text-center">
+                          Please log in to save places
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
