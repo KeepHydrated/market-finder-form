@@ -452,9 +452,21 @@ export default function ShopManager() {
   const handleAddMarket = async (marketData: any) => {
     console.log('handleAddMarket called with:', marketData);
     try {
+      // Format the hours object as JSON string for database storage
+      const formattedMarketData = {
+        name: marketData.name,
+        address: marketData.address,
+        city: marketData.city || '',
+        state: marketData.state || '',
+        days: marketData.days,
+        hours: JSON.stringify(marketData.hours)
+      };
+
+      console.log('Formatted market data:', formattedMarketData);
+
       const { data, error } = await supabase
         .from('markets')
-        .insert([marketData])
+        .insert([formattedMarketData])
         .select()
         .single();
 
