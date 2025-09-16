@@ -30,6 +30,7 @@ export const AddressAutocomplete = ({
   required
 }: AddressAutocompleteProps) => {
   const elementRef = useRef<HTMLElement | null>(null);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -149,8 +150,16 @@ export const AddressAutocomplete = ({
             }
           };
 
+          // Clear any existing interval before creating a new one
+          if (pollIntervalRef.current) {
+            clearInterval(pollIntervalRef.current);
+          }
+
           // Poll every 200ms for changes
           const pollInterval = setInterval(pollForChanges, 200);
+
+          // Store the interval reference for cleanup
+          pollIntervalRef.current = pollInterval;
 
           // Listen to multiple input events
           placeAutocomplete.addEventListener('input', handleInputChange);
@@ -175,7 +184,7 @@ export const AddressAutocomplete = ({
           setTimeout(checkForInnerInput, 500);
 
           // Store the interval reference for cleanup
-          (elementRef.current as any).pollInterval = pollInterval;
+          pollIntervalRef.current = pollInterval;
 
           // Handle focus/blur for modal compatibility
           placeAutocomplete.addEventListener('focus', () => {
@@ -263,8 +272,9 @@ export const AddressAutocomplete = ({
   // Cleanup function to clear polling interval
   useEffect(() => {
     return () => {
-      if (elementRef.current && (elementRef.current as any).pollInterval) {
-        clearInterval((elementRef.current as any).pollInterval);
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
       }
     };
   }, []);
