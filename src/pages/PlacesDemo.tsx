@@ -158,6 +158,39 @@ export default function PlacesDemo() {
                 Clear All
               </Button>
               
+              {/* Convert input to place button */}
+              <Button 
+                onClick={() => {
+                  // Try to get text from the Google Places input
+                  const googleInput = document.querySelector('gmp-place-autocomplete input') as HTMLInputElement;
+                  const inputText = googleInput?.value || selectedAddress || manualAddress;
+                  
+                  if (!inputText || !inputText.trim()) {
+                    toast({
+                      title: "No Input",
+                      description: "Please type something in the address fields first",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  
+                  const parts = inputText.split(', ');
+                  const mockPlace = {
+                    address: inputText,
+                    city: parts.length > 1 ? parts[parts.length - 2] : 'Unknown',
+                    state: parts.length > 0 ? parts[parts.length - 1] : 'Unknown'
+                  };
+                  setSelectedPlace(mockPlace);
+                  toast({
+                    title: "Address Converted!",
+                    description: `Created place from: ${inputText}`,
+                  });
+                }}
+                className="w-full"
+              >
+                Create Place from Current Input
+              </Button>
+              
               {/* Temporary save button for manual input */}
               {(selectedAddress || manualAddress) && !selectedPlace && (
                 <Button 
