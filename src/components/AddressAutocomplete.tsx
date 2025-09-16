@@ -120,21 +120,11 @@ export const AddressAutocomplete = ({
           // Handle input changes
           placeAutocomplete.addEventListener('input', (event: any) => {
             console.log('Raw input event:', event);
-            console.log('Event target:', event.target);
-            console.log('Event target value:', event.target.value);
             
-            let inputValue = event.target.value;
+            // For gmp-place-autocomplete, the value is stored directly on the element
+            let inputValue = placeAutocomplete.value || event.target.textContent || '';
             
-            // Handle case where Google Places returns an object
-            if (inputValue && typeof inputValue === 'object') {
-              if (inputValue.value !== undefined) {
-                inputValue = inputValue.value;
-              } else if (inputValue._type === 'undefined') {
-                inputValue = '';
-              } else {
-                inputValue = String(inputValue);
-              }
-            }
+            console.log('Input value from element:', inputValue);
             
             // Ensure we always pass a string
             const stringValue = typeof inputValue === 'string' ? inputValue : String(inputValue || '');
