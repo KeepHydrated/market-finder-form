@@ -364,12 +364,17 @@ export default function Test() {
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">OR Google Places Autocomplete:</Label>
                     <AddressAutocomplete
-                      value=""
+                      value={marketAddress}
                       onChange={(value) => {
                         console.log('📍 AddressAutocomplete onChange called with:', `"${value}"`);
-                        if (value && value.trim()) {
-                          setMarketAddress(value);
-                          console.log('📍 marketAddress state updated to:', `"${value}"`);
+                        setMarketAddress(value || '');
+                        console.log('📍 marketAddress state updated to:', `"${value || ''}"`);
+                      }}
+                      onPlaceSelected={(place) => {
+                        console.log('📍 Place selected:', place);
+                        if (place && place.address) {
+                          setMarketAddress(place.address);
+                          console.log('📍 marketAddress set to address:', place.address);
                         }
                       }}
                       placeholder="Start typing an address..."
