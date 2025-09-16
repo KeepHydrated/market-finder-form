@@ -107,36 +107,34 @@ export const AddressAutocomplete = ({
           });
 
           // Handle input changes - multiple event types for Google Places
-          const handleInputChange = () => {
-            // Try multiple ways to get the current input value
-            const inputElement = placeAutocomplete.querySelector('input');
+          const handleInputChange = (event?: Event) => {
             let inputValue = '';
             
-            if (inputElement) {
-              inputValue = inputElement.value || '';
-              console.log('Got value from input element:', inputValue);
-            } else {
+            // Try to get value from the event target first
+            if (event && event.target) {
+              inputValue = (event.target as HTMLInputElement).value || '';
+              console.log('Got value from event target:', inputValue);
+            }
+            
+            // If no value from event, try the input element
+            if (!inputValue) {
+              const inputElement = placeAutocomplete.querySelector('input');
+              if (inputElement) {
+                inputValue = inputElement.value || '';
+                console.log('Got value from input element:', inputValue);
+              }
+            }
+            
+            // If still no value, try the autocomplete element itself
+            if (!inputValue) {
               inputValue = placeAutocomplete.value || '';
               console.log('Got value from placeAutocomplete:', inputValue);
             }
             
-            // Also try getting the inner text content
-            if (!inputValue) {
-              const textContent = placeAutocomplete.textContent || '';
-              console.log('Trying textContent:', textContent);
-              inputValue = textContent;
-            }
-            
             console.log('Final input value captured:', inputValue);
             
-            // Ensure we always pass a string
-            const stringValue = typeof inputValue === 'string' ? inputValue : String(inputValue || '');
-            console.log('Final string value being sent:', stringValue);
-            
-            // Only update if we have a value
-            if (stringValue && stringValue.trim()) {
-              onChange(stringValue);
-            }
+            // Always call onChange with the current value, even if empty
+            onChange(inputValue);
           };
 
           // Listen to multiple input events
@@ -151,13 +149,15 @@ export const AddressAutocomplete = ({
               inputElement.addEventListener('input', handleInputChange);
               inputElement.addEventListener('keyup', handleInputChange);
               inputElement.addEventListener('change', handleInputChange);
+              console.log('✅ Added event listeners to inner input element');
             } else {
               // If input doesn't exist yet, try again shortly
               setTimeout(checkForInnerInput, 100);
             }
           };
           
-          checkForInnerInput();
+          // Wait a bit for the element to fully initialize
+          setTimeout(checkForInnerInput, 500);
 
           // Handle focus/blur for modal compatibility
           placeAutocomplete.addEventListener('focus', () => {
