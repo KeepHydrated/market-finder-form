@@ -96,43 +96,75 @@ export default function Test() {
             
             {/* Search Results Dropdown */}
             {showResults && (
-              <Card className="absolute top-full left-0 right-0 z-50 mt-2 max-h-96 overflow-y-auto">
+              <Card className="absolute top-full left-0 right-0 z-50 mt-2 shadow-lg border">
                 <CardContent className="p-0">
                   {isLoading ? (
                     <div className="p-4 text-center text-muted-foreground">
                       Loading markets...
                     </div>
-                  ) : filteredMarkets.length > 0 ? (
-                    <div className="divide-y">
-                      {filteredMarkets.map((market) => (
-                        <div
-                          key={market.id}
-                          onClick={() => handleMarketSelect(market)}
-                          className="p-4 hover:bg-muted cursor-pointer transition-colors"
-                        >
-                          <div className="flex items-start space-x-3">
-                            <MapPin className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-medium text-foreground truncate">
-                                {market.name}
-                              </h3>
-                              <p className="text-sm text-muted-foreground">
-                                {market.address}, {market.city}, {market.state}
-                              </p>
-                              {market.days && market.days.length > 0 && (
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  Open: {market.days.join(', ')}
-                                </p>
-                              )}
+                  ) : (
+                    <>
+                      {/* Search Results */}
+                      {filteredMarkets.length > 0 && (
+                        <div className="max-h-72 overflow-y-auto divide-y">
+                          {filteredMarkets.map((market) => (
+                            <div
+                              key={market.id}
+                              onClick={() => handleMarketSelect(market)}
+                              className="p-4 hover:bg-muted cursor-pointer transition-colors"
+                            >
+                              <div className="flex items-start space-x-3">
+                                <MapPin className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-medium text-foreground truncate">
+                                    {market.name}
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground">
+                                    {market.address}, {market.city}, {market.state}
+                                  </p>
+                                  {market.days && market.days.length > 0 && (
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      Open: {market.days.join(', ')}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
                             </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* No Results Message */}
+                      {filteredMarkets.length === 0 && (
+                        <div className="p-4 text-center text-muted-foreground">
+                          No markets found matching "{searchTerm}"
+                        </div>
+                      )}
+                      
+                      {/* Always Visible Add Market Option */}
+                      <div className="border-t bg-muted/30">
+                        <div
+                          onClick={() => {
+                            console.log('Add new market clicked');
+                            setShowResults(false);
+                            // TODO: Open add market modal
+                          }}
+                          className="p-4 hover:bg-muted cursor-pointer transition-colors flex items-center space-x-3"
+                        >
+                          <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                            <span className="text-primary-foreground text-xs font-bold">+</span>
+                          </div>
+                          <div>
+                            <h3 className="font-medium text-foreground">
+                              Add Market
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              Don't see your market? Add it here
+                            </p>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-4 text-center text-muted-foreground">
-                      No markets found matching "{searchTerm}"
-                    </div>
+                      </div>
+                    </>
                   )}
                 </CardContent>
               </Card>
