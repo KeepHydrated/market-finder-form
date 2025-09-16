@@ -68,19 +68,32 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
     e.preventDefault();
     
     console.log('Form submitted with data:', formData);
+    console.log('Address type:', typeof formData.address);
+    console.log('Address value:', formData.address);
+    
+    // Ensure address is a string
+    const addressString = typeof formData.address === 'string' ? formData.address : '';
+    
     console.log('Validation check:', { 
       hasName: !!formData.name, 
-      hasAddress: !!formData.address && typeof formData.address === 'string', 
+      hasAddress: !!addressString, 
       hasDays: formData.days.length > 0 
     });
     
-    if (!formData.name || !formData.address || typeof formData.address !== 'string' || formData.days.length === 0) {
+    if (!formData.name || !addressString || formData.days.length === 0) {
       console.log('Form validation failed, not submitting');
       return;
     }
 
     console.log('Form validation passed, calling onMarketAdded');
-    onMarketAdded(formData);
+    
+    // Create clean form data with string address
+    const cleanFormData = {
+      ...formData,
+      address: addressString
+    };
+    
+    onMarketAdded(cleanFormData);
     setFormData({
       name: '',
       address: '',
@@ -179,10 +192,15 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
             <Label htmlFor="address-google">Address *</Label>
             <AddressAutocomplete
               id="address-google"
-              value={formData.address}
+              value={typeof formData.address === 'string' ? formData.address : ''}
               onChange={(address) => {
-                console.log('Address changed:', address);
-                setFormData(prev => ({ ...prev, address: address || '' }));
+                console.log('Address onChange called with:', address, 'Type:', typeof address);
+                if (typeof address === 'string') {
+                  setFormData(prev => ({ ...prev, address }));
+                } else {
+                  console.warn('Received non-string address:', address);
+                  setFormData(prev => ({ ...prev, address: '' }));
+                }
               }}
               onPlaceSelected={(place) => {
                 console.log('Place selected:', place);
