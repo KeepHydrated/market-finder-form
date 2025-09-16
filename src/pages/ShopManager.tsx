@@ -880,25 +880,21 @@ export default function ShopManager() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="space-y-1">
-                        <div className="font-medium">Vacation Mode</div>
-                        <p className="text-sm text-muted-foreground">
-                          {vacationMode 
-                            ? "Your store is currently on vacation and hidden from customers" 
-                            : "Your store is active and visible to customers"
-                          }
-                        </p>
-                      </div>
-                      <Switch
-                        checked={vacationMode}
-                        onCheckedChange={handleVacationModeToggle}
-                        disabled={isPublicAccess}
-                      />
-                    </div>
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="space-y-1">
+                    <div className="font-medium">Vacation Mode</div>
+                    <p className="text-sm text-muted-foreground">
+                      {vacationMode 
+                        ? "Your store is currently on vacation and hidden from customers" 
+                        : "Your store is active and visible to customers"
+                      }
+                    </p>
                   </div>
+                  <Switch
+                    checked={vacationMode}
+                    onCheckedChange={handleVacationModeToggle}
+                    disabled={isPublicAccess}
+                  />
                 </div>
 
                 <Separator />
