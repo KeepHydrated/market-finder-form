@@ -152,34 +152,10 @@ export default function PlacesDemo() {
                 <div className="p-3 bg-muted rounded-md text-sm">
                   {selectedAddress || manualAddress || 'No input yet...'}
                 </div>
-                {/* Debug info */}
-                <div className="text-xs text-muted-foreground">
-                  Debug: selectedAddress="{selectedAddress}", manualAddress="{manualAddress}", selectedPlace={selectedPlace ? 'exists' : 'null'}
-                </div>
               </div>
 
               <Button onClick={handleClear} variant="outline" className="w-full">
                 Clear All
-              </Button>
-              
-              {/* Always visible test button */}
-              <Button 
-                onClick={() => {
-                  const testPlace = {
-                    address: "Test Address, Test City, TX",
-                    city: "Test City",
-                    state: "TX"
-                  };
-                  setSelectedPlace(testPlace);
-                  toast({
-                    title: "Test Place Created",
-                    description: "Created a test place for debugging",
-                  });
-                }}
-                variant="destructive" 
-                className="w-full"
-              >
-                TEST: Create Test Place
               </Button>
               
               {/* Temporary save button for manual input */}
