@@ -912,7 +912,7 @@ export default function ShopManager() {
                   />
                 </div>
 
-                {!isPublicAccess && !isEditing && (
+                {!isPublicAccess && (
                   <div className="pt-6">
                     <Separator className="mb-4" />
                         <div className="space-y-4">
