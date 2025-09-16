@@ -841,29 +841,6 @@ export default function ShopManager() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-sm font-medium">Email</Label>
-                    <p className="text-sm text-muted-foreground mt-1">{user?.email}</p>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-sm font-medium">Account Created</Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
-                    </p>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium">Shop Status</Label>
-                    <div className="mt-1">
-                      <Badge variant={shopData?.status === 'accepted' ? 'default' : 'secondary'}>
-                        {shopData?.status || 'No Shop'}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-
                 <Separator />
 
                 {!isPublicAccess && (
