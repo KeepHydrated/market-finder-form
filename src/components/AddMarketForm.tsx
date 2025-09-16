@@ -197,38 +197,58 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address-google">Address *</Label>
-            <AddressAutocomplete
-              id="address-google"
-              value={typeof formData.address === 'string' ? formData.address : ''}
-              onChange={(address) => {
-                console.log('Address onChange called with:', address, 'Type:', typeof address);
-                if (typeof address === 'string') {
-                  setFormData(prev => ({ ...prev, address }));
-                } else {
-                  console.warn('Received non-string address:', address);
-                  setFormData(prev => ({ ...prev, address: '' }));
-                }
-              }}
-              onPlaceSelected={(place) => {
-                console.log('Place selected:', place);
-                console.log('Setting form data with place info');
-                setFormData(prev => ({
-                  ...prev,
-                  address: place.address || '',
-                  city: place.city || '',
-                  state: place.state || ''
-                }));
-                console.log('Form data updated with:', {
-                  address: place.address || '',
-                  city: place.city || '',
-                  state: place.state || ''
-                });
-              }}
-              onGooglePlacesActiveChange={setIsGooglePlacesActive}
-              placeholder="Start typing an address..."
-              required
-            />
+            <Label htmlFor="address-google" className="text-base font-medium">Address *</Label>
+            <p className="text-sm text-muted-foreground mb-2">
+              Option 1: Use Google Places autocomplete below, OR Option 2: Use the manual input
+            </p>
+            
+            {/* Manual address input as backup */}
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Manual Address Entry:</Label>
+              <Input
+                value={typeof formData.address === 'string' ? formData.address : ''}
+                onChange={(e) => {
+                  console.log('📍 Manual address input:', e.target.value);
+                  setFormData(prev => ({ ...prev, address: e.target.value }));
+                }}
+                placeholder="Type full address manually (e.g., Japanese Tea Garden, North Saint Mary's Street, San Antonio, TX)"
+                className="text-base py-3"
+              />
+            </div>
+            
+            {/* Google Places Autocomplete */}
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">OR Google Places Autocomplete:</Label>
+              <AddressAutocomplete
+                id="address-google"
+                value={typeof formData.address === 'string' ? formData.address : ''}
+                onChange={(address) => {
+                  console.log('📍 AddressAutocomplete onChange called with:', `"${address}"`);
+                  setFormData(prev => ({ ...prev, address: address || '' }));
+                }}
+                onPlaceSelected={(place) => {
+                  console.log('📍 Place selected:', place);
+                  if (place && place.address) {
+                    setFormData(prev => ({
+                      ...prev,
+                      address: place.address || '',
+                      city: place.city || '',
+                      state: place.state || ''
+                    }));
+                    console.log('📍 Form data updated with place:', place);
+                  }
+                }}
+                onGooglePlacesActiveChange={setIsGooglePlacesActive}
+                placeholder="Start typing an address..."
+                className="text-base py-3"
+              />
+            </div>
+            
+            {formData.address && (
+              <p className="text-sm text-green-600">
+                ✅ Address entered: {formData.address}
+              </p>
+            )}
           </div>
 
 
