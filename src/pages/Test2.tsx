@@ -124,6 +124,16 @@ export default function Test2() {
                   id="location-search"
                 />
                 
+                {/* Info Box */}
+                <div className="mt-4 p-4 bg-muted/50 border border-border rounded-lg">
+                  <h3 className="font-medium text-foreground mb-2">
+                    Current Input:
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {selectedLocation || 'No location entered yet...'}
+                  </p>
+                </div>
+                
                 {selectedLocation && (
                   <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                     <h3 className="font-medium text-green-800 dark:text-green-200 mb-2">
