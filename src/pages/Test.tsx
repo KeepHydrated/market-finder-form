@@ -343,21 +343,43 @@ export default function Test() {
                     Address *
                   </Label>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Start typing an address, then <strong>click on a suggestion</strong> from the dropdown that appears
+                    Option 1: Use Google Places autocomplete below, OR Option 2: Use the manual input
                   </p>
-                  <AddressAutocomplete
-                    value={marketAddress}
-                    onChange={(value) => {
-                      console.log('📍 AddressAutocomplete onChange called with:', `"${value}"`);
-                      setMarketAddress(value);
-                      console.log('📍 marketAddress state updated to:', `"${value}"`);
-                    }}
-                    placeholder="Start typing an address..."
-                    className="text-base py-3"
-                  />
+                  
+                  {/* Manual address input as backup */}
+                  <div className="space-y-2">
+                    <Label className="text-sm text-muted-foreground">Manual Address Entry:</Label>
+                    <Input
+                      value={marketAddress}
+                      onChange={(e) => {
+                        console.log('📍 Manual address input:', e.target.value);
+                        setMarketAddress(e.target.value);
+                      }}
+                      placeholder="Type full address manually (e.g., Japanese Tea Garden, North Saint Mary's Street, San Antonio, TX)"
+                      className="text-base py-3"
+                    />
+                  </div>
+                  
+                  {/* Google Places Autocomplete */}
+                  <div className="space-y-2">
+                    <Label className="text-sm text-muted-foreground">OR Google Places Autocomplete:</Label>
+                    <AddressAutocomplete
+                      value=""
+                      onChange={(value) => {
+                        console.log('📍 AddressAutocomplete onChange called with:', `"${value}"`);
+                        if (value && value.trim()) {
+                          setMarketAddress(value);
+                          console.log('📍 marketAddress state updated to:', `"${value}"`);
+                        }
+                      }}
+                      placeholder="Start typing an address..."
+                      className="text-base py-3"
+                    />
+                  </div>
+                  
                   {marketAddress && (
                     <p className="text-sm text-green-600">
-                      ✅ Address selected: {marketAddress}
+                      ✅ Address entered: {marketAddress}
                     </p>
                   )}
                 </div>

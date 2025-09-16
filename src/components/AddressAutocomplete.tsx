@@ -114,16 +114,29 @@ export const AddressAutocomplete = ({
             
             if (inputElement) {
               inputValue = inputElement.value || '';
+              console.log('Got value from input element:', inputValue);
             } else {
               inputValue = placeAutocomplete.value || '';
+              console.log('Got value from placeAutocomplete:', inputValue);
             }
             
-            console.log('Input value captured:', inputValue);
+            // Also try getting the inner text content
+            if (!inputValue) {
+              const textContent = placeAutocomplete.textContent || '';
+              console.log('Trying textContent:', textContent);
+              inputValue = textContent;
+            }
+            
+            console.log('Final input value captured:', inputValue);
             
             // Ensure we always pass a string
             const stringValue = typeof inputValue === 'string' ? inputValue : String(inputValue || '');
             console.log('Final string value being sent:', stringValue);
-            onChange(stringValue);
+            
+            // Only update if we have a value
+            if (stringValue && stringValue.trim()) {
+              onChange(stringValue);
+            }
           };
 
           // Listen to multiple input events
