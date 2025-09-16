@@ -4,6 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 
 /// <reference types="google.maps" />
 
+// Extend the Window interface to include our custom property
+declare global {
+  interface Window {
+    gmpShadowPatched?: boolean;
+  }
+}
+
 interface AddressAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
@@ -35,6 +42,87 @@ export const AddressAutocomplete = ({
   useEffect(() => {
     const initializeAutocomplete = async () => {
       try {
+        // Setup Shadow DOM patching before loading Google Maps
+        if (!window.gmpShadowPatched) {
+          const originalAttachShadow = Element.prototype.attachShadow;
+          
+          Element.prototype.attachShadow = function (init) {
+            if (this.localName === "gmp-place-autocomplete") {
+              // Force shadow DOM to be open so we can style it
+              const shadow = originalAttachShadow.call(this, {
+                ...init,
+                mode: "open"
+              });
+
+              const style = document.createElement("style");
+              style.textContent = `
+                /* Style the input container to match desired appearance */
+                .input-container {
+                  border: 1px solid #d1d5db !important;
+                  border-radius: 6px !important;
+                  background-color: white !important;
+                  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+                }
+
+                /* Focus state for the container */
+                .input-container:focus-within {
+                  border-color: #3b82f6 !important;
+                  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+                }
+
+                /* Style the input itself */
+                input {
+                  border: none !important;
+                  outline: none !important;
+                  font-size: 14px !important;
+                  font-family: inherit !important;
+                  line-height: 1.5 !important;
+                  background: transparent !important;
+                  color: black !important;
+                  padding: 8px 12px !important;
+                  padding-left: 40px !important;
+                  padding-right: 40px !important;
+                }
+
+                input::placeholder {
+                  color: #6b7280 !important;
+                }
+
+                /* Hide Google's default focus ring */
+                .focus-ring {
+                  display: none !important;
+                }
+
+                /* Ensure icons stay in correct position */
+                .autocomplete-icon {
+                  position: absolute !important;
+                  left: 12px !important;
+                  top: 50% !important;
+                  transform: translateY(-50%) !important;
+                  z-index: 1 !important;
+                }
+
+                .clear-button {
+                  position: absolute !important;
+                  right: 12px !important;
+                  top: 50% !important;
+                  transform: translateY(-50%) !important;
+                  z-index: 1 !important;
+                  background: none !important;
+                  border: none !important;
+                  cursor: pointer !important;
+                }
+              `;
+
+              shadow.appendChild(style);
+              return shadow;
+            }
+            return originalAttachShadow.call(this, init);
+          };
+
+          window.gmpShadowPatched = true;
+        }
+
         // Fetch API key from edge function
         const { data, error } = await supabase.functions.invoke('get-google-api-key');
         
@@ -132,78 +220,6 @@ export const AddressAutocomplete = ({
               onGooglePlacesActiveChange?.(false);
             }, 100);
           });
-
-          // Apply custom styles directly to the element
-          placeAutocomplete.style.cssText = `
-            width: 100%;
-            --gmp-place-field-background-color: white;
-            --gmp-place-field-color: black;
-            --gmp-place-field-border-color: #d1d5db;
-            --gmp-place-field-focus-border-color: #3b82f6;
-            --gmp-place-field-placeholder-color: #6b7280;
-          `;
-
-          // Apply custom styles
-          const style = document.createElement('style');
-          style.innerHTML = `
-            gmp-place-autocomplete {
-              width: 100%;
-              --gmp-place-field-background-color: white !important;
-              --gmp-place-field-color: black !important;
-              --gmp-place-field-border-color: #d1d5db !important;
-              --gmp-place-field-focus-border-color: #3b82f6 !important;
-              --gmp-place-field-placeholder-color: #6b7280 !important;
-            }
-            gmp-place-autocomplete input {
-              width: 100% !important;
-              padding: 8px 12px !important;
-              border: 1px solid #d1d5db !important;
-              border-radius: 6px !important;
-              background-color: white !important;
-              color: black !important;
-              font-size: 14px !important;
-              line-height: 1.5 !important;
-              transition: border-color 0.2s !important;
-            }
-            gmp-place-autocomplete input:focus {
-              outline: none !important;
-              border-color: #3b82f6 !important;
-              box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-            }
-            gmp-place-autocomplete input::placeholder {
-              color: #6b7280 !important;
-            }
-            /* Additional overrides for Google Places suggestions */
-            .pac-container {
-              background-color: white !important;
-              border: 1px solid #d1d5db !important;
-              border-radius: 6px !important;
-              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-            }
-            .pac-item {
-              background-color: white !important;
-              color: black !important;
-              border-bottom: 1px solid #f3f4f6 !important;
-            }
-            .pac-item:hover {
-              background-color: #f9fafb !important;
-            }
-            .pac-item-selected {
-              background-color: #f3f4f6 !important;
-            }
-            .pac-matched {
-              color: #1f2937 !important;
-              font-weight: 600 !important;
-            }
-            .gm-style .gm-style-iw-c {
-              z-index: 999999 !important;
-            }
-          `;
-          
-          if (!document.getElementById('gmp-place-autocomplete-styles')) {
-            style.id = 'gmp-place-autocomplete-styles';
-            document.head.appendChild(style);
-          }
 
           elementRef.current = placeAutocomplete;
         }
