@@ -119,7 +119,10 @@ export const AddressAutocomplete = ({
 
           // Handle input changes
           placeAutocomplete.addEventListener('input', (event: any) => {
-            onChange(event.target.value);
+            const inputValue = event.target.value;
+            // Ensure we always pass a string
+            const stringValue = typeof inputValue === 'string' ? inputValue : String(inputValue || '');
+            onChange(stringValue);
           });
 
           // Handle focus/blur for modal compatibility
