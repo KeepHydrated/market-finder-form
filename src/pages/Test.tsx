@@ -131,14 +131,63 @@ export default function Test() {
     setSelectedDays([]);
   };
 
-  const handleSubmitMarket = () => {
-    console.log('Submit market:', {
-      name: marketName,
-      address: marketAddress,
-      days: selectedDays
-    });
-    // TODO: Add to database
-    handleCloseModal();
+  const handleSubmitMarket = async () => {
+    try {
+      // Parse the Google Places address to extract city and state
+      const addressParts = marketAddress.split(', ');
+      let city = 'Unknown';
+      let state = 'Unknown';
+      
+      if (addressParts.length >= 3) {
+        city = addressParts[addressParts.length - 3];
+        state = addressParts[addressParts.length - 2];
+      }
+
+      // Format the hours data
+      const hoursData = selectedDays.reduce((acc, dayObj) => {
+        const fullDayName = dayObj.day === 'Mon' ? 'Monday' :
+                           dayObj.day === 'Tue' ? 'Tuesday' :
+                           dayObj.day === 'Wed' ? 'Wednesday' :
+                           dayObj.day === 'Thu' ? 'Thursday' :
+                           dayObj.day === 'Fri' ? 'Friday' :
+                           dayObj.day === 'Sat' ? 'Saturday' : 'Sunday';
+        
+        acc[fullDayName] = `${dayObj.startHour}:00 ${dayObj.startPeriod} - ${dayObj.endHour}:00 ${dayObj.endPeriod}`;
+        return acc;
+      }, {} as Record<string, string>);
+
+      const { data, error } = await supabase
+        .from('markets')
+        .insert({
+          name: marketName,
+          address: marketAddress,
+          city: city,
+          state: state,
+          days: selectedDays.map(d => d.day),
+          hours: JSON.stringify(hoursData)
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error adding market:', error);
+        alert('Failed to add market. Please try again.');
+        return;
+      }
+
+      console.log('Market added successfully:', data);
+      
+      // Refresh the markets list
+      fetchMarkets();
+      
+      // Close the modal
+      handleCloseModal();
+      
+      alert('Market added successfully!');
+    } catch (error) {
+      console.error('Error adding market:', error);
+      alert('Failed to add market. Please try again.');
+    }
   };
 
   return (
