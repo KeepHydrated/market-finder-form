@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { AddressAutocomplete } from '@/components/AddressAutocomplete';
@@ -100,6 +101,20 @@ export default function Test2() {
           </h1>
           
           <div className="bg-card p-6 rounded-lg border shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-xl font-semibold">Location Search Test</h2>
+                <p className="text-sm text-muted-foreground">Test the Google Places functionality</p>
+              </div>
+              <div>
+                <Link to="/places-demo">
+                  <Button variant="outline" size="sm">
+                    View Full Demo
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            
             <div className="space-y-6">
               <div className="space-y-4">
                 <Label htmlFor="location-search" className="text-lg font-medium">

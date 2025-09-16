@@ -21,6 +21,7 @@ import Markets from "./pages/Markets";
 import Tet from "./pages/Tet";
 import Test from "./pages/Test";
 import Test2 from "./pages/Test2";
+import PlacesDemo from "./pages/PlacesDemo";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => (
                 <Route path="/markets" element={<Markets />} />
                 <Route path="/test" element={<Test />} />
                 <Route path="/test2" element={<Test2 />} />
+                <Route path="/places-demo" element={<PlacesDemo />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
