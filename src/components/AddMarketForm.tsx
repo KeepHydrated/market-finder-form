@@ -32,6 +32,19 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
     hours: {} as Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>
   });
 
+  // Separate state for Google Places selection
+  const [googlePlacesData, setGooglePlacesData] = useState<{
+    address: string;
+    city: string;
+    state: string;
+    isSelected: boolean;
+  }>({
+    address: '',
+    city: '',
+    state: '',
+    isSelected: false
+  });
+
   const [dayTimeSelections, setDayTimeSelections] = useState<Record<string, {
     startTime: string;
     startPeriod: 'AM' | 'PM';
@@ -67,15 +80,18 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Ensure address is a string and trim whitespace
-    const addressString = typeof formData.address === 'string' ? formData.address.trim() : '';
+    // Prioritize Google Places selection over manual entry
+    const effectiveAddress = googlePlacesData.isSelected ? googlePlacesData.address : formData.address;
+    const addressString = typeof effectiveAddress === 'string' ? effectiveAddress.trim() : '';
     const name = formData.name.trim();
     
     console.log('🔍 Form validation check:');
     console.log('  - Name:', `"${name}"`);
-    console.log('  - Address:', `"${addressString}"`);
+    console.log('  - Google Places Selected:', googlePlacesData.isSelected);
+    console.log('  - Google Places Address:', `"${googlePlacesData.address}"`);
+    console.log('  - Manual Address:', `"${formData.address}"`);
+    console.log('  - Effective Address:', `"${addressString}"`);
     console.log('  - Days:', formData.days);
-    console.log('  - Form data:', formData);
     
     // Enhanced validation with specific error messages
     const missingFields = [];
@@ -134,7 +150,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
     // Create clean form data with formatted hours and days
     const cleanFormData = {
       name: name,
-      address: addressString,
+      address: addressString, // This now uses the effective address
       days: formattedDays,
       hours: formatHours()
     };
@@ -149,6 +165,12 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
       state: '',
       days: [],
       hours: {}
+    });
+    setGooglePlacesData({
+      address: '',
+      city: '',
+      state: '',
+      isSelected: false
     });
     setDayTimeSelections({});
   };
@@ -261,21 +283,38 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
               <Label className="text-sm text-muted-foreground">OR Google Places Autocomplete:</Label>
               <AddressAutocomplete
                 id="address-google"
-                value={typeof formData.address === 'string' ? formData.address : ''}
+                value={googlePlacesData.isSelected ? googlePlacesData.address : formData.address}
                 onChange={(address) => {
                   console.log('📍 AddressAutocomplete onChange called with:', `"${address}"`);
+                  // When user types manually in Google Places field, clear the "selected" state
+                  if (!address) {
+                    setGooglePlacesData({
+                      address: '',
+                      city: '',
+                      state: '',
+                      isSelected: false
+                    });
+                  }
                   setFormData(prev => ({ ...prev, address: address || '' }));
                 }}
                 onPlaceSelected={(place) => {
-                  console.log('📍 Place selected:', place);
+                  console.log('📍 Place selected from Google Places:', place);
                   if (place && place.address) {
+                    // Set Google Places data as selected
+                    setGooglePlacesData({
+                      address: place.address || '',
+                      city: place.city || '',
+                      state: place.state || '',
+                      isSelected: true
+                    });
+                    // Also mirror to manual field for visual consistency
                     setFormData(prev => ({
                       ...prev,
                       address: place.address || '',
                       city: place.city || '',
                       state: place.state || ''
                     }));
-                    console.log('📍 Form data updated with place:', place);
+                    console.log('📍 Google Places data set as selected:', place);
                   }
                 }}
                 onGooglePlacesActiveChange={setIsGooglePlacesActive}
@@ -284,9 +323,10 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
               />
             </div>
             
-            {formData.address && (
+            {(googlePlacesData.isSelected ? googlePlacesData.address : formData.address) && (
               <p className="text-sm text-green-600">
-                ✅ Address entered: {formData.address}
+                ✅ Address entered: {googlePlacesData.isSelected ? googlePlacesData.address : formData.address}
+                {googlePlacesData.isSelected && <span className="ml-2 text-xs">(from Google Places)</span>}
               </p>
             )}
           </div>
@@ -393,10 +433,20 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
             </Button>
             <Button 
               type="submit"
-              onClick={() => console.log('Add Market button clicked!')}
-              disabled={!formData.name.trim() || !formData.address.trim() || formData.days.length === 0}
+              onClick={() => {
+                const effectiveAddress = googlePlacesData.isSelected ? googlePlacesData.address : formData.address;
+                console.log('Add Market button clicked!');
+                console.log('Effective address for validation:', effectiveAddress);
+              }}
+              disabled={
+                !formData.name.trim() || 
+                !(googlePlacesData.isSelected ? googlePlacesData.address.trim() : formData.address.trim()) || 
+                formData.days.length === 0
+              }
               className={`${
-                (!formData.name.trim() || !formData.address.trim() || formData.days.length === 0)
+                (!formData.name.trim() || 
+                 !(googlePlacesData.isSelected ? googlePlacesData.address.trim() : formData.address.trim()) || 
+                 formData.days.length === 0)
                   ? 'opacity-50 cursor-not-allowed'
                   : 'hover:bg-primary/90'
               }`}
