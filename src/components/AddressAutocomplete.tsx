@@ -8,6 +8,7 @@ import './AddressAutocomplete.css';
 interface AddressAutocompleteProps {
   value: string;
   onChange: (value: string, isFromGooglePlaces: boolean, city?: string, state?: string) => void;
+  onPlaceSelected?: (place: { address: string; city: string; state: string; }) => void;
   onGooglePlacesActiveChange?: (isActive: boolean) => void;
   placeholder?: string;
   className?: string;
@@ -18,6 +19,7 @@ interface AddressAutocompleteProps {
 export const AddressAutocomplete = ({
   value,
   onChange,
+  onPlaceSelected,
   onGooglePlacesActiveChange,
   placeholder = "Start typing an address...",
   className,
@@ -109,6 +111,11 @@ export const AddressAutocomplete = ({
             // Update form state with Google Places data
             onChange(selectedAddress, true, city, state);
             console.log('Called onChange with Google Places data:', { selectedAddress, city, state });
+
+            // Also call onPlaceSelected if provided
+            if (onPlaceSelected) {
+              onPlaceSelected({ address: selectedAddress, city, state });
+            }
 
             console.log('=== END GOOGLE PLACES SELECTION ===');
           });
