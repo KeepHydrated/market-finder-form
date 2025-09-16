@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Store, Package, ShoppingCart, DollarSign, Edit, Plus, Calendar, Trash2 } from 'lucide-react';
+import { Store, Package, ShoppingCart, DollarSign, Edit, Plus, Calendar, Trash2, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { ProductGrid } from '@/components/ProductGrid';
@@ -584,6 +584,7 @@ export default function ShopManager() {
             <TabsTrigger value="overview" className="w-full justify-start">Overview</TabsTrigger>
             <TabsTrigger value="shop" className="w-full justify-start">Shop Details</TabsTrigger>
             <TabsTrigger value="products" className="w-full justify-start">Products</TabsTrigger>
+            <TabsTrigger value="account" className="w-full justify-start">Account</TabsTrigger>
           </TabsList>
 
           <div className="flex-1 space-y-6">
@@ -827,6 +828,116 @@ export default function ShopManager() {
                   vendorId={shopData.id}
                   vendorName={shopData.store_name}
                 />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="account" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <User className="h-5 w-5 mr-2" />
+                  Account Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium">Email</Label>
+                    <p className="text-sm text-muted-foreground mt-1">{user?.email}</p>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-sm font-medium">Account Created</Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium">Shop Status</Label>
+                    <div className="mt-1">
+                      <Badge variant={shopData?.status === 'accepted' ? 'default' : 'secondary'}>
+                        {shopData?.status || 'No Shop'}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Account Actions</h3>
+                  
+                  <div className="space-y-3">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => window.location.href = '/profile'}
+                      className="w-fit"
+                    >
+                      Edit Profile
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      onClick={() => supabase.auth.signOut()}
+                      className="w-fit"
+                    >
+                      Sign Out
+                    </Button>
+                  </div>
+                </div>
+
+                {!isPublicAccess && (
+                  <>
+                    <Separator />
+                    <div className="pt-4 border-t border-destructive/20">
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="text-lg font-semibold text-destructive">Account Danger Zone</h3>
+                          <p className="text-sm text-muted-foreground">
+                            These actions cannot be undone. Please be careful.
+                          </p>
+                        </div>
+                        
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button 
+                              variant="destructive" 
+                              className="w-fit"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete Account
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Account</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete your account, 
+                                shop, products, and all associated data from our servers.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction 
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                onClick={() => {
+                                  toast({
+                                    title: "Feature Coming Soon",
+                                    description: "Account deletion will be available in a future update.",
+                                  });
+                                }}
+                              >
+                                Delete Account
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
