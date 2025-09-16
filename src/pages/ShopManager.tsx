@@ -903,7 +903,7 @@ export default function ShopManager() {
                     <Separator className="mb-4" />
                     <div className="space-y-4">
                       <div>
-                        <h3 className="text-lg font-semibold text-destructive">Account Danger Zone</h3>
+                        <h3 className="text-lg font-semibold text-destructive">Shop Danger Zone</h3>
                         <p className="text-sm text-muted-foreground">
                           These actions cannot be undone. Please be careful.
                         </p>
