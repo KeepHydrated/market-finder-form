@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Search, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Search, MapPin, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Market {
@@ -20,6 +22,14 @@ export default function Test() {
   const [filteredMarkets, setFilteredMarkets] = useState<Market[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [showAddMarketModal, setShowAddMarketModal] = useState(false);
+  
+  // Add Market Form State
+  const [marketName, setMarketName] = useState('');
+  const [marketAddress, setMarketAddress] = useState('');
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+
+  const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   // Fetch all markets on component mount
   useEffect(() => {
@@ -72,6 +82,36 @@ export default function Test() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+  };
+
+  const handleDayToggle = (day: string) => {
+    setSelectedDays(prev => 
+      prev.includes(day) 
+        ? prev.filter(d => d !== day)
+        : [...prev, day]
+    );
+  };
+
+  const handleAddMarket = () => {
+    setShowAddMarketModal(true);
+    setShowResults(false);
+  };
+
+  const handleCloseModal = () => {
+    setShowAddMarketModal(false);
+    setMarketName('');
+    setMarketAddress('');
+    setSelectedDays([]);
+  };
+
+  const handleSubmitMarket = () => {
+    console.log('Submit market:', {
+      name: marketName,
+      address: marketAddress,
+      days: selectedDays
+    });
+    // TODO: Add to database
+    handleCloseModal();
   };
 
   return (
@@ -139,11 +179,7 @@ export default function Test() {
                       {/* Always Visible Add Market Option */}
                       <div className="border-t bg-muted/30">
                         <div
-                          onClick={() => {
-                            console.log('Add new market clicked');
-                            setShowResults(false);
-                            // TODO: Open add market modal
-                          }}
+                          onClick={handleAddMarket}
                           className="p-4 hover:bg-muted cursor-pointer transition-colors flex items-center space-x-3"
                         >
                           <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
@@ -165,6 +201,98 @@ export default function Test() {
               </Card>
             )}
           </div>
+          
+          {/* Add Market Modal */}
+          <Dialog open={showAddMarketModal} onOpenChange={setShowAddMarketModal}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Add New Farmers Market</DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-6 py-4">
+                {/* Market Name */}
+                <div className="space-y-2">
+                  <Label htmlFor="market-name" className="text-base font-medium">
+                    Market Name *
+                  </Label>
+                  <Input
+                    id="market-name"
+                    value={marketName}
+                    onChange={(e) => setMarketName(e.target.value)}
+                    placeholder="e.g. Downtown Farmers Market"
+                    className="text-base py-3"
+                  />
+                </div>
+                
+                {/* Address */}
+                <div className="space-y-2">
+                  <Label htmlFor="market-address" className="text-base font-medium">
+                    Address *
+                  </Label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      id="market-address"
+                      value={marketAddress}
+                      onChange={(e) => setMarketAddress(e.target.value)}
+                      className="pl-10 pr-10 text-base py-3"
+                    />
+                    {marketAddress && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setMarketAddress('')}
+                        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Days Open */}
+                <div className="space-y-3">
+                  <Label className="text-base font-medium">
+                    Days Open *
+                  </Label>
+                  <div className="flex flex-wrap gap-3">
+                    {daysOfWeek.map((day) => (
+                      <Button
+                        key={day}
+                        type="button"
+                        variant={selectedDays.includes(day) ? "default" : "outline"}
+                        onClick={() => handleDayToggle(day)}
+                        className="min-w-[60px] px-4 py-2"
+                      >
+                        {day}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-6">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleCloseModal}
+                    className="px-6"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleSubmitMarket}
+                    disabled={!marketName || !marketAddress || selectedDays.length === 0}
+                    className="px-6 bg-green-600 hover:bg-green-700"
+                  >
+                    Add Market
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>
