@@ -728,24 +728,7 @@ export default function ShopManager() {
 
           <TabsContent value="shop" className="space-y-6">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <Button
-                  variant={isEditing ? "outline" : "default"}
-                  onClick={() => {
-                    if (isEditing) {
-                      setFormData({
-                        store_name: shopData.store_name || '',
-                        primary_specialty: shopData.primary_specialty || '',
-                        website: shopData.website || '',
-                        description: shopData.description || '',
-                      });
-                    }
-                    setIsEditing(!isEditing);
-                  }}
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  {isEditing ? 'Save' : 'Edit'}
-                </Button>
+              <CardHeader>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -856,6 +839,27 @@ export default function ShopManager() {
                     </div>
                   </div>
                 )}
+
+                {/* Edit button positioned at bottom right */}
+                <div className="flex justify-end mt-6">
+                  <Button
+                    variant={isEditing ? "outline" : "default"}
+                    onClick={() => {
+                      if (isEditing) {
+                        setFormData({
+                          store_name: shopData.store_name || '',
+                          primary_specialty: shopData.primary_specialty || '',
+                          website: shopData.website || '',
+                          description: shopData.description || '',
+                        });
+                      }
+                      setIsEditing(!isEditing);
+                    }}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    {isEditing ? 'Save' : 'Edit'}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
