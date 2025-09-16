@@ -117,20 +117,45 @@ export const AddressAutocomplete = ({
             }
           });
 
-          // Handle input changes
-          placeAutocomplete.addEventListener('input', (event: any) => {
-            console.log('Raw input event:', event);
+          // Handle input changes - multiple event types for Google Places
+          const handleInputChange = () => {
+            // Try multiple ways to get the current input value
+            const inputElement = placeAutocomplete.querySelector('input');
+            let inputValue = '';
             
-            // For gmp-place-autocomplete, the value is stored directly on the element
-            let inputValue = placeAutocomplete.value || event.target.textContent || '';
+            if (inputElement) {
+              inputValue = inputElement.value || '';
+            } else {
+              inputValue = placeAutocomplete.value || '';
+            }
             
-            console.log('Input value from element:', inputValue);
+            console.log('Input value captured:', inputValue);
             
             // Ensure we always pass a string
             const stringValue = typeof inputValue === 'string' ? inputValue : String(inputValue || '');
             console.log('Final string value being sent:', stringValue);
             onChange(stringValue);
-          });
+          };
+
+          // Listen to multiple input events
+          placeAutocomplete.addEventListener('input', handleInputChange);
+          placeAutocomplete.addEventListener('keyup', handleInputChange);
+          placeAutocomplete.addEventListener('change', handleInputChange);
+          
+          // Also listen to the inner input element if it exists
+          const checkForInnerInput = () => {
+            const inputElement = placeAutocomplete.querySelector('input');
+            if (inputElement) {
+              inputElement.addEventListener('input', handleInputChange);
+              inputElement.addEventListener('keyup', handleInputChange);
+              inputElement.addEventListener('change', handleInputChange);
+            } else {
+              // If input doesn't exist yet, try again shortly
+              setTimeout(checkForInnerInput, 100);
+            }
+          };
+          
+          checkForInnerInput();
 
           // Handle focus/blur for modal compatibility
           placeAutocomplete.addEventListener('focus', () => {
