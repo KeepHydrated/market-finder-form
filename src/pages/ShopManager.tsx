@@ -728,7 +728,7 @@ export default function ShopManager() {
 
           <TabsContent value="shop" className="space-y-6">
             <Card>
-              <CardContent className="space-y-2 pt-4">
+              <CardContent className="space-y-4 pt-4">
                 <MarketSearch
                   markets={markets}
                   searchTerm={marketSearchTerm}
@@ -738,7 +738,7 @@ export default function ShopManager() {
                   disabled={!isEditing}
                 />
 
-                <div className="space-y-2">
+                <div className="space-y-4">
                   <Label htmlFor="store_name">Store Name</Label>
                   <Input
                     id="store_name"
@@ -748,7 +748,7 @@ export default function ShopManager() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-4">
                   <Label htmlFor="specialty">Primary Specialty</Label>
                   <Select
                     value={formData.primary_specialty}
@@ -768,7 +768,7 @@ export default function ShopManager() {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-4">
                   <Label htmlFor="website">Website</Label>
                   <Input
                     id="website"
@@ -780,7 +780,7 @@ export default function ShopManager() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-4">
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
