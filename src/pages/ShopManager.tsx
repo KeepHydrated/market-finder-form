@@ -77,6 +77,9 @@ export default function ShopManager() {
   const [marketSearchTerm, setMarketSearchTerm] = useState('');
   const [showAddMarket, setShowAddMarket] = useState(false);
 
+  // Check for public access via URL parameter
+  const isPublicAccess = new URLSearchParams(window.location.search).get('demo') === 'true';
+
   // Form state
   const [formData, setFormData] = useState({
     store_name: '',
@@ -89,8 +92,11 @@ export default function ShopManager() {
     if (user) {
       fetchShopData();
       fetchMarkets();
+    } else if (isPublicAccess) {
+      // Load demo data for public access
+      loadDemoData();
     }
-  }, [user]);
+  }, [user, isPublicAccess]);
 
   useEffect(() => {
     if (shopData) {
@@ -135,6 +141,99 @@ export default function ShopManager() {
     } finally {
       setLoadingShop(false);
     }
+  };
+
+  const loadDemoData = () => {
+    const demoShop: ShopData = {
+      id: 'demo-shop-id',
+      store_name: 'Demo Fresh Market',
+      primary_specialty: 'Organic Produce',
+      website: 'https://demo-fresh-market.com',
+      description: 'A demonstration shop showcasing fresh, organic produce and artisanal goods. This is a demo version for testing purposes.',
+      products: [
+        {
+          id: 1,
+          name: 'Organic Apples',
+          price: 450,
+          category: 'Fruits',
+          description: 'Fresh organic apples from local orchards',
+          image: '/placeholder.svg'
+        },
+        {
+          id: 2,
+          name: 'Farm Fresh Eggs',
+          price: 650,
+          category: 'Dairy',
+          description: 'Free-range eggs from happy chickens',
+          image: '/placeholder.svg'
+        },
+        {
+          id: 3,
+          name: 'Artisan Bread',
+          price: 550,
+          category: 'Bakery',
+          description: 'Handcrafted sourdough bread',
+          image: '/placeholder.svg'
+        }
+      ],
+      selected_market: 'Downtown Farmers Market',
+      search_term: 'Downtown Farmers Market',
+      market_address: '123 Main St, Downtown',
+      market_days: ['Saturday', 'Sunday'],
+      market_hours: { saturday: '8AM-2PM', sunday: '9AM-1PM' },
+      status: 'accepted'
+    };
+
+    const demoOrders: Order[] = [
+      {
+        id: 'demo-order-1',
+        email: 'customer@example.com',
+        total_amount: 1100,
+        status: 'completed',
+        created_at: new Date(Date.now() - 86400000).toISOString(),
+        order_items: [
+          {
+            product_name: 'Organic Apples',
+            quantity: 2,
+            unit_price: 450,
+            total_price: 900
+          },
+          {
+            product_name: 'Farm Fresh Eggs',
+            quantity: 1,
+            unit_price: 650,
+            total_price: 650
+          }
+        ]
+      },
+      {
+        id: 'demo-order-2',
+        email: 'another@example.com',
+        total_amount: 550,
+        status: 'completed',
+        created_at: new Date(Date.now() - 172800000).toISOString(),
+        order_items: [
+          {
+            product_name: 'Artisan Bread',
+            quantity: 1,
+            unit_price: 550,
+            total_price: 550
+          }
+        ]
+      }
+    ];
+
+    setShopData(demoShop);
+    setOrders(demoOrders);
+    setFormData({
+      store_name: demoShop.store_name,
+      primary_specialty: demoShop.primary_specialty,
+      website: demoShop.website,
+      description: demoShop.description,
+    });
+    setMarketSearchTerm(demoShop.search_term);
+    setLoadingShop(false);
+    setLoadingOrders(false);
   };
 
   const fetchMarkets = async () => {
@@ -392,7 +491,7 @@ export default function ShopManager() {
     );
   }
 
-  if (!user) {
+  if (!user && !isPublicAccess) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Card className="w-full max-w-md">
@@ -434,6 +533,16 @@ export default function ShopManager() {
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
+          {isPublicAccess && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <p className="text-blue-800 font-medium">
+                🎯 Demo Mode - This is a demonstration of the shop manager interface
+              </p>
+              <p className="text-blue-600 text-sm mt-1">
+                All data shown is sample data for demonstration purposes
+              </p>
+            </div>
+          )}
         </div>
 
         <Tabs defaultValue="overview" className="flex gap-6">
