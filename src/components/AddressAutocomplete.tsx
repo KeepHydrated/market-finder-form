@@ -119,9 +119,26 @@ export const AddressAutocomplete = ({
 
           // Handle input changes
           placeAutocomplete.addEventListener('input', (event: any) => {
-            const inputValue = event.target.value;
+            console.log('Raw input event:', event);
+            console.log('Event target:', event.target);
+            console.log('Event target value:', event.target.value);
+            
+            let inputValue = event.target.value;
+            
+            // Handle case where Google Places returns an object
+            if (inputValue && typeof inputValue === 'object') {
+              if (inputValue.value !== undefined) {
+                inputValue = inputValue.value;
+              } else if (inputValue._type === 'undefined') {
+                inputValue = '';
+              } else {
+                inputValue = String(inputValue);
+              }
+            }
+            
             // Ensure we always pass a string
             const stringValue = typeof inputValue === 'string' ? inputValue : String(inputValue || '');
+            console.log('Final string value being sent:', stringValue);
             onChange(stringValue);
           });
 
