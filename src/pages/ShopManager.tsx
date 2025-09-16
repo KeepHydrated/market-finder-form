@@ -442,6 +442,7 @@ export default function ShopManager() {
   };
 
   const handleAddMarket = async (marketData: any) => {
+    console.log('handleAddMarket called with:', marketData);
     try {
       const { data, error } = await supabase
         .from('markets')

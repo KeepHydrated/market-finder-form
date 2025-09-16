@@ -67,10 +67,19 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form submitted with data:', formData);
+    console.log('Validation check:', { 
+      hasName: !!formData.name, 
+      hasAddress: !!formData.address, 
+      hasDays: formData.days.length > 0 
+    });
+    
     if (!formData.name || !formData.address || formData.days.length === 0) {
+      console.log('Form validation failed, not submitting');
       return;
     }
 
+    console.log('Form validation passed, calling onMarketAdded');
     onMarketAdded(formData);
     setFormData({
       name: '',
