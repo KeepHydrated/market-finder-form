@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 
 /// <reference types="google.maps" />
@@ -30,8 +29,7 @@ export const AddressAutocomplete = ({
   id,
   required
 }: AddressAutocompleteProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const elementRef = useRef<HTMLElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -53,67 +51,55 @@ export const AddressAutocomplete = ({
 
         await loader.load();
         
-        if (inputRef.current && !autocompleteRef.current) {
-          // Prevent the input from losing focus when clicking on dropdown
-          const input = inputRef.current;
+        if (!elementRef.current) {
+          // Create the new PlaceAutocompleteElement
+          const placeAutocomplete = document.createElement('gmp-place-autocomplete') as any;
           
-          input.addEventListener('blur', (e) => {
-            // Prevent blur if clicking on pac-container
-            const pacContainer = document.querySelector('.pac-container');
-            if (pacContainer && pacContainer.contains(e.relatedTarget as Node)) {
-              e.preventDefault();
-              input.focus();
-            }
-          });
+          // Set attributes
+          placeAutocomplete.setAttribute('type', 'address');
+          placeAutocomplete.setAttribute('country-restriction', 'us');
+          if (placeholder) {
+            placeAutocomplete.setAttribute('placeholder', placeholder);
+          }
+          if (required) {
+            placeAutocomplete.setAttribute('required', 'true');
+          }
+          if (id) {
+            placeAutocomplete.setAttribute('id', id);
+          }
+          if (className) {
+            placeAutocomplete.className = className;
+          }
 
-          autocompleteRef.current = new google.maps.places.Autocomplete(input, {
-            types: ['address', 'establishment'],
-            componentRestrictions: { country: 'us' }
-          });
+          // Set the value
+          if (value) {
+            placeAutocomplete.value = value;
+          }
 
-          // Global click handler to prevent modal closing
-          const handleGlobalClick = (e: MouseEvent) => {
-            const target = e.target as Element;
-            if (target && (target.closest('.pac-container') || target.classList.contains('pac-item'))) {
-              e.stopImmediatePropagation();
-              onGooglePlacesActiveChange?.(true);
-              
-              // Reset after a short delay
-              setTimeout(() => {
-                onGooglePlacesActiveChange?.(false);
-              }, 100);
-            }
-          };
-
-          // Add global event listener with high priority
-          document.addEventListener('mousedown', handleGlobalClick, true);
-          document.addEventListener('click', handleGlobalClick, true);
-
-          autocompleteRef.current.addListener('place_changed', () => {
-            const place = autocompleteRef.current?.getPlace();
+          // Add event listeners
+          placeAutocomplete.addEventListener('gmp-placeselect', (event: any) => {
+            const place = event.detail.place;
             
-            if (place && place.address_components) {
-              const addressComponents = place.address_components;
-              
+            if (place && place.addressComponents) {
               let streetNumber = '';
               let streetName = '';
               let city = '';
               let state = '';
               
-              addressComponents.forEach(component => {
+              place.addressComponents.forEach((component: any) => {
                 const types = component.types;
                 
                 if (types.includes('street_number')) {
-                  streetNumber = component.long_name;
+                  streetNumber = component.longText;
                 }
                 if (types.includes('route')) {
-                  streetName = component.long_name;
+                  streetName = component.longText;
                 }
                 if (types.includes('locality')) {
-                  city = component.long_name;
+                  city = component.longText;
                 }
                 if (types.includes('administrative_area_level_1')) {
-                  state = component.short_name;
+                  state = component.shortText;
                 }
               });
               
@@ -131,95 +117,58 @@ export const AddressAutocomplete = ({
             }
           });
 
-          // Apply styles and prevent dropdown from closing
-          const addGlobalStyles = () => {
-            // Remove existing styles if any
-            const existingStyle = document.getElementById('google-places-styles');
-            if (existingStyle) {
-              existingStyle.remove();
-            }
+          // Handle input changes
+          placeAutocomplete.addEventListener('input', (event: any) => {
+            onChange(event.target.value);
+          });
 
-            const style = document.createElement('style');
-            style.id = 'google-places-styles';
-            style.innerHTML = `
-              .pac-container {
-                z-index: 999999 !important;
-                background: white !important;
-                border: 1px solid hsl(var(--border)) !important;
-                border-radius: 6px !important;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
-                margin-top: 2px !important;
-                position: absolute !important;
-                overflow: visible !important;
-              }
-              .pac-item {
-                padding: 8px 12px !important;
-                cursor: pointer !important;
-                border-bottom: 1px solid hsl(var(--border)) !important;
-                color: hsl(var(--foreground)) !important;
-                font-size: 14px !important;
-                line-height: 1.5 !important;
-                pointer-events: auto !important;
-                user-select: none !important;
-              }
-              .pac-item:last-child {
-                border-bottom: none !important;
-              }
-              .pac-item:hover, .pac-item-selected {
-                background-color: hsl(var(--muted)) !important;
-              }
-              .pac-item-query {
-                font-weight: 500 !important;
-              }
-              .pac-matched {
-                font-weight: 600 !important;
-                color: hsl(var(--primary)) !important;
-              }
-            `;
-            document.head.appendChild(style);
+          // Handle focus/blur for modal compatibility
+          placeAutocomplete.addEventListener('focus', () => {
+            onGooglePlacesActiveChange?.(true);
+          });
 
-            // Prevent modal from closing when clicking on Google Places dropdown
+          placeAutocomplete.addEventListener('blur', () => {
             setTimeout(() => {
-              const pacContainer = document.querySelector('.pac-container');
-              if (pacContainer) {
-                // Add data attribute to identify Google Places elements
-                pacContainer.setAttribute('data-google-places', 'true');
-                
-                // Prevent default mousedown behavior that might close modal
-                pacContainer.addEventListener('mousedown', (e) => {
-                  e.stopPropagation();
-                });
+              onGooglePlacesActiveChange?.(false);
+            }, 100);
+          });
 
-                pacContainer.addEventListener('click', (e) => {
-                  e.stopPropagation();
-                });
-                
-                const pacItems = pacContainer.querySelectorAll('.pac-item');
-                pacItems.forEach(item => {
-                  item.setAttribute('data-google-places-item', 'true');
-                  
-                  item.addEventListener('mousedown', (e) => {
-                    e.stopPropagation();
-                  });
+          // Apply custom styles
+          const style = document.createElement('style');
+          style.innerHTML = `
+            gmp-place-autocomplete {
+              width: 100%;
+            }
+            gmp-place-autocomplete input {
+              width: 100% !important;
+              padding: 8px 12px !important;
+              border: 1px solid hsl(var(--border)) !important;
+              border-radius: 6px !important;
+              background-color: hsl(var(--background)) !important;
+              color: hsl(var(--foreground)) !important;
+              font-size: 14px !important;
+              line-height: 1.5 !important;
+              transition: border-color 0.2s !important;
+            }
+            gmp-place-autocomplete input:focus {
+              outline: none !important;
+              border-color: hsl(var(--ring)) !important;
+              box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2) !important;
+            }
+            gmp-place-autocomplete input::placeholder {
+              color: hsl(var(--muted-foreground)) !important;
+            }
+            .gm-style .gm-style-iw-c {
+              z-index: 999999 !important;
+            }
+          `;
+          
+          if (!document.getElementById('gmp-place-autocomplete-styles')) {
+            style.id = 'gmp-place-autocomplete-styles';
+            document.head.appendChild(style);
+          }
 
-                  item.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                  });
-                });
-              }
-            }, 50);
-          };
-
-          // Add styles multiple times to ensure they apply
-          addGlobalStyles();
-          setTimeout(addGlobalStyles, 100);
-          setTimeout(addGlobalStyles, 500);
-
-          // Cleanup function
-          return () => {
-            document.removeEventListener('mousedown', handleGlobalClick, true);
-            document.removeEventListener('click', handleGlobalClick, true);
-          };
+          elementRef.current = placeAutocomplete;
         }
         
         setIsLoaded(true);
@@ -231,29 +180,23 @@ export const AddressAutocomplete = ({
     if (!isLoaded) {
       initializeAutocomplete();
     }
-  }, [isLoaded, onChange, onPlaceSelected, onGooglePlacesActiveChange]);
+  }, [isLoaded, onChange, onPlaceSelected, onGooglePlacesActiveChange, value, placeholder, className, id, required]);
+
+  // Update value when prop changes
+  useEffect(() => {
+    if (elementRef.current && (elementRef.current as any).value !== value) {
+      (elementRef.current as any).value = value;
+    }
+  }, [value]);
 
   return (
-    <div style={{ position: 'relative', zIndex: 1 }}>
-      <Input
-        ref={inputRef}
-        id={id}
-        name={`address-field-${Math.random().toString(36).substr(2, 9)}`}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={className}
-        autoComplete="new-password"
-        autoCorrect="off"
-        autoCapitalize="off"
-        spellCheck={false}
-        data-form-type="other"
-        data-lpignore="true"
-        role="combobox"
-        aria-expanded="false"
-        aria-autocomplete="list"
-        required={required}
-      />
-    </div>
+    <div 
+      style={{ position: 'relative', zIndex: 1 }}
+      ref={(containerRef) => {
+        if (containerRef && elementRef.current && !containerRef.contains(elementRef.current)) {
+          containerRef.appendChild(elementRef.current);
+        }
+      }}
+    />
   );
 };
