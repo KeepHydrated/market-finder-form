@@ -113,7 +113,7 @@ export default function PlacesDemo() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="max-w-2xl mx-auto">
           {/* Input Section */}
           <Card>
             <CardHeader>
@@ -214,65 +214,40 @@ export default function PlacesDemo() {
                   Convert to Place (for testing)
                 </Button>
               )}
-            </CardContent>
-          </Card>
 
-          {/* Results Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Results</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {selectedPlace ? (
-                <div className="space-y-3">
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <h3 className="font-semibold text-green-800 mb-2">✅ Place Selected!</h3>
-                    <div className="space-y-2 text-sm">
-                      <div>
-                        <span className="font-medium">Full Address:</span>
-                        <p className="text-green-700">{selectedPlace.address}</p>
-                      </div>
-                      <div>
-                        <span className="font-medium">City:</span>
-                        <p className="text-green-700">{selectedPlace.city}</p>
-                      </div>
-                      <div>
-                        <span className="font-medium">State:</span>
-                        <p className="text-green-700">{selectedPlace.state}</p>
-                      </div>
+              {/* Selected Place Results */}
+              {selectedPlace && (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <h3 className="font-semibold text-green-800 mb-2">✅ Place Selected!</h3>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <span className="font-medium">Full Address:</span>
+                      <p className="text-green-700">{selectedPlace.address}</p>
                     </div>
-                    
-                    {/* Save Button */}
-                    <div className="mt-4 pt-3 border-t border-green-200">
-                      <Button 
-                        onClick={handleSave}
-                        disabled={isSaving || !user}
-                        className="w-full"
-                      >
-                        {isSaving ? 'Saving...' : 'Save to Database'}
-                      </Button>
-                      {!user && (
-                        <p className="text-xs text-green-600 mt-2 text-center">
-                          Please log in to save places
-                        </p>
-                      )}
+                    <div>
+                      <span className="font-medium">City:</span>
+                      <p className="text-green-700">{selectedPlace.city}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium">State:</span>
+                      <p className="text-green-700">{selectedPlace.state}</p>
                     </div>
                   </div>
-                </div>
-              ) : (
-                <div className="p-4 bg-muted/50 border border-dashed rounded-lg text-center">
-                  <p className="text-muted-foreground">
-                    Use the Google Places autocomplete above to select a location
-                  </p>
-                </div>
-              )}
-
-              {(selectedAddress || manualAddress) && !selectedPlace && (
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h3 className="font-semibold text-blue-800 mb-2">ℹ️ Typing in Progress</h3>
-                  <div className="text-sm">
-                    <span className="font-medium">Current Input:</span>
-                    <p className="text-blue-700">{selectedAddress || manualAddress}</p>
+                  
+                  {/* Save Button */}
+                  <div className="mt-4 pt-3 border-t border-green-200">
+                    <Button 
+                      onClick={handleSave}
+                      disabled={isSaving || !user}
+                      className="w-full"
+                    >
+                      {isSaving ? 'Saving...' : 'Save to Database'}
+                    </Button>
+                    {!user && (
+                      <p className="text-xs text-green-600 mt-2 text-center">
+                        Please log in to save places
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
