@@ -146,6 +146,16 @@ export default function PlacesDemo() {
                 />
               </div>
 
+              {/* Mirror Section */}
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">Mirror (what you're typing above):</Label>
+                <div className="p-3 border border-dashed border-muted-foreground/30 rounded-md bg-muted/30 text-sm min-h-[44px] flex items-center">
+                  <span className="text-muted-foreground italic">
+                    {selectedAddress || 'Start typing in the Google Places field above...'}
+                  </span>
+                </div>
+              </div>
+
               {/* Current Input Display */}
               <div className="space-y-2">
                 <Label className="text-sm text-muted-foreground">Current Input:</Label>
