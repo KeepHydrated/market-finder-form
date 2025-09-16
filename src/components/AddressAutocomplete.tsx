@@ -137,6 +137,21 @@ export const AddressAutocomplete = ({
             onChange(inputValue);
           };
 
+          // Add a polling mechanism to continuously check for input changes
+          const pollForChanges = () => {
+            const inputElement = placeAutocomplete.querySelector('input');
+            if (inputElement) {
+              const currentValue = inputElement.value || '';
+              if (currentValue !== value) {
+                console.log('Polling detected change:', currentValue);
+                onChange(currentValue);
+              }
+            }
+          };
+
+          // Poll every 200ms for changes
+          const pollInterval = setInterval(pollForChanges, 200);
+
           // Listen to multiple input events
           placeAutocomplete.addEventListener('input', handleInputChange);
           placeAutocomplete.addEventListener('keyup', handleInputChange);
@@ -158,6 +173,9 @@ export const AddressAutocomplete = ({
           
           // Wait a bit for the element to fully initialize
           setTimeout(checkForInnerInput, 500);
+
+          // Store the interval reference for cleanup
+          (elementRef.current as any).pollInterval = pollInterval;
 
           // Handle focus/blur for modal compatibility
           placeAutocomplete.addEventListener('focus', () => {
@@ -241,6 +259,15 @@ export const AddressAutocomplete = ({
       initializeAutocomplete();
     }
   }, [isLoaded, onChange, onPlaceSelected, onGooglePlacesActiveChange, value, placeholder, className, id, required]);
+
+  // Cleanup function to clear polling interval
+  useEffect(() => {
+    return () => {
+      if (elementRef.current && (elementRef.current as any).pollInterval) {
+        clearInterval((elementRef.current as any).pollInterval);
+      }
+    };
+  }, []);
 
   // Update value when prop changes
   useEffect(() => {
