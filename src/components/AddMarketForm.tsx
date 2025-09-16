@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AddressAutocomplete } from './AddressAutocomplete';
+import { CheckCircle2 } from 'lucide-react';
 
 const DAYS_OF_WEEK = [
   'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
@@ -25,24 +26,16 @@ interface AddMarketFormProps {
 export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormProps) => {
   const [formData, setFormData] = useState({
     name: '',
-    address: '',
-    city: '',
-    state: '',
     days: [] as string[],
     hours: {} as Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>
   });
 
-  // Separate state for Google Places selection
-  const [googlePlacesData, setGooglePlacesData] = useState<{
-    address: string;
-    city: string;
-    state: string;
-    isSelected: boolean;
-  }>({
-    address: '',
+  // Simplified address state - single source of truth
+  const [addressData, setAddressData] = useState({
+    value: '',
+    isFromGooglePlaces: false,
     city: '',
-    state: '',
-    isSelected: false
+    state: ''
   });
 
   const [dayTimeSelections, setDayTimeSelections] = useState<Record<string, {
@@ -79,26 +72,22 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Prioritize Google Places selection over manual entry
-    const effectiveAddress = googlePlacesData.isSelected ? googlePlacesData.address : formData.address;
-    const addressString = typeof effectiveAddress === 'string' ? effectiveAddress.trim() : '';
+
+    const addressString = addressData.value.trim();
     const name = formData.name.trim();
-    
+
     console.log('🔍 Form validation check:');
     console.log('  - Name:', `"${name}"`);
-    console.log('  - Google Places Selected:', googlePlacesData.isSelected);
-    console.log('  - Google Places Address:', `"${googlePlacesData.address}"`);
-    console.log('  - Manual Address:', `"${formData.address}"`);
-    console.log('  - Effective Address:', `"${addressString}"`);
+    console.log('  - Address:', `"${addressString}"`);
+    console.log('  - Address from Google Places:', addressData.isFromGooglePlaces);
     console.log('  - Days:', formData.days);
-    
+
     // Enhanced validation with specific error messages
     const missingFields = [];
     if (!name) missingFields.push('Market name');
     if (!addressString) missingFields.push('Address');
     if (formData.days.length === 0) missingFields.push('Operating days');
-    
+
     if (missingFields.length > 0) {
       console.log('❌ Validation failed - Missing:', missingFields);
       alert(`Please fill in the following required fields: ${missingFields.join(', ')}`);
@@ -160,17 +149,14 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
     // Reset form
     setFormData({
       name: '',
-      address: '',
-      city: '',
-      state: '',
       days: [],
       hours: {}
     });
-    setGooglePlacesData({
-      address: '',
+    setAddressData({
+      value: '',
+      isFromGooglePlaces: false,
       city: '',
-      state: '',
-      isSelected: false
+      state: ''
     });
     setDayTimeSelections({});
   };
@@ -219,7 +205,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
 
   return (
     <Dialog open={open} onOpenChange={handleCloseModal}>
-      <DialogContent 
+      <DialogContent
         className="max-w-2xl max-h-[90vh] overflow-y-auto"
         onInteractOutside={(e) => {
           // Check if the interaction is with Google Places elements
@@ -228,9 +214,24 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
             target.closest('.pac-container') ||
             target.classList.contains('pac-item') ||
             target.classList.contains('pac-item-query') ||
+            target.closest('[data-google-places]') ||
             target.getAttribute('data-google-places') ||
             target.getAttribute('data-google-places-item')
           )) {
+            console.log('Preventing dialog close for Google Places interaction');
+            e.preventDefault();
+            return;
+          }
+        }}
+        onPointerDownOutside={(e) => {
+          // Also prevent pointer events from closing dialog
+          const target = e.target as Element;
+          if (target && (
+            target.closest('.pac-container') ||
+            target.classList.contains('pac-item') ||
+            target.closest('[data-google-places]')
+          )) {
+            console.log('Preventing pointer down outside for Google Places');
             e.preventDefault();
           }
         }}>
@@ -239,101 +240,60 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Market Name Field - with green styling */}
           <div className="space-y-2">
-            <Label htmlFor="name">Market Name *</Label>
+            <Label htmlFor="name" className="text-base font-medium">Market Name *</Label>
             <Input
               id="name"
-              name={`market-name-${Math.random().toString(36).substr(2, 9)}`}
+              type="text"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="e.g. Downtown Farmers Market"
-              autoComplete="new-password"
-              autoCorrect="off"
-              autoCapitalize="off"
-              spellCheck="false"
-              data-form-type="other"
-              data-lpignore="true"
-              role="textbox"
+              placeholder="Enter market name"
+              className="text-base py-3 border-green-500 focus:border-green-600 focus:ring-green-500 rounded-lg"
               required
             />
           </div>
 
+          {/* Address Field - update to match green styling */}
           <div className="space-y-2">
-            <Label htmlFor="address-google" className="text-base font-medium">Address *</Label>
+            <Label htmlFor="address" className="text-base font-medium">Address *</Label>
             <p className="text-sm text-muted-foreground mb-2">
-              Option 1: Use Google Places autocomplete below, OR Option 2: Use the manual input
+              Start typing to see address suggestions, or enter manually
             </p>
             
-            {/* Manual address input as backup */}
-            <div className="space-y-2">
-              <Label className="text-sm text-muted-foreground">Manual Address Entry:</Label>
-              <Input
-                value={typeof formData.address === 'string' ? formData.address : ''}
-                onChange={(e) => {
-                  console.log('📍 Manual address input:', e.target.value);
-                  setFormData(prev => ({ ...prev, address: e.target.value }));
-                }}
-                placeholder="Type full address manually (e.g., Japanese Tea Garden, North Saint Mary's Street, San Antonio, TX)"
-                className="text-base py-3"
-              />
-            </div>
+            <AddressAutocomplete
+              id="address"
+              value={addressData.value}
+              onChange={(address) => {
+                console.log('📍 Address input changed to:', `"${address}"`);
+                setAddressData(prev => ({
+                  ...prev,
+                  value: address,
+                  isFromGooglePlaces: false
+                }));
+              }}
+              onPlaceSelected={(place) => {
+                console.log('📍 Place selected from Google Places:', place);
+                if (place && place.address) {
+                  setAddressData({
+                    value: place.address,
+                    isFromGooglePlaces: true,
+                    city: place.city || '',
+                    state: place.state || ''
+                  });
+                }
+              }}
+              onGooglePlacesActiveChange={setIsGooglePlacesActive}
+              placeholder="Enter address (autocomplete available)"
+              className="text-base py-3 border-green-500 focus:border-green-600 focus:ring-green-500 rounded-lg"
+            />
             
-            {/* Google Places Autocomplete */}
-            <div className="space-y-2">
-              <Label className="text-sm text-muted-foreground">OR Google Places Autocomplete:</Label>
-              <AddressAutocomplete
-                id="address-google"
-                value={googlePlacesData.isSelected ? googlePlacesData.address : formData.address}
-                onChange={(address) => {
-                  console.log('📍 AddressAutocomplete onChange called with:', `"${address}"`);
-                  
-                  // If we get an empty string but have a Google selection, ignore it
-                  if (!address && googlePlacesData.isSelected) {
-                    console.log('🚫 Ignoring empty onChange - Google Places selection is active');
-                    return;
-                  }
-                  
-                  // When user types manually in Google Places field, clear the "selected" state
-                  if (!address) {
-                    setGooglePlacesData({
-                      address: '',
-                      city: '',
-                      state: '',
-                      isSelected: false
-                    });
-                  }
-                  setFormData(prev => ({ ...prev, address: address || '' }));
-                }}
-                onPlaceSelected={(place) => {
-                  console.log('📍 Place selected from Google Places:', place);
-                  if (place && place.address) {
-                    // Set Google Places data as selected
-                    setGooglePlacesData({
-                      address: place.address || '',
-                      city: place.city || '',
-                      state: place.state || '',
-                      isSelected: true
-                    });
-                    // Also mirror to manual field for visual consistency
-                    setFormData(prev => ({
-                      ...prev,
-                      address: place.address || '',
-                      city: place.city || '',
-                      state: place.state || ''
-                    }));
-                    console.log('📍 Google Places data set as selected:', place);
-                  }
-                }}
-                onGooglePlacesActiveChange={setIsGooglePlacesActive}
-                placeholder="Start typing an address..."
-                className="text-base py-3"
-              />
-            </div>
-            
-            {(googlePlacesData.isSelected ? googlePlacesData.address : formData.address) && (
-              <p className="text-sm text-green-600">
-                ✅ Address entered: {googlePlacesData.isSelected ? googlePlacesData.address : formData.address}
-                {googlePlacesData.isSelected && <span className="ml-2 text-xs">(from Google Places)</span>}
+            {/* Show validation message */}
+            {addressData.value && (
+              <p className="text-sm text-green-600 flex items-center gap-2 mt-2">
+                <CheckCircle2 className="h-4 w-4" />
+                Address entered: {addressData.value}
+                {addressData.isFromGooglePlaces && <span className="ml-2 text-xs">(from Google Places)</span>}
               </p>
             )}
           </div>
@@ -441,18 +401,18 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
             <Button 
               type="submit"
               onClick={() => {
-                const effectiveAddress = googlePlacesData.isSelected ? googlePlacesData.address : formData.address;
+                const effectiveAddress = addressData.value;
                 console.log('Add Market button clicked!');
                 console.log('Effective address for validation:', effectiveAddress);
               }}
               disabled={
                 !formData.name.trim() || 
-                !(googlePlacesData.isSelected ? googlePlacesData.address.trim() : formData.address.trim()) || 
+                !addressData.value.trim() || 
                 formData.days.length === 0
               }
               className={`${
                 (!formData.name.trim() || 
-                 !(googlePlacesData.isSelected ? googlePlacesData.address.trim() : formData.address.trim()) || 
+                 !addressData.value.trim() || 
                  formData.days.length === 0)
                   ? 'opacity-50 cursor-not-allowed'
                   : 'hover:bg-primary/90'

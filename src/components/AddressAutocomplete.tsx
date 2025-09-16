@@ -1,17 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import { supabase } from '@/integrations/supabase/client';
+import './AddressAutocomplete.css';
 
 /// <reference types="google.maps" />
 
 interface AddressAutocompleteProps {
   value: string;
-  onChange: (value: string) => void;
-  onPlaceSelected?: (place: {
-    address: string;
-    city: string;
-    state: string;
-  }) => void;
+  onChange: (value: string, isFromGooglePlaces: boolean, city?: string, state?: string) => void;
   onGooglePlacesActiveChange?: (isActive: boolean) => void;
   placeholder?: string;
   className?: string;
@@ -22,17 +18,14 @@ interface AddressAutocompleteProps {
 export const AddressAutocomplete = ({
   value,
   onChange,
-  onPlaceSelected,
   onGooglePlacesActiveChange,
   placeholder = "Start typing an address...",
   className,
   id,
   required
 }: AddressAutocompleteProps) => {
-  const elementRef = useRef<HTMLElement | null>(null);
-  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const lastKnownValueRef = useRef<string>('');
-  const hasGoogleSelectionRef = useRef<boolean>(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -40,7 +33,7 @@ export const AddressAutocomplete = ({
       try {
         // Fetch API key from edge function
         const { data, error } = await supabase.functions.invoke('get-google-api-key');
-        
+
         if (error || !data?.apiKey) {
           console.error('Failed to get Google API key:', error);
           return;
@@ -54,292 +47,143 @@ export const AddressAutocomplete = ({
 
         await loader.load();
         console.log('✅ Google Maps API loaded successfully');
-        
-        if (!elementRef.current) {
-          console.log('🔧 Creating Google Places autocomplete element...');
-          // Create the new PlaceAutocompleteElement
-          const placeAutocomplete = document.createElement('gmp-place-autocomplete') as any;
-          
-          // Set attributes
-          placeAutocomplete.setAttribute('type', 'address');
-          // Removed country restriction to allow global address search
-          if (placeholder) {
-            placeAutocomplete.setAttribute('placeholder', placeholder);
-          }
-          if (required) {
-            placeAutocomplete.setAttribute('required', 'true');
-          }
-          if (id) {
-            placeAutocomplete.setAttribute('id', id);
-          }
-          if (className) {
-            placeAutocomplete.className = className;
-          }
+        console.log('Google Maps object available:', !!window.google);
+        console.log('Google Maps Places available:', !!(window.google && window.google.maps && window.google.maps.places));
 
-          // Set the value
-          if (value) {
-            placeAutocomplete.value = value;
-          }
+        if (inputRef.current && !autocompleteRef.current) {
+          console.log('🔧 Creating Google Places Autocomplete...');
+          console.log('Input element exists:', !!inputRef.current);
+          console.log('Input element:', inputRef.current);
 
-          // Add event listeners
-          placeAutocomplete.addEventListener('gmp-placeselect', (event: any) => {
+          // Create the traditional Google Places Autocomplete
+          const autocomplete = new google.maps.places.Autocomplete(inputRef.current, {
+            types: ['address'],
+            // Removed country restriction for global addresses
+          });
+
+          console.log('✅ Google Places Autocomplete created');
+          console.log('Autocomplete object:', autocomplete);
+          console.log('Input element after autocomplete creation:', inputRef.current);
+
+          // Handle place selection
+          autocomplete.addListener('place_changed', () => {
             console.log('=== GOOGLE PLACES SELECTION EVENT FIRED ===');
-            const place = event.detail.place;
-            console.log('Place selected event:', place);
-            console.log('Place formattedAddress:', place.formattedAddress);
-            console.log('Place displayName:', place.displayName);
-            
-            // Try the simplest approach first - just use formattedAddress
-            const selectedAddress = place.formattedAddress || place.displayName || '';
-            console.log('Selected address to use:', selectedAddress);
-            
-            // Update the internal tracking immediately to prevent polling conflicts
-            lastKnownValueRef.current = selectedAddress;
-            
-            // Mark that we have a Google selection to prevent empty onChange from clearing it
-            hasGoogleSelectionRef.current = true;
-            console.log('🔒 Google selection locked to prevent clearing');
-            
-            // Update the input element value immediately to stay in sync
-            const inputElement = placeAutocomplete.querySelector('input');
-            if (inputElement) {
-              inputElement.value = selectedAddress;
+            console.log('Current input value before selection:', inputRef.current?.value);
+
+            const place = autocomplete.getPlace();
+            console.log('Place selected:', place);
+            console.log('Place object keys:', Object.keys(place));
+            console.log('Place formatted_address:', place.formatted_address);
+
+            if (!place || !place.formatted_address) {
+              console.log('❌ No valid place data received');
+              return;
             }
-            
-            // Update immediately
-            onChange(selectedAddress);
-            console.log('Called onChange with address:', selectedAddress);
-            
-            if (onPlaceSelected) {
-              console.log('Calling onPlaceSelected');
-              onPlaceSelected({
-                address: selectedAddress,
-                city: '',
-                state: ''
-              });
+
+            const selectedAddress = place.formatted_address;
+            console.log('Selected address:', selectedAddress);
+
+            // Update the input value
+            if (inputRef.current) {
+              inputRef.current.value = selectedAddress;
             }
-            
+
+            // Extract city and state
+            let city = '';
+            let state = '';
+
+            if (place.address_components) {
+              for (const component of place.address_components) {
+                if (component.types.includes('locality')) {
+                  city = component.long_name;
+                }
+                if (component.types.includes('administrative_area_level_1')) {
+                  state = component.short_name;
+                }
+              }
+            }
+
+            console.log('Extracted city:', city);
+            console.log('Extracted state:', state);
+
+            // Update form state with Google Places data
+            onChange(selectedAddress, true, city, state);
+            console.log('Called onChange with Google Places data:', { selectedAddress, city, state });
+
             console.log('=== END GOOGLE PLACES SELECTION ===');
           });
 
-          // Handle input changes - multiple event types for Google Places
-          const handleInputChange = (event?: Event) => {
-            let inputValue = '';
-            
-            // Try to get value from the event target first
-            if (event && event.target) {
-              inputValue = (event.target as HTMLInputElement).value || '';
-              console.log('Got value from event target:', inputValue);
-            }
-            
-            // If no value from event, try the input element
-            if (!inputValue) {
-              const inputElement = placeAutocomplete.querySelector('input');
-              if (inputElement) {
-                inputValue = inputElement.value || '';
-                console.log('Got value from input element:', inputValue);
-              }
-            }
-            
-            // If still no value, try the autocomplete element itself
-            if (!inputValue) {
-              inputValue = placeAutocomplete.value || '';
-              console.log('Got value from placeAutocomplete:', inputValue);
-            }
-            
-            console.log('Final input value captured:', inputValue);
-            
-            // Prevent empty onChange from clearing Google selection
-            if (!inputValue && hasGoogleSelectionRef.current) {
-              console.log('🚫 Ignoring empty onChange - Google selection is locked');
-              return;
-            }
-            
-            // If user actually starts typing, unlock Google selection
-            if (inputValue && hasGoogleSelectionRef.current) {
-              console.log('🔓 Unlocking Google selection - user is typing');
-              hasGoogleSelectionRef.current = false;
-            }
-            
-            onChange(inputValue);
-          };
-
-          // Minimal polling for edge cases - much less aggressive
-          const pollForChanges = () => {
-            const inputElement = placeAutocomplete.querySelector('input');
-            if (inputElement) {
-              const currentValue = inputElement.value || '';
-              
-              // Only trigger onChange if the value actually changed and it's not an empty value when Google selection is locked
-              if (currentValue !== lastKnownValueRef.current) {
-                // Prevent empty onChange from clearing Google selection
-                if (!currentValue && hasGoogleSelectionRef.current) {
-                  console.log('🚫 Polling: Ignoring empty change - Google selection is locked');
-                  return;
-                }
-                
-                console.log('📊 Polling detected real change:', `"${currentValue}"`);
-                
-                // Update our tracking
-                lastKnownValueRef.current = currentValue;
-                
-                // Call onChange
-                onChange(currentValue);
-              }
-            }
-          };
-
-          // Clear any existing interval before creating a new one
-          if (pollIntervalRef.current) {
-            clearInterval(pollIntervalRef.current);
-          }
-
-          // Poll much less aggressively - every 1 second
-          const pollInterval = setInterval(pollForChanges, 1000);
-
-          // Store the interval reference for cleanup
-          pollIntervalRef.current = pollInterval;
-
-          // Listen to multiple input events
-          placeAutocomplete.addEventListener('input', handleInputChange);
-          placeAutocomplete.addEventListener('keyup', handleInputChange);
-          placeAutocomplete.addEventListener('change', handleInputChange);
-          
-          // Also listen to the inner input element if it exists
-          const checkForInnerInput = () => {
-            const inputElement = placeAutocomplete.querySelector('input');
-            if (inputElement) {
-              inputElement.addEventListener('input', handleInputChange);
-              inputElement.addEventListener('keyup', handleInputChange);
-              inputElement.addEventListener('change', handleInputChange);
-              console.log('✅ Added event listeners to inner input element');
-            } else {
-              // If input doesn't exist yet, try again shortly
-              setTimeout(checkForInnerInput, 100);
-            }
-          };
-          
-          // Wait a bit for the element to fully initialize
-          setTimeout(checkForInnerInput, 500);
-
-          // Store the interval reference for cleanup
-          pollIntervalRef.current = pollInterval;
-
-          // Handle focus/blur for modal compatibility
-          placeAutocomplete.addEventListener('focus', () => {
-            onGooglePlacesActiveChange?.(true);
-          });
-
-          placeAutocomplete.addEventListener('blur', () => {
-            setTimeout(() => {
-              onGooglePlacesActiveChange?.(false);
-            }, 100);
-          });
-
-          // Apply custom styles
-          const style = document.createElement('style');
-          style.innerHTML = `
-            gmp-place-autocomplete {
-              width: 100%;
-            }
-            gmp-place-autocomplete input {
-              width: 100% !important;
-              padding: 8px 12px !important;
-              border: 1px solid #d1d5db !important;
-              border-radius: 6px !important;
-              background-color: white !important;
-              color: black !important;
-              font-size: 14px !important;
-              line-height: 1.5 !important;
-              transition: border-color 0.2s !important;
-            }
-            gmp-place-autocomplete input:focus {
-              outline: none !important;
-              border-color: #3b82f6 !important;
-              box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-            }
-            gmp-place-autocomplete input::placeholder {
-              color: #6b7280 !important;
-            }
-            /* Additional overrides for Google Places suggestions */
-            .pac-container {
-              background-color: white !important;
-              border: 1px solid #d1d5db !important;
-              border-radius: 6px !important;
-              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-            }
-            .pac-item {
-              background-color: white !important;
-              color: black !important;
-              border-bottom: 1px solid #f3f4f6 !important;
-            }
-            .pac-item:hover {
-              background-color: #f9fafb !important;
-            }
-            .pac-item-selected {
-              background-color: #f3f4f6 !important;
-            }
-            .pac-matched {
-              color: #1f2937 !important;
-              font-weight: 600 !important;
-            }
-            .gm-style .gm-style-iw-c {
-              z-index: 999999 !important;
-            }
-          `;
-          
-          if (!document.getElementById('gmp-place-autocomplete-styles')) {
-            style.id = 'gmp-place-autocomplete-styles';
-            document.head.appendChild(style);
-          }
-
-          elementRef.current = placeAutocomplete;
+          autocompleteRef.current = autocomplete;
+          setIsLoaded(true);
+          console.log('✅ Google Places autocomplete fully initialized!');
         }
-        
-        setIsLoaded(true);
-        console.log('✅ Google Places autocomplete fully initialized and ready to use!');
       } catch (error) {
         console.error('Error loading Google Places API:', error);
       }
     };
 
-    if (!isLoaded) {
-      initializeAutocomplete();
-    }
-  }, [isLoaded, onChange, onPlaceSelected, onGooglePlacesActiveChange, value, placeholder, className, id, required]);
+    initializeAutocomplete();
+  }, [onChange]);
 
-  // Cleanup function to clear polling interval
-  useEffect(() => {
-    return () => {
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
-        pollIntervalRef.current = null;
-      }
-    };
-  }, []);
+  // Handle input changes (manual typing)
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    console.log('Manual input change:', inputValue);
 
-  // Update value when prop changes
-  useEffect(() => {
-    if (elementRef.current && (elementRef.current as any).value !== value) {
-      (elementRef.current as any).value = value;
-      // Also update the input element if it exists
-      const inputElement = (elementRef.current as any).querySelector('input');
-      if (inputElement) {
-        inputElement.value = value;
+    // Check if Google Places suggestions are showing
+    setTimeout(() => {
+      const pacContainer = document.querySelector('.pac-container') as HTMLElement;
+      if (pacContainer) {
+        console.log('PAC container visible after input:', pacContainer.style.display !== 'none');
+        const pacItems = pacContainer.querySelectorAll('.pac-item');
+        console.log('Number of suggestions:', pacItems.length);
       }
+    }, 100);
+
+    onChange(inputValue, false);
+  };
+
+  // Handle focus/blur for modal compatibility
+  const handleFocus = () => {
+    console.log('Input focused - checking for Google Places dropdown');
+    // Check if pac-container exists after a short delay
+    setTimeout(() => {
+      const pacContainer = document.querySelector('.pac-container') as HTMLElement;
+      console.log('PAC container found:', pacContainer);
+      if (pacContainer) {
+        console.log('PAC container is visible:', pacContainer.style.display !== 'none');
+        console.log('PAC container z-index:', pacContainer.style.zIndex);
+        console.log('PAC container position:', pacContainer.style.position);
+      }
+    }, 100);
+
+    if (onGooglePlacesActiveChange) {
+      onGooglePlacesActiveChange(true);
     }
-    // Update our internal tracking when the prop changes
-    lastKnownValueRef.current = value;
-  }, [value]);
+  };
+
+  const handleBlur = () => {
+    // Delay to allow place selection to complete
+    setTimeout(() => {
+      if (onGooglePlacesActiveChange) {
+        onGooglePlacesActiveChange(false);
+      }
+    }, 200);
+  };
 
   return (
-    <div 
-      style={{ position: 'relative', zIndex: 1 }}
-      ref={(containerRef) => {
-        if (containerRef && elementRef.current && !containerRef.contains(elementRef.current)) {
-          containerRef.appendChild(elementRef.current);
-        }
-      }}
+    <input
+      ref={inputRef}
+      type="text"
+      id={id}
+      className={`address-autocomplete-input ${className || ''}`}
+      placeholder={placeholder}
+      defaultValue={value}
+      onChange={handleInputChange}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      required={required}
+      autoComplete="off"
     />
   );
 };
