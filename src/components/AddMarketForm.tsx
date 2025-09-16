@@ -70,11 +70,11 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
     console.log('Form submitted with data:', formData);
     console.log('Validation check:', { 
       hasName: !!formData.name, 
-      hasAddress: !!formData.address, 
+      hasAddress: !!formData.address && typeof formData.address === 'string', 
       hasDays: formData.days.length > 0 
     });
     
-    if (!formData.name || !formData.address || formData.days.length === 0) {
+    if (!formData.name || !formData.address || typeof formData.address !== 'string' || formData.days.length === 0) {
       console.log('Form validation failed, not submitting');
       return;
     }
@@ -180,13 +180,17 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
             <AddressAutocomplete
               id="address-google"
               value={formData.address}
-              onChange={(value) => setFormData(prev => ({ ...prev, address: value }))}
+              onChange={(address) => {
+                console.log('Address changed:', address);
+                setFormData(prev => ({ ...prev, address: address || '' }));
+              }}
               onPlaceSelected={(place) => {
+                console.log('Place selected:', place);
                 setFormData(prev => ({
                   ...prev,
-                  address: place.address,
-                  city: place.city,
-                  state: place.state
+                  address: place.address || '',
+                  city: place.city || '',
+                  state: place.state || ''
                 }));
               }}
               onGooglePlacesActiveChange={setIsGooglePlacesActive}
