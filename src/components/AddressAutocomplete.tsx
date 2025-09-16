@@ -105,7 +105,7 @@ export const AddressAutocomplete = ({
                 }
               });
               
-              const fullAddress = `${streetNumber} ${streetName}`.trim();
+              const fullAddress = place.formattedAddress || place.displayName || `${streetNumber} ${streetName}, ${city}, ${state}`.trim();
               console.log('Full address extracted:', fullAddress);
               console.log('City extracted:', city);
               console.log('State extracted:', state);

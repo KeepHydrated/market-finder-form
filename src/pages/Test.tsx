@@ -350,10 +350,8 @@ export default function Test() {
                     }}
                     onPlaceSelected={(place) => {
                       console.log('Place selected:', place);
-                      if (place.address) {
-                        console.log('Setting address to:', place.address);
-                        setMarketAddress(place.address);
-                      }
+                      console.log('Setting address to:', place.address);
+                      setMarketAddress(place.address);
                     }}
                     placeholder="Enter market address..."
                     className="text-base py-3"
