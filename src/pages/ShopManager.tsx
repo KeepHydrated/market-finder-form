@@ -791,51 +791,6 @@ export default function ShopManager() {
                   />
                 </div>
 
-                {isEditing && (
-                  <div className="pt-6 border-t border-destructive/20">
-                    <div className="space-y-4">
-                      <div>
-                        <h3 className="text-lg font-semibold text-destructive">Danger Zone</h3>
-                        <p className="text-sm text-muted-foreground">
-                          This action cannot be undone. This will permanently delete your shop and all associated data.
-                        </p>
-                      </div>
-                      
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button 
-                            variant="destructive" 
-                            disabled={isDeleting || isPublicAccess}
-                            className="w-fit"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete Shop
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete your shop 
-                              "{shopData.store_name}" and remove all of your products, orders, and shop data from our servers.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction 
-                              onClick={handleDeleteShop}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              disabled={isDeleting}
-                            >
-                              {isDeleting ? "Deleting..." : "Yes, delete shop"}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                )}
-
                 {/* Edit button positioned at bottom right */}
                 <div className="flex justify-end mt-6">
                   <Button
