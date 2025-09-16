@@ -67,40 +67,64 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('=== FORM SUBMISSION STARTED ===');
-    console.log('Form submitted with data:', formData);
-    console.log('Address type:', typeof formData.address);
-    console.log('Address value:', formData.address);
-    
     // Ensure address is a string
     const addressString = typeof formData.address === 'string' ? formData.address : '';
     
-    console.log('Validation check:', { 
-      hasName: !!formData.name, 
-      hasAddress: !!addressString, 
-      hasDays: formData.days.length > 0 
-    });
-    
     if (!formData.name || !addressString || formData.days.length === 0) {
-      console.log('Form validation failed, not submitting');
-      console.log('Missing fields:', {
-        name: !formData.name ? 'missing' : 'ok',
-        address: !addressString ? 'missing' : 'ok', 
-        days: formData.days.length === 0 ? 'missing' : 'ok'
-      });
       return;
     }
 
-    console.log('Form validation passed, calling onMarketAdded');
-    
-    // Create clean form data with string address
-    const cleanFormData = {
-      ...formData,
-      address: addressString
+    // Format hours object into readable string
+    const formatHours = () => {
+      if (!formData.hours || Object.keys(formData.hours).length === 0) {
+        return null;
+      }
+      
+      const dayAbbrevMap: Record<string, string> = {
+        'Monday': 'Mon',
+        'Tuesday': 'Tue', 
+        'Wednesday': 'Wed',
+        'Thursday': 'Thu',
+        'Friday': 'Fri',
+        'Saturday': 'Sat',
+        'Sunday': 'Sun'
+      };
+      
+      const hoursArray = formData.days
+        .filter(day => formData.hours[day])
+        .map(day => {
+          const timeData = formData.hours[day];
+          const dayAbbrev = dayAbbrevMap[day] || day.slice(0, 3);
+          return `${dayAbbrev}: ${timeData.start} ${timeData.startPeriod} - ${timeData.end} ${timeData.endPeriod}`;
+        });
+      
+      return hoursArray.join(', ');
+    };
+
+    // Convert days to 3-letter abbreviations
+    const dayAbbrevMap: Record<string, string> = {
+      'Monday': 'Mon',
+      'Tuesday': 'Tue', 
+      'Wednesday': 'Wed',
+      'Thursday': 'Thu',
+      'Friday': 'Fri',
+      'Saturday': 'Sat',
+      'Sunday': 'Sun'
     };
     
-    console.log('Clean form data being passed:', cleanFormData);
+    const formattedDays = formData.days.map(day => dayAbbrevMap[day] || day.slice(0, 3));
+    
+    // Create clean form data with formatted hours and days
+    const cleanFormData = {
+      name: formData.name,
+      address: addressString,
+      days: formattedDays,
+      hours: formatHours()
+    };
+    
     onMarketAdded(cleanFormData);
+    
+    // Reset form
     setFormData({
       name: '',
       address: '',
@@ -110,7 +134,6 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
       hours: {}
     });
     setDayTimeSelections({});
-    console.log('=== FORM SUBMISSION COMPLETED ===');
   };
 
   const handleDayToggle = (day: string) => {
