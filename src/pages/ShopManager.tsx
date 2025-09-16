@@ -774,29 +774,8 @@ export default function ShopManager() {
           </TabsContent>
 
           <TabsContent value="shop" className="space-y-6 max-w-2xl">
-            <div className="relative">
-              {/* Edit button positioned outside card at top right */}
-              <div className="absolute -top-12 right-0 z-10">
-                <Button
-                  variant={isEditing ? "outline" : "default"}
-                  onClick={() => {
-                    if (isEditing) {
-                      setFormData({
-                        store_name: shopData.store_name || '',
-                        primary_specialty: shopData.primary_specialty || '',
-                        website: shopData.website || '',
-                        description: shopData.description || '',
-                      });
-                    }
-                    setIsEditing(!isEditing);
-                  }}
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  {isEditing ? 'Save' : 'Edit'}
-                </Button>
-              </div>
-              
-              <Card>
+            <div className="flex gap-4 items-start">
+              <Card className="flex-1">
                 <CardContent className="space-y-4 pt-4">
                   <MarketSearch
                     markets={markets}
@@ -861,6 +840,26 @@ export default function ShopManager() {
                   </div>
                 </CardContent>
               </Card>
+              
+              {/* Edit button positioned to the side of the card */}
+              <Button
+                variant={isEditing ? "outline" : "default"}
+                onClick={() => {
+                  if (isEditing) {
+                    setFormData({
+                      store_name: shopData.store_name || '',
+                      primary_specialty: shopData.primary_specialty || '',
+                      website: shopData.website || '',
+                      description: shopData.description || '',
+                    });
+                  }
+                  setIsEditing(!isEditing);
+                }}
+                className="shrink-0"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                {isEditing ? 'Save' : 'Edit'}
+              </Button>
             </div>
           </TabsContent>
 
