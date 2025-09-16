@@ -67,6 +67,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('=== FORM SUBMISSION STARTED ===');
     console.log('Form submitted with data:', formData);
     console.log('Address type:', typeof formData.address);
     console.log('Address value:', formData.address);
@@ -82,6 +83,11 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
     
     if (!formData.name || !addressString || formData.days.length === 0) {
       console.log('Form validation failed, not submitting');
+      console.log('Missing fields:', {
+        name: !formData.name ? 'missing' : 'ok',
+        address: !addressString ? 'missing' : 'ok', 
+        days: formData.days.length === 0 ? 'missing' : 'ok'
+      });
       return;
     }
 
@@ -93,6 +99,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
       address: addressString
     };
     
+    console.log('Clean form data being passed:', cleanFormData);
     onMarketAdded(cleanFormData);
     setFormData({
       name: '',
@@ -103,6 +110,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
       hours: {}
     });
     setDayTimeSelections({});
+    console.log('=== FORM SUBMISSION COMPLETED ===');
   };
 
   const handleDayToggle = (day: string) => {
@@ -317,7 +325,10 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">
+            <Button 
+              type="submit"
+              onClick={() => console.log('Add Market button clicked!')}
+            >
               Add Market
             </Button>
           </div>
