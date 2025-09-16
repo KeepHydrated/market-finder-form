@@ -133,26 +133,11 @@ export const AddressAutocomplete = ({
             }, 100);
           });
 
-          // Apply custom styles directly to the element
-          placeAutocomplete.style.cssText = `
-            width: 100%;
-            --gmp-place-field-background-color: white;
-            --gmp-place-field-color: black;
-            --gmp-place-field-border-color: #d1d5db;
-            --gmp-place-field-focus-border-color: #3b82f6;
-            --gmp-place-field-placeholder-color: #6b7280;
-          `;
-
           // Apply custom styles
           const style = document.createElement('style');
           style.innerHTML = `
             gmp-place-autocomplete {
               width: 100%;
-              --gmp-place-field-background-color: white !important;
-              --gmp-place-field-color: black !important;
-              --gmp-place-field-border-color: #d1d5db !important;
-              --gmp-place-field-focus-border-color: #3b82f6 !important;
-              --gmp-place-field-placeholder-color: #6b7280 !important;
             }
             gmp-place-autocomplete input {
               width: 100% !important;
