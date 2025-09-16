@@ -142,21 +142,21 @@ export const AddressAutocomplete = ({
             gmp-place-autocomplete input {
               width: 100% !important;
               padding: 8px 12px !important;
-              border: 1px solid hsl(var(--border)) !important;
+              border: 1px solid #d1d5db !important;
               border-radius: 6px !important;
-              background-color: hsl(var(--background)) !important;
-              color: hsl(var(--foreground)) !important;
+              background-color: white !important;
+              color: black !important;
               font-size: 14px !important;
               line-height: 1.5 !important;
               transition: border-color 0.2s !important;
             }
             gmp-place-autocomplete input:focus {
               outline: none !important;
-              border-color: hsl(var(--ring)) !important;
-              box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2) !important;
+              border-color: #3b82f6 !important;
+              box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
             }
             gmp-place-autocomplete input::placeholder {
-              color: hsl(var(--muted-foreground)) !important;
+              color: #6b7280 !important;
             }
             .gm-style .gm-style-iw-c {
               z-index: 999999 !important;
