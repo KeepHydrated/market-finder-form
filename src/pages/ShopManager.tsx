@@ -866,28 +866,6 @@ export default function ShopManager() {
 
                 <Separator />
 
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Account Actions</h3>
-                  
-                  <div className="space-y-3">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => window.location.href = '/profile'}
-                      className="w-fit"
-                    >
-                      Edit Profile
-                    </Button>
-                    
-                    <Button 
-                      variant="outline" 
-                      onClick={() => supabase.auth.signOut()}
-                      className="w-fit"
-                    >
-                      Sign Out
-                    </Button>
-                  </div>
-                </div>
-
                 {!isPublicAccess && (
                   <>
                     <Separator />
