@@ -100,7 +100,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
 
     // Format hours object into readable string
     const formatHours = () => {
-      if (!formData.hours || Object.keys(formData.hours).length === 0) {
+      if (!formData.days || formData.days.length === 0) {
         return null;
       }
       
@@ -114,13 +114,32 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
         'Sunday': 'Sun'
       };
       
-      const hoursArray = formData.days
-        .filter(day => formData.hours[day])
-        .map(day => {
-          const timeData = formData.hours[day];
-          const dayAbbrev = dayAbbrevMap[day] || day.slice(0, 3);
-          return `${dayAbbrev}: ${timeData.start} ${timeData.startPeriod} - ${timeData.end} ${timeData.endPeriod}`;
-        });
+      const hoursArray = formData.days.map(day => {
+        const dayAbbrev = dayAbbrevMap[day] || day.slice(0, 3);
+        
+        // Get time data from formData.hours or dayTimeSelections, with fallbacks
+        const formDataTime = formData.hours[day];
+        const selectionTime = dayTimeSelections[day];
+        
+        let startTime = '08:00';
+        let startPeriod = 'AM';
+        let endTime = '02:00';
+        let endPeriod = 'PM';
+        
+        if (formDataTime) {
+          startTime = formDataTime.start;
+          startPeriod = formDataTime.startPeriod;
+          endTime = formDataTime.end;
+          endPeriod = formDataTime.endPeriod;
+        } else if (selectionTime) {
+          startTime = selectionTime.startTime;
+          startPeriod = selectionTime.startPeriod;
+          endTime = selectionTime.endTime;
+          endPeriod = selectionTime.endPeriod;
+        }
+        
+        return `${dayAbbrev}: ${startTime} ${startPeriod} - ${endTime} ${endPeriod}`;
+      });
       
       return hoursArray.join(', ');
     };
