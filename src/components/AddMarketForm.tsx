@@ -164,15 +164,30 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
   };
 
   const handleDayToggle = (day: string) => {
+    const isCurrentlySelected = formData.days.includes(day);
+    
     setFormData(prev => ({
       ...prev,
-      days: prev.days.includes(day) 
+      days: isCurrentlySelected 
         ? prev.days.filter(d => d !== day)
-        : [...prev.days, day]
+        : [...prev.days, day],
+      hours: isCurrentlySelected
+        ? // Remove from hours when deselecting
+          Object.fromEntries(Object.entries(prev.hours).filter(([key]) => key !== day))
+        : // Add to hours when selecting
+          {
+            ...prev.hours,
+            [day]: {
+              start: '08:00',
+              end: '02:00',
+              startPeriod: 'AM',
+              endPeriod: 'PM'
+            }
+          }
     }));
 
     // Initialize time selection for newly selected day
-    if (!formData.days.includes(day)) {
+    if (!isCurrentlySelected) {
       setDayTimeSelections(prevTimes => ({
         ...prevTimes,
         [day]: {
@@ -215,7 +230,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
       setFormData({
         name: editingMarket.name || '',
         days: fullDayNames,
-        hours: {}
+        hours: {} // Will be populated below
       });
       setAddressData({
         value: editingMarket.address || '',
@@ -276,6 +291,23 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
       }
       
       setDayTimeSelections(defaultTimeSelections);
+      
+      // Also populate formData.hours with the parsed time data
+      const formDataHours: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }> = {};
+      Object.keys(defaultTimeSelections).forEach(day => {
+        const timeData = defaultTimeSelections[day];
+        formDataHours[day] = {
+          start: timeData.startTime,
+          end: timeData.endTime,
+          startPeriod: timeData.startPeriod,
+          endPeriod: timeData.endPeriod
+        };
+      });
+      
+      setFormData(prev => ({
+        ...prev,
+        hours: formDataHours
+      }));
     } else {
       // Reset form when not editing
       setFormData({
