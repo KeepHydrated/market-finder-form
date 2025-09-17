@@ -238,16 +238,38 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
       // Parse and override with actual hours if available
       if (editingMarket.hours) {
         try {
-          const hoursData = typeof editingMarket.hours === 'string' 
-            ? JSON.parse(editingMarket.hours) 
-            : editingMarket.hours;
+          let hoursString = editingMarket.hours;
           
-          // Merge parsed hours with defaults
-          Object.keys(hoursData).forEach(day => {
-            if (defaultTimeSelections[day]) {
-              defaultTimeSelections[day] = { ...defaultTimeSelections[day], ...hoursData[day] };
-            }
-          });
+          // Remove extra quotes if present
+          if (typeof hoursString === 'string' && hoursString.startsWith('"') && hoursString.endsWith('"')) {
+            hoursString = hoursString.slice(1, -1);
+          }
+          
+          // Parse the hours string format: "Mon: 09:00 AM - 06:00 PM, Thu: 10:00 AM - 01:00 PM"
+          if (typeof hoursString === 'string' && hoursString.includes(':')) {
+            const dayHourPairs = hoursString.split(', ');
+            
+            dayHourPairs.forEach(pair => {
+              const [dayAbbrev, timeRange] = pair.split(': ');
+              if (timeRange && timeRange.includes(' - ')) {
+                const [startTime, endTime] = timeRange.split(' - ');
+                const [startHour, startPeriod] = startTime.split(' ');
+                const [endHour, endPeriod] = endTime.split(' ');
+                
+                // Convert abbreviated day back to full name for the form
+                const fullDayName = abbrevToDayMap[dayAbbrev] || dayAbbrev;
+                
+                if (defaultTimeSelections[fullDayName]) {
+                  defaultTimeSelections[fullDayName] = {
+                    startTime: startHour,
+                    startPeriod: startPeriod as 'AM' | 'PM',
+                    endTime: endHour,
+                    endPeriod: endPeriod as 'AM' | 'PM'
+                  };
+                }
+              }
+            });
+          }
         } catch (e) {
           console.log('Could not parse market hours:', e);
         }
