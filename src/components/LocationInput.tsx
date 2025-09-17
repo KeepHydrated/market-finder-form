@@ -94,7 +94,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
       } else {
         setSuggestions([]);
       }
-    }, 300);
+    }, 150);
 
     return () => clearTimeout(timeoutId);
   }, [value, zipcode]);
