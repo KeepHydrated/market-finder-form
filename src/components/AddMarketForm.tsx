@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,9 +21,10 @@ interface AddMarketFormProps {
   open: boolean;
   onClose: () => void;
   onMarketAdded: (market: any) => void;
+  editingMarket?: any;
 }
 
-export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormProps) => {
+export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket }: AddMarketFormProps) => {
   const [formData, setFormData] = useState({
     name: '',
     days: [] as string[],
@@ -192,6 +193,35 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
 
   const [isGooglePlacesActive, setIsGooglePlacesActive] = useState(false);
 
+  // Populate form when editing a market
+  useEffect(() => {
+    if (editingMarket) {
+      setFormData({
+        name: editingMarket.name || '',
+        days: editingMarket.days || [],
+        hours: {}
+      });
+      setAddressData({
+        value: editingMarket.address || '',
+        isFromGooglePlaces: false,
+        city: editingMarket.city || '',
+        state: editingMarket.state || ''
+      });
+      
+      // Parse and set day time selections if available
+      if (editingMarket.hours) {
+        try {
+          const hoursData = typeof editingMarket.hours === 'string' 
+            ? JSON.parse(editingMarket.hours) 
+            : editingMarket.hours;
+          setDayTimeSelections(hoursData);
+        } catch (e) {
+          console.log('Could not parse market hours:', e);
+        }
+      }
+    }
+  }, [editingMarket]);
+
   const handleCloseModal = (open: boolean) => {
     // Don't close if Google Places is active
     if (isGooglePlacesActive) {
@@ -199,6 +229,19 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
     }
     
     if (!open) {
+      // Reset form when closing
+      setFormData({
+        name: '',
+        days: [],
+        hours: {}
+      });
+      setAddressData({
+        value: '',
+        isFromGooglePlaces: false,
+        city: '',
+        state: ''
+      });
+      setDayTimeSelections({});
       onClose();
     }
   };
@@ -236,7 +279,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
           }
         }}>
         <DialogHeader>
-          <DialogTitle>Add New Farmers Market</DialogTitle>
+          <DialogTitle>{editingMarket ? 'Edit' : 'Add New'} Farmers Market</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -401,7 +444,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
               type="submit"
               onClick={() => {
                 const effectiveAddress = addressData.value;
-                console.log('Add Market button clicked!');
+                console.log(`${editingMarket ? 'Update' : 'Add'} Market button clicked!`);
                 console.log('Effective address for validation:', effectiveAddress);
               }}
               disabled={
@@ -417,7 +460,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
                   : 'hover:bg-primary/90'
               }`}
             >
-              Add Market
+              {editingMarket ? 'Update' : 'Add'} Market
             </Button>
           </div>
         </form>

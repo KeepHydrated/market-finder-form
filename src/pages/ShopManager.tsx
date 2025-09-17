@@ -79,6 +79,7 @@ export default function ShopManager() {
   const [markets, setMarkets] = useState<any[]>([]);
   const [marketSearchTerm, setMarketSearchTerm] = useState('');
   const [showAddMarket, setShowAddMarket] = useState(false);
+  const [editingMarket, setEditingMarket] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [vacationMode, setVacationMode] = useState(false);
@@ -450,8 +451,15 @@ export default function ShopManager() {
     }
   };
 
+  const handleEditMarket = (market: any) => {
+    setEditingMarket(market);
+    setShowAddMarket(true);
+  };
+
   const handleAddMarket = async (marketData: any) => {
     console.log('handleAddMarket called with:', marketData);
+    console.log('EditingMarket:', editingMarket);
+    
     try {
       // Format the hours object as JSON string for database storage
       const formattedMarketData = {
@@ -465,27 +473,54 @@ export default function ShopManager() {
 
       console.log('Formatted market data:', formattedMarketData);
 
-      const { data, error } = await supabase
-        .from('markets')
-        .insert([formattedMarketData])
-        .select()
-        .single();
+      let data;
+      if (editingMarket) {
+        // Update existing market
+        const { data: updateData, error } = await supabase
+          .from('markets')
+          .update(formattedMarketData)
+          .eq('id', editingMarket.id)
+          .select()
+          .single();
 
-      if (error) throw error;
+        if (error) throw error;
+        data = updateData;
 
-      setMarkets(prev => [...prev, data]);
+        // Update the markets list
+        setMarkets(prev => prev.map(m => m.id === editingMarket.id ? data : m));
+        
+        toast({
+          title: "Market Updated",
+          description: `${marketData.name} has been updated.`,
+        });
+      } else {
+        // Create new market
+        const { data: insertData, error } = await supabase
+          .from('markets')
+          .insert([formattedMarketData])
+          .select()
+          .single();
+
+        if (error) throw error;
+        data = insertData;
+
+        setMarkets(prev => [...prev, data]);
+        
+        toast({
+          title: "Market Added",
+          description: `${marketData.name} has been added and selected.`,
+        });
+      }
+
       await handleMarketSelect(data);
       setShowAddMarket(false);
+      setEditingMarket(null);
 
-      toast({
-        title: "Market Added",
-        description: `${marketData.name} has been added and selected.`,
-      });
     } catch (error: any) {
-      console.error('Error adding market:', error);
+      console.error('Error with market:', error);
       toast({
-        title: "Add Failed",
-        description: error.message || "Failed to add market.",
+        title: editingMarket ? "Update Failed" : "Add Failed",
+        description: error.message || `Failed to ${editingMarket ? 'update' : 'add'} market.`,
         variant: "destructive",
       });
     }
@@ -783,6 +818,8 @@ export default function ShopManager() {
                     onSearchTermChange={setMarketSearchTerm}
                     onSelectMarket={handleMarketSelect}
                     onAddMarket={() => setShowAddMarket(true)}
+                    onEditMarket={handleEditMarket}
+                    submittedMarketName={shopData?.selected_market}
                     disabled={!isEditing}
                   />
 
@@ -976,8 +1013,12 @@ export default function ShopManager() {
 
       <AddMarketForm
         open={showAddMarket}
-        onClose={() => setShowAddMarket(false)}
+        onClose={() => {
+          setShowAddMarket(false);
+          setEditingMarket(null);
+        }}
         onMarketAdded={handleAddMarket}
+        editingMarket={editingMarket}
       />
     </div>
   );

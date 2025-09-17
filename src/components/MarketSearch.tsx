@@ -19,13 +19,14 @@ interface MarketSearchProps {
   markets: Market[];
   onSelectMarket: (market: Market) => void;
   onAddMarket: () => void;
+  onEditMarket?: (market: Market) => void;
   searchTerm: string;
   onSearchTermChange: (term: string) => void;
   submittedMarketName?: string | null;
   disabled?: boolean;
 }
 
-export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm, onSearchTermChange, submittedMarketName, disabled = false }: MarketSearchProps) => {
+export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, onEditMarket, searchTerm, onSearchTermChange, submittedMarketName, disabled = false }: MarketSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -138,7 +139,16 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, searchTerm,
             </div>
             
             <button
-              onClick={onAddMarket}
+              onClick={() => {
+                if (isEditingSubmittedMarket && onEditMarket) {
+                  const selectedMarket = markets.find(m => m.name.toLowerCase() === searchTerm.toLowerCase());
+                  if (selectedMarket) {
+                    onEditMarket(selectedMarket);
+                  }
+                } else {
+                  onAddMarket();
+                }
+              }}
               className={cn(
                 "w-full px-4 py-3 text-left hover:bg-muted transition-colors flex items-center gap-2 border-t border-border",
                 selectedIndex === visibleMarkets.length && "bg-muted"
