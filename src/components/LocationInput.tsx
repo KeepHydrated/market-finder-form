@@ -128,9 +128,9 @@ export const LocationInput: React.FC<LocationInputProps> = ({
   };
 
   return (
-    <div className={`space-y-0 ${className}`}>
+    <div className={`${className}`}>
       {label && (
-        <label className="block text-base font-bold text-foreground">
+        <label className="block text-base font-bold text-foreground mb-1">
           {label}
         </label>
       )}
