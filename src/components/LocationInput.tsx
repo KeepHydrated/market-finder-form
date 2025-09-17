@@ -135,7 +135,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
         </label>
       )}
       
-      <div className="relative -mt-1">
+      <div className="relative -mt-0.5">
         <div className="relative">
           <input
             ref={inputRef}
