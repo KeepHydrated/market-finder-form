@@ -83,6 +83,9 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
     console.log('  - Address:', `"${addressString}"`);
     console.log('  - Address from Google Places:', addressData.isFromGooglePlaces);
     console.log('  - Days:', formData.days);
+    console.log('🔍 Debug form data:');
+    console.log('  - formData.hours:', JSON.stringify(formData.hours, null, 2));
+    console.log('  - dayTimeSelections:', JSON.stringify(dayTimeSelections, null, 2));
 
     // Enhanced validation with specific error messages
     const missingFields = [];
@@ -164,6 +167,9 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
       days: formattedDays,
       hours: formatHours()
     };
+    
+    console.log('🔍 Final formatted data before submission:');
+    console.log('  - cleanFormData:', JSON.stringify(cleanFormData, null, 2));
     
     onMarketAdded(cleanFormData);
     
