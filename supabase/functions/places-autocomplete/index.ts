@@ -34,15 +34,37 @@ serve(async (req) => {
     
     // Add location bias for zipcode if provided
     if (zipcode) {
-      const zipToCoords: Record<string, { lat: number; lng: number }> = {
-        '78212': { lat: 29.4241, lng: -98.4936 },
-        '78213': { lat: 29.4889, lng: -98.5151 },
-        // Add more zipcodes as needed
+      // For better results, we could use a zipcode-to-coordinates service
+      // For now, we'll add the zipcode as a region bias
+      url += `&region=us`;
+      
+      // Try to get coordinates for common US zipcodes using a simple mapping
+      // In production, you might want to use a proper zipcode geocoding service
+      const getCoordinatesFromZipcode = (zip: string): { lat: number; lng: number } | null => {
+        const zipToCoords: Record<string, { lat: number; lng: number }> = {
+          // Texas zipcodes
+          '78212': { lat: 29.4241, lng: -98.4936 },
+          '78213': { lat: 29.4889, lng: -98.5151 },
+          '78215': { lat: 29.4520, lng: -98.4826 },
+          '78216': { lat: 29.5163, lng: -98.4968 },
+          '78209': { lat: 29.4677, lng: -98.5042 },
+          // Add more common zipcodes as needed
+          '10001': { lat: 40.7505, lng: -73.9934 }, // NYC
+          '90210': { lat: 34.0901, lng: -118.4065 }, // Beverly Hills
+          '94102': { lat: 37.7849, lng: -122.4094 }, // San Francisco
+          '60601': { lat: 41.8827, lng: -87.6233 }, // Chicago
+          '33101': { lat: 25.7743, lng: -80.1937 }, // Miami
+        };
+        
+        return zipToCoords[zip] || null;
       };
       
-      const coords = zipToCoords[zipcode];
+      const coords = getCoordinatesFromZipcode(zipcode);
       if (coords) {
-        url += `&location=${coords.lat},${coords.lng}&radius=25000`;
+        url += `&location=${coords.lat},${coords.lng}&radius=50000`; // 50km radius
+        console.log(`Using location bias for zipcode ${zipcode}: ${coords.lat}, ${coords.lng}`);
+      } else {
+        console.log(`No coordinates found for zipcode ${zipcode}, using general US region`);
       }
     }
     

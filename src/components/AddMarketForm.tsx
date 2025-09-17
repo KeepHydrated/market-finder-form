@@ -22,9 +22,10 @@ interface AddMarketFormProps {
   onClose: () => void;
   onMarketAdded: (market: any) => void;
   editingMarket?: any;
+  userZipcode?: string;
 }
 
-export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket }: AddMarketFormProps) => {
+export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, userZipcode }: AddMarketFormProps) => {
   const [formData, setFormData] = useState({
     name: '',
     days: [] as string[],
@@ -360,6 +361,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket }: A
                   });
                 }
               }}
+              zipcode={userZipcode}
               className="border-green-500 focus:border-green-600"
             />
             

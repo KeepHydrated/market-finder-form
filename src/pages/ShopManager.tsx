@@ -80,12 +80,37 @@ export default function ShopManager() {
   const [marketSearchTerm, setMarketSearchTerm] = useState('');
   const [showAddMarket, setShowAddMarket] = useState(false);
   const [editingMarket, setEditingMarket] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [vacationMode, setVacationMode] = useState(false);
 
   // Check for public access via URL parameter
   const isPublicAccess = new URLSearchParams(window.location.search).get('demo') === 'true';
+
+  // Fetch user profile
+  const fetchUserProfile = async () => {
+    if (!user) return;
+    
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+        
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "not found" which is ok
+        console.error('Error fetching profile:', error);
+        return;
+      }
+      
+      if (profile) {
+        setUserProfile(profile);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
 
   // Form state
   const [formData, setFormData] = useState({
@@ -99,6 +124,7 @@ export default function ShopManager() {
     if (user) {
       fetchShopData();
       fetchMarkets();
+      fetchUserProfile();
     } else if (isPublicAccess) {
       // Load demo data for public access
       loadDemoData();
@@ -1019,6 +1045,7 @@ export default function ShopManager() {
         }}
         onMarketAdded={handleAddMarket}
         editingMarket={editingMarket}
+        userZipcode={userProfile?.zipcode}
       />
     </div>
   );
