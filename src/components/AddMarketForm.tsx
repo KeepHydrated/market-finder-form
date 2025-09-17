@@ -430,7 +430,6 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
           }
         }}>
         <DialogHeader>
-          <DialogTitle>{editingMarket ? 'Edit' : 'Add New'} Farmers Market</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
