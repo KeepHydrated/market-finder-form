@@ -508,7 +508,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
           {formData.days.length > 0 && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-12">
-                {formData.days.map((day) => (
+                {DAYS_OF_WEEK.filter(day => formData.days.includes(day)).map((day) => (
                   <div key={day} className="space-y-3 border-t pt-4">
                     <h5 className={`font-medium ${day === 'Saturday' || day === 'Tuesday' ? 'text-sm' : ''}`}>{day}</h5>
                     <div className="flex items-center justify-between">
