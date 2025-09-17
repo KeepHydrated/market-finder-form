@@ -130,7 +130,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
   return (
     <div className={`${className}`}>
       {label && (
-        <label className="block text-base font-bold text-foreground mb-1">
+        <label className="block text-base font-bold text-foreground">
           {label}
         </label>
       )}
