@@ -156,10 +156,28 @@ export default function ShopManager() {
       }
 
       if (data) {
+        console.log('Raw data from database:', [data]); // Debug log
         const parsedData = {
           ...data,
           products: typeof data.products === 'string' ? JSON.parse(data.products) : data.products || [],
+          market_hours: (() => {
+            try {
+              if (typeof data.market_hours === 'string') {
+                // Remove extra quotes if present
+                let hoursString = data.market_hours;
+                if (hoursString.startsWith('"') && hoursString.endsWith('"')) {
+                  hoursString = hoursString.slice(1, -1);
+                }
+                return hoursString;
+              }
+              return data.market_hours || null;
+            } catch (e) {
+              console.error('Error parsing market_hours:', e);
+              return data.market_hours || null;
+            }
+          })()
         };
+        console.log('Parsed submissions:', [parsedData]); // Debug log
         setShopData(parsedData);
         setFormData({
           store_name: parsedData.store_name || '',
@@ -439,6 +457,9 @@ export default function ShopManager() {
     if (!shopData) return;
 
     try {
+      // Ensure hours are stored as JSON string in database
+      const hoursToStore = typeof market.hours === 'string' ? market.hours : JSON.stringify(market.hours);
+      
       const { error } = await supabase
         .from('submissions')
         .update({
@@ -446,7 +467,7 @@ export default function ShopManager() {
           search_term: market.name,
           market_address: market.address,
           market_days: market.days,
-          market_hours: market.hours,
+          market_hours: hoursToStore,
           updated_at: new Date().toISOString(),
         })
         .eq('id', shopData.id);
