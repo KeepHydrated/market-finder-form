@@ -510,7 +510,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
               <div className="grid grid-cols-2 gap-12">
                 {formData.days.map((day) => (
                   <div key={day} className="space-y-3 border-t pt-4">
-                    <h5 className="font-medium">{day}</h5>
+                    <h5 className={`font-medium ${day === 'Saturday' || day === 'Tuesday' ? 'text-sm' : ''}`}>{day}</h5>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1">
                         <Select 
