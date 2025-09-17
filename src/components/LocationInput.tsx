@@ -141,7 +141,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
             ref={inputRef}
             type="text"
             placeholder={placeholder}
-            className="w-full pl-10 pr-4 py-3 text-base border-2 border-border rounded-lg focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-background text-foreground placeholder:text-muted-foreground"
+            className="w-full pl-10 pr-4 py-2 text-base border-2 border-border rounded-lg focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-background text-foreground placeholder:text-muted-foreground"
             value={value}
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => setIsOpen(true)}
