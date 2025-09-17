@@ -208,17 +208,50 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket }: A
         state: editingMarket.state || ''
       });
       
-      // Parse and set day time selections if available
+      // Initialize dayTimeSelections for each day with default values first
+      const defaultTimeSelections: Record<string, any> = {};
+      (editingMarket.days || []).forEach((day: string) => {
+        defaultTimeSelections[day] = {
+          startTime: '08:00',
+          startPeriod: 'AM',
+          endTime: '02:00',
+          endPeriod: 'PM'
+        };
+      });
+      
+      // Parse and override with actual hours if available
       if (editingMarket.hours) {
         try {
           const hoursData = typeof editingMarket.hours === 'string' 
             ? JSON.parse(editingMarket.hours) 
             : editingMarket.hours;
-          setDayTimeSelections(hoursData);
+          
+          // Merge parsed hours with defaults
+          Object.keys(hoursData).forEach(day => {
+            if (defaultTimeSelections[day]) {
+              defaultTimeSelections[day] = { ...defaultTimeSelections[day], ...hoursData[day] };
+            }
+          });
         } catch (e) {
           console.log('Could not parse market hours:', e);
         }
       }
+      
+      setDayTimeSelections(defaultTimeSelections);
+    } else {
+      // Reset form when not editing
+      setFormData({
+        name: '',
+        days: [],
+        hours: {}
+      });
+      setAddressData({
+        value: '',
+        isFromGooglePlaces: false,
+        city: '',
+        state: ''
+      });
+      setDayTimeSelections({});
     }
   }, [editingMarket]);
 
