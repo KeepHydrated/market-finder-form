@@ -197,9 +197,24 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
   // Populate form when editing a market
   useEffect(() => {
     if (editingMarket) {
+      // Convert abbreviated days back to full day names
+      const abbrevToDayMap: Record<string, string> = {
+        'Mon': 'Monday',
+        'Tue': 'Tuesday', 
+        'Wed': 'Wednesday',
+        'Thu': 'Thursday',
+        'Fri': 'Friday',
+        'Sat': 'Saturday',
+        'Sun': 'Sunday'
+      };
+      
+      const fullDayNames = (editingMarket.days || []).map((day: string) => 
+        abbrevToDayMap[day] || day
+      );
+      
       setFormData({
         name: editingMarket.name || '',
-        days: editingMarket.days || [],
+        days: fullDayNames,
         hours: {}
       });
       setAddressData({
