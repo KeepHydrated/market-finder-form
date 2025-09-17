@@ -448,7 +448,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
           </div>
 
           {/* Address Field - update to match green styling */}
-          <div className="space-y-2">
+          <div className="space-y-2 mt-6">
             <Label htmlFor="address" className="text-base font-medium">Address *</Label>
             
             <LocationInput
