@@ -484,7 +484,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
 
 
           <div className="space-y-2">
-            <Label>Times Open *</Label>
+            <Label className="text-base font-medium">Times Open *</Label>
             <div className="flex flex-wrap gap-2">
               {DAYS_OF_WEEK.map((day) => {
                 const shortDay = day.slice(0, 3);
