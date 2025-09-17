@@ -480,13 +480,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
             />
             
             {/* Show validation message */}
-            {addressData.value && (
-              <p className="text-sm text-green-600 flex items-center gap-2 mt-2">
-                <CheckCircle2 className="h-4 w-4" />
-                Address entered: {addressData.value}
-                {addressData.isFromGooglePlaces && <span className="ml-2 text-xs">(from Google Places)</span>}
-              </p>
-            )}
+            {/* Removed address validation message */}
           </div>
 
 
