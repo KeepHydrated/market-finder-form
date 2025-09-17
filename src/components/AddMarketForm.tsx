@@ -476,7 +476,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
                 }
               }}
               zipcode={userZipcode}
-              className=""
+              className="text-base py-3"
             />
             
             {/* Show validation message */}
