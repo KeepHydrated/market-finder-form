@@ -39,7 +39,18 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, onEditMarke
   );
 
   const showResults = isOpen;
-  const visibleMarkets = markets; // Always show all markets
+  
+  // Sort markets to show selected market at the top
+  const sortedMarkets = [...markets].sort((a, b) => {
+    const aIsSelected = a.name.toLowerCase() === searchTerm.toLowerCase().trim();
+    const bIsSelected = b.name.toLowerCase() === searchTerm.toLowerCase().trim();
+    
+    if (aIsSelected && !bIsSelected) return -1;
+    if (!aIsSelected && bIsSelected) return 1;
+    return 0;
+  });
+  
+  const visibleMarkets = sortedMarkets; // Show all markets with selected one first
   const totalItems = visibleMarkets.length + 1; // +1 for "Add Market" option
   const hasTextInSearch = searchTerm.trim().length > 0;
   const isEditingSubmittedMarket = submittedMarketName && searchTerm.toLowerCase().trim() === submittedMarketName.toLowerCase();
@@ -121,21 +132,31 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, onEditMarke
         {showResults && !disabled && (
           <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
             <div className="max-h-60 overflow-y-auto">
-              {visibleMarkets.map((market, index) => (
-                <button
-                  key={market.id}
-                  onClick={() => handleSelectMarket(market)}
-                  className={cn(
-                    "w-full px-4 py-3 text-left hover:bg-muted transition-colors",
-                    selectedIndex === index && "bg-muted"
-                  )}
-                >
-                  <div className="font-medium text-foreground">{market.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {market.city}, {market.state}
-                  </div>
-                </button>
-              ))}
+              {visibleMarkets.map((market, index) => {
+                const isCurrentlySelected = market.name.toLowerCase() === searchTerm.toLowerCase().trim();
+                return (
+                  <button
+                    key={market.id}
+                    onClick={() => handleSelectMarket(market)}
+                    className={cn(
+                      "w-full px-4 py-3 text-left hover:bg-muted transition-colors",
+                      selectedIndex === index && "bg-muted",
+                      isCurrentlySelected && "bg-primary/10 border-l-4 border-l-primary"
+                    )}
+                  >
+                    <div className={cn(
+                      "font-medium text-foreground",
+                      isCurrentlySelected && "text-primary font-semibold"
+                    )}>
+                      {market.name}
+                      {isCurrentlySelected && <span className="ml-2 text-xs text-primary">(Selected)</span>}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {market.city}, {market.state}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
             
             <button
