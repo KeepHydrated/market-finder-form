@@ -443,7 +443,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Enter market name"
-              className="text-base py-3 border-green-500 focus:border-green-600 focus:ring-green-500 rounded-lg"
+              className="text-base py-3 rounded-lg"
               required
             />
           </div>
@@ -476,7 +476,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
                 }
               }}
               zipcode={userZipcode}
-              className="border-green-500 focus:border-green-600"
+              className=""
             />
             
             {/* Show validation message */}
