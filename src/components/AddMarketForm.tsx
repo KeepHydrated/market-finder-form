@@ -433,7 +433,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
           <DialogTitle>{editingMarket ? 'Edit' : 'Add New'} Farmers Market</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Market Name Field - with green styling */}
           <div className="space-y-2">
             <Label htmlFor="name" className="text-base font-medium">Market Name *</Label>
