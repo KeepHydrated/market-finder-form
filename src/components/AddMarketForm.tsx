@@ -179,19 +179,8 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
     
     onMarketAdded(cleanFormData);
     
-    // Reset form
-    setFormData({
-      name: '',
-      days: [],
-      hours: {}
-    });
-    setAddressData({
-      value: '',
-      isFromGooglePlaces: false,
-      city: '',
-      state: ''
-    });
-    setDayTimeSelections({});
+    // Don't reset form here - let the modal close handler do it
+    // This prevents the flash of empty form data
   };
 
   const handleDayToggle = (day: string) => {
