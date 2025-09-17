@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, Plus, Edit } from "lucide-react";
+import { Search, Plus, Edit, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface Market {
@@ -24,33 +25,34 @@ interface MarketSearchProps {
   onSearchTermChange: (term: string) => void;
   submittedMarketName?: string | null;
   disabled?: boolean;
+  selectedMarkets?: Market[];
+  onRemoveMarket?: (market: Market) => void;
 }
 
-export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, onEditMarket, searchTerm, onSearchTermChange, submittedMarketName, disabled = false }: MarketSearchProps) => {
+export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, onEditMarket, searchTerm, onSearchTermChange, submittedMarketName, disabled = false, selectedMarkets = [], onRemoveMarket }: MarketSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const filteredMarkets = markets.filter(market =>
-    market.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    market.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    market.state.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const showResults = isOpen;
+  // Filter out already selected markets and limit selection logic
+  const selectedMarketIds = selectedMarkets.map(m => m.id);
+  const availableMarkets = markets.filter(market => !selectedMarketIds.includes(market.id));
+  const maxMarketsReached = selectedMarkets.length >= 3;
   
-  // Sort markets to show selected market at the top
-  const sortedMarkets = [...markets].sort((a, b) => {
-    const aIsSelected = a.name.toLowerCase() === searchTerm.toLowerCase().trim();
-    const bIsSelected = b.name.toLowerCase() === searchTerm.toLowerCase().trim();
+  const showResults = isOpen && !maxMarketsReached;
+  
+  // Sort available markets
+  const sortedMarkets = [...availableMarkets].sort((a, b) => {
+    const aMatchesSearch = a.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const bMatchesSearch = b.name.toLowerCase().includes(searchTerm.toLowerCase());
     
-    if (aIsSelected && !bIsSelected) return -1;
-    if (!aIsSelected && bIsSelected) return 1;
+    if (aMatchesSearch && !bMatchesSearch) return -1;
+    if (!aMatchesSearch && bMatchesSearch) return 1;
     return 0;
   });
   
-  const visibleMarkets = sortedMarkets; // Show all markets with selected one first
+  const visibleMarkets = sortedMarkets;
   const totalItems = visibleMarkets.length + 1; // +1 for "Add Market" option
   const hasTextInSearch = searchTerm.trim().length > 0;
   const isEditingSubmittedMarket = submittedMarketName && searchTerm.toLowerCase().trim() === submittedMarketName.toLowerCase();
@@ -95,7 +97,7 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, onEditMarke
   };
 
   const handleSelectMarket = (market: Market) => {
-    onSearchTermChange(market.name);
+    onSearchTermChange(''); // Clear search after selection
     setIsOpen(false);
     setSelectedIndex(-1);
     onSelectMarket(market);
@@ -110,8 +112,36 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, onEditMarke
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium text-foreground">
-        Which farmers market do you want to join? *
+        Which farmers markets do you want to join? (Up to 3) *
       </label>
+      
+      {/* Selected Markets Display */}
+      {selectedMarkets.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground">
+            Selected Markets ({selectedMarkets.length}/3):
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {selectedMarkets.map((market) => (
+              <Badge 
+                key={market.id} 
+                variant="secondary" 
+                className="flex items-center gap-1 px-3 py-1"
+              >
+                <span>{market.name}</span>
+                {onRemoveMarket && (
+                  <button
+                    onClick={() => onRemoveMarket(market)}
+                    className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
       
       <div className="relative w-full" ref={dropdownRef}>
         <div className="relative">
@@ -119,13 +149,13 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, onEditMarke
           <Input
             ref={inputRef}
             type="text"
-            placeholder="Search for a farmers market..."
+            placeholder={maxMarketsReached ? "Maximum 3 markets selected" : "Search for a farmers market..."}
             value={searchTerm}
             onChange={handleInputChange}
-            onFocus={() => !disabled && setIsOpen(true)}
+            onFocus={() => !disabled && !maxMarketsReached && setIsOpen(true)}
             onKeyDown={handleKeyDown}
             className="pl-10 h-14 text-lg border-2 border-border rounded-xl"
-            disabled={disabled}
+            disabled={disabled || maxMarketsReached}
           />
         </div>
 

@@ -77,6 +77,7 @@ export default function ShopManager() {
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [markets, setMarkets] = useState<any[]>([]);
+  const [selectedMarkets, setSelectedMarkets] = useState<any[]>([]);
   const [marketSearchTerm, setMarketSearchTerm] = useState('');
   const [showAddMarket, setShowAddMarket] = useState(false);
   const [editingMarket, setEditingMarket] = useState<any>(null);
@@ -175,10 +176,19 @@ export default function ShopManager() {
               console.error('Error parsing market_hours:', e);
               return data.market_hours || null;
             }
+          })(),
+          selected_markets: (() => {
+            try {
+              return Array.isArray(data.selected_markets) ? data.selected_markets : [];
+            } catch (e) {
+              console.error('Error parsing selected_markets:', e);
+              return [];
+            }
           })()
         };
         console.log('Parsed submissions:', [parsedData]); // Debug log
         setShopData(parsedData);
+        setSelectedMarkets(parsedData.selected_markets || []);
         setFormData({
           store_name: parsedData.store_name || '',
           primary_specialty: parsedData.primary_specialty || '',
@@ -456,43 +466,90 @@ export default function ShopManager() {
   const handleMarketSelect = async (market: any) => {
     if (!shopData) return;
 
+    // Check if market is already selected
+    if (selectedMarkets.some(m => m.id === market.id)) {
+      toast({
+        title: "Market Already Selected",
+        description: `${market.name} is already in your selected markets.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if max markets reached
+    if (selectedMarkets.length >= 3) {
+      toast({
+        title: "Maximum Markets Reached",
+        description: "You can only select up to 3 farmers markets.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      // Ensure hours are stored as JSON string in database
-      const hoursToStore = typeof market.hours === 'string' ? market.hours : JSON.stringify(market.hours);
+      const newSelectedMarkets = [...selectedMarkets, market];
       
       const { error } = await supabase
         .from('submissions')
         .update({
-          selected_market: market.name,
-          search_term: market.name,
-          market_address: market.address,
-          market_days: market.days,
-          market_hours: hoursToStore,
+          selected_markets: newSelectedMarkets,
           updated_at: new Date().toISOString(),
         })
         .eq('id', shopData.id);
 
       if (error) throw error;
 
-      setMarketSearchTerm(market.name);
+      setSelectedMarkets(newSelectedMarkets);
       setShopData(prev => prev ? {
         ...prev,
-        selected_market: market.name,
-        search_term: market.name,
-        market_address: market.address,
-        market_days: market.days,
-        market_hours: market.hours,
+        selected_markets: newSelectedMarkets,
       } : null);
 
       toast({
-        title: "Market Selected",
-        description: `You've joined ${market.name}.`,
+        title: "Market Added",
+        description: `You've joined ${market.name}. ${3 - newSelectedMarkets.length} market slots remaining.`,
       });
     } catch (error: any) {
       console.error('Error selecting market:', error);
       toast({
         title: "Selection Failed",
         description: error.message || "Failed to select market.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRemoveMarket = async (marketToRemove: any) => {
+    if (!shopData) return;
+
+    try {
+      const newSelectedMarkets = selectedMarkets.filter(m => m.id !== marketToRemove.id);
+      
+      const { error } = await supabase
+        .from('submissions')
+        .update({
+          selected_markets: newSelectedMarkets,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', shopData.id);
+
+      if (error) throw error;
+
+      setSelectedMarkets(newSelectedMarkets);
+      setShopData(prev => prev ? {
+        ...prev,
+        selected_markets: newSelectedMarkets,
+      } : null);
+
+      toast({
+        title: "Market Removed",
+        description: `${marketToRemove.name} has been removed from your selected markets.`,
+      });
+    } catch (error: any) {
+      console.error('Error removing market:', error);
+      toast({
+        title: "Removal Failed",
+        description: error.message || "Failed to remove market.",
         variant: "destructive",
       });
     }
@@ -868,6 +925,8 @@ export default function ShopManager() {
                     onEditMarket={handleEditMarket}
                     submittedMarketName={shopData?.selected_market}
                     disabled={!isEditing}
+                    selectedMarkets={selectedMarkets}
+                    onRemoveMarket={handleRemoveMarket}
                   />
 
                   <div className="space-y-4">

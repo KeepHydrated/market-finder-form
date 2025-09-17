@@ -235,6 +235,7 @@ export type Database = {
           products: Json | null
           search_term: string | null
           selected_market: string | null
+          selected_markets: Json | null
           status: string | null
           store_name: string
           updated_at: string
@@ -253,6 +254,7 @@ export type Database = {
           products?: Json | null
           search_term?: string | null
           selected_market?: string | null
+          selected_markets?: Json | null
           status?: string | null
           store_name: string
           updated_at?: string
@@ -271,6 +273,7 @@ export type Database = {
           products?: Json | null
           search_term?: string | null
           selected_market?: string | null
+          selected_markets?: Json | null
           status?: string | null
           store_name?: string
           updated_at?: string
