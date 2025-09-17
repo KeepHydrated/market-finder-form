@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AddressAutocomplete } from './AddressAutocomplete';
+import { LocationInput } from './LocationInput';
 import { CheckCircle2 } from 'lucide-react';
 
 const DAYS_OF_WEEK = [
@@ -261,8 +261,9 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
               Start typing to see address suggestions, or enter manually
             </p>
             
-            <AddressAutocomplete
-              id="address"
+            <LocationInput
+              label=""
+              placeholder="Enter address (autocomplete available)"
               value={addressData.value}
               onChange={(address) => {
                 console.log('📍 Address input changed to:', `"${address}"`);
@@ -272,20 +273,18 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded }: AddMarketFormPro
                   isFromGooglePlaces: false
                 }));
               }}
-              onPlaceSelected={(place) => {
-                console.log('📍 Place selected from Google Places:', place);
-                if (place && place.address) {
+              onLocationSelect={(location) => {
+                console.log('📍 Location selected from Google Places:', location);
+                if (location && location.description) {
                   setAddressData({
-                    value: place.address,
+                    value: location.description,
                     isFromGooglePlaces: true,
-                    city: place.city || '',
-                    state: place.state || ''
+                    city: '',
+                    state: ''
                   });
                 }
               }}
-              onGooglePlacesActiveChange={setIsGooglePlacesActive}
-              placeholder="Enter address (autocomplete available)"
-              className="text-base py-3 border-green-500 focus:border-green-600 focus:ring-green-500 rounded-lg"
+              className="border-green-500 focus:border-green-600"
             />
             
             {/* Show validation message */}
