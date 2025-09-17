@@ -443,7 +443,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Enter market name"
-              className="text-base py-3 rounded-lg focus:ring-0 focus:ring-offset-0"
+              className="text-base py-3 rounded-lg focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:ring-offset-0"
               required
             />
           </div>
