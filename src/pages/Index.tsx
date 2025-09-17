@@ -133,7 +133,7 @@ const Index = () => {
     if (user && profile) {
       setProfileData({
         username: profile.full_name || user.email?.split('@')[0] || "",
-        zipcode: profileData.zipcode,
+        zipcode: profile.zipcode || "",
         avatarUrl: profile.avatar_url || ""
       });
     }
@@ -402,7 +402,8 @@ const Index = () => {
         .from('profiles')
         .update({
           full_name: profileData.username,
-          avatar_url: profileData.avatarUrl
+          avatar_url: profileData.avatarUrl,
+          zipcode: profileData.zipcode
         })
         .eq('user_id', user.id);
 
