@@ -48,15 +48,21 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
   }>>({});
 
   const updateTimeSelection = (day: string, field: string, value: string) => {
-    setDayTimeSelections(prev => ({
-      ...prev,
-      [day]: {
-        ...prev[day],
-        [field]: value
-      }
-    }));
+    console.log('🔍 updateTimeSelection called:', { day, field, value });
+    
+    setDayTimeSelections(prev => {
+      const updated = {
+        ...prev,
+        [day]: {
+          ...prev[day],
+          [field]: value
+        }
+      };
+      console.log('🔍 Updated dayTimeSelections:', updated);
+      return updated;
+    });
 
-    // Update formData hours
+    // Update formData hours - ensure we use the same day key
     const updatedSelection = { ...dayTimeSelections[day], [field]: value };
     setFormData(prev => ({
       ...prev,
@@ -296,10 +302,11 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
                 const [startHour, startPeriod] = startTime.split(' ');
                 const [endHour, endPeriod] = endTime.split(' ');
                 
-                // Convert abbreviated day back to full name for the form
+                // Convert abbreviated day back to full name for consistency
                 const fullDayName = abbrevToDayMap[dayAbbrev] || dayAbbrev;
                 
-                if (defaultTimeSelections[fullDayName]) {
+                // Only update if this day is in our selected days
+                if (fullDayNames.includes(fullDayName)) {
                   defaultTimeSelections[fullDayName] = {
                     startTime: startHour,
                     startPeriod: startPeriod as 'AM' | 'PM',
@@ -315,7 +322,23 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
         }
       }
       
+      console.log('🔍 Setting dayTimeSelections to:', defaultTimeSelections);
       setDayTimeSelections(defaultTimeSelections);
+      
+      // Clean up any inconsistent entries (both abbreviated and full day names)
+      setTimeout(() => {
+        setDayTimeSelections(prev => {
+          const cleaned: typeof prev = {};
+          // Only keep entries that match our full day names
+          Object.keys(prev).forEach(key => {
+            if (fullDayNames.includes(key)) {
+              cleaned[key] = prev[key];
+            }
+          });
+          console.log('🔍 Cleaned dayTimeSelections:', cleaned);
+          return cleaned;
+        });
+      }, 100);
       
       // Also populate formData.hours with the parsed time data
       const formDataHours: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }> = {};
