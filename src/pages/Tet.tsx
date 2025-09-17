@@ -80,6 +80,29 @@ const Tet = () => {
   useEffect(() => {
     fetchAcceptedSubmission();
     fetchAllAcceptedSubmissions();
+
+    // Set up real-time subscription for accepted submissions
+    const channel = supabase
+      .channel('accepted-submissions-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'submissions',
+          filter: 'status=eq.accepted'
+        },
+        (payload) => {
+          console.log('Accepted submission updated:', payload);
+          // Refresh the data when submissions are accepted or updated
+          fetchAllAcceptedSubmissions();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
