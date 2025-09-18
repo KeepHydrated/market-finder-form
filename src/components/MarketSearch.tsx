@@ -140,8 +140,10 @@ export const MarketSearch = ({
           <div 
             key={market.id}
             className={cn(
-              "flex items-center gap-2 px-3 py-2 bg-muted/80 border border-border rounded-lg transition-colors",
-              activeMarketTab === index && "bg-primary/10 border-primary/30"
+              "flex items-center gap-2 px-4 py-2 rounded-full transition-colors border",
+              activeMarketTab === index 
+                ? "bg-primary text-primary-foreground border-primary" 
+                : "bg-muted/50 border-border hover:bg-muted"
             )}
           >
             <button
@@ -150,9 +152,9 @@ export const MarketSearch = ({
                 const marketInfo = `${market.name} - ${market.address}, ${market.city}, ${market.state}`;
                 onSearchTermChange(marketInfo);
               }}
-              className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
+              className="text-sm font-medium"
             >
-              <span>{market.name}</span>
+              {market.name}
             </button>
             {onRemoveMarket && (
               <button
@@ -162,7 +164,12 @@ export const MarketSearch = ({
                     onMarketTabChange?.(null);
                   }
                 }}
-                className="hover:bg-destructive hover:text-destructive-foreground rounded-full p-1 transition-colors"
+                className={cn(
+                  "rounded-full p-0.5 transition-colors",
+                  activeMarketTab === index 
+                    ? "hover:bg-primary-foreground/20" 
+                    : "hover:bg-destructive hover:text-destructive-foreground"
+                )}
               >
                 <X className="h-3 w-3" />
               </button>
@@ -179,7 +186,7 @@ export const MarketSearch = ({
               setIsOpen(true);
               setTimeout(() => inputRef.current?.focus(), 0);
             }}
-            className="flex items-center gap-2 px-3 py-2 bg-muted/50 border border-dashed border-border rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            className="flex items-center gap-2 px-4 py-2 bg-muted/30 border border-dashed border-muted-foreground/30 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
             title="Add another market"
           >
             <Plus className="h-4 w-4" />
