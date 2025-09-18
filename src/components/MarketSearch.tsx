@@ -72,10 +72,6 @@ export const MarketSearch = ({
   const totalItems = visibleMarkets.length + 1; // +1 for "Add Market" option
   const hasTextInSearch = searchTerm.trim().length > 0;
   const isEditingSubmittedMarket = submittedMarketName && searchTerm.toLowerCase().trim() === submittedMarketName.toLowerCase();
-  const isEditingSelectedMarket = selectedMarkets.some(market => 
-    market.name.toLowerCase() === searchTerm.toLowerCase().trim()
-  );
-  const shouldShowEditButton = isEditingSubmittedMarket || isEditingSelectedMarket;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -240,8 +236,8 @@ export const MarketSearch = ({
             
             <button
               onClick={() => {
-                if (maxMarketsReached && !shouldShowEditButton) return;
-                if (shouldShowEditButton && onEditMarket) {
+                if (maxMarketsReached && !isEditingSubmittedMarket) return;
+                if (isEditingSubmittedMarket && onEditMarket) {
                   const selectedMarket = markets.find(m => m.name.toLowerCase() === searchTerm.toLowerCase()) ||
                                        selectedMarkets.find(m => m.name.toLowerCase() === searchTerm.toLowerCase());
                   if (selectedMarket) {
@@ -253,12 +249,12 @@ export const MarketSearch = ({
               }}
               className={cn(
                 "w-full px-4 py-3 text-left transition-colors flex items-center gap-2 border-t border-border",
-                maxMarketsReached && !shouldShowEditButton ? "cursor-not-allowed opacity-50" : "hover:bg-muted cursor-pointer",
-                selectedIndex === visibleMarkets.length && (shouldShowEditButton || !maxMarketsReached) && "bg-muted"
+                maxMarketsReached && !isEditingSubmittedMarket ? "cursor-not-allowed opacity-50" : "hover:bg-muted cursor-pointer",
+                selectedIndex === visibleMarkets.length && (isEditingSubmittedMarket || !maxMarketsReached) && "bg-muted"
               )}
-              disabled={maxMarketsReached && !shouldShowEditButton}
+              disabled={maxMarketsReached && !isEditingSubmittedMarket}
             >
-              {shouldShowEditButton ? (
+              {isEditingSubmittedMarket ? (
                 <>
                   <Edit className="h-4 w-4 text-success" />
                   <span className="text-success font-medium">Edit market</span>
