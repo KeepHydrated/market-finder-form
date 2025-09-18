@@ -40,7 +40,7 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, onEditMarke
   const availableMarkets = markets.filter(market => !selectedMarketIds.includes(market.id));
   const maxMarketsReached = selectedMarkets.length >= 3;
   
-  const showResults = isOpen && !maxMarketsReached;
+  const showResults = isOpen;
   
   // Sort available markets
   const sortedMarkets = [...availableMarkets].sort((a, b) => {
@@ -152,27 +152,36 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, onEditMarke
             placeholder={maxMarketsReached ? "Maximum 3 markets selected" : "Search for a farmers market..."}
             value={searchTerm}
             onChange={handleInputChange}
-            onFocus={() => !disabled && !maxMarketsReached && setIsOpen(true)}
+            onFocus={() => !disabled && setIsOpen(true)}
             onKeyDown={handleKeyDown}
             className="pl-10 h-14 text-lg border-2 border-border rounded-xl"
-            disabled={disabled || maxMarketsReached}
+            disabled={disabled}
           />
         </div>
 
         {showResults && !disabled && (
           <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
+            {maxMarketsReached && (
+              <div className="px-4 py-3 border-b border-border bg-muted/50">
+                <p className="text-sm text-muted-foreground">
+                  Maximum 3 markets selected. Remove a market to select a different one.
+                </p>
+              </div>
+            )}
             <div className="max-h-60 overflow-y-auto">
               {visibleMarkets.map((market, index) => {
                 const isCurrentlySelected = market.name.toLowerCase() === searchTerm.toLowerCase().trim();
                 return (
                   <button
                     key={market.id}
-                    onClick={() => handleSelectMarket(market)}
+                    onClick={() => !maxMarketsReached && handleSelectMarket(market)}
                     className={cn(
-                      "w-full px-4 py-3 text-left hover:bg-muted transition-colors",
-                      selectedIndex === index && "bg-muted",
+                      "w-full px-4 py-3 text-left transition-colors",
+                      maxMarketsReached ? "cursor-not-allowed opacity-50" : "hover:bg-muted cursor-pointer",
+                      selectedIndex === index && !maxMarketsReached && "bg-muted",
                       isCurrentlySelected && "bg-primary/10 border-l-4 border-l-primary"
                     )}
+                    disabled={maxMarketsReached}
                   >
                     <div className={cn(
                       "font-medium text-foreground",
