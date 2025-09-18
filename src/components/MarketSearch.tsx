@@ -135,64 +135,58 @@ export const MarketSearch = ({
       </label>
       
       {/* Selected Markets as Tabs */}
-      {selectedMarkets.length > 0 && (
-        <div className="space-y-2">
-          <Tabs
-            value={activeMarketTab !== null ? activeMarketTab.toString() : undefined}
-            onValueChange={(value) => {
-              const tabIndex = parseInt(value);
-              onMarketTabChange?.(tabIndex);
-              // Populate search input with market info when tab is clicked
-              const selectedMarket = selectedMarkets[tabIndex];
-              if (selectedMarket) {
-                const marketInfo = `${selectedMarket.name} - ${selectedMarket.address}, ${selectedMarket.city}, ${selectedMarket.state}`;
-                onSearchTermChange(marketInfo);
-              }
-            }}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {selectedMarkets.map((market, index) => (
+          <div 
+            key={market.id}
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 bg-muted/80 border border-border rounded-lg transition-colors",
+              activeMarketTab === index && "bg-primary/10 border-primary/30"
+            )}
           >
-            <TabsList className="h-auto p-1 bg-muted/50 w-full justify-start">
-              {selectedMarkets.map((market, index) => (
-                <TabsTrigger 
-                  key={market.id} 
-                  value={index.toString()}
-                  className="flex items-center gap-1 px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  <span>{market.name}</span>
-                  {onRemoveMarket && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRemoveMarket(market);
-                        if (activeMarketTab === index) {
-                          onMarketTabChange?.(null);
-                        }
-                      }}
-                      className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  )}
-                </TabsTrigger>
-              ))}
-              {/* Add Market Plus Button */}
+            <button
+              onClick={() => {
+                onMarketTabChange?.(index);
+                const marketInfo = `${market.name} - ${market.address}, ${market.city}, ${market.state}`;
+                onSearchTermChange(marketInfo);
+              }}
+              className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
+            >
+              <span>{market.name}</span>
+            </button>
+            {onRemoveMarket && (
               <button
                 onClick={() => {
-                  onSearchTermChange('');
-                  onMarketTabChange?.(null);
-                  setIsOpen(true);
-                  setTimeout(() => inputRef.current?.focus(), 0);
+                  onRemoveMarket(market);
+                  if (activeMarketTab === index) {
+                    onMarketTabChange?.(null);
+                  }
                 }}
-                className="flex items-center gap-1 px-3 py-2 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
-                title="Add another market"
-                disabled={maxMarketsReached}
+                className="hover:bg-destructive hover:text-destructive-foreground rounded-full p-1 transition-colors"
               >
-                <Plus className="h-4 w-4" />
-                <span className="text-sm">Add</span>
+                <X className="h-3 w-3" />
               </button>
-            </TabsList>
-          </Tabs>
-        </div>
-      )}
+            )}
+          </div>
+        ))}
+        
+        {/* Add Market Plus Button */}
+        {!maxMarketsReached && (
+          <button
+            onClick={() => {
+              onSearchTermChange('');
+              onMarketTabChange?.(null);
+              setIsOpen(true);
+              setTimeout(() => inputRef.current?.focus(), 0);
+            }}
+            className="flex items-center gap-2 px-3 py-2 bg-muted/50 border border-dashed border-border rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            title="Add another market"
+          >
+            <Plus className="h-4 w-4" />
+            <span className="text-sm">Add</span>
+          </button>
+        )}
+      </div>
       
       <div className="relative w-full" ref={dropdownRef}>
         <div className="relative">
