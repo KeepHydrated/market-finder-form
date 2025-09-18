@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 interface Market {
@@ -27,9 +28,24 @@ interface MarketSearchProps {
   disabled?: boolean;
   selectedMarkets?: Market[];
   onRemoveMarket?: (market: Market) => void;
+  activeMarketTab?: number | null;
+  onMarketTabChange?: (tabIndex: number | null) => void;
 }
 
-export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, onEditMarket, searchTerm, onSearchTermChange, submittedMarketName, disabled = false, selectedMarkets = [], onRemoveMarket }: MarketSearchProps) => {
+export const MarketSearch = ({ 
+  markets, 
+  onSelectMarket, 
+  onAddMarket, 
+  onEditMarket, 
+  searchTerm, 
+  onSearchTermChange, 
+  submittedMarketName, 
+  disabled = false, 
+  selectedMarkets = [], 
+  onRemoveMarket,
+  activeMarketTab,
+  onMarketTabChange
+}: MarketSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -101,6 +117,9 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, onEditMarke
     setIsOpen(false);
     setSelectedIndex(-1);
     onSelectMarket(market);
+    // Set the newly selected market as the active tab
+    const newActiveTabIndex = selectedMarkets.length; // Index will be at the end after adding
+    onMarketTabChange?.(newActiveTabIndex);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,31 +134,42 @@ export const MarketSearch = ({ markets, onSelectMarket, onAddMarket, onEditMarke
         Which farmers markets do you want to join? (Up to 3) *
       </label>
       
-      {/* Selected Markets Display */}
+      {/* Selected Markets as Tabs */}
       {selectedMarkets.length > 0 && (
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground">
             Selected Markets ({selectedMarkets.length}/3):
           </p>
-          <div className="flex flex-wrap gap-2">
-            {selectedMarkets.map((market) => (
-              <Badge 
-                key={market.id} 
-                variant="secondary" 
-                className="flex items-center gap-1 px-3 py-1"
-              >
-                <span>{market.name}</span>
-                {onRemoveMarket && (
-                  <button
-                    onClick={() => onRemoveMarket(market)}
-                    className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                )}
-              </Badge>
-            ))}
-          </div>
+          <Tabs 
+            value={activeMarketTab !== null ? activeMarketTab.toString() : undefined}
+            onValueChange={(value) => onMarketTabChange?.(parseInt(value))}
+          >
+            <TabsList className="h-auto p-1 bg-muted/50 w-full justify-start">
+              {selectedMarkets.map((market, index) => (
+                <TabsTrigger 
+                  key={market.id} 
+                  value={index.toString()}
+                  className="flex items-center gap-1 px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  <span>{market.name}</span>
+                  {onRemoveMarket && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveMarket(market);
+                        if (activeMarketTab === index) {
+                          onMarketTabChange?.(null);
+                        }
+                      }}
+                      className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  )}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
         </div>
       )}
       

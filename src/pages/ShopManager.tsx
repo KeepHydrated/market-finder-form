@@ -85,6 +85,7 @@ export default function ShopManager() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [vacationMode, setVacationMode] = useState(false);
+  const [activeMarketTab, setActiveMarketTab] = useState<number | null>(null);
 
   // Check for public access via URL parameter
   const isPublicAccess = new URLSearchParams(window.location.search).get('demo') === 'true';
@@ -927,6 +928,8 @@ export default function ShopManager() {
                     disabled={!isEditing}
                     selectedMarkets={selectedMarkets}
                     onRemoveMarket={handleRemoveMarket}
+                    activeMarketTab={activeMarketTab}
+                    onMarketTabChange={setActiveMarketTab}
                   />
 
                   <div className="space-y-4">
