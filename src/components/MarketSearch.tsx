@@ -140,16 +140,27 @@ export const MarketSearch = ({
           <p className="text-xs text-muted-foreground">
             Selected Markets ({selectedMarkets.length}/3):
           </p>
+          
+          {/* Market Details Display */}
+          {activeMarketTab !== null && selectedMarkets[activeMarketTab] && (
+            <div className="p-3 bg-muted/30 rounded-lg border">
+              <div className="font-medium text-foreground">
+                {selectedMarkets[activeMarketTab].name}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                {selectedMarkets[activeMarketTab].address}, {selectedMarkets[activeMarketTab].city}, {selectedMarkets[activeMarketTab].state}
+              </div>
+            </div>
+          )}
           <Tabs 
             value={activeMarketTab !== null ? activeMarketTab.toString() : undefined}
             onValueChange={(value) => {
               const tabIndex = parseInt(value);
               onMarketTabChange?.(tabIndex);
-              // Populate search input with market info when tab is clicked
+              // Just populate with market name for cleaner display
               const selectedMarket = selectedMarkets[tabIndex];
               if (selectedMarket) {
-                const marketInfo = `${selectedMarket.name} - ${selectedMarket.address}, ${selectedMarket.city}, ${selectedMarket.state}`;
-                onSearchTermChange(marketInfo);
+                onSearchTermChange(selectedMarket.name);
               }
             }}
           >
