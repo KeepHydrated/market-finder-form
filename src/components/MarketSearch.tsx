@@ -137,10 +137,7 @@ export const MarketSearch = ({
       {/* Selected Markets as Tabs */}
       {selectedMarkets.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">
-            Selected Markets ({selectedMarkets.length}/3):
-          </p>
-          <Tabs 
+          <Tabs
             value={activeMarketTab !== null ? activeMarketTab.toString() : undefined}
             onValueChange={(value) => {
               const tabIndex = parseInt(value);
