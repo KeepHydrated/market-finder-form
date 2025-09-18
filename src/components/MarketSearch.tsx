@@ -142,7 +142,16 @@ export const MarketSearch = ({
           </p>
           <Tabs 
             value={activeMarketTab !== null ? activeMarketTab.toString() : undefined}
-            onValueChange={(value) => onMarketTabChange?.(parseInt(value))}
+            onValueChange={(value) => {
+              const tabIndex = parseInt(value);
+              onMarketTabChange?.(tabIndex);
+              // Populate search input with market info when tab is clicked
+              const selectedMarket = selectedMarkets[tabIndex];
+              if (selectedMarket) {
+                const marketInfo = `${selectedMarket.name} - ${selectedMarket.address}, ${selectedMarket.city}, ${selectedMarket.state}`;
+                onSearchTermChange(marketInfo);
+              }
+            }}
           >
             <TabsList className="h-auto p-1 bg-muted/50 w-full justify-start">
               {selectedMarkets.map((market, index) => (
