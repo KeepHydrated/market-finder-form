@@ -179,10 +179,12 @@ export const MarketSearch = ({
                 onClick={() => {
                   onSearchTermChange('');
                   onMarketTabChange?.(null);
-                  onAddMarket();
+                  setIsOpen(true);
+                  setTimeout(() => inputRef.current?.focus(), 0);
                 }}
                 className="flex items-center gap-1 px-3 py-2 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
                 title="Add another market"
+                disabled={maxMarketsReached}
               >
                 <Plus className="h-4 w-4" />
                 <span className="text-sm">Add</span>
