@@ -236,6 +236,7 @@ export const MarketSearch = ({
             
             <button
               onClick={() => {
+                if (maxMarketsReached) return;
                 if (isEditingSubmittedMarket && onEditMarket) {
                   const selectedMarket = markets.find(m => m.name.toLowerCase() === searchTerm.toLowerCase());
                   if (selectedMarket) {
@@ -246,9 +247,11 @@ export const MarketSearch = ({
                 }
               }}
               className={cn(
-                "w-full px-4 py-3 text-left hover:bg-muted transition-colors flex items-center gap-2 border-t border-border",
-                selectedIndex === visibleMarkets.length && "bg-muted"
+                "w-full px-4 py-3 text-left transition-colors flex items-center gap-2 border-t border-border",
+                maxMarketsReached ? "cursor-not-allowed opacity-50" : "hover:bg-muted cursor-pointer",
+                selectedIndex === visibleMarkets.length && !maxMarketsReached && "bg-muted"
               )}
+              disabled={maxMarketsReached}
             >
               {isEditingSubmittedMarket ? (
                 <>
