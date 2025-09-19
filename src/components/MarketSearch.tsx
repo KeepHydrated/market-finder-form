@@ -331,7 +331,7 @@ export const MarketSearch = ({
               ) : (
                 <>
                   <Plus className="h-4 w-4 text-success" />
-                  <span className="text-success font-medium">Add market</span>
+                  <span className="text-success font-medium">Submit new market</span>
                 </>
               )}
             </button>
