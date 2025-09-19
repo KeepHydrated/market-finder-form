@@ -971,7 +971,10 @@ export default function ShopManager() {
                        searchTerm={marketSearchTerm}
                        onSearchTermChange={setMarketSearchTerm}
                        onSelectMarket={handleMarketSelect}
-                       onAddMarket={() => setShowAddMarket(true)}
+                        onAddMarket={(replacementMarket) => {
+                          // TODO: Store replacement market context for modal
+                          setShowAddMarket(true);
+                        }}
                        onEditMarket={handleEditMarket}
                        submittedMarketName={shopData?.selected_market}
                        selectedMarkets={selectedMarkets}

@@ -113,8 +113,10 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
     setSelectedMarkets(prev => prev.map(m => m.id === oldMarket.id ? newMarket : m));
   }, []);
 
-  const handleAddMarket = useCallback(() => {
+  const handleAddMarket = useCallback((replacementMarket?: Market) => {
     setShowAddForm(true);
+    // TODO: Store replacement market context for when the submission is approved
+    // This will be used to replace the selected market if there is one
   }, []);
 
   const handleMarketAdded = useCallback(async (marketData: any) => {

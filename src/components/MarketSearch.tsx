@@ -20,7 +20,7 @@ interface Market {
 interface MarketSearchProps {
   markets: Market[];
   onSelectMarket: (market: Market) => void;
-  onAddMarket: () => void;
+  onAddMarket: (replacementMarket?: Market) => void;
   onEditMarket?: (market: Market) => void;
   searchTerm: string;
   onSearchTermChange: (term: string) => void;
@@ -119,7 +119,7 @@ export const MarketSearch = ({
         if (selectedIndex >= 0 && selectedIndex < visibleMarkets.length) {
           handleSelectMarket(visibleMarkets[selectedIndex]);
         } else if (selectedIndex === visibleMarkets.length) {
-          onAddMarket();
+          handleSubmitNewMarket();
         }
         break;
       case 'Escape':
@@ -144,6 +144,20 @@ export const MarketSearch = ({
       // Set the newly selected market as the active tab
       const newActiveTabIndex = selectedMarkets.length; // Index will be at the end after adding
       onMarketTabChange?.(newActiveTabIndex);
+    }
+  };
+
+  const handleSubmitNewMarket = () => {
+    if (isEditingSubmittedMarket && onEditMarket) {
+      const selectedMarket = markets.find(m => m.name.toLowerCase() === searchTerm.toLowerCase()) ||
+                           selectedMarkets.find(m => m.name.toLowerCase() === searchTerm.toLowerCase());
+      if (selectedMarket) {
+        onEditMarket(selectedMarket);
+      }
+    } else {
+      // If a market tab is selected, this new market submission should replace it when approved
+      const replacementContext = isEditingMarket && editingMarket ? editingMarket : null;
+      onAddMarket(replacementContext);
     }
   };
 
@@ -300,18 +314,7 @@ export const MarketSearch = ({
             </div>
             
             <button
-              onClick={() => {
-                if (isEditingSubmittedMarket && onEditMarket) {
-                  const selectedMarket = markets.find(m => m.name.toLowerCase() === searchTerm.toLowerCase()) ||
-                                       selectedMarkets.find(m => m.name.toLowerCase() === searchTerm.toLowerCase());
-                  if (selectedMarket) {
-                    onEditMarket(selectedMarket);
-                  }
-                } else {
-                  // Always allow submitting new markets
-                  onAddMarket();
-                }
-              }}
+              onClick={handleSubmitNewMarket}
               className={cn(
                 "w-full px-4 py-3 text-left transition-colors flex items-center gap-2 border-t border-border hover:bg-muted cursor-pointer",
                 selectedIndex === visibleMarkets.length && "bg-muted"

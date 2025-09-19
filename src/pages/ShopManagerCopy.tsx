@@ -782,7 +782,7 @@ export default function ShopManagerCopy() {
                     searchTerm={marketSearchTerm}
                     onSearchTermChange={setMarketSearchTerm}
                     onSelectMarket={handleMarketSelect}
-                    onAddMarket={() => setShowAddMarket(true)}
+                    onAddMarket={(replacementMarket) => setShowAddMarket(true)}
                     disabled={!isEditing}
                   />
 
