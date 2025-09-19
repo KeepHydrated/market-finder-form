@@ -220,7 +220,6 @@ export const MarketSearch = ({
             onFocus={handleInputFocus}
             onKeyDown={handleKeyDown}
             className="pl-10 h-14 text-lg border-2 border-border rounded-xl"
-            disabled={disabled}
           />
         </div>
 
