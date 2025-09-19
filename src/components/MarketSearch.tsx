@@ -58,6 +58,13 @@ export const MarketSearch = ({
   const isEditingMarket = activeMarketTab !== null && activeMarketTab !== undefined;
   const editingMarket = isEditingMarket ? selectedMarkets[activeMarketTab] : null;
   
+  console.log('MarketSearch state:', {
+    activeMarketTab,
+    isEditingMarket,
+    selectedMarketsCount: selectedMarkets.length,
+    editingMarketName: editingMarket?.name || 'none'
+  });
+  
   // When editing, exclude all selected markets except the one being edited
   const availableMarkets = markets.filter(market => {
     if (isEditingMarket && editingMarket) {
