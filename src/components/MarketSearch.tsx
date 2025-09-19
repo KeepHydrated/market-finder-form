@@ -58,6 +58,13 @@ export const MarketSearch = ({
   const isEditingMarket = activeMarketTab !== null && activeMarketTab !== undefined;
   const editingMarket = isEditingMarket ? selectedMarkets[activeMarketTab] : null;
   
+  // Set first tab as active by default when there are markets but no active tab
+  useEffect(() => {
+    if (selectedMarkets.length > 0 && (activeMarketTab === null || activeMarketTab === undefined)) {
+      onMarketTabChange?.(0);
+    }
+  }, [selectedMarkets.length, activeMarketTab, onMarketTabChange]);
+  
   // Show all markets in dropdown, but highlight selected ones
   const availableMarkets = markets;
   
