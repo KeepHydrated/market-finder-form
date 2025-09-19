@@ -72,8 +72,6 @@ export const MarketSearch = ({
   const totalItems = visibleMarkets.length + 1; // +1 for "Add Market" option
   const hasTextInSearch = searchTerm.trim().length > 0;
   const isEditingSubmittedMarket = submittedMarketName && searchTerm.toLowerCase().trim() === submittedMarketName.toLowerCase();
-  
-  console.log('Dropdown state:', { isOpen, showResults, visibleMarkets: visibleMarkets.length, hasTextInSearch });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -125,14 +123,14 @@ export const MarketSearch = ({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('Input change:', e.target.value);
     onSearchTermChange(e.target.value);
-    setIsOpen(true);
+    if (!isOpen) {
+      setIsOpen(true);
+    }
     setSelectedIndex(-1);
   };
 
   const handleInputFocus = () => {
-    console.log('Input focused, disabled:', disabled);
     if (!disabled) {
       setIsOpen(true);
     }
@@ -191,7 +189,6 @@ export const MarketSearch = ({
         <button
           onClick={() => {
             if (maxMarketsReached) return;
-            console.log('Add button clicked');
             onSearchTermChange('');
             onMarketTabChange?.(null);
             setIsOpen(true);
