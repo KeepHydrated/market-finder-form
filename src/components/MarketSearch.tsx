@@ -261,28 +261,29 @@ export const MarketSearch = ({
 
         {showResults && (
           <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
-            {maxMarketsReached && !isEditingMarket && (
-              <div className="px-4 py-3 border-b border-border bg-muted/50">
-                <p className="text-sm text-muted-foreground">
-                  Maximum 3 markets selected. Remove a market to select a different one.
-                </p>
-              </div>
-            )}
-            <div className="max-h-60 overflow-y-auto">
-              {visibleMarkets.map((market, index) => {
-                const isActiveTab = isEditingMarket && editingMarket && market.id === editingMarket.id;
-                return (
-                  <button
-                    key={market.id}
-                    onClick={() => !maxMarketsReached && handleSelectMarket(market)}
-                    className={cn(
-                      "w-full px-4 py-3 text-left transition-colors",
-                      maxMarketsReached ? "cursor-not-allowed opacity-50" : "hover:bg-muted cursor-pointer",
-                      selectedIndex === index && !maxMarketsReached && "bg-muted",
-                      isActiveTab && "bg-primary/10 border-l-4 border-l-primary"
-                    )}
-                    disabled={maxMarketsReached}
-                  >
+             {maxMarketsReached && !isEditingMarket && (
+               <div className="px-4 py-3 border-b border-border bg-muted/50">
+                 <p className="text-sm text-muted-foreground">
+                   Maximum 3 markets selected. Select a market tab above to replace it, or remove a market to add a new one.
+                 </p>
+               </div>
+             )}
+             <div className="max-h-60 overflow-y-auto">
+               {visibleMarkets.map((market, index) => {
+                 const isActiveTab = isEditingMarket && editingMarket && market.id === editingMarket.id;
+                 const canSelect = !maxMarketsReached || isEditingMarket;
+                 return (
+                   <button
+                     key={market.id}
+                     onClick={() => canSelect && handleSelectMarket(market)}
+                     className={cn(
+                       "w-full px-4 py-3 text-left transition-colors",
+                       canSelect ? "hover:bg-muted cursor-pointer" : "cursor-not-allowed opacity-50",
+                       selectedIndex === index && canSelect && "bg-muted",
+                       isActiveTab && "bg-primary/10 border-l-4 border-l-primary"
+                     )}
+                     disabled={!canSelect}
+                   >
                     <div className={cn(
                       "font-medium text-foreground",
                       isActiveTab && "text-primary font-semibold"
