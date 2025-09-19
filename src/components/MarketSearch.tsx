@@ -247,7 +247,7 @@ export const MarketSearch = ({
 
         {showResults && (
           <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
-            {maxMarketsReached && (
+            {maxMarketsReached && !isEditingMarket && (
               <div className="px-4 py-3 border-b border-border bg-muted/50">
                 <p className="text-sm text-muted-foreground">
                   Maximum 3 markets selected. Remove a market to select a different one.
