@@ -37,7 +37,8 @@ interface SubmitContentProps {
 export const SubmitContent = ({ user }: SubmitContentProps) => {
   const { toast } = useToast();
   const [markets, setMarkets] = useState<Market[]>([]);
-  const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
+  const [selectedMarkets, setSelectedMarkets] = useState<Market[]>([]);
+  const [activeMarketTab, setActiveMarketTab] = useState<number | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAddProductForm, setShowAddProductForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -101,11 +102,15 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
   }, [products, saveProducts]);
 
   const handleSelectMarket = useCallback((market: Market) => {
-    setSelectedMarket(market);
+    setSelectedMarkets(prev => [...prev, market]);
   }, []);
 
-  const handleBackToSearch = useCallback(() => {
-    setSelectedMarket(null);
+  const handleRemoveMarket = useCallback((market: Market) => {
+    setSelectedMarkets(prev => prev.filter(m => m.id !== market.id));
+  }, []);
+
+  const handleReplaceMarket = useCallback((oldMarket: Market, newMarket: Market) => {
+    setSelectedMarkets(prev => prev.map(m => m.id === oldMarket.id ? newMarket : m));
   }, []);
 
   const handleAddMarket = useCallback(() => {
@@ -249,6 +254,16 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
       return;
     }
     
+    // Validate that at least one market is selected
+    if (selectedMarkets.length === 0) {
+      toast({
+        title: "Market Required",
+        description: "Please select at least one market to apply to.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
       const { error } = await supabase
         .from('submissions')
@@ -259,11 +274,8 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
           website: vendorApplicationData.website,
           description: vendorApplicationData.description,
           products: JSON.stringify(products),
-          selected_market: selectedMarket?.name || customMarketData?.name || null,
-          search_term: selectedMarket ? null : searchTerm,
-          market_address: customMarketData?.address || null,
-          market_days: customMarketData?.days || null,
-          market_hours: customMarketData?.hours || null,
+          selected_markets: JSON.stringify(selectedMarkets.map(m => m.name)),
+          market_data: JSON.stringify(selectedMarkets),
           status: 'pending'
         });
 
@@ -281,16 +293,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
         variant: "destructive"
       });
     }
-  }, [user, vendorApplicationData, products, selectedMarket, customMarketData, searchTerm, toast]);
-
-  if (selectedMarket) {
-    return (
-      <MarketDetails 
-        market={selectedMarket} 
-        onBack={handleBackToSearch} 
-      />
-    );
-  }
+  }, [user, vendorApplicationData, products, selectedMarkets, toast]);
 
   return (
     <>
@@ -316,6 +319,11 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
         onSearchTermChange={setSearchTerm}
         submittedMarketName={submittedMarketName}
         disabled={isSubmitted}
+        selectedMarkets={selectedMarkets}
+        onRemoveMarket={handleRemoveMarket}
+        activeMarketTab={activeMarketTab}
+        onMarketTabChange={setActiveMarketTab}
+        onReplaceMarket={handleReplaceMarket}
       />
       
       <Card className="mt-8 p-8 bg-card border-border">

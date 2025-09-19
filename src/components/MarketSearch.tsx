@@ -30,6 +30,7 @@ interface MarketSearchProps {
   onRemoveMarket?: (market: Market) => void;
   activeMarketTab?: number | null;
   onMarketTabChange?: (tabIndex: number | null) => void;
+  onReplaceMarket?: (oldMarket: Market, newMarket: Market) => void;
 }
 
 export const MarketSearch = ({ 
@@ -44,17 +45,28 @@ export const MarketSearch = ({
   selectedMarkets = [], 
   onRemoveMarket,
   activeMarketTab,
-  onMarketTabChange
+  onMarketTabChange,
+  onReplaceMarket
 }: MarketSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Filter out already selected markets and limit selection logic
+  // Filter out already selected markets except when editing
   const selectedMarketIds = selectedMarkets.map(m => m.id);
-  const availableMarkets = markets.filter(market => !selectedMarketIds.includes(market.id));
-  const maxMarketsReached = selectedMarkets.length >= 3;
+  const isEditingMarket = activeMarketTab !== null && activeMarketTab !== undefined;
+  const editingMarket = isEditingMarket ? selectedMarkets[activeMarketTab] : null;
+  
+  // When editing, exclude all selected markets except the one being edited
+  const availableMarkets = markets.filter(market => {
+    if (isEditingMarket && editingMarket) {
+      return !selectedMarketIds.includes(market.id) || market.id === editingMarket.id;
+    }
+    return !selectedMarketIds.includes(market.id);
+  });
+  
+  const maxMarketsReached = selectedMarkets.length >= 3 && !isEditingMarket;
   
   const showResults = isOpen;
   
@@ -116,10 +128,18 @@ export const MarketSearch = ({
     onSearchTermChange(''); // Clear search after selection
     setIsOpen(false);
     setSelectedIndex(-1);
-    onSelectMarket(market);
-    // Set the newly selected market as the active tab
-    const newActiveTabIndex = selectedMarkets.length; // Index will be at the end after adding
-    onMarketTabChange?.(newActiveTabIndex);
+    
+    if (isEditingMarket && editingMarket && onReplaceMarket) {
+      // Replace the market being edited
+      onReplaceMarket(editingMarket, market);
+      // Keep the same active tab
+    } else {
+      // Add new market
+      onSelectMarket(market);
+      // Set the newly selected market as the active tab
+      const newActiveTabIndex = selectedMarkets.length; // Index will be at the end after adding
+      onMarketTabChange?.(newActiveTabIndex);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
