@@ -214,21 +214,29 @@ export const MarketSearch = ({
         <button
           type="button"
           onClick={() => {
-            if (maxMarketsReached) return;
+            if (maxMarketsReached) {
+              // Show toast message instead of doing nothing
+              import('@/hooks/use-toast').then(({ toast }) => {
+                toast({
+                  title: "Maximum markets reached",
+                  description: "You can only select up to 3 farmers markets. Remove one to add a different market.",
+                  variant: "destructive"
+                });
+              });
+              return;
+            }
             onSearchTermChange('');
             onMarketTabChange?.(null);
             setIsOpen(true);
             setTimeout(() => inputRef.current?.focus(), 0);
           }}
-          disabled={maxMarketsReached}
-          style={maxMarketsReached ? { pointerEvents: 'none' } : undefined}
           className={cn(
-            "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full",
+            "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full transition-colors",
             maxMarketsReached 
-              ? "bg-muted/5 border-muted-foreground/20 text-muted-foreground/40 cursor-not-allowed opacity-30"
-              : "bg-background border-muted-foreground/50 hover:bg-muted text-foreground hover:text-foreground transition-colors"
+              ? "bg-muted/5 border-muted-foreground/20 text-muted-foreground/40 cursor-pointer opacity-50"
+              : "bg-background border-muted-foreground/50 hover:bg-muted text-foreground hover:text-foreground"
           )}
-          title={maxMarketsReached ? "Maximum 3 markets allowed" : "Add another market"}
+          title={maxMarketsReached ? "Maximum 3 markets allowed - click for details" : "Add another market"}
         >
           <Plus className="h-4 w-4" />
           <span className="text-sm">Add</span>
