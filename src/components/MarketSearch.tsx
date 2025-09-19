@@ -301,7 +301,9 @@ export const MarketSearch = ({
             
             <button
               onClick={() => {
-                if (maxMarketsReached && !isEditingSubmittedMarket) return;
+                const canAdd = !maxMarketsReached || isEditingMarket || isEditingSubmittedMarket;
+                if (!canAdd) return;
+                
                 if (isEditingSubmittedMarket && onEditMarket) {
                   const selectedMarket = markets.find(m => m.name.toLowerCase() === searchTerm.toLowerCase()) ||
                                        selectedMarkets.find(m => m.name.toLowerCase() === searchTerm.toLowerCase());
@@ -314,10 +316,12 @@ export const MarketSearch = ({
               }}
               className={cn(
                 "w-full px-4 py-3 text-left transition-colors flex items-center gap-2 border-t border-border",
-                maxMarketsReached && !isEditingSubmittedMarket ? "cursor-not-allowed opacity-50" : "hover:bg-muted cursor-pointer",
-                selectedIndex === visibleMarkets.length && (isEditingSubmittedMarket || !maxMarketsReached) && "bg-muted"
+                (!maxMarketsReached || isEditingMarket || isEditingSubmittedMarket) 
+                  ? "hover:bg-muted cursor-pointer" 
+                  : "cursor-not-allowed opacity-50",
+                selectedIndex === visibleMarkets.length && (isEditingSubmittedMarket || isEditingMarket || !maxMarketsReached) && "bg-muted"
               )}
-              disabled={maxMarketsReached && !isEditingSubmittedMarket}
+              disabled={maxMarketsReached && !isEditingMarket && !isEditingSubmittedMarket}
             >
               {isEditingSubmittedMarket ? (
                 <>
