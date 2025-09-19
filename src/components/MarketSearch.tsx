@@ -53,11 +53,6 @@ export const MarketSearch = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Debug logging for disabled prop
-  useEffect(() => {
-    console.log('MarketSearch received disabled prop:', disabled);
-  }, [disabled]);
-
   // Filter out already selected markets except when editing
   const selectedMarketIds = selectedMarkets.map(m => m.id);
   const isEditingMarket = activeMarketTab !== null && activeMarketTab !== undefined;
