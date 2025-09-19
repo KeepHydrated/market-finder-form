@@ -939,34 +939,6 @@ export default function ShopManager() {
                     />
                   </CardContent>
                 </Card>
-
-                {/* Individual Market Input Boxes */}
-                {selectedMarkets.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Selected Markets Details</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {selectedMarkets.map((market, index) => (
-                        <div key={market.id} className="space-y-2">
-                          <Label htmlFor={`market-${index}`}>
-                            Market {index + 1}
-                          </Label>
-                          <Input
-                            id={`market-${index}`}
-                            value={`${market.name} - ${market.address}, ${market.city}, ${market.state}`}
-                            readOnly
-                            className="bg-muted/50"
-                          />
-                          <div className="text-xs text-muted-foreground">
-                            Days: {Array.isArray(market.days) ? market.days.join(', ') : 'Not specified'} 
-                            {market.hours && ` | Hours: ${market.hours}`}
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                )}
               </TabsContent>
               
               <TabsContent value="store" className="space-y-4">
