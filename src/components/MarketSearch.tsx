@@ -179,8 +179,6 @@ export const MarketSearch = ({
                 onMarketTabChange?.(index);
                 const marketInfo = `${market.name} - ${market.address}, ${market.city}, ${market.state}`;
                 onSearchTermChange(marketInfo);
-                setIsOpen(true);
-                setTimeout(() => inputRef.current?.focus(), 0);
               }}
               className="text-sm font-medium"
             >
