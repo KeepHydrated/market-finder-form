@@ -71,7 +71,7 @@ export const MarketSearch = ({
   // Show all markets in dropdown, but highlight selected ones
   const availableMarkets = markets;
   
-  const maxMarketsReached = selectedMarkets.length >= 3 && !isEditingMarket;
+  const maxMarketsReached = selectedMarkets.length >= 3;
   
   const showResults = isOpen;
   
@@ -214,11 +214,7 @@ export const MarketSearch = ({
         <button
           type="button"
           onClick={() => {
-            console.log('Button clicked! maxMarketsReached:', maxMarketsReached, 'selectedMarkets.length:', selectedMarkets.length);
-            if (maxMarketsReached) {
-              console.log('Max markets reached, should not proceed');
-              return;
-            }
+            if (maxMarketsReached) return;
             onSearchTermChange('');
             onMarketTabChange?.(null);
             setIsOpen(true);
