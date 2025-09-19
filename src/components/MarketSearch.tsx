@@ -191,7 +191,7 @@ export const MarketSearch = ({
             "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full transition-colors",
             maxMarketsReached 
               ? "bg-muted/20 border-muted-foreground/20 text-muted-foreground/50 cursor-not-allowed"
-              : "bg-muted/30 border-muted-foreground/30 hover:bg-muted text-muted-foreground hover:text-foreground"
+              : "bg-background border-muted-foreground/50 hover:bg-muted text-foreground hover:text-foreground"
           )}
           title={maxMarketsReached ? "Maximum 3 markets allowed" : "Add another market"}
         >
