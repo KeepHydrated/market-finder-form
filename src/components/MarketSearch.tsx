@@ -125,15 +125,28 @@ export const MarketSearch = ({
   };
 
   const handleSelectMarket = (market: Market) => {
+    console.log('handleSelectMarket called with:', {
+      marketName: market.name,
+      isEditingMarket,
+      activeMarketTab,
+      editingMarket: editingMarket?.name,
+      hasReplaceCallback: !!onReplaceMarket
+    });
+    
     onSearchTermChange(''); // Clear search after selection
     setIsOpen(false);
     setSelectedIndex(-1);
     
     if (isEditingMarket && editingMarket && onReplaceMarket) {
+      console.log('Calling onReplaceMarket:', {
+        oldMarket: editingMarket.name,
+        newMarket: market.name
+      });
       // Replace the market being edited
       onReplaceMarket(editingMarket, market);
       // Keep the same active tab
     } else {
+      console.log('Adding new market (not replacing)');
       // Add new market
       onSelectMarket(market);
       // Set the newly selected market as the active tab
@@ -176,6 +189,11 @@ export const MarketSearch = ({
           >
             <button
               onClick={() => {
+                console.log('Market tab clicked:', {
+                  index,
+                  marketName: market.name,
+                  currentActiveTab: activeMarketTab
+                });
                 onMarketTabChange?.(index);
                 const marketInfo = `${market.name} - ${market.address}, ${market.city}, ${market.state}`;
                 onSearchTermChange(marketInfo);
