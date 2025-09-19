@@ -212,6 +212,7 @@ export const MarketSearch = ({
         
         {/* Add Market Plus Button */}
         <button
+          type="button"
           onClick={() => {
             if (maxMarketsReached) return;
             onSearchTermChange('');
@@ -223,7 +224,7 @@ export const MarketSearch = ({
           className={cn(
             "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full transition-colors",
             maxMarketsReached 
-              ? "bg-muted/10 border-muted-foreground/10 text-muted-foreground/30 cursor-not-allowed opacity-50"
+              ? "bg-muted/10 border-muted-foreground/10 text-muted-foreground/30 cursor-not-allowed opacity-50 pointer-events-none"
               : "bg-background border-muted-foreground/50 hover:bg-muted text-foreground hover:text-foreground"
           )}
           title={maxMarketsReached ? "Maximum 3 markets allowed" : "Add another market"}
