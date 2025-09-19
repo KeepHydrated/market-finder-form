@@ -233,7 +233,7 @@ export const MarketSearch = ({
           className={cn(
             "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full transition-colors",
             maxMarketsReached 
-              ? "bg-muted/5 border-muted-foreground/20 text-muted-foreground/40 cursor-pointer opacity-50"
+              ? "bg-muted/20 border-muted-foreground/40 text-muted-foreground/70 cursor-pointer opacity-75"
               : "bg-background border-muted-foreground/50 hover:bg-muted text-foreground hover:text-foreground"
           )}
           title={maxMarketsReached ? "Maximum 3 markets allowed - click for details" : "Add another market"}
