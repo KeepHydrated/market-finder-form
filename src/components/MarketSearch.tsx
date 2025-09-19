@@ -70,7 +70,7 @@ export const MarketSearch = ({
   
   const showResults = isOpen;
   
-  console.log('MarketSearch render state:', { isOpen, showResults, disabled, maxMarketsReached, selectedMarketsLength: selectedMarkets.length });
+  console.log('MarketSearch render - isOpen:', isOpen, 'showResults:', showResults, 'disabled:', disabled, 'maxMarketsReached:', maxMarketsReached, 'selectedMarketsLength:', selectedMarkets.length);
   
   // Sort available markets
   const sortedMarkets = [...availableMarkets].sort((a, b) => {
@@ -153,10 +153,12 @@ export const MarketSearch = ({
   };
 
   const handleInputFocus = () => {
-    console.log('Input focus event triggered', { disabled, maxMarketsReached, isEditingMarket });
+    console.log('Input focus - disabled:', disabled, 'maxMarketsReached:', maxMarketsReached, 'isEditingMarket:', isEditingMarket);
     if (!disabled) {
       console.log('Setting isOpen to true');
       setIsOpen(true);
+    } else {
+      console.log('Input is disabled, not opening dropdown');
     }
   };
 
