@@ -255,7 +255,7 @@ export const MarketSearch = ({
             )}
             <div className="max-h-60 overflow-y-auto">
               {visibleMarkets.map((market, index) => {
-                const isCurrentlySelected = market.name.toLowerCase() === searchTerm.toLowerCase().trim();
+                const isCurrentlySelected = selectedMarketIds.includes(market.id);
                 return (
                   <button
                     key={market.id}
