@@ -206,7 +206,7 @@ export const MarketSearch = ({
           <Input
             ref={inputRef}
             type="text"
-            placeholder={maxMarketsReached ? "Maximum 3 markets selected" : "Search for a farmers market..."}
+            placeholder="Search for a farmers market..."
             value={searchTerm}
             onChange={handleInputChange}
             onFocus={() => !disabled && setIsOpen(true)}
