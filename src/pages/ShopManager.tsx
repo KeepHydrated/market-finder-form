@@ -920,7 +920,7 @@ export default function ShopManager() {
                 <TabsTrigger value="store">Store Information</TabsTrigger>
               </TabsList>
               
-               <TabsContent value="markets" className="space-y-4">
+               <TabsContent value="markets" className="space-y-6">
                 <Card>
                   <CardContent className="pt-6">
                     <MarketSearch
