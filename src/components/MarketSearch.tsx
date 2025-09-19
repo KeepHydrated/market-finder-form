@@ -213,8 +213,7 @@ export const MarketSearch = ({
         {/* Add Market Plus Button */}
         <button
           type="button"
-          onClick={() => {
-            if (maxMarketsReached) return;
+          onClick={maxMarketsReached ? undefined : () => {
             onSearchTermChange('');
             onMarketTabChange?.(null);
             setIsOpen(true);
@@ -222,10 +221,10 @@ export const MarketSearch = ({
           }}
           disabled={maxMarketsReached}
           className={cn(
-            "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full transition-colors",
+            "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full",
             maxMarketsReached 
-              ? "bg-muted/10 border-muted-foreground/10 text-muted-foreground/30 cursor-not-allowed opacity-50 pointer-events-none"
-              : "bg-background border-muted-foreground/50 hover:bg-muted text-foreground hover:text-foreground"
+              ? "bg-muted/5 border-muted-foreground/20 text-muted-foreground/40 cursor-not-allowed opacity-30 pointer-events-none"
+              : "bg-background border-muted-foreground/50 hover:bg-muted text-foreground hover:text-foreground transition-colors"
           )}
           title={maxMarketsReached ? "Maximum 3 markets allowed" : "Add another market"}
         >
