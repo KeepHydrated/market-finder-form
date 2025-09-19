@@ -64,6 +64,10 @@ export const MarketSearch = ({
     isEditingMarket,
     maxMarketsReached: selectedMarkets.length >= 3 && !isEditingMarket
   });
+  console.log('activeMarketTab value:', activeMarketTab);
+  console.log('selectedMarkets.length:', selectedMarkets.length);
+  console.log('isEditingMarket:', isEditingMarket);
+  console.log('maxMarketsReached calculation:', selectedMarkets.length >= 3 && !isEditingMarket);
   
   // When editing, exclude all selected markets except the one being edited
   const availableMarkets = markets.filter(market => {
@@ -183,7 +187,7 @@ export const MarketSearch = ({
           >
             <button
               onClick={() => {
-                console.log('Market tab clicked:', { index, currentActiveTab: activeMarketTab });
+                console.log('Market tab clicked - index:', index, 'currentActiveTab:', activeMarketTab);
                 onMarketTabChange?.(index);
                 const marketInfo = `${market.name} - ${market.address}, ${market.city}, ${market.state}`;
                 onSearchTermChange(marketInfo);
