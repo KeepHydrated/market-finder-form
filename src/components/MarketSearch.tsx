@@ -250,7 +250,7 @@ export const MarketSearch = ({
             )}
             <div className="max-h-60 overflow-y-auto">
               {visibleMarkets.map((market, index) => {
-                const isCurrentlySelected = selectedMarketIds.includes(market.id);
+                const isActiveTab = isEditingMarket && editingMarket && market.id === editingMarket.id;
                 return (
                   <button
                     key={market.id}
@@ -259,16 +259,16 @@ export const MarketSearch = ({
                       "w-full px-4 py-3 text-left transition-colors",
                       maxMarketsReached ? "cursor-not-allowed opacity-50" : "hover:bg-muted cursor-pointer",
                       selectedIndex === index && !maxMarketsReached && "bg-muted",
-                      isCurrentlySelected && "bg-primary/10 border-l-4 border-l-primary"
+                      isActiveTab && "bg-primary/10 border-l-4 border-l-primary"
                     )}
                     disabled={maxMarketsReached}
                   >
                     <div className={cn(
                       "font-medium text-foreground",
-                      isCurrentlySelected && "text-primary font-semibold"
+                      isActiveTab && "text-primary font-semibold"
                     )}>
                       {market.name}
-                      {isCurrentlySelected && <span className="ml-2 text-xs text-primary">(Selected)</span>}
+                      {isActiveTab && <span className="ml-2 text-xs text-primary">(Selected)</span>}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       {market.city}, {market.state}
