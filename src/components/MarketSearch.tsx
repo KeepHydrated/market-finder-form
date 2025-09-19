@@ -178,21 +178,26 @@ export const MarketSearch = ({
         ))}
         
         {/* Add Market Plus Button */}
-        {!maxMarketsReached && (
-          <button
-            onClick={() => {
-              onSearchTermChange('');
-              onMarketTabChange?.(null);
-              setIsOpen(true);
-              setTimeout(() => inputRef.current?.focus(), 0);
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-muted/30 border border-dashed border-muted-foreground/30 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-            title="Add another market"
-          >
-            <Plus className="h-4 w-4" />
-            <span className="text-sm">Add</span>
-          </button>
-        )}
+        <button
+          onClick={() => {
+            if (maxMarketsReached) return;
+            onSearchTermChange('');
+            onMarketTabChange?.(null);
+            setIsOpen(true);
+            setTimeout(() => inputRef.current?.focus(), 0);
+          }}
+          disabled={maxMarketsReached}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full transition-colors",
+            maxMarketsReached 
+              ? "bg-muted/20 border-muted-foreground/20 text-muted-foreground/50 cursor-not-allowed"
+              : "bg-muted/30 border-muted-foreground/30 hover:bg-muted text-muted-foreground hover:text-foreground"
+          )}
+          title={maxMarketsReached ? "Maximum 3 markets allowed" : "Add another market"}
+        >
+          <Plus className="h-4 w-4" />
+          <span className="text-sm">Add</span>
+        </button>
       </div>
       
       <div className="relative w-full" ref={dropdownRef}>
