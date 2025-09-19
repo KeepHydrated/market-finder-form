@@ -87,6 +87,11 @@ export default function ShopManager() {
   const [vacationMode, setVacationMode] = useState(false);
   const [activeMarketTab, setActiveMarketTab] = useState<number | null>(null);
 
+  // Debug logging for editing state
+  useEffect(() => {
+    console.log('ShopManager isEditing state changed to:', isEditing, 'MarketSearch will be disabled:', !isEditing);
+  }, [isEditing]);
+
   // Check for public access via URL parameter
   const isPublicAccess = new URLSearchParams(window.location.search).get('demo') === 'true';
 
@@ -1048,9 +1053,11 @@ export default function ShopManager() {
                   <Button
                     variant={isEditing ? "outline" : "default"}
                     onClick={() => {
+                      console.log('Edit button clicked, current isEditing:', isEditing);
                       if (isEditing) {
                         handleSaveShop();
                       } else {
+                        console.log('Setting isEditing to true');
                         setIsEditing(true);
                       }
                     }}
