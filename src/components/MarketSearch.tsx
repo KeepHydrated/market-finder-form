@@ -53,18 +53,13 @@ export const MarketSearch = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Filter out already selected markets except when editing
+  // Track selected markets for highlighting
   const selectedMarketIds = selectedMarkets.map(m => m.id);
   const isEditingMarket = activeMarketTab !== null && activeMarketTab !== undefined;
   const editingMarket = isEditingMarket ? selectedMarkets[activeMarketTab] : null;
   
-  // When editing, exclude all selected markets except the one being edited
-  const availableMarkets = markets.filter(market => {
-    if (isEditingMarket && editingMarket) {
-      return !selectedMarketIds.includes(market.id) || market.id === editingMarket.id;
-    }
-    return !selectedMarketIds.includes(market.id);
-  });
+  // Show all markets in dropdown, but highlight selected ones
+  const availableMarkets = markets;
   
   const maxMarketsReached = selectedMarkets.length >= 3 && !isEditingMarket;
   
