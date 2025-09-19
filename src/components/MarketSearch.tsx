@@ -301,9 +301,6 @@ export const MarketSearch = ({
             
             <button
               onClick={() => {
-                const canAdd = !maxMarketsReached || isEditingMarket || isEditingSubmittedMarket;
-                if (!canAdd) return;
-                
                 if (isEditingSubmittedMarket && onEditMarket) {
                   const selectedMarket = markets.find(m => m.name.toLowerCase() === searchTerm.toLowerCase()) ||
                                        selectedMarkets.find(m => m.name.toLowerCase() === searchTerm.toLowerCase());
@@ -311,17 +308,14 @@ export const MarketSearch = ({
                     onEditMarket(selectedMarket);
                   }
                 } else {
+                  // Always allow submitting new markets
                   onAddMarket();
                 }
               }}
               className={cn(
-                "w-full px-4 py-3 text-left transition-colors flex items-center gap-2 border-t border-border",
-                (!maxMarketsReached || isEditingMarket || isEditingSubmittedMarket) 
-                  ? "hover:bg-muted cursor-pointer" 
-                  : "cursor-not-allowed opacity-50",
-                selectedIndex === visibleMarkets.length && (isEditingSubmittedMarket || isEditingMarket || !maxMarketsReached) && "bg-muted"
+                "w-full px-4 py-3 text-left transition-colors flex items-center gap-2 border-t border-border hover:bg-muted cursor-pointer",
+                selectedIndex === visibleMarkets.length && "bg-muted"
               )}
-              disabled={maxMarketsReached && !isEditingMarket && !isEditingSubmittedMarket}
             >
               {isEditingSubmittedMarket ? (
                 <>
