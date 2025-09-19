@@ -110,17 +110,8 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
   }, []);
 
   const handleReplaceMarket = useCallback((oldMarket: Market, newMarket: Market) => {
-    console.log('handleReplaceMarket called:', {
-      oldMarket: oldMarket.name,
-      newMarket: newMarket.name,
-      currentSelectedMarkets: selectedMarkets.map(m => m.name)
-    });
-    setSelectedMarkets(prev => {
-      const updated = prev.map(m => m.id === oldMarket.id ? newMarket : m);
-      console.log('Updated selected markets:', updated.map(m => m.name));
-      return updated;
-    });
-  }, [selectedMarkets]);
+    setSelectedMarkets(prev => prev.map(m => m.id === oldMarket.id ? newMarket : m));
+  }, []);
 
   const handleAddMarket = useCallback(() => {
     setShowAddForm(true);

@@ -556,6 +556,49 @@ export default function ShopManager() {
     }
   };
 
+  const handleReplaceMarket = async (oldMarket: any, newMarket: any) => {
+    console.log('handleReplaceMarket called:', {
+      oldMarket: oldMarket.name,
+      newMarket: newMarket.name,
+      currentSelectedMarkets: selectedMarkets.map((m: any) => m.name)
+    });
+    
+    if (!shopData) return;
+
+    try {
+      const newSelectedMarkets = selectedMarkets.map(m => m.id === oldMarket.id ? newMarket : m);
+      
+      const { error } = await supabase
+        .from('submissions')
+        .update({
+          selected_markets: newSelectedMarkets,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', shopData.id);
+
+      if (error) throw error;
+
+      console.log('Updated selected markets:', newSelectedMarkets.map((m: any) => m.name));
+      setSelectedMarkets(newSelectedMarkets);
+      setShopData(prev => prev ? {
+        ...prev,
+        selected_markets: newSelectedMarkets,
+      } : null);
+
+      toast({
+        title: "Market Replaced",
+        description: `${oldMarket.name} has been replaced with ${newMarket.name}.`,
+      });
+    } catch (error: any) {
+      console.error('Error replacing market:', error);
+      toast({
+        title: "Replacement Failed",
+        description: error.message || "Failed to replace market.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleEditMarket = (market: any) => {
     setEditingMarket(market);
     setShowAddMarket(true);
@@ -923,20 +966,21 @@ export default function ShopManager() {
                <TabsContent value="markets" className="space-y-6">
                 <Card>
                   <CardContent className="pt-6">
-                    <MarketSearch
-                      markets={markets}
-                      searchTerm={marketSearchTerm}
-                      onSearchTermChange={setMarketSearchTerm}
-                      onSelectMarket={handleMarketSelect}
-                      onAddMarket={() => setShowAddMarket(true)}
-                      onEditMarket={handleEditMarket}
-                      submittedMarketName={shopData?.selected_market}
-                      disabled={!isEditing}
-                      selectedMarkets={selectedMarkets}
-                      onRemoveMarket={handleRemoveMarket}
-                      activeMarketTab={activeMarketTab}
-                      onMarketTabChange={setActiveMarketTab}
-                    />
+                     <MarketSearch
+                       markets={markets}
+                       searchTerm={marketSearchTerm}
+                       onSearchTermChange={setMarketSearchTerm}
+                       onSelectMarket={handleMarketSelect}
+                       onAddMarket={() => setShowAddMarket(true)}
+                       onEditMarket={handleEditMarket}
+                       submittedMarketName={shopData?.selected_market}
+                       disabled={!isEditing}
+                       selectedMarkets={selectedMarkets}
+                       onRemoveMarket={handleRemoveMarket}
+                       activeMarketTab={activeMarketTab}
+                       onMarketTabChange={setActiveMarketTab}
+                       onReplaceMarket={handleReplaceMarket}
+                     />
                   </CardContent>
                 </Card>
               </TabsContent>
