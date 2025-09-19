@@ -72,6 +72,8 @@ export const MarketSearch = ({
   const totalItems = visibleMarkets.length + 1; // +1 for "Add Market" option
   const hasTextInSearch = searchTerm.trim().length > 0;
   const isEditingSubmittedMarket = submittedMarketName && searchTerm.toLowerCase().trim() === submittedMarketName.toLowerCase();
+  
+  console.log('Dropdown state:', { isOpen, showResults, visibleMarkets: visibleMarkets.length, hasTextInSearch });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -123,9 +125,17 @@ export const MarketSearch = ({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Input change:', e.target.value);
     onSearchTermChange(e.target.value);
     setIsOpen(true);
     setSelectedIndex(-1);
+  };
+
+  const handleInputFocus = () => {
+    console.log('Input focused, disabled:', disabled);
+    if (!disabled) {
+      setIsOpen(true);
+    }
   };
 
   return (
@@ -181,6 +191,7 @@ export const MarketSearch = ({
         <button
           onClick={() => {
             if (maxMarketsReached) return;
+            console.log('Add button clicked');
             onSearchTermChange('');
             onMarketTabChange?.(null);
             setIsOpen(true);
@@ -209,14 +220,14 @@ export const MarketSearch = ({
             placeholder="Search for a farmers market..."
             value={searchTerm}
             onChange={handleInputChange}
-            onFocus={() => !disabled && setIsOpen(true)}
+            onFocus={handleInputFocus}
             onKeyDown={handleKeyDown}
             className="pl-10 h-14 text-lg border-2 border-border rounded-xl"
             disabled={disabled}
           />
         </div>
 
-        {showResults && !disabled && (
+        {showResults && (
           <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
             {maxMarketsReached && (
               <div className="px-4 py-3 border-b border-border bg-muted/50">
