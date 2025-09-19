@@ -70,6 +70,8 @@ export const MarketSearch = ({
   
   const showResults = isOpen;
   
+  console.log('MarketSearch render state:', { isOpen, showResults, disabled, maxMarketsReached, selectedMarketsLength: selectedMarkets.length });
+  
   // Sort available markets
   const sortedMarkets = [...availableMarkets].sort((a, b) => {
     const aMatchesSearch = a.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -151,7 +153,9 @@ export const MarketSearch = ({
   };
 
   const handleInputFocus = () => {
+    console.log('Input focus event triggered', { disabled, maxMarketsReached, isEditingMarket });
     if (!disabled) {
+      console.log('Setting isOpen to true');
       setIsOpen(true);
     }
   };
@@ -238,6 +242,7 @@ export const MarketSearch = ({
             value={searchTerm}
             onChange={handleInputChange}
             onFocus={handleInputFocus}
+            onClick={handleInputFocus}
             onKeyDown={handleKeyDown}
             className="pl-10 h-14 text-lg border-2 border-border rounded-xl"
           />
