@@ -157,8 +157,10 @@ export const MarketSearch = ({
     } else {
       // If a market tab is selected, this new market submission should replace it when approved
       const replacementContext = isEditingMarket && editingMarket ? editingMarket : null;
-      onAddMarket(replacementContext);
+      onAddMarket(replacementContext || undefined);
     }
+    setIsOpen(false);
+    setSelectedIndex(-1);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -316,8 +318,8 @@ export const MarketSearch = ({
             <button
               onClick={handleSubmitNewMarket}
               className={cn(
-                "w-full px-4 py-3 text-left transition-colors flex items-center gap-2 border-t border-border hover:bg-muted cursor-pointer",
-                selectedIndex === visibleMarkets.length && "bg-muted"
+                "w-full px-4 py-3 text-left transition-colors flex items-center gap-2 border-t border-border cursor-pointer",
+                selectedIndex === visibleMarkets.length ? "bg-muted hover:bg-muted" : "hover:bg-muted"
               )}
             >
               {isEditingSubmittedMarket ? (

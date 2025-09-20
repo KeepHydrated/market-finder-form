@@ -79,6 +79,7 @@ export default function ShopManagerCopy() {
   const [markets, setMarkets] = useState<any[]>([]);
   const [marketSearchTerm, setMarketSearchTerm] = useState('');
   const [showAddMarket, setShowAddMarket] = useState(false);
+  const [editingMarket, setEditingMarket] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [vacationMode, setVacationMode] = useState(false);
@@ -782,7 +783,10 @@ export default function ShopManagerCopy() {
                     searchTerm={marketSearchTerm}
                     onSearchTermChange={setMarketSearchTerm}
                     onSelectMarket={handleMarketSelect}
-                    onAddMarket={(replacementMarket) => setShowAddMarket(true)}
+                    onAddMarket={(replacementMarket) => {
+                      setEditingMarket(replacementMarket || null);
+                      setShowAddMarket(true);
+                    }}
                     disabled={!isEditing}
                   />
 

@@ -972,7 +972,7 @@ export default function ShopManager() {
                        onSearchTermChange={setMarketSearchTerm}
                        onSelectMarket={handleMarketSelect}
                         onAddMarket={(replacementMarket) => {
-                          // TODO: Store replacement market context for modal
+                          setEditingMarket(replacementMarket || null);
                           setShowAddMarket(true);
                         }}
                        onEditMarket={handleEditMarket}
