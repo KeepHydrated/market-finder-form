@@ -315,7 +315,29 @@ export default function ShopManager() {
         return;
       }
 
-      setMarkets(data || []);
+      const marketData = data || [];
+      setMarkets(marketData);
+      
+      // Clear selected markets and tabs if no markets exist
+      if (marketData.length === 0) {
+        setSelectedMarkets([]);
+        setActiveMarketTab(null);
+        
+        // Also update the database to clear selected markets
+        if (user && shopData) {
+          const { error: updateError } = await supabase
+            .from('submissions')
+            .update({ 
+              selected_markets: [],
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', user.id);
+
+          if (updateError) {
+            console.error('❌ Error clearing selected markets:', updateError);
+          }
+        }
+      }
     } catch (error) {
       console.error('Error fetching markets:', error);
     }
