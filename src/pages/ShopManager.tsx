@@ -733,8 +733,37 @@ export default function ShopManager() {
             description: `${replacementMarket.name} has been replaced with ${marketData.name}.`,
           });
         }
+      } else if (!editingMarket) {
+        // For new market creation without replacement, add to selected markets if under limit
+        if (selectedMarkets.length < 3) {
+          const newSelectedMarkets = [...selectedMarkets, data];
+          
+          // Update the database
+          const { error: updateError } = await supabase
+            .from('submissions')
+            .update({ 
+              selected_markets: newSelectedMarkets,
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', user?.id);
+
+          if (updateError) throw updateError;
+
+          setSelectedMarkets(newSelectedMarkets);
+          setShopData(prev => prev ? {
+            ...prev,
+            selected_markets: newSelectedMarkets,
+          } : null);
+
+          // Set the newly added market as the active tab
+          setActiveMarketTab(newSelectedMarkets.length - 1);
+          
+          toast({
+            title: "Market Added to Selection",
+            description: `${marketData.name} has been added to your selected markets.`,
+          });
+        }
       }
-      // For new market creation without replacement, just add to available markets
 
       setShowAddMarket(false);
       setEditingMarket(null);
