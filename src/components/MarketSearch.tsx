@@ -240,10 +240,8 @@ export const MarketSearch = ({
               });
               return;
             }
-            onSearchTermChange('');
-            onMarketTabChange?.(null);
-            setIsOpen(true);
-            setTimeout(() => inputRef.current?.focus(), 0);
+            // Directly open the new market form
+            onAddMarket(null);
           }}
           className={cn(
             "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full transition-colors",
