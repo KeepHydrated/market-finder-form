@@ -241,30 +241,20 @@ export const MarketSearch = ({
         <button
           type="button"
           onClick={() => {
-            if (maxMarketsReached && !isEditingMarket) {
-              // Show toast message only if not replacing an existing market
-              import('@/hooks/use-toast').then(({ toast }) => {
-                toast({
-                  title: "Maximum markets reached",
-                  description: "You can only select up to 3 farmers markets. Remove one to add a different market.",
-                  variant: "destructive"
-                });
-              });
-              return;
-            }
             // Create a new empty market slot and open dropdown
             onSearchTermChange('');
             onMarketTabChange?.(selectedMarkets.length); // Set active tab to new slot
             setIsOpen(true);
             setTimeout(() => inputRef.current?.focus(), 0);
           }}
+          disabled={maxMarketsReached && !isEditingMarket}
           className={cn(
             "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full transition-colors",
             maxMarketsReached && !isEditingMarket
-              ? "bg-muted/20 border-muted-foreground/40 text-muted-foreground/70 cursor-pointer opacity-75"
+              ? "bg-muted/20 border-muted-foreground/40 text-muted-foreground/70 cursor-not-allowed opacity-50"
               : "bg-background border-muted-foreground/50 hover:bg-muted text-foreground hover:text-foreground"
           )}
-          title={maxMarketsReached && !isEditingMarket ? "Maximum 3 markets allowed - click for details" : "Add another market"}
+          title={maxMarketsReached && !isEditingMarket ? "Maximum 3 markets allowed" : "Add another market"}
         >
           <Plus className="h-4 w-4" />
           <span className="text-sm">Add</span>
