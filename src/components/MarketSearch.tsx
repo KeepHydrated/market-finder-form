@@ -155,9 +155,8 @@ export const MarketSearch = ({
         onEditMarket(selectedMarket);
       }
     } else {
-      // If a market tab is selected, this new market submission should replace it when approved
-      const replacementContext = isEditingMarket && editingMarket ? editingMarket : null;
-      onAddMarket(replacementContext || undefined);
+      // Always pass null for new market submissions - no replacement
+      onAddMarket(null);
     }
     setIsOpen(false);
     setSelectedIndex(-1);

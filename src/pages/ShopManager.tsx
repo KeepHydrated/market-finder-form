@@ -695,40 +695,33 @@ export default function ShopManager() {
         });
       }
 
-      // Handle replacement logic after market creation/update
-      if (editingMarket && !editingMarket.id) {
-        // This is a replacement scenario (editingMarket exists but doesn't have an id, meaning it's from selected markets)
-        const newSelectedMarkets = selectedMarkets.map(m => 
-          m.id === editingMarket.id ? data : m
-        );
-        
-        // Update the database
-        const { error: updateError } = await supabase
-          .from('submissions')
-          .update({ 
+      // Only handle replacement logic for existing market updates
+      if (editingMarket && editingMarket.id) {
+        // This is editing an existing market - update it in selected markets if it's there
+        const marketIndex = selectedMarkets.findIndex(m => m.id === editingMarket.id);
+        if (marketIndex !== -1) {
+          const newSelectedMarkets = [...selectedMarkets];
+          newSelectedMarkets[marketIndex] = data;
+          
+          // Update the database
+          const { error: updateError } = await supabase
+            .from('submissions')
+            .update({ 
+              selected_markets: newSelectedMarkets,
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', user?.id);
+
+          if (updateError) throw updateError;
+
+          setSelectedMarkets(newSelectedMarkets);
+          setShopData(prev => prev ? {
+            ...prev,
             selected_markets: newSelectedMarkets,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', user?.id);
-
-        if (updateError) throw updateError;
-
-        setSelectedMarkets(newSelectedMarkets);
-        setShopData(prev => prev ? {
-          ...prev,
-          selected_markets: newSelectedMarkets,
-        } : null);
-
-        toast({
-          title: "Market Replaced",
-          description: `${editingMarket.name} has been replaced with ${marketData.name}.`,
-        });
-      } else if (!editingMarket) {
-        // Regular market addition - select it if under limit
-        if (selectedMarkets.length < 3) {
-          await handleMarketSelect(data);
+          } : null);
         }
       }
+      // For new market creation, just add to available markets - no automatic selection
 
       setShowAddMarket(false);
       setEditingMarket(null);
@@ -1040,10 +1033,10 @@ export default function ShopManager() {
                        searchTerm={marketSearchTerm}
                        onSearchTermChange={setMarketSearchTerm}
                        onSelectMarket={handleMarketSelect}
-                        onAddMarket={(replacementMarket) => {
-                          setEditingMarket(replacementMarket || null);
-                          setShowAddMarket(true);
-                        }}
+                         onAddMarket={(replacementMarket) => {
+                           setEditingMarket(null); // Always clear editing market for new submissions
+                           setShowAddMarket(true);
+                         }}
                        onEditMarket={handleEditMarket}
                        submittedMarketName={shopData?.selected_market}
                        selectedMarkets={selectedMarkets}
