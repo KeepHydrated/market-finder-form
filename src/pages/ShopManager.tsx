@@ -318,23 +318,25 @@ export default function ShopManager() {
       const marketData = data || [];
       setMarkets(marketData);
       
-      // Clear selected markets and tabs if no markets exist
+      // Clear selected markets, tabs, and search term if no markets exist
       if (marketData.length === 0) {
         setSelectedMarkets([]);
         setActiveMarketTab(null);
+        setMarketSearchTerm('');
         
-        // Also update the database to clear selected markets
+        // Also update the database to clear selected markets and search term
         if (user && shopData) {
           const { error: updateError } = await supabase
             .from('submissions')
             .update({ 
               selected_markets: [],
+              search_term: '',
               updated_at: new Date().toISOString()
             })
             .eq('user_id', user.id);
 
           if (updateError) {
-            console.error('❌ Error clearing selected markets:', updateError);
+            console.error('❌ Error clearing selected markets and search term:', updateError);
           }
         }
       }
