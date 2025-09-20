@@ -1040,12 +1040,12 @@ export default function ShopManager() {
                        searchTerm={marketSearchTerm}
                        onSearchTermChange={setMarketSearchTerm}
                        onSelectMarket={handleMarketSelect}
-                         onAddMarket={(replacementMarket) => {
-                           // Store replacement context separately, don't set as editingMarket
-                           setReplacementMarket(replacementMarket);
-                           setEditingMarket(null); // Keep null so form shows as "Add Market"
-                           setShowAddMarket(true);
-                         }}
+                          onAddMarket={(replacementMarket) => {
+                            // Store replacement context separately, don't set as editingMarket
+                            setReplacementMarket(replacementMarket);
+                            setEditingMarket(null); // Keep null so form shows as "Add Market"
+                            setShowAddMarket(true);
+                          }}
                        onEditMarket={handleEditMarket}
                        submittedMarketName={shopData?.selected_market}
                        selectedMarkets={selectedMarkets}
