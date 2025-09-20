@@ -285,7 +285,7 @@ export const MarketSearch = ({
         </div>
         
         {/* Help text */}
-        <div className="mt-2 text-center">
+        <div className="mt-2 text-left">
           <button
             onClick={() => onAddMarket(null)}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
