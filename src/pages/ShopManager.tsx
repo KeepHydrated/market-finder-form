@@ -467,8 +467,8 @@ export default function ShopManager() {
   const handleMarketSelect = async (market: any) => {
     if (!shopData) return;
 
-    // Check if market is already selected
-    if (selectedMarkets.some(m => m.id === market.id)) {
+    // Check if market is already selected, but allow if we're replacing a market
+    if (selectedMarkets.some(m => m.id === market.id) && activeMarketTab === null) {
       toast({
         title: "Market Already Selected",
         description: `${market.name} is already in your selected markets.`,
@@ -477,11 +477,46 @@ export default function ShopManager() {
       return;
     }
 
-    // Check if max markets reached
+    // If we're editing a market tab (replacement mode)
+    if (activeMarketTab !== null) {
+      const newSelectedMarkets = [...selectedMarkets];
+      newSelectedMarkets[activeMarketTab] = market;
+      setSelectedMarkets(newSelectedMarkets);
+      
+      try {
+        setSaving(true);
+        const { error } = await supabase
+          .from('submissions')
+          .update({ 
+            selected_markets: newSelectedMarkets,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user?.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Market Updated",
+          description: `Successfully replaced with ${market.name}`,
+        });
+      } catch (error) {
+        console.error('Error updating markets:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update market selection.",
+          variant: "destructive",
+        });
+      } finally {
+        setSaving(false);
+      }
+      return;
+    }
+
+    // Check if max markets reached (for new additions)
     if (selectedMarkets.length >= 3) {
       toast({
         title: "Maximum Markets Reached",
-        description: "You can only select up to 3 farmers markets.",
+        description: "You can only select up to 3 farmers markets. Remove one to add a different market.",
         variant: "destructive",
       });
       return;
