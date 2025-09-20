@@ -850,12 +850,16 @@ export default function ShopManager() {
       const updatedSelectedMarkets = selectedMarkets.filter(m => m.id !== market.id);
       setSelectedMarkets(updatedSelectedMarkets);
       
-      // Update database if it was in selected markets
-      if (selectedMarkets.some(m => m.id === market.id)) {
+      // Clear search term since we're deleting markets
+      setMarketSearchTerm('');
+      
+      // Update database if it was in selected markets or clear search term
+      if (selectedMarkets.some(m => m.id === market.id) || marketSearchTerm) {
         await supabase
           .from('submissions')
           .update({ 
             selected_markets: updatedSelectedMarkets,
+            search_term: '', // Clear search term
             updated_at: new Date().toISOString()
           })
           .eq('user_id', user?.id);
