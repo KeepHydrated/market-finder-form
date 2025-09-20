@@ -691,11 +691,45 @@ export default function ShopManager() {
         
         toast({
           title: "Market Added",
-          description: `${marketData.name} has been added and selected.`,
+          description: `${marketData.name} has been added to available markets.`,
         });
       }
 
-      await handleMarketSelect(data);
+      // Handle replacement logic after market creation/update
+      if (editingMarket && !editingMarket.id) {
+        // This is a replacement scenario (editingMarket exists but doesn't have an id, meaning it's from selected markets)
+        const newSelectedMarkets = selectedMarkets.map(m => 
+          m.id === editingMarket.id ? data : m
+        );
+        
+        // Update the database
+        const { error: updateError } = await supabase
+          .from('submissions')
+          .update({ 
+            selected_markets: newSelectedMarkets,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user?.id);
+
+        if (updateError) throw updateError;
+
+        setSelectedMarkets(newSelectedMarkets);
+        setShopData(prev => prev ? {
+          ...prev,
+          selected_markets: newSelectedMarkets,
+        } : null);
+
+        toast({
+          title: "Market Replaced",
+          description: `${editingMarket.name} has been replaced with ${marketData.name}.`,
+        });
+      } else if (!editingMarket) {
+        // Regular market addition - select it if under limit
+        if (selectedMarkets.length < 3) {
+          await handleMarketSelect(data);
+        }
+      }
+
       setShowAddMarket(false);
       setEditingMarket(null);
 

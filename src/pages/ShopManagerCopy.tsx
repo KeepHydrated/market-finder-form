@@ -80,6 +80,7 @@ export default function ShopManagerCopy() {
   const [marketSearchTerm, setMarketSearchTerm] = useState('');
   const [showAddMarket, setShowAddMarket] = useState(false);
   const [editingMarket, setEditingMarket] = useState(null);
+  const [selectedMarkets, setSelectedMarkets] = useState<any[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [vacationMode, setVacationMode] = useState(false);
@@ -133,8 +134,17 @@ export default function ShopManagerCopy() {
         const parsedData = {
           ...data,
           products: typeof data.products === 'string' ? JSON.parse(data.products) : data.products || [],
+          selected_markets: (() => {
+            try {
+              return Array.isArray(data.selected_markets) ? data.selected_markets : [];
+            } catch (e) {
+              console.error('Error parsing selected_markets:', e);
+              return [];
+            }
+          })()
         };
         setShopData(parsedData);
+        setSelectedMarkets(parsedData.selected_markets || []);
         setFormData({
           store_name: parsedData.store_name || '',
           primary_specialty: parsedData.primary_specialty || '',
@@ -453,6 +463,8 @@ export default function ShopManagerCopy() {
 
   const handleAddMarket = async (marketData: any) => {
     console.log('handleAddMarket called with:', marketData);
+    console.log('EditingMarket:', editingMarket);
+    
     try {
       // Format the hours object as JSON string for database storage
       const formattedMarketData = {
@@ -475,13 +487,50 @@ export default function ShopManagerCopy() {
       if (error) throw error;
 
       setMarkets(prev => [...prev, data]);
-      await handleMarketSelect(data);
-      setShowAddMarket(false);
+      
+      // Handle replacement logic after market creation
+      if (editingMarket) {
+        // This is a replacement scenario
+        const newSelectedMarkets = selectedMarkets.map(m => 
+          m.id === editingMarket.id ? data : m
+        );
+        
+        // Update the database
+        const { error: updateError } = await supabase
+          .from('submissions')
+          .update({ 
+            selected_markets: newSelectedMarkets,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user?.id);
 
-      toast({
-        title: "Market Added",
-        description: `${marketData.name} has been added and selected.`,
-      });
+        if (updateError) throw updateError;
+
+        setSelectedMarkets(newSelectedMarkets);
+        setShopData(prev => prev ? {
+          ...prev,
+          selected_markets: newSelectedMarkets,
+        } : null);
+
+        toast({
+          title: "Market Replaced",
+          description: `${editingMarket.name} has been replaced with ${marketData.name}.`,
+        });
+      } else {
+        // Regular market addition - select it if under limit
+        if (selectedMarkets.length < 3) {
+          await handleMarketSelect(data);
+        }
+        
+        toast({
+          title: "Market Added",
+          description: `${marketData.name} has been added to available markets.`,
+        });
+      }
+      
+      setShowAddMarket(false);
+      setEditingMarket(null);
+
     } catch (error: any) {
       console.error('Error adding market:', error);
       toast({
