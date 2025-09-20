@@ -1175,117 +1175,107 @@ export default function ShopManager() {
           </TabsContent>
 
           <TabsContent value="shop" className="space-y-6 max-w-2xl">
-            <Tabs defaultValue="markets" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="markets">Farmers Markets</TabsTrigger>
-                <TabsTrigger value="store">Store Information</TabsTrigger>
-              </TabsList>
+            <Card>
+              <CardContent className="pt-6">
+                 <MarketSearch
+                   markets={markets}
+                   searchTerm={marketSearchTerm}
+                   onSearchTermChange={setMarketSearchTerm}
+                   onSelectMarket={handleMarketSelect}
+                       onAddMarket={(replacementMarket) => {
+                         // Clear any previous state and ensure form is blank
+                         setReplacementMarket(null);
+                         setEditingMarket(null); // Keep null so form shows as "Add Market"
+                         setShowAddMarket(true);
+                       }}
+                   onEditMarket={handleEditMarket}
+                   submittedMarketName={shopData?.selected_market}
+                   selectedMarkets={selectedMarkets}
+                   onRemoveMarket={handleRemoveMarket}
+                   activeMarketTab={activeMarketTab}
+                   onMarketTabChange={setActiveMarketTab}
+                   onReplaceMarket={handleReplaceMarket}
+                   userSubmittedMarketIds={userSubmittedMarketIds}
+                 />
+              </CardContent>
+            </Card>
+            
+            {/* Store Information Section */}
+            <div className="flex gap-4 items-start">
+              <Card className="flex-1">
+                <CardContent className="space-y-4 pt-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="store_name">Store Name</Label>
+                    <Input
+                      id="store_name"
+                      value={formData.store_name}
+                      onChange={(e) => setFormData(prev => ({ ...prev, store_name: e.target.value }))}
+                      disabled={!isEditing}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="specialty">Primary Specialty</Label>
+                    <Select
+                      value={formData.primary_specialty}
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, primary_specialty: value }))}
+                      disabled={!isEditing}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a specialty" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {SPECIALTY_CATEGORIES.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="website">Website</Label>
+                    <Input
+                      id="website"
+                      type="url"
+                      value={formData.website}
+                      onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
+                      disabled={!isEditing}
+                      placeholder="https://example.com"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      disabled={!isEditing}
+                      rows={4}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
               
-               <TabsContent value="markets" className="space-y-6">
-                <Card>
-                  <CardContent className="pt-6">
-                     <MarketSearch
-                       markets={markets}
-                       searchTerm={marketSearchTerm}
-                       onSearchTermChange={setMarketSearchTerm}
-                       onSelectMarket={handleMarketSelect}
-                           onAddMarket={(replacementMarket) => {
-                             // Clear any previous state and ensure form is blank
-                             setReplacementMarket(null);
-                             setEditingMarket(null); // Keep null so form shows as "Add Market"
-                             setShowAddMarket(true);
-                           }}
-                       onEditMarket={handleEditMarket}
-                       submittedMarketName={shopData?.selected_market}
-                       selectedMarkets={selectedMarkets}
-                       onRemoveMarket={handleRemoveMarket}
-                       activeMarketTab={activeMarketTab}
-                       onMarketTabChange={setActiveMarketTab}
-                       onReplaceMarket={handleReplaceMarket}
-                       userSubmittedMarketIds={userSubmittedMarketIds}
-                     />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="store" className="space-y-4">
-                <div className="flex gap-4 items-start">
-                  <Card className="flex-1">
-                    <CardContent className="space-y-4 pt-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="store_name">Store Name</Label>
-                        <Input
-                          id="store_name"
-                          value={formData.store_name}
-                          onChange={(e) => setFormData(prev => ({ ...prev, store_name: e.target.value }))}
-                          disabled={!isEditing}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="specialty">Primary Specialty</Label>
-                        <Select
-                          value={formData.primary_specialty}
-                          onValueChange={(value) => setFormData(prev => ({ ...prev, primary_specialty: value }))}
-                          disabled={!isEditing}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a specialty" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {SPECIALTY_CATEGORIES.map((category) => (
-                              <SelectItem key={category} value={category}>
-                                {category}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="website">Website</Label>
-                        <Input
-                          id="website"
-                          type="url"
-                          value={formData.website}
-                          onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
-                          disabled={!isEditing}
-                          placeholder="https://example.com"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
-                        <Textarea
-                          id="description"
-                          value={formData.description}
-                          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                          disabled={!isEditing}
-                          rows={4}
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  {/* Edit button positioned to the side of the card */}
-                  <Button
-                    variant={isEditing ? "outline" : "default"}
-                    onClick={() => {
-                      if (isEditing) {
-                        handleSaveShop();
-                      } else {
-                        setIsEditing(true);
-                      }
-                    }}
-                    disabled={isSaving}
-                    className="shrink-0"
-                  >
-                    <Edit className="h-4 w-4 mr-2" />
-                    {isEditing ? (isSaving ? 'Saving...' : 'Save') : 'Edit'}
-                  </Button>
-                </div>
-              </TabsContent>
-            </Tabs>
+              {/* Edit button positioned to the side of the card */}
+              <Button
+                variant={isEditing ? "outline" : "default"}
+                onClick={() => {
+                  if (isEditing) {
+                    handleSaveShop();
+                  } else {
+                    setIsEditing(true);
+                  }
+                }}
+                disabled={isSaving}
+                className="shrink-0"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                {isEditing ? (isSaving ? 'Saving...' : 'Save') : 'Edit'}
+              </Button>
+            </div>
           </TabsContent>
 
           <TabsContent value="products" className="space-y-6">
