@@ -149,6 +149,14 @@ export const MarketSearch = ({
   };
 
   const handleSelectMarket = (market: Market) => {
+    // Check if market is already selected (prevent duplicates)
+    if (selectedMarketIds.includes(market.id)) {
+      setIsOpen(false);
+      setSelectedIndex(-1);
+      // Don't clear search term, just close dropdown
+      return;
+    }
+    
     onSearchTermChange(''); // Clear search after selection
     setIsOpen(false);
     setSelectedIndex(-1);
@@ -305,7 +313,8 @@ export const MarketSearch = ({
              <div className="max-h-60 overflow-y-auto">
                {visibleMarkets.map((market, index) => {
                  const isActiveTab = isEditingMarket && editingMarket && market.id === editingMarket.id;
-                 const canSelect = !maxMarketsReached || isEditingMarket;
+                 const isAlreadySelected = selectedMarketIds.includes(market.id);
+                 const canSelect = (!maxMarketsReached || isEditingMarket) && !isAlreadySelected;
                  return (
                    <button
                      key={market.id}
@@ -314,18 +323,24 @@ export const MarketSearch = ({
                        "w-full px-4 py-3 text-left transition-colors",
                        canSelect ? "hover:bg-muted cursor-pointer" : "cursor-not-allowed opacity-50",
                        selectedIndex === index && canSelect && "bg-muted",
-                       isActiveTab && "bg-primary/10 border-l-4 border-l-primary"
+                       isActiveTab && "bg-primary/10 border-l-4 border-l-primary",
+                       isAlreadySelected && !isActiveTab && "bg-muted/30 border-l-4 border-l-muted-foreground"
                      )}
                      disabled={!canSelect}
                    >
                     <div className={cn(
                       "font-medium text-foreground",
-                      isActiveTab && "text-primary font-semibold"
+                      isActiveTab && "text-primary font-semibold",
+                      isAlreadySelected && !isActiveTab && "text-muted-foreground"
                     )}>
                       {market.name}
                       {isActiveTab && <span className="ml-2 text-xs text-primary">(Selected)</span>}
+                      {isAlreadySelected && !isActiveTab && <span className="ml-2 text-xs text-muted-foreground">(Already added)</span>}
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className={cn(
+                      "text-sm text-muted-foreground",
+                      isAlreadySelected && !isActiveTab && "text-muted-foreground/70"
+                    )}>
                       {market.city}, {market.state}
                     </div>
                   </button>
