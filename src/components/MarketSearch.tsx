@@ -67,6 +67,15 @@ export const MarketSearch = ({
       onSearchTermChange(marketInfo);
     }
   }, [selectedMarkets.length, activeMarketTab, onMarketTabChange, onSearchTermChange, selectedMarkets]);
+
+  // Update search term when active tab changes
+  useEffect(() => {
+    if (activeMarketTab !== null && activeMarketTab !== undefined && selectedMarkets[activeMarketTab]) {
+      const selectedMarket = selectedMarkets[activeMarketTab];
+      const marketInfo = `${selectedMarket.name} - ${selectedMarket.address}, ${selectedMarket.city}, ${selectedMarket.state}`;
+      onSearchTermChange(marketInfo);
+    }
+  }, [activeMarketTab, selectedMarkets, onSearchTermChange]);
   
   // Show all markets in dropdown, but highlight selected ones
   const availableMarkets = markets;
