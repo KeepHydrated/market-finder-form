@@ -1175,86 +1175,85 @@ export default function ShopManager() {
           </TabsContent>
 
           <TabsContent value="shop" className="space-y-6 max-w-2xl">
-            <Card>
-              <CardContent className="pt-6">
-                 <MarketSearch
-                   markets={markets}
-                   searchTerm={marketSearchTerm}
-                   onSearchTermChange={setMarketSearchTerm}
-                   onSelectMarket={handleMarketSelect}
-                       onAddMarket={(replacementMarket) => {
-                         // Clear any previous state and ensure form is blank
-                         setReplacementMarket(null);
-                         setEditingMarket(null); // Keep null so form shows as "Add Market"
-                         setShowAddMarket(true);
-                       }}
-                   onEditMarket={handleEditMarket}
-                   submittedMarketName={shopData?.selected_market}
-                   selectedMarkets={selectedMarkets}
-                   onRemoveMarket={handleRemoveMarket}
-                   activeMarketTab={activeMarketTab}
-                   onMarketTabChange={setActiveMarketTab}
-                   onReplaceMarket={handleReplaceMarket}
-                   userSubmittedMarketIds={userSubmittedMarketIds}
-                 />
-              </CardContent>
-            </Card>
-            
-            {/* Store Information Section */}
             <div className="flex gap-4 items-start">
               <Card className="flex-1">
-                <CardContent className="space-y-4 pt-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="store_name">Store Name</Label>
-                    <Input
-                      id="store_name"
-                      value={formData.store_name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, store_name: e.target.value }))}
-                      disabled={!isEditing}
-                    />
-                  </div>
+                <CardContent className="space-y-6 pt-6">
+                  {/* Farmers Markets Section */}
+                  <MarketSearch
+                    markets={markets}
+                    searchTerm={marketSearchTerm}
+                    onSearchTermChange={setMarketSearchTerm}
+                    onSelectMarket={handleMarketSelect}
+                        onAddMarket={(replacementMarket) => {
+                          // Clear any previous state and ensure form is blank
+                          setReplacementMarket(null);
+                          setEditingMarket(null); // Keep null so form shows as "Add Market"
+                          setShowAddMarket(true);
+                        }}
+                    onEditMarket={handleEditMarket}
+                    submittedMarketName={shopData?.selected_market}
+                    selectedMarkets={selectedMarkets}
+                    onRemoveMarket={handleRemoveMarket}
+                    activeMarketTab={activeMarketTab}
+                    onMarketTabChange={setActiveMarketTab}
+                    onReplaceMarket={handleReplaceMarket}
+                    userSubmittedMarketIds={userSubmittedMarketIds}
+                  />
+                  
+                  {/* Store Information Section */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <div className="space-y-2">
+                      <Label htmlFor="store_name">Store Name</Label>
+                      <Input
+                        id="store_name"
+                        value={formData.store_name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, store_name: e.target.value }))}
+                        disabled={!isEditing}
+                      />
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="specialty">Primary Specialty</Label>
-                    <Select
-                      value={formData.primary_specialty}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, primary_specialty: value }))}
-                      disabled={!isEditing}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a specialty" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {SPECIALTY_CATEGORIES.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="specialty">Primary Specialty</Label>
+                      <Select
+                        value={formData.primary_specialty}
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, primary_specialty: value }))}
+                        disabled={!isEditing}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a specialty" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SPECIALTY_CATEGORIES.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="website">Website</Label>
-                    <Input
-                      id="website"
-                      type="url"
-                      value={formData.website}
-                      onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
-                      disabled={!isEditing}
-                      placeholder="https://example.com"
-                    />
-                  </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="website">Website</Label>
+                      <Input
+                        id="website"
+                        type="url"
+                        value={formData.website}
+                        onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
+                        disabled={!isEditing}
+                        placeholder="https://example.com"
+                      />
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                      disabled={!isEditing}
-                      rows={4}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Description</Label>
+                      <Textarea
+                        id="description"
+                        value={formData.description}
+                        onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                        disabled={!isEditing}
+                        rows={4}
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
