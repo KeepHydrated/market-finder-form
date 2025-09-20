@@ -1083,7 +1083,7 @@ export default function ShopManager() {
             <TabsTrigger value="overview" className="w-full justify-start">Overview</TabsTrigger>
             <TabsTrigger value="shop" className="w-full justify-start">Shop Information</TabsTrigger>
             <TabsTrigger value="products" className="w-full justify-start">Products</TabsTrigger>
-            <TabsTrigger value="account" className="w-full justify-start">Account</TabsTrigger>
+            <TabsTrigger value="account" className="w-full justify-start">Settings</TabsTrigger>
           </TabsList>
 
           <div className="flex-1 space-y-6">
@@ -1305,7 +1305,7 @@ export default function ShopManager() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <User className="h-5 w-5 mr-2" />
-                  Account Information
+                  Settings
                 </CardTitle>
               </CardHeader>
               {/* Reduced spacing in Account tab content */}
