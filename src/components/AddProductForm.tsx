@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Upload, X, ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -20,6 +21,7 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
   const [price, setPrice] = useState(editingProduct?.price?.toString() || '');
   const [images, setImages] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>(editingProduct?.images || []);
+  const [websiteSaleEnabled, setWebsiteSaleEnabled] = useState(true);
   const { toast } = useToast();
 
   // Update form when editingProduct changes
@@ -30,12 +32,14 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
       setPrice(editingProduct.price.toString());
       setExistingImages(editingProduct.images);
       setImages([]);
+      setWebsiteSaleEnabled(true); // Default to enabled for existing products
     } else {
       setProductName('');
       setDescription('');
       setPrice('');
       setExistingImages([]);
       setImages([]);
+      setWebsiteSaleEnabled(true); // Default to enabled for new products
     }
   }, [editingProduct]);
 
@@ -75,7 +79,8 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
       name: productName,
       description,
       price: parseFloat(price),
-      images: combinedImages as any // Mix of base64 strings and File objects
+      images: combinedImages as any, // Mix of base64 strings and File objects
+      websiteSaleEnabled
     };
 
     // Include the ID when editing an existing product
@@ -91,6 +96,7 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
     setPrice('');
     setImages([]);
     setExistingImages([]);
+    setWebsiteSaleEnabled(true);
     onClose();
   };
 
@@ -223,6 +229,22 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
                 className="pl-8"
               />
             </div>
+          </div>
+
+          <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/50">
+            <div className="space-y-1">
+              <Label htmlFor="website-sale" className="text-sm font-medium">
+                Available for Online Purchase
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Allow customers to buy this product directly from your online store
+              </p>
+            </div>
+            <Switch
+              id="website-sale"
+              checked={websiteSaleEnabled}
+              onCheckedChange={setWebsiteSaleEnabled}
+            />
           </div>
         </div>
 
