@@ -674,6 +674,34 @@ export default function ShopManager() {
         // Update the markets list
         setMarkets(prev => prev.map(m => m.id === editingMarket.id ? data : m));
         
+        // Also update selectedMarkets if this market is in the selection
+        const updatedSelectedMarkets = selectedMarkets.map(m => 
+          m.id === editingMarket.id ? data : m
+        );
+        
+        if (updatedSelectedMarkets.some(m => m.id === editingMarket.id)) {
+          console.log('🔍 Updating selected markets with new data');
+          setSelectedMarkets(updatedSelectedMarkets);
+          
+          // Update the database with new selected markets data
+          const { error: updateError } = await supabase
+            .from('submissions')
+            .update({ 
+              selected_markets: updatedSelectedMarkets,
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', user?.id);
+
+          if (updateError) {
+            console.error('❌ Error updating selected markets:', updateError);
+          }
+          
+          setShopData(prev => prev ? {
+            ...prev,
+            selected_markets: updatedSelectedMarkets,
+          } : null);
+        }
+        
         toast({
           title: "Market Updated",
           description: `${marketData.name} has been updated.`,
