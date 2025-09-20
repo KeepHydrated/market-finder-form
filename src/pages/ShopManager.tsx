@@ -81,6 +81,7 @@ export default function ShopManager() {
   const [marketSearchTerm, setMarketSearchTerm] = useState('');
   const [showAddMarket, setShowAddMarket] = useState(false);
   const [editingMarket, setEditingMarket] = useState<any>(null);
+  const [replacementMarket, setReplacementMarket] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
@@ -695,10 +696,10 @@ export default function ShopManager() {
         });
       }
 
-      // Handle replacement logic when editingMarket is set (replacement scenario)
-      if (editingMarket) {
+      // Handle replacement logic when replacementMarket is set (replacement scenario)
+      if (replacementMarket) {
         // Find the market to replace in selectedMarkets
-        const marketIndex = selectedMarkets.findIndex(m => m.id === editingMarket.id);
+        const marketIndex = selectedMarkets.findIndex(m => m.id === replacementMarket.id);
         if (marketIndex !== -1) {
           const newSelectedMarkets = [...selectedMarkets];
           newSelectedMarkets[marketIndex] = data;
@@ -722,7 +723,7 @@ export default function ShopManager() {
 
           toast({
             title: "Market Replaced",
-            description: `${editingMarket.name} has been replaced with ${marketData.name}.`,
+            description: `${replacementMarket.name} has been replaced with ${marketData.name}.`,
           });
         }
       }
@@ -730,6 +731,7 @@ export default function ShopManager() {
 
       setShowAddMarket(false);
       setEditingMarket(null);
+      setReplacementMarket(null);
 
     } catch (error: any) {
       console.error('Error with market:', error);
@@ -1039,11 +1041,9 @@ export default function ShopManager() {
                        onSearchTermChange={setMarketSearchTerm}
                        onSelectMarket={handleMarketSelect}
                          onAddMarket={(replacementMarket) => {
-                           // Check if there's an active tab to replace
-                           const replacementContext = (activeMarketTab !== null && activeMarketTab !== undefined) 
-                             ? selectedMarkets[activeMarketTab] 
-                             : null;
-                           setEditingMarket(replacementContext);
+                           // Store replacement context separately, don't set as editingMarket
+                           setReplacementMarket(replacementMarket);
+                           setEditingMarket(null); // Keep null so form shows as "Add Market"
                            setShowAddMarket(true);
                          }}
                        onEditMarket={handleEditMarket}
