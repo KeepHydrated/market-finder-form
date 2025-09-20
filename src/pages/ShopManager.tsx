@@ -682,7 +682,10 @@ export default function ShopManager() {
         // Create new market
         const { data: insertData, error } = await supabase
           .from('markets')
-          .insert([formattedMarketData])
+          .insert([{
+            ...formattedMarketData,
+            user_id: user?.id // Track who created this market
+          }])
           .select()
           .single();
 
@@ -742,6 +745,58 @@ export default function ShopManager() {
       toast({
         title: editingMarket ? "Update Failed" : "Add Failed",
         description: error.message || `Failed to ${editingMarket ? 'update' : 'add'} market.`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteMarket = async (market: any) => {
+    try {
+      const { error } = await supabase
+        .from('markets')
+        .delete()
+        .eq('id', market.id);
+
+      if (error) throw error;
+
+      // Remove from markets list
+      setMarkets(prev => prev.filter(m => m.id !== market.id));
+      
+      // Remove from user submitted market IDs
+      setUserSubmittedMarketIds(prev => prev.filter(id => id !== market.id));
+      
+      // Remove from selected markets if it was selected
+      const updatedSelectedMarkets = selectedMarkets.filter(m => m.id !== market.id);
+      setSelectedMarkets(updatedSelectedMarkets);
+      
+      // Update database if it was in selected markets
+      if (selectedMarkets.some(m => m.id === market.id)) {
+        await supabase
+          .from('submissions')
+          .update({ 
+            selected_markets: updatedSelectedMarkets,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user?.id);
+      }
+
+      // Reset active tab if needed
+      if (activeMarketTab !== null && selectedMarkets[activeMarketTab]?.id === market.id) {
+        setActiveMarketTab(null);
+      }
+
+      toast({
+        title: "Market Deleted",
+        description: `${market.name} has been removed from available markets.`,
+      });
+
+      setShowAddMarket(false);
+      setEditingMarket(null);
+    } catch (error: any) {
+      console.error('Error deleting market:', error);
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete market.",
         variant: "destructive",
       });
     }
@@ -1263,6 +1318,7 @@ export default function ShopManager() {
         onMarketAdded={handleAddMarket}
         editingMarket={editingMarket}
         userZipcode={userProfile?.zipcode}
+        onDeleteMarket={handleDeleteMarket}
       />
     </div>
   );

@@ -23,9 +23,10 @@ interface AddMarketFormProps {
   onMarketAdded: (market: any) => void;
   editingMarket?: any;
   userZipcode?: string;
+  onDeleteMarket?: (market: any) => void;
 }
 
-export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, userZipcode }: AddMarketFormProps) => {
+export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, userZipcode, onDeleteMarket }: AddMarketFormProps) => {
   const [formData, setFormData] = useState({
     name: '',
     days: [] as string[],
@@ -571,6 +572,16 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
+            {editingMarket && onDeleteMarket && (
+              <Button 
+                type="button" 
+                variant="destructive" 
+                onClick={() => onDeleteMarket(editingMarket)}
+                className="mr-auto"
+              >
+                Delete Market
+              </Button>
+            )}
             <Button 
               type="submit"
               onClick={() => {
