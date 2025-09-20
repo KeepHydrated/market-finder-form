@@ -240,8 +240,11 @@ export const MarketSearch = ({
               });
               return;
             }
-            // Directly open the new market form
-            onAddMarket(null);
+            // Create a new empty market slot and open dropdown
+            onSearchTermChange('');
+            onMarketTabChange?.(selectedMarkets.length); // Set active tab to new slot
+            setIsOpen(true);
+            setTimeout(() => inputRef.current?.focus(), 0);
           }}
           className={cn(
             "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full transition-colors",
