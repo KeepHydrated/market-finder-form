@@ -247,14 +247,14 @@ export const MarketSearch = ({
             setIsOpen(true);
             setTimeout(() => inputRef.current?.focus(), 0);
           }}
-          disabled={maxMarketsReached && !isEditingMarket}
+          disabled={maxMarketsReached}
           className={cn(
             "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full transition-colors",
-            maxMarketsReached && !isEditingMarket
+            maxMarketsReached
               ? "bg-muted/20 border-muted-foreground/40 text-muted-foreground/70 cursor-not-allowed opacity-50"
               : "bg-background border-muted-foreground/50 hover:bg-muted text-foreground hover:text-foreground"
           )}
-          title={maxMarketsReached && !isEditingMarket ? "Maximum 3 markets allowed" : "Add another market"}
+          title={maxMarketsReached ? "Maximum 3 markets allowed" : "Add another market"}
         >
           <Plus className="h-4 w-4" />
           <span className="text-sm">Add</span>
