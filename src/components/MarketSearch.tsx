@@ -66,10 +66,15 @@ export const MarketSearch = ({
   // Set first tab as active by default when there are markets but no active tab
   useEffect(() => {
     if (selectedMarkets.length > 0 && (activeMarketTab === null || activeMarketTab === undefined)) {
+      // Only auto-select first tab if we actually have markets and this isn't a removal scenario
+      // Check if this is during initial load or a legitimate need to select first tab
       onMarketTabChange?.(0);
       const firstMarket = selectedMarkets[0];
       const marketInfo = `${firstMarket.name} - ${firstMarket.address}, ${firstMarket.city}, ${firstMarket.state}`;
       onSearchTermChange(marketInfo);
+    } else if (selectedMarkets.length === 0) {
+      // Clear search term when no markets are selected
+      onSearchTermChange('');
     }
   }, [selectedMarkets.length, activeMarketTab, onMarketTabChange, onSearchTermChange, selectedMarkets]);
 
@@ -228,6 +233,8 @@ export const MarketSearch = ({
               <button
                 onClick={() => {
                   onRemoveMarket(market);
+                  // Clear search term immediately when removing
+                  onSearchTermChange('');
                   if (activeMarketTab === index) {
                     onMarketTabChange?.(null);
                   }
