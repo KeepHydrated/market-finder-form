@@ -687,11 +687,11 @@ export default function ShopManager() {
         if (error) throw error;
         data = insertData;
 
-        setMarkets(prev => [...prev, data]);
+        // Don't add to markets list immediately - needs approval first
         
         toast({
-          title: "Market Added",
-          description: `${marketData.name} has been added to available markets.`,
+          title: "Market Submitted",
+          description: `${marketData.name} has been submitted for approval.`,
         });
       }
 
