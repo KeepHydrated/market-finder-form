@@ -1198,6 +1198,7 @@ export default function ShopManager() {
                     onMarketTabChange={setActiveMarketTab}
                     onReplaceMarket={handleReplaceMarket}
                     userSubmittedMarketIds={userSubmittedMarketIds}
+                    disabled={!isEditing}
                   />
                   
                   {/* Store Information Section */}

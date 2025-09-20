@@ -196,11 +196,13 @@ export const MarketSearch = ({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSearchTermChange(e.target.value);
-    if (!isOpen) {
-      setIsOpen(true);
+    if (!disabled) {
+      onSearchTermChange(e.target.value);
+      if (!isOpen) {
+        setIsOpen(true);
+      }
+      setSelectedIndex(-1);
     }
-    setSelectedIndex(-1);
   };
 
   const handleInputFocus = () => {
@@ -229,29 +231,37 @@ export const MarketSearch = ({
           >
             <button
               onClick={() => {
-                onMarketTabChange?.(index);
-                const marketInfo = `${market.name} - ${market.address}, ${market.city}, ${market.state}`;
-                onSearchTermChange(marketInfo);
+                if (!disabled) {
+                  onMarketTabChange?.(index);
+                  const marketInfo = `${market.name} - ${market.address}, ${market.city}, ${market.state}`;
+                  onSearchTermChange(marketInfo);
+                }
               }}
               className="text-sm font-medium"
+              disabled={disabled}
             >
               {market.name}
             </button>
             {onRemoveMarket && (
               <button
                 onClick={() => {
-                  onRemoveMarket(market);
-                  // Clear search term immediately when removing
-                  onSearchTermChange('');
-                  if (activeMarketTab === index) {
-                    onMarketTabChange?.(null);
+                  if (!disabled) {
+                    onRemoveMarket(market);
+                    // Clear search term immediately when removing
+                    onSearchTermChange('');
+                    if (activeMarketTab === index) {
+                      onMarketTabChange?.(null);
+                    }
                   }
                 }}
+                disabled={disabled}
                 className={cn(
                   "rounded-full p-0.5 transition-colors",
-                  activeMarketTab === index 
-                    ? "hover:bg-primary-foreground/20" 
-                    : "hover:bg-destructive hover:text-destructive-foreground"
+                  disabled 
+                    ? "opacity-50 cursor-not-allowed"
+                    : activeMarketTab === index 
+                      ? "hover:bg-primary-foreground/20" 
+                      : "hover:bg-destructive hover:text-destructive-foreground"
                 )}
               >
                 <X className="h-3 w-3" />
@@ -270,14 +280,14 @@ export const MarketSearch = ({
             setIsOpen(true);
             setTimeout(() => inputRef.current?.focus(), 0);
           }}
-          disabled={maxMarketsReached}
+          disabled={maxMarketsReached || disabled}
           className={cn(
             "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full transition-colors",
-            maxMarketsReached
+            maxMarketsReached || disabled
               ? "bg-muted/20 border-muted-foreground/40 text-muted-foreground/70 cursor-not-allowed opacity-50"
               : "bg-background border-muted-foreground/50 hover:bg-muted text-foreground hover:text-foreground"
           )}
-          title={maxMarketsReached ? "Maximum 3 markets allowed" : "Add another market"}
+          title={maxMarketsReached ? "Maximum 3 markets allowed" : disabled ? "Click Edit to modify markets" : "Add another market"}
         >
           <Plus className="h-4 w-4" />
           <span className="text-sm">Add</span>
@@ -296,6 +306,7 @@ export const MarketSearch = ({
             onFocus={handleInputFocus}
             onClick={handleInputFocus}
             onKeyDown={handleKeyDown}
+            disabled={disabled}
             className="pl-10 h-14 text-lg border-2 border-border rounded-xl"
           />
         </div>
