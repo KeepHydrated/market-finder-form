@@ -273,15 +273,15 @@ export const MarketSearch = ({
           />
         </div>
 
-        {showResults && (
-          <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
-             {maxMarketsReached && !isEditingMarket && (
-               <div className="px-4 py-3 border-b border-border bg-muted/50">
-                 <p className="text-sm text-muted-foreground">
-                   Maximum 3 markets selected. Select a market tab above to replace it, or remove a market to add a new one.
-                 </p>
-               </div>
-             )}
+         {showResults && (
+           <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
+              {maxMarketsReached && !isEditingMarket && (
+                <div className="px-4 py-3 border-b border-border bg-muted/50">
+                  <p className="text-sm text-muted-foreground">
+                    Maximum 3 markets selected. Select a market tab above to replace it, or remove a market to add a new one.
+                  </p>
+                </div>
+              )}
              <div className="max-h-60 overflow-y-auto">
                {visibleMarkets.map((market, index) => {
                  const isActiveTab = isEditingMarket && editingMarket && market.id === editingMarket.id;
