@@ -283,6 +283,16 @@ export const MarketSearch = ({
             className="pl-10 h-14 text-lg border-2 border-border rounded-xl"
           />
         </div>
+        
+        {/* Help text */}
+        <div className="mt-2 text-center">
+          <button
+            onClick={() => onAddMarket(null)}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Don't see your market? Submit it here.
+          </button>
+        </div>
 
          {showResults && (
            <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
