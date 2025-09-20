@@ -87,6 +87,7 @@ export default function ShopManager() {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [vacationMode, setVacationMode] = useState(false);
   const [activeMarketTab, setActiveMarketTab] = useState<number | null>(null);
+  const [userSubmittedMarketIds, setUserSubmittedMarketIds] = useState<number[]>([]);
 
   // Check for public access via URL parameter
   const isPublicAccess = new URLSearchParams(window.location.search).get('demo') === 'true';
@@ -690,6 +691,9 @@ export default function ShopManager() {
 
         setMarkets(prev => [...prev, data]);
         
+        // Track this as a user-submitted market
+        setUserSubmittedMarketIds(prev => [...prev, data.id]);
+        
         toast({
           title: "Market Added",
           description: `${marketData.name} has been added to available markets.`,
@@ -1053,6 +1057,7 @@ export default function ShopManager() {
                        activeMarketTab={activeMarketTab}
                        onMarketTabChange={setActiveMarketTab}
                        onReplaceMarket={handleReplaceMarket}
+                       userSubmittedMarketIds={userSubmittedMarketIds}
                      />
                   </CardContent>
                 </Card>

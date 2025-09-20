@@ -31,6 +31,7 @@ interface MarketSearchProps {
   activeMarketTab?: number | null;
   onMarketTabChange?: (tabIndex: number | null) => void;
   onReplaceMarket?: (oldMarket: Market, newMarket: Market) => void;
+  userSubmittedMarketIds?: number[];
 }
 
 export const MarketSearch = ({ 
@@ -46,7 +47,8 @@ export const MarketSearch = ({
   onRemoveMarket,
   activeMarketTab,
   onMarketTabChange,
-  onReplaceMarket
+  onReplaceMarket,
+  userSubmittedMarketIds = []
 }: MarketSearchProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -57,6 +59,9 @@ export const MarketSearch = ({
   const selectedMarketIds = selectedMarkets.map(m => m.id);
   const isEditingMarket = activeMarketTab !== null && activeMarketTab !== undefined;
   const editingMarket = isEditingMarket ? selectedMarkets[activeMarketTab] : null;
+  
+  // Check if the current active tab is a user-submitted market
+  const isActiveTabUserSubmitted = isEditingMarket && editingMarket && userSubmittedMarketIds.includes(editingMarket.id);
   
   // Set first tab as active by default when there are markets but no active tab
   useEffect(() => {
@@ -163,6 +168,9 @@ export const MarketSearch = ({
       if (selectedMarket) {
         onEditMarket(selectedMarket);
       }
+    } else if (isActiveTabUserSubmitted && editingMarket && onEditMarket) {
+      // Edit the user-submitted market from the active tab
+      onEditMarket(editingMarket);
     } else {
       // If a tab is active, pass the replacement context
       const replacementContext = (activeMarketTab !== null && activeMarketTab !== undefined) 
@@ -326,6 +334,11 @@ export const MarketSearch = ({
               )}
             >
               {isEditingSubmittedMarket ? (
+                <>
+                  <Edit className="h-4 w-4 text-success" />
+                  <span className="text-success font-medium">Edit market</span>
+                </>
+              ) : isActiveTabUserSubmitted ? (
                 <>
                   <Edit className="h-4 w-4 text-success" />
                   <span className="text-success font-medium">Edit market</span>
