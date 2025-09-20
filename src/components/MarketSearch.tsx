@@ -284,7 +284,7 @@ export const MarketSearch = ({
           className={cn(
             "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full transition-colors",
             maxMarketsReached || disabled
-              ? "bg-muted/20 border-muted-foreground/40 text-muted-foreground/70 cursor-not-allowed opacity-50"
+              ? "bg-muted/20 border-muted-foreground/40 text-muted-foreground cursor-not-allowed opacity-50"
               : "bg-background border-muted-foreground/50 hover:bg-muted text-foreground hover:text-foreground"
           )}
           title={maxMarketsReached ? "Maximum 3 markets allowed" : disabled ? "Click Edit to modify markets" : "Add another market"}
@@ -350,7 +350,7 @@ export const MarketSearch = ({
                     </div>
                     <div className={cn(
                       "text-sm text-muted-foreground",
-                      isAlreadySelected && !isActiveTab && "text-muted-foreground/70"
+                      isAlreadySelected && !isActiveTab && "text-muted-foreground"
                     )}>
                       {market.city}, {market.state}
                     </div>
