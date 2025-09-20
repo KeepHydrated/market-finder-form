@@ -212,7 +212,7 @@ export const MarketSearch = ({
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium text-foreground">
-        Which farmers markets do you want to join? (Up to 3) *
+        Which farmers markets is your store at? (Up to 3) *
       </label>
       
       {/* Selected Markets as Tabs */}
