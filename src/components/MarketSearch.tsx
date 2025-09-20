@@ -164,8 +164,11 @@ export const MarketSearch = ({
         onEditMarket(selectedMarket);
       }
     } else {
-      // Always pass null for new market submissions - no replacement
-      onAddMarket(null);
+      // If a tab is active, pass the replacement context
+      const replacementContext = (activeMarketTab !== null && activeMarketTab !== undefined) 
+        ? selectedMarkets[activeMarketTab] 
+        : null;
+      onAddMarket(replacementContext);
     }
     setIsOpen(false);
     setSelectedIndex(-1);

@@ -695,9 +695,9 @@ export default function ShopManager() {
         });
       }
 
-      // Only handle replacement logic for existing market updates
-      if (editingMarket && editingMarket.id) {
-        // This is editing an existing market - update it in selected markets if it's there
+      // Handle replacement logic when editingMarket is set (replacement scenario)
+      if (editingMarket) {
+        // Find the market to replace in selectedMarkets
         const marketIndex = selectedMarkets.findIndex(m => m.id === editingMarket.id);
         if (marketIndex !== -1) {
           const newSelectedMarkets = [...selectedMarkets];
@@ -719,9 +719,14 @@ export default function ShopManager() {
             ...prev,
             selected_markets: newSelectedMarkets,
           } : null);
+
+          toast({
+            title: "Market Replaced",
+            description: `${editingMarket.name} has been replaced with ${marketData.name}.`,
+          });
         }
       }
-      // For new market creation, just add to available markets - no automatic selection
+      // For new market creation without replacement, just add to available markets
 
       setShowAddMarket(false);
       setEditingMarket(null);
@@ -1034,7 +1039,11 @@ export default function ShopManager() {
                        onSearchTermChange={setMarketSearchTerm}
                        onSelectMarket={handleMarketSelect}
                          onAddMarket={(replacementMarket) => {
-                           setEditingMarket(null); // Always clear editing market for new submissions
+                           // Check if there's an active tab to replace
+                           const replacementContext = (activeMarketTab !== null && activeMarketTab !== undefined) 
+                             ? selectedMarkets[activeMarketTab] 
+                             : null;
+                           setEditingMarket(replacementContext);
                            setShowAddMarket(true);
                          }}
                        onEditMarket={handleEditMarket}
