@@ -587,10 +587,14 @@ export default function ShopManager() {
     try {
       const newSelectedMarkets = selectedMarkets.filter(m => m.id !== marketToRemove.id);
       
+      // Clear search term when removing a market
+      setMarketSearchTerm('');
+      
       const { error } = await supabase
         .from('submissions')
         .update({
           selected_markets: newSelectedMarkets,
+          search_term: '', // Clear search term in database
           updated_at: new Date().toISOString(),
         })
         .eq('id', shopData.id);
@@ -601,6 +605,7 @@ export default function ShopManager() {
       setShopData(prev => prev ? {
         ...prev,
         selected_markets: newSelectedMarkets,
+        search_term: '', // Clear search term in shop data
       } : null);
 
       toast({
