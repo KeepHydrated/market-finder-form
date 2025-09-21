@@ -15,33 +15,32 @@ interface HeaderProps {
 
 export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderProps) => {
   const location = useLocation();
-  const [hasAcceptedSubmission, setHasAcceptedSubmission] = useState(false);
+  const [hasAnySubmission, setHasAnySubmission] = useState(false);
 
   useEffect(() => {
-    const checkAcceptedSubmission = async () => {
+    const checkAnySubmission = async () => {
       if (!user) {
-        setHasAcceptedSubmission(false);
+        setHasAnySubmission(false);
         return;
       }
 
       try {
         const { data, error } = await supabase
           .from('submissions')
-          .select('id')
+          .select('id, status')
           .eq('user_id', user.id)
-          .eq('status', 'accepted')
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
 
-        setHasAcceptedSubmission(!!data);
+        setHasAnySubmission(!!data);
       } catch (error) {
         console.error('Error checking submission status:', error);
-        setHasAcceptedSubmission(false);
+        setHasAnySubmission(false);
       }
     };
 
-    checkAcceptedSubmission();
+    checkAnySubmission();
   }, [user]);
 
   return (
@@ -80,9 +79,9 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             </Link>
             <CartButton />
             {user && (
-              <Link to={hasAcceptedSubmission ? "/shop-manager" : "/submit"}>
+              <Link to={hasAnySubmission ? "/shop-manager" : "/submit"}>
                 <Button variant="ghost" size="sm">
-                  {hasAcceptedSubmission ? (
+                  {hasAnySubmission ? (
                     <Store className="h-5 w-5" />
                   ) : (
                     <Plus className="h-5 w-5" />
