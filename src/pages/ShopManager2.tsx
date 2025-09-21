@@ -76,7 +76,9 @@ export default function ShopManager() {
     averageRating: 0,
     reviewCount: 0,
     recentOrders: [],
-    topProducts: []
+    topProducts: [],
+    orderSuccessRate: 0,
+    avgItemsPerOrder: 0
   });
 
   // Form state
@@ -404,6 +406,16 @@ export default function ShopManager() {
       const revenue = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0;
       const averageRating = reviews?.length ? 
         reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length : 0;
+      
+      // Calculate order success rate
+      const completedOrders = orders?.filter(order => order.status === 'completed').length || 0;
+      const orderSuccessRate = totalOrders > 0 ? (completedOrders / totalOrders) * 100 : 0;
+      
+      // Calculate average items per order
+      const totalItems = orders?.reduce((sum, order) => {
+        return sum + (order.order_items?.reduce((itemSum: number, item: any) => itemSum + item.quantity, 0) || 0);
+      }, 0) || 0;
+      const avgItemsPerOrder = totalOrders > 0 ? totalItems / totalOrders : 0;
 
       // Get recent orders (last 5)
       const recentOrders = orders?.slice(0, 5) || [];
@@ -434,7 +446,9 @@ export default function ShopManager() {
         averageRating,
         reviewCount: reviews?.length || 0,
         recentOrders,
-        topProducts
+        topProducts,
+        orderSuccessRate,
+        avgItemsPerOrder
       });
     } catch (error) {
       console.error('Error fetching analytics:', error);
@@ -1085,11 +1099,15 @@ export default function ShopManager() {
                           <p className="text-sm text-muted-foreground">Markets Active</p>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold">89%</div>
+                          <div className="text-2xl font-bold">
+                            {analytics.totalOrders > 0 ? `${analytics.orderSuccessRate.toFixed(0)}%` : '--'}
+                          </div>
                           <p className="text-sm text-muted-foreground">Order Success Rate</p>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold">2.3</div>
+                          <div className="text-2xl font-bold">
+                            {analytics.totalOrders > 0 ? analytics.avgItemsPerOrder.toFixed(1) : '--'}
+                          </div>
                           <p className="text-sm text-muted-foreground">Avg. Items/Order</p>
                         </div>
                       </div>
