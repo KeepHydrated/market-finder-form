@@ -81,9 +81,11 @@ export const MarketSearch = ({
 
   // Update search term when active tab changes
   useEffect(() => {
+    console.log('🔍 Tab change effect triggered:', { activeMarketTab, selectedMarketsLength: selectedMarkets.length });
     if (activeMarketTab !== null && activeMarketTab !== undefined && activeMarketTab >= 0 && selectedMarkets[activeMarketTab]) {
       const selectedMarket = selectedMarkets[activeMarketTab];
       const marketInfo = `${selectedMarket.name} - ${selectedMarket.address}, ${selectedMarket.city}, ${selectedMarket.state}`;
+      console.log('🔍 Updating search term to:', marketInfo);
       onSearchTermChange(marketInfo);
     }
   }, [activeMarketTab, selectedMarkets, onSearchTermChange]);

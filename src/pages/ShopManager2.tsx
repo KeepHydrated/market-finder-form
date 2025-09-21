@@ -402,9 +402,14 @@ export default function ShopManager() {
   };
 
   const handleReplaceMarket = (marketIndex: number, newMarket: any) => {
+    console.log('🔍 handleReplaceMarket called:', { marketIndex, newMarket: newMarket.name });
+    console.log('🔍 selectedMarkets before:', selectedMarkets.map(m => m.name));
+    
     const updatedMarkets = [...selectedMarkets];
     updatedMarkets[marketIndex] = newMarket;
     setSelectedMarkets(updatedMarkets);
+    
+    console.log('🔍 selectedMarkets after update:', updatedMarkets.map(m => m.name));
     
     toast({
       title: "Market Replaced",
