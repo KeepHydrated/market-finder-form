@@ -249,6 +249,18 @@ const Homepage = () => {
     fetchAcceptedSubmissions();
   }, []);
 
+  // Refresh data when component becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchAcceptedSubmissions();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   const fetchVendorRatings = async (vendorIds: string[]) => {
     if (vendorIds.length === 0) return;
 
