@@ -12,7 +12,6 @@ import { AuthForm } from '@/components/auth/AuthForm';
 import { ProductGrid } from '@/components/ProductGrid';
 import { AddProductForm } from '@/components/AddProductForm';
 import { AddMarketForm } from '@/components/AddMarketForm';
-import { MarketSearch } from '@/components/MarketSearch';
 import { FarmersMarketSearch } from '@/components/FarmersMarketSearch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -600,40 +599,10 @@ export default function ShopManager() {
                       </p>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                      {/* Farmers Markets Section */}
-                      <MarketSearch
-                        markets={markets}
-                        searchTerm={marketSearchTerm}
-                        onSearchTermChange={setMarketSearchTerm}
-                        onSelectMarket={handleMarketSelect}
-                        onAddMarket={(replacementMarket) => {
-                          setReplacementMarket(null);
-                          setEditingMarket(null);
-                          setShowAddMarket(true);
-                        }}
-                        onEditMarket={handleEditMarket}
-                        submittedMarketName={undefined}
-                        selectedMarkets={selectedMarkets}
-                        onRemoveMarket={(market) => {
-                          const marketIndex = selectedMarkets.findIndex(m => m.id === market.id);
-                          if (marketIndex !== -1) handleRemoveMarket(marketIndex);
-                        }}
-                        activeMarketTab={activeMarketTab}
-                        onMarketTabChange={setActiveMarketTab}
-                        onReplaceMarket={(oldMarket, newMarket) => {
-                          const marketIndex = selectedMarkets.findIndex(m => m.id === oldMarket.id);
-                          if (marketIndex !== -1) handleReplaceMarket(marketIndex, newMarket);
-                        }}
-                        userSubmittedMarketIds={userSubmittedMarketIds}
-                        disabled={false}
-                      />
-                      
-                      {/* Store Information Section */}
-                      <div className="space-y-4 pt-4 border-t">
-                        {/* Farmers Market Search */}
-                        <div className="space-y-2">
-                          <FarmersMarketSearch />
-                        </div>
+                      {/* Farmers Market Search */}
+                      <div className="space-y-2">
+                        <FarmersMarketSearch />
+                      </div>
                         
                         <div className="space-y-2">
                           <Label htmlFor="store_name">Store Name *</Label>
@@ -685,8 +654,7 @@ export default function ShopManager() {
                             rows={4}
                           />
                         </div>
-                      </div>
-                    </CardContent>
+                      </CardContent>
                   </Card>
                 </TabsContent>
 
