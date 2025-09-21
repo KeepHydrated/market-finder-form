@@ -586,6 +586,7 @@ export default function ShopManager() {
             <Tabs defaultValue="overview" className="flex gap-6">
               <TabsList className="flex flex-col h-fit w-48 space-y-1 p-1">
                 <TabsTrigger value="overview" className="w-full justify-start">Overview</TabsTrigger>
+                <TabsTrigger value="overview2" className="w-full justify-start">Overview 2</TabsTrigger>
                 <TabsTrigger value="account" className="w-full justify-start">Account</TabsTrigger>
               </TabsList>
 
@@ -693,6 +694,113 @@ export default function ShopManager() {
                   </div>
                 </TabsContent>
                   </Tabs>
+                </TabsContent>
+
+                <TabsContent value="overview2" className="space-y-6">
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <Card>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Total Products</CardTitle>
+                        <div className="h-4 w-4 text-muted-foreground">📦</div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{products.length}</div>
+                        <p className="text-xs text-muted-foreground">
+                          {products.length === 1 ? 'product' : 'products'} in catalog
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Market Coverage</CardTitle>
+                        <div className="h-4 w-4 text-muted-foreground">🏪</div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{selectedMarkets.length}/3</div>
+                        <p className="text-xs text-muted-foreground">
+                          farmers markets selected
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Shop Status</CardTitle>
+                        <div className="h-4 w-4 text-muted-foreground">
+                          {shopData?.status === 'accepted' ? '✅' : shopData?.status === 'pending' ? '⏳' : '📝'}
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold capitalize">
+                          {shopData?.status || 'Not Submitted'}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          submission status
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Shop Overview</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                          <Label className="text-sm font-medium">Store Name</Label>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {formData.store_name || 'Not set'}
+                          </p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium">Primary Specialty</Label>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {formData.primary_specialty || 'Not set'}
+                          </p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium">Website</Label>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {formData.website || 'Not set'}
+                          </p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium">Created</Label>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {shopData?.created_at ? new Date(shopData.created_at).toLocaleDateString() : 'Not submitted'}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {formData.description && (
+                        <div>
+                          <Label className="text-sm font-medium">Description</Label>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {formData.description}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {products.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Product Categories</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-wrap gap-2">
+                          {Array.from(new Set(products.map(p => p.category).filter(Boolean))).map(category => (
+                            <div key={category} className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">
+                              {category} ({products.filter(p => p.category === category).length})
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="account" className="space-y-6">
