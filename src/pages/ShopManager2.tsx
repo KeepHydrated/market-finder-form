@@ -587,7 +587,7 @@ export default function ShopManager() {
               <div className="flex-1 space-y-6">
                 <TabsContent value="overview" className="space-y-6">
                   <Card>
-                    <CardContent className="space-y-6">
+                    <CardContent className="space-y-6 pt-8">
                       {/* Farmers Market Search */}
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
