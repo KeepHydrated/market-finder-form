@@ -51,7 +51,6 @@ export const FarmersMarketSearch = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [isShowingSpecificMarket, setIsShowingSpecificMarket] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -79,11 +78,9 @@ export const FarmersMarketSearch = ({
   // Search for farmers markets with debouncing
   useEffect(() => {
     const searchFarmersMarkets = async () => {
-      if (!searchQuery.trim() || searchQuery.length < 2 || isShowingSpecificMarket) {
-        if (!isShowingSpecificMarket) {
-          setSuggestions([]);
-          setShowSuggestions(false);
-        }
+      if (!searchQuery.trim() || searchQuery.length < 2) {
+        setSuggestions([]);
+        setShowSuggestions(false);
         return;
       }
 
@@ -115,7 +112,7 @@ export const FarmersMarketSearch = ({
 
     const debounceTimer = setTimeout(searchFarmersMarkets, 300);
     return () => clearTimeout(debounceTimer);
-  }, [searchQuery, userLocation, isShowingSpecificMarket]);
+  }, [searchQuery, userLocation]);
 
   const handleSuggestionClick = (market: FarmersMarket) => {
     // Check if market is already selected
@@ -145,18 +142,15 @@ export const FarmersMarketSearch = ({
     // Show only the clicked market in suggestions
     setSuggestions([market]);
     setShowSuggestions(true);
-    setIsShowingSpecificMarket(true);
     
     // Focus the input
     inputRef.current?.focus();
   };
 
-  // Filter out already selected markets from suggestions (unless showing specific market)
-  const filteredSuggestions = isShowingSpecificMarket 
-    ? suggestions 
-    : suggestions.filter(
-        suggestion => !selectedMarkets.some(selected => selected.place_id === suggestion.place_id)
-      );
+  // Filter out already selected markets from suggestions
+  const filteredSuggestions = suggestions.filter(
+    suggestion => !selectedMarkets.some(selected => selected.place_id === suggestion.place_id)
+  );
 
   const openInGoogleMaps = (address: string) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
@@ -198,10 +192,7 @@ export const FarmersMarketSearch = ({
                   : "Edit to change markets"
             }
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setIsShowingSpecificMarket(false); // Reset when user types
-            }}
+            onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => filteredSuggestions.length > 0 && isEditing && setShowSuggestions(true)}
             className="pl-10 pr-4 py-3 text-lg"
             autoComplete="off"
