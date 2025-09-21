@@ -155,24 +155,34 @@ export const MarketSearch = ({
   };
 
   const handleSelectMarket = (market: Market) => {
+    console.log('🔍 handleSelectMarket called with:', market.name);
+    console.log('🔍 isEditingMarket:', isEditingMarket);
+    console.log('🔍 selectedMarketIds:', selectedMarketIds);
+    console.log('🔍 market.id:', market.id);
+    console.log('🔍 selectedMarketIds.includes(market.id):', selectedMarketIds.includes(market.id));
+    
     // When editing, allow selecting markets that are already selected (for replacement)
     // When not editing, prevent duplicates
     if (selectedMarketIds.includes(market.id) && !isEditingMarket) {
+      console.log('🔍 Blocking selection - duplicate and not editing');
       setIsOpen(false);
       setSelectedIndex(-1);
       // Don't clear search term, just close dropdown
       return;
     }
     
+    console.log('🔍 Proceeding with selection');
     onSearchTermChange(''); // Clear search after selection
     setIsOpen(false);
     setSelectedIndex(-1);
     
     if (isEditingMarket && editingMarket && onReplaceMarket) {
+      console.log('🔍 Calling onReplaceMarket');
       // Replace the market being edited
       onReplaceMarket(editingMarket, market);
       // Keep the same active tab
     } else {
+      console.log('🔍 Calling onSelectMarket');
       // Add new market
       onSelectMarket(market);
       // Set the newly selected market as the active tab
@@ -336,7 +346,15 @@ export const MarketSearch = ({
                  return (
                    <button
                      key={market.id}
-                     onClick={() => canSelect && handleSelectMarket(market)}
+                     onClick={() => {
+                       console.log('🔍 Market button clicked:', market.name);
+                       console.log('🔍 canSelect:', canSelect);
+                       if (canSelect) {
+                         handleSelectMarket(market);
+                       } else {
+                         console.log('🔍 Selection blocked by canSelect');
+                       }
+                     }}
                      className={cn(
                        "w-full px-4 py-3 text-left transition-colors",
                        canSelect ? "hover:bg-muted cursor-pointer" : "cursor-not-allowed opacity-50",
