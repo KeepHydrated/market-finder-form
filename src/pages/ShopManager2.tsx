@@ -583,11 +583,11 @@ export default function ShopManager() {
               </div>
             )}
 
-            <Tabs defaultValue="overview" className="flex gap-6">
+            <Tabs defaultValue="overview2" className="flex gap-6">
               <TabsList className="flex flex-col h-fit w-48 space-y-1 p-1">
+                <TabsTrigger value="overview2" className="w-full justify-start">Overview</TabsTrigger>
                 <TabsTrigger value="overview" className="w-full justify-start">Shop</TabsTrigger>
                 <TabsTrigger value="products-main" className="w-full justify-start">Products</TabsTrigger>
-                <TabsTrigger value="overview2" className="w-full justify-start">Overview</TabsTrigger>
                 <TabsTrigger value="account" className="w-full justify-start">Account</TabsTrigger>
               </TabsList>
 
