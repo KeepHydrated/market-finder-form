@@ -701,68 +701,163 @@ export default function ShopManager() {
                 </TabsContent>
 
                 <TabsContent value="overview2" className="space-y-6">
-                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                     <Card>
                       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Products</CardTitle>
+                        <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
                         <div className="h-4 w-4 text-muted-foreground">📦</div>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">{products.length}</div>
+                        <div className="text-2xl font-bold">12</div>
                         <p className="text-xs text-muted-foreground">
-                          {products.length === 1 ? 'product' : 'products'} in catalog
+                          +3 from last week
                         </p>
                       </CardContent>
                     </Card>
 
                     <Card>
                       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Market Coverage</CardTitle>
-                        <div className="h-4 w-4 text-muted-foreground">🏪</div>
+                        <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+                        <div className="h-4 w-4 text-muted-foreground">💰</div>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">{selectedMarkets.length}/3</div>
+                        <div className="text-2xl font-bold">$1,247</div>
                         <p className="text-xs text-muted-foreground">
-                          farmers markets selected
+                          +12% from last month
                         </p>
                       </CardContent>
                     </Card>
 
                     <Card>
                       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Shop Status</CardTitle>
-                        <div className="h-4 w-4 text-muted-foreground">
-                          {shopData?.status === 'accepted' ? '✅' : shopData?.status === 'pending' ? '⏳' : '📝'}
-                        </div>
+                        <CardTitle className="text-sm font-medium">Shop Views</CardTitle>
+                        <div className="h-4 w-4 text-muted-foreground">👁️</div>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold capitalize">
-                          {shopData?.status || 'Not Submitted'}
-                        </div>
+                        <div className="text-2xl font-bold">186</div>
                         <p className="text-xs text-muted-foreground">
-                          submission status
+                          +8% this week
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
+                        <div className="h-4 w-4 text-muted-foreground">⭐</div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">4.8</div>
+                        <p className="text-xs text-muted-foreground">
+                          Based on 24 reviews
                         </p>
                       </CardContent>
                     </Card>
                   </div>
 
-
-                  {products.length > 0 && (
+                  <div className="grid gap-6 md:grid-cols-2">
                     <Card>
                       <CardHeader>
-                        <CardTitle>Product Categories</CardTitle>
+                        <CardTitle>Recent Orders</CardTitle>
                       </CardHeader>
-                      <CardContent>
-                        <div className="flex flex-wrap gap-2">
-                          {Array.from(new Set(products.map(p => p.category).filter(Boolean))).map(category => (
-                            <div key={category} className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm">
-                              {category} ({products.filter(p => p.category === category).length})
-                            </div>
-                          ))}
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <p className="font-medium">Order #1001</p>
+                            <p className="text-sm text-muted-foreground">john@example.com</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">$45.99</p>
+                            <p className="text-sm text-green-600">Completed</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <p className="font-medium">Order #1002</p>
+                            <p className="text-sm text-muted-foreground">sarah@example.com</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">$22.50</p>
+                            <p className="text-sm text-yellow-600">Pending</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <p className="font-medium">Order #1003</p>
+                            <p className="text-sm text-muted-foreground">mike@example.com</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">$78.25</p>
+                            <p className="text-sm text-green-600">Completed</p>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
-                  )}
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Top Selling Products</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">Organic Apples</p>
+                            <p className="text-sm text-muted-foreground">Fruits</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">24 sold</p>
+                            <p className="text-sm text-muted-foreground">$4.50 each</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">Fresh Bread</p>
+                            <p className="text-sm text-muted-foreground">Bakery</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">18 sold</p>
+                            <p className="text-sm text-muted-foreground">$6.00 each</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">Honey Jar</p>
+                            <p className="text-sm text-muted-foreground">Artisan</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">12 sold</p>
+                            <p className="text-sm text-muted-foreground">$12.99 each</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Performance Overview</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-blue-600">{products.length}</div>
+                          <p className="text-sm text-muted-foreground">Products Listed</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-green-600">{selectedMarkets.length}</div>
+                          <p className="text-sm text-muted-foreground">Markets Active</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-purple-600">89%</div>
+                          <p className="text-sm text-muted-foreground">Order Success Rate</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-orange-600">2.3</div>
+                          <p className="text-sm text-muted-foreground">Avg. Items/Order</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </TabsContent>
 
                 <TabsContent value="account" className="space-y-6">
