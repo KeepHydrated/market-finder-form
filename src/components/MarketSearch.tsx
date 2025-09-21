@@ -108,6 +108,17 @@ export const MarketSearch = ({
       return availableMarkets; // Show all markets when no search term
     }
     
+    // Check if the search term matches any selected market's full info format
+    // If so, show all markets instead of filtering (user is browsing from a selected tab)
+    const isSelectedMarketInfo = selectedMarkets.some(market => {
+      const marketInfo = `${market.name} - ${market.address}, ${market.city}, ${market.state}`;
+      return searchTerm === marketInfo;
+    });
+    
+    if (isSelectedMarketInfo) {
+      return availableMarkets; // Show all markets when search term is from a selected market tab
+    }
+    
     const searchLower = searchTerm.toLowerCase();
     return availableMarkets.filter(market => 
       market.name.toLowerCase().includes(searchLower) ||
