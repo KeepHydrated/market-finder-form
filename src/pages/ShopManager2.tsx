@@ -583,14 +583,21 @@ export default function ShopManager() {
               </div>
             )}
 
-            <Tabs defaultValue="shop" className="flex gap-6">
+            <Tabs defaultValue="overview" className="flex gap-6">
               <TabsList className="flex flex-col h-fit w-48 space-y-1 p-1">
-                <TabsTrigger value="shop" className="w-full justify-start">Shop Information</TabsTrigger>
-                <TabsTrigger value="products" className="w-full justify-start">Products</TabsTrigger>
+                <TabsTrigger value="overview" className="w-full justify-start">Overview</TabsTrigger>
+                <TabsTrigger value="account" className="w-full justify-start">Account</TabsTrigger>
               </TabsList>
 
               <div className="flex-1 space-y-6">
-                <TabsContent value="shop" className="space-y-6 max-w-2xl">
+                <TabsContent value="overview" className="space-y-6">
+                  <Tabs defaultValue="shop" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="shop">Shop Information</TabsTrigger>
+                      <TabsTrigger value="products">Products</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="shop" className="space-y-6 max-w-2xl mt-6">
                   <Card>
                     <CardContent className="space-y-6">
                       {/* Farmers Market Search */}
@@ -684,6 +691,46 @@ export default function ShopManager() {
                       {isSubmitting ? 'Submitting...' : shopData ? 'Update Submission' : 'Submit for Review'}
                     </Button>
                   </div>
+                </TabsContent>
+                  </Tabs>
+                </TabsContent>
+
+                <TabsContent value="account" className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Account Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {user && (
+                        <div className="space-y-4">
+                          <div>
+                            <Label>Email</Label>
+                            <Input value={user.email || ''} disabled className="bg-muted" />
+                          </div>
+                          
+                          {userProfile && (
+                            <>
+                              <div>
+                                <Label>Display Name</Label>
+                                <Input value={userProfile.display_name || ''} disabled className="bg-muted" />
+                              </div>
+                              
+                              <div>
+                                <Label>Zip Code</Label>
+                                <Input value={userProfile.zipcode || ''} disabled className="bg-muted" />
+                              </div>
+                            </>
+                          )}
+                          
+                          <div className="pt-4">
+                            <p className="text-sm text-muted-foreground">
+                              Account settings can be updated through your profile settings.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
                 </TabsContent>
               </div>
             </Tabs>
