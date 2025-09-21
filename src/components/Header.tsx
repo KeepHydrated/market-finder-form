@@ -81,7 +81,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             {user && (
               <Link to="/submit">
                 <Button variant="ghost" size="sm">
-                  <Store className="h-5 w-5" />
+                  <Plus className="h-5 w-5" />
                 </Button>
               </Link>
             )}
