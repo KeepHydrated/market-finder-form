@@ -861,42 +861,6 @@ export default function ShopManager() {
                 <TabsContent value="account" className="space-y-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Account Information</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {user && (
-                        <div className="space-y-4">
-                          <div>
-                            <Label>Email</Label>
-                            <Input value={user.email || ''} disabled className="bg-muted" />
-                          </div>
-                          
-                          {userProfile && (
-                            <>
-                              <div>
-                                <Label>Display Name</Label>
-                                <Input value={userProfile.display_name || ''} disabled className="bg-muted" />
-                              </div>
-                              
-                              <div>
-                                <Label>Zip Code</Label>
-                                <Input value={userProfile.zipcode || ''} disabled className="bg-muted" />
-                              </div>
-                            </>
-                          )}
-                          
-                          <div className="pt-4">
-                            <p className="text-sm text-muted-foreground">
-                              Account settings can be updated through your profile settings.
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
                       <CardTitle>Store Settings</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
