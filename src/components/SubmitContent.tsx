@@ -169,6 +169,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
       };
       
       setMarkets(prev => [...prev, newMarket]);
+      setSelectedMarkets(prev => [...prev, newMarket]); // Add to selected markets
       setSearchTerm(marketData.name);
       setSubmittedMarketName(marketData.name);
       setCustomMarketData(marketData);
