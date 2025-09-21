@@ -1078,101 +1078,14 @@ export default function ShopManager() {
           )}
         </div>
 
-        <Tabs defaultValue="overview" className="flex gap-6">
+        <Tabs defaultValue="products" className="flex gap-6">
           <TabsList className="flex flex-col h-fit w-48 space-y-1 p-1">
-            <TabsTrigger value="overview" className="w-full justify-start">Overview</TabsTrigger>
             <TabsTrigger value="shop" className="w-full justify-start">Shop Information</TabsTrigger>
             <TabsTrigger value="products" className="w-full justify-start">Products</TabsTrigger>
-            <TabsTrigger value="account" className="w-full justify-start">Settings</TabsTrigger>
           </TabsList>
 
           <div className="flex-1 space-y-6">
 
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{formatPrice(getTotalRevenue())}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-                  <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{getTotalOrders()}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Products</CardTitle>
-                  <Package className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{shopData.products?.length || 0}</div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Orders</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loadingOrders ? (
-                  <div className="text-center py-8">Loading orders...</div>
-                ) : orders.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No orders yet. Orders will appear here once customers start purchasing your products.
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {orders.map((order) => (
-                      <Card key={order.id}>
-                        <CardContent className="pt-6">
-                          <div className="flex justify-between items-start mb-4">
-                            <div>
-                              <p className="font-medium">Order #{order.id.slice(0, 8)}...</p>
-                              <p className="text-sm text-muted-foreground">{order.email}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {new Date(order.created_at).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="font-semibold">{formatPrice(order.total_amount)}</p>
-                              <Badge variant={order.status === 'completed' ? 'default' : 'secondary'}>
-                                {order.status}
-                              </Badge>
-                            </div>
-                          </div>
-                          
-                          <Separator className="my-3" />
-                          
-                          <div className="space-y-2">
-                            <p className="text-sm font-medium">Items:</p>
-                            {order.order_items.map((item, index) => (
-                              <div key={index} className="flex justify-between text-sm">
-                                <span>{item.quantity}x {item.product_name}</span>
-                                <span>{formatPrice(item.total_price)}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-          </TabsContent>
 
           <TabsContent value="shop" className="space-y-6 max-w-2xl">
             <div className="flex gap-4 items-start">
@@ -1300,80 +1213,6 @@ export default function ShopManager() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="account" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <User className="h-5 w-5 mr-2" />
-                  Settings
-                </CardTitle>
-              </CardHeader>
-              {/* Reduced spacing in Account tab content */}
-              <CardContent>
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="space-y-1">
-                    <div className="font-medium">Vacation Mode</div>
-                    <p className="text-sm text-muted-foreground">
-                      {vacationMode 
-                        ? "Your store is currently on vacation and hidden from customers" 
-                        : "Your store is active and visible to customers"
-                      }
-                    </p>
-                  </div>
-                  <Switch
-                    checked={vacationMode}
-                    onCheckedChange={handleVacationModeToggle}
-                    disabled={isPublicAccess}
-                  />
-                </div>
-
-                {!isPublicAccess && (
-                  <div className="pt-6">
-                    <Separator className="mb-4" />
-                        <div className="space-y-4">
-                          <div>
-                            <h3 className="text-lg font-semibold text-destructive">Delete Account</h3>
-                            <p className="text-sm text-muted-foreground">
-                              Permanently delete your entire account, including all shops, products, and personal data.
-                            </p>
-                          </div>
-                          
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button 
-                                variant="destructive" 
-                                className="w-fit"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete Account
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete Account</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently delete your entire account, 
-                                  including all shops, products, orders, and personal data from our servers.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction 
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                  onClick={handleDeleteAccount}
-                                  disabled={isDeletingAccount}
-                                >
-                                  {isDeletingAccount ? "Deleting..." : "Yes, delete account"}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           </div>
         </Tabs>
