@@ -206,7 +206,7 @@ export const FarmersMarketSearch = ({
         </div>
 
         {/* Suggestions Dropdown */}
-        {showSuggestions && filteredSuggestions.length > 0 && (
+        {showSuggestions && (
           <div
             ref={suggestionsRef}
             className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 max-h-96 overflow-y-auto mt-1"
