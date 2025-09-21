@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { CartButton } from "@/components/shopping/CartButton";
-import { ArrowLeft, Heart, Store, Plus } from "lucide-react";
+import { ArrowLeft, Heart, Store } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -74,7 +74,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             {user && (
               <Link to="/submit">
                 <Button variant="ghost" size="sm">
-                  <Plus className="h-5 w-5" />
+                  <Store className="h-5 w-5" />
                 </Button>
               </Link>
             )}
