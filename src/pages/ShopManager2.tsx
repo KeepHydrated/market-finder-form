@@ -709,17 +709,6 @@ export default function ShopManager() {
                     </CardContent>
                   </Card>
 
-                  {/* Submit Button */}
-                  <div className="flex justify-center pt-6">
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={isSubmitting}
-                      size="lg"
-                      className="px-8"
-                    >
-                      {isSubmitting ? 'Submitting...' : shopData ? 'Update Submission' : 'Submit for Review'}
-                    </Button>
-                  </div>
                 </TabsContent>
 
                 <TabsContent value="overview2" className="space-y-6">
