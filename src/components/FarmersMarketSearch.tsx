@@ -134,7 +134,7 @@ export const FarmersMarketSearch = () => {
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-foreground">Find Local Farmers Markets</h1>
+        <h1 className="text-4xl font-bold text-foreground">Which farmers markets do you sell at? (Up to 3) *</h1>
         <p className="text-muted-foreground text-lg">
           Search for farmers markets near you
         </p>
