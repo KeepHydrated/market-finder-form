@@ -155,8 +155,9 @@ export const MarketSearch = ({
   };
 
   const handleSelectMarket = (market: Market) => {
-    // Check if market is already selected (prevent duplicates)
-    if (selectedMarketIds.includes(market.id)) {
+    // When editing, allow selecting markets that are already selected (for replacement)
+    // When not editing, prevent duplicates
+    if (selectedMarketIds.includes(market.id) && !isEditingMarket) {
       setIsOpen(false);
       setSelectedIndex(-1);
       // Don't clear search term, just close dropdown
