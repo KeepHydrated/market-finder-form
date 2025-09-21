@@ -15,7 +15,6 @@ import VendorDuplicate from "./pages/VendorDuplicate";
 import Likes from "./pages/Likes";
 import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
-import ShopManager from "./pages/ShopManager";
 import ShopManager2 from "./pages/ShopManager2";
 import Markets from "./pages/Markets";
 import Tet from "./pages/Tet";
@@ -44,7 +43,7 @@ const App = () => (
                 <Route path="/tet" element={<Tet />} />
                 <Route path="/likes" element={<Likes />} />
                 <Route path="/order-success" element={<OrderSuccess />} />
-                <Route path="/shop-manager" element={<ShopManager />} />
+                <Route path="/shop-manager" element={<ShopManager2 />} />
                 <Route path="/submit" element={<ShopManager2 />} />
                 <Route path="/markets" element={<Markets />} />
                 <Route path="/places-demo" element={<PlacesDemo />} />

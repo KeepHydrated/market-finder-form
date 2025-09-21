@@ -79,13 +79,9 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             </Link>
             <CartButton />
             {user && (
-              <Link to={hasAnySubmission ? "/shop-manager" : "/submit"}>
+              <Link to="/submit">
                 <Button variant="ghost" size="sm">
-                  {hasAnySubmission ? (
-                    <Store className="h-5 w-5" />
-                  ) : (
-                    <Plus className="h-5 w-5" />
-                  )}
+                  <Store className="h-5 w-5" />
                 </Button>
               </Link>
             )}
