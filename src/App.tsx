@@ -19,6 +19,7 @@ import ShopManager2 from "./pages/ShopManager2";
 import Markets from "./pages/Markets";
 import Tet from "./pages/Tet";
 import PlacesDemo from "./pages/PlacesDemo";
+import Test from "./pages/Test";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
                 <Route path="/submit" element={<ShopManager2 />} />
                 <Route path="/markets" element={<Markets />} />
                 <Route path="/places-demo" element={<PlacesDemo />} />
+                <Route path="/test" element={<Test />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
