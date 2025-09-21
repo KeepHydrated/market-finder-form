@@ -599,15 +599,15 @@ const Homepage = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                 {(selectedMarket ? selectedMarket.vendors : acceptedSubmissions).map((submission) => (
                   <Card 
                     key={submission.id} 
-                    className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
+                    className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]" 
                     onClick={() => navigate(`/vendor/${submission.id}`)}
                   >
                     {/* Product Image */}
-                    <div className="aspect-video bg-muted relative">
+                    <div className="aspect-[4/3] bg-muted relative">
                       {submission.products && submission.products.length > 0 && submission.products[0].images && submission.products[0].images.length > 0 ? (
                         <img 
                           src={submission.products[0].images[0]} 
@@ -698,18 +698,18 @@ const Homepage = () => {
                 <p className="text-muted-foreground">No markets available yet.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                 {groupVendorsByMarket().map((market, index) => (
                   <Card 
                      key={index}
-                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]"
                      onClick={() => {
                        setSelectedMarket(market);
                        setViewMode('vendors');
                      }}
                   >
                     {/* Vendor Images Collage */}
-                    <div className="aspect-video bg-muted relative overflow-hidden">
+                    <div className="aspect-[4/3] bg-muted relative overflow-hidden">
                       {market.vendors.length === 1 ? (
                         // Single vendor - show their product image or placeholder
                         <div className="w-full h-full">
