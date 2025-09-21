@@ -115,12 +115,15 @@ export const FarmersMarketSearch = () => {
 
       setLoading(true);
       try {
+        console.log('Calling farmers-market-search function with query:', searchQuery);
         const { data, error } = await supabase.functions.invoke('farmers-market-search', {
           body: {
             query: searchQuery,
             location: userLocation
           }
         });
+
+        console.log('Function response:', { data, error });
 
         if (error) {
           console.error('Error searching farmers markets:', error);

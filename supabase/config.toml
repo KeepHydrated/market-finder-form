@@ -1,1 +1,4 @@
 project_id = "cxkvyrtdgbqxtcelytwl"
+
+[functions.farmers-market-search]
+verify_jwt = false
