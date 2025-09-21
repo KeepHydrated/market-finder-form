@@ -152,11 +152,7 @@ export const FarmersMarketSearch = () => {
   }, []);
 
   return (
-    <div className="max-w-6xl space-y-6 mt-6">
-      <div className="space-y-4">
-        <Label>Which farmers markets do you sell at? (Up to 3) *</Label>
-      </div>
-
+    <div className="max-w-6xl space-y-6">
       {/* Search Bar */}
       <div className="relative max-w-2xl">
         <div className="relative">

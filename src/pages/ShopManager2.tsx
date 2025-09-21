@@ -591,9 +591,7 @@ export default function ShopManager() {
                       {/* Farmers Market Search */}
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <FarmersMarketSearch />
-                          </div>
+                          <Label>Which farmers markets do you sell at? (Up to 3) *</Label>
                           {shopData && (
                             <Button
                               variant="outline"
@@ -625,6 +623,7 @@ export default function ShopManager() {
                             </Button>
                           )}
                         </div>
+                        <FarmersMarketSearch />
                       </div>
                         
                         <div className="space-y-2">
