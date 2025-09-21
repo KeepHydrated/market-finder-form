@@ -328,7 +328,10 @@ export const MarketSearch = ({
                {visibleMarkets.map((market, index) => {
                  const isActiveTab = isEditingMarket && editingMarket && market.id === editingMarket.id;
                  const isAlreadySelected = selectedMarketIds.includes(market.id);
-                 const canSelect = (!maxMarketsReached || isEditingMarket) && !isAlreadySelected;
+                 // When editing, allow selecting any market except the one currently being edited
+                 const canSelect = isEditingMarket 
+                   ? !isActiveTab  // Can select any market except the current one being edited
+                   : !isAlreadySelected && !maxMarketsReached; // Normal selection rules when not editing
                  return (
                    <button
                      key={market.id}
