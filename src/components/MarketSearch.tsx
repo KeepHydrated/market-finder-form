@@ -57,7 +57,7 @@ export const MarketSearch = ({
 
   // Track selected markets for highlighting
   const selectedMarketIds = selectedMarkets.map(m => m.id);
-  const isEditingMarket = activeMarketTab !== null && activeMarketTab !== undefined;
+  const isEditingMarket = activeMarketTab !== null && activeMarketTab !== undefined && activeMarketTab >= 0;
   const editingMarket = isEditingMarket ? selectedMarkets[activeMarketTab] : null;
   
   // Check if the current active tab is a user-submitted market
@@ -65,7 +65,8 @@ export const MarketSearch = ({
   
   // Set first tab as active by default when there are markets but no active tab
   useEffect(() => {
-    if (selectedMarkets.length > 0 && (activeMarketTab === null || activeMarketTab === undefined)) {
+    // Don't auto-select if we're in "adding new market" mode (activeMarketTab === -1)
+    if (selectedMarkets.length > 0 && (activeMarketTab === null || activeMarketTab === undefined) && activeMarketTab !== -1) {
       // Only auto-select first tab if we actually have markets and this isn't a removal scenario
       // Check if this is during initial load or a legitimate need to select first tab
       onMarketTabChange?.(0);
@@ -80,7 +81,7 @@ export const MarketSearch = ({
 
   // Update search term when active tab changes
   useEffect(() => {
-    if (activeMarketTab !== null && activeMarketTab !== undefined && selectedMarkets[activeMarketTab]) {
+    if (activeMarketTab !== null && activeMarketTab !== undefined && activeMarketTab >= 0 && selectedMarkets[activeMarketTab]) {
       const selectedMarket = selectedMarkets[activeMarketTab];
       const marketInfo = `${selectedMarket.name} - ${selectedMarket.address}, ${selectedMarket.city}, ${selectedMarket.state}`;
       onSearchTermChange(marketInfo);
@@ -278,7 +279,7 @@ export const MarketSearch = ({
           onClick={() => {
             // Clear everything for a fresh new market addition
             onSearchTermChange('');
-            onMarketTabChange?.(null); // Clear active tab for new addition
+            onMarketTabChange?.(-1); // Use -1 to indicate "adding new market" mode
             setIsOpen(true);
             setTimeout(() => inputRef.current?.focus(), 0);
           }}
