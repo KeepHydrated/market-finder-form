@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Clock, ExternalLink, Search } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { MapPin, Clock, ExternalLink, Search, X } from 'lucide-react';
 
 // Updated: Removed Google Maps functionality
 
@@ -34,12 +35,14 @@ interface FarmersMarket {
 export const FarmersMarketSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<FarmersMarket[]>([]);
-  const [selectedMarket, setSelectedMarket] = useState<FarmersMarket | null>(null);
+  const [selectedMarkets, setSelectedMarkets] = useState<FarmersMarket[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+
+  const maxMarkets = 3;
 
   // Get user's location
   useEffect(() => {
@@ -102,11 +105,27 @@ export const FarmersMarketSearch = () => {
   }, [searchQuery, userLocation]);
 
   const handleSuggestionClick = (market: FarmersMarket) => {
-    console.log('Selected market opening hours:', market.opening_hours);
-    setSelectedMarket(market);
-    setSearchQuery(market.structured_formatting?.main_text || market.name);
+    // Check if market is already selected
+    const isAlreadySelected = selectedMarkets.some(selected => selected.place_id === market.place_id);
+    if (isAlreadySelected) return;
+    
+    // Check if we've reached the maximum
+    if (selectedMarkets.length >= maxMarkets) return;
+    
+    console.log('Selected market:', market.name);
+    setSelectedMarkets(prev => [...prev, market]);
+    setSearchQuery(''); // Clear search after selection
     setShowSuggestions(false);
   };
+
+  const removeMarket = (marketToRemove: FarmersMarket) => {
+    setSelectedMarkets(prev => prev.filter(market => market.place_id !== marketToRemove.place_id));
+  };
+
+  // Filter out already selected markets from suggestions
+  const filteredSuggestions = suggestions.filter(
+    suggestion => !selectedMarkets.some(selected => selected.place_id === suggestion.place_id)
+  );
 
   const openInGoogleMaps = (address: string) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
@@ -147,12 +166,17 @@ export const FarmersMarketSearch = () => {
           <Input
             ref={inputRef}
             type="text"
-            placeholder="Search for farmers markets..."
+            placeholder={
+              selectedMarkets.length >= maxMarkets 
+                ? "Maximum markets selected" 
+                : "Search for farmers markets..."
+            }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+            onFocus={() => filteredSuggestions.length > 0 && setShowSuggestions(true)}
             className="pl-10 pr-4 py-3 text-lg"
             autoComplete="off"
+            disabled={selectedMarkets.length >= maxMarkets}
           />
           {loading && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -162,12 +186,12 @@ export const FarmersMarketSearch = () => {
         </div>
 
         {/* Suggestions Dropdown */}
-        {showSuggestions && suggestions.length > 0 && (
+        {showSuggestions && filteredSuggestions.length > 0 && (
           <div
             ref={suggestionsRef}
             className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 max-h-96 overflow-y-auto mt-1"
           >
-            {suggestions.map((market) => (
+            {filteredSuggestions.map((market) => (
               <div
                 key={market.place_id}
                 className="flex items-center p-3 hover:bg-muted cursor-pointer border-b border-border last:border-b-0"
@@ -192,7 +216,42 @@ export const FarmersMarketSearch = () => {
             ))}
           </div>
         )}
+
+        {/* Maximum reached message */}
+        {selectedMarkets.length >= maxMarkets && (
+          <div className="text-center text-sm text-muted-foreground mt-2">
+            Maximum of {maxMarkets} markets selected
+          </div>
+        )}
       </div>
+
+      {/* Selected Markets */}
+      {selectedMarkets.length > 0 && (
+        <div className="max-w-2xl mx-auto space-y-3">
+          <h3 className="text-lg font-semibold">Selected Markets ({selectedMarkets.length}/{maxMarkets})</h3>
+          <div className="flex flex-wrap gap-2">
+            {selectedMarkets.map((market) => (
+              <Badge
+                key={market.place_id}
+                variant="secondary"
+                className="flex items-center gap-2 px-3 py-2 text-sm"
+              >
+                <MapPin className="h-3 w-3" />
+                <span className="truncate max-w-xs">
+                  {market.structured_formatting?.main_text || market.name}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeMarket(market)}
+                  className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-1 transition-colors"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
