@@ -446,6 +446,11 @@ export default function ShopManager() {
         // Update the markets list
         setMarkets(prev => prev.map(m => m.id === editingMarket.id ? updateData : m));
         
+        // Also update the selected markets if this market is currently selected
+        setSelectedMarkets(prev => 
+          prev.map(m => m.id === editingMarket.id ? updateData : m)
+        );
+        
         toast({
           title: "Market Updated",
           description: `${marketData.name} has been updated.`,
