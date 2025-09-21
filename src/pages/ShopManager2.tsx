@@ -742,48 +742,6 @@ export default function ShopManager() {
                     </Card>
                   </div>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Shop Overview</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <div>
-                          <Label className="text-sm font-medium">Store Name</Label>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {formData.store_name || 'Not set'}
-                          </p>
-                        </div>
-                        <div>
-                          <Label className="text-sm font-medium">Primary Specialty</Label>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {formData.primary_specialty || 'Not set'}
-                          </p>
-                        </div>
-                        <div>
-                          <Label className="text-sm font-medium">Website</Label>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {formData.website || 'Not set'}
-                          </p>
-                        </div>
-                        <div>
-                          <Label className="text-sm font-medium">Created</Label>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {shopData?.created_at ? new Date(shopData.created_at).toLocaleDateString() : 'Not submitted'}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      {formData.description && (
-                        <div>
-                          <Label className="text-sm font-medium">Description</Label>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {formData.description}
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
 
                   {products.length > 0 && (
                     <Card>
