@@ -127,7 +127,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
       let state = '';
       
       if (addressParts.length >= 2) {
-        // Assume format: "Street, City, State" or similar
+        // For format like "Place, Street, City, State" or "Place, City, State"
         city = addressParts[addressParts.length - 2] || '';
         const lastPart = addressParts[addressParts.length - 1] || '';
         // Extract state (first 2 chars if it contains state abbreviation)
