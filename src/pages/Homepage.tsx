@@ -599,7 +599,7 @@ const Homepage = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
                 {(selectedMarket ? selectedMarket.vendors : acceptedSubmissions).map((submission) => (
                   <Card 
                     key={submission.id} 
@@ -698,7 +698,7 @@ const Homepage = () => {
                 <p className="text-muted-foreground">No markets available yet.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
                 {groupVendorsByMarket().map((market, index) => (
                   <Card 
                      key={index}
