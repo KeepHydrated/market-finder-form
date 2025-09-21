@@ -151,13 +151,13 @@ export const FarmersMarketSearch = () => {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="max-w-6xl space-y-6">
       <div className="space-y-4">
         <h1 className="text-lg font-bold text-foreground text-left">Which farmers markets do you sell at? (Up to 3) *</h1>
       </div>
 
       {/* Search Bar */}
-      <div className="relative max-w-2xl mx-auto">
+      <div className="relative max-w-2xl">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
@@ -224,7 +224,7 @@ export const FarmersMarketSearch = () => {
 
       {/* Selected Markets */}
       {selectedMarkets.length > 0 && (
-        <div className="max-w-2xl mx-auto space-y-3">
+        <div className="max-w-2xl space-y-3">
           <h3 className="text-lg font-semibold">Selected Markets ({selectedMarkets.length}/{maxMarkets})</h3>
           <div className="flex flex-wrap gap-2">
             {selectedMarkets.map((market) => (
