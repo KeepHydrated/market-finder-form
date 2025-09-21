@@ -190,11 +190,8 @@ export const MarketSearch = ({
       // Edit the user-submitted market from the active tab
       onEditMarket(editingMarket);
     } else {
-      // If a tab is active, pass the replacement context
-      const replacementContext = (activeMarketTab !== null && activeMarketTab !== undefined) 
-        ? selectedMarkets[activeMarketTab] 
-        : null;
-      onAddMarket(replacementContext);
+      // Always open blank form for "Submit new market" - no replacement context
+      onAddMarket();
     }
     setIsOpen(false);
     setSelectedIndex(-1);
