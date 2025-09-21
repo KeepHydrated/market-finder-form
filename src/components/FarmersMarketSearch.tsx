@@ -37,12 +37,14 @@ interface FarmersMarketSearchProps {
   selectedMarkets: FarmersMarket[];
   onMarketsChange: (markets: FarmersMarket[]) => void;
   maxMarkets?: number;
+  isEditing?: boolean;
 }
 
 export const FarmersMarketSearch = ({ 
   selectedMarkets, 
   onMarketsChange, 
-  maxMarkets = 3 
+  maxMarkets = 3,
+  isEditing = true
 }: FarmersMarketSearchProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<FarmersMarket[]>([]);
@@ -170,14 +172,16 @@ export const FarmersMarketSearch = ({
             placeholder={
               selectedMarkets.length >= maxMarkets 
                 ? "Maximum markets selected" 
-                : "Search for farmers markets..."
+                : isEditing
+                  ? "Search for farmers markets..."  
+                  : "Edit to change markets"
             }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => filteredSuggestions.length > 0 && setShowSuggestions(true)}
+            onFocus={() => filteredSuggestions.length > 0 && isEditing && setShowSuggestions(true)}
             className="pl-10 pr-4 py-3 text-lg"
             autoComplete="off"
-            disabled={selectedMarkets.length >= maxMarkets}
+            disabled={selectedMarkets.length >= maxMarkets || !isEditing}
           />
           {loading && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -244,7 +248,8 @@ export const FarmersMarketSearch = ({
                 <button
                   type="button"
                   onClick={() => removeMarket(market)}
-                  className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-1 transition-colors"
+                  disabled={!isEditing}
+                  className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <X className="h-3 w-3" />
                 </button>

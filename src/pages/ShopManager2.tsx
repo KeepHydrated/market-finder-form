@@ -838,7 +838,8 @@ export default function ShopManager() {
                           <Label>Which farmers markets do you sell at? (Up to 3) *</Label>
                           <FarmersMarketSearch 
                             selectedMarkets={selectedFarmersMarkets} 
-                            onMarketsChange={setSelectedFarmersMarkets} 
+                            onMarketsChange={setSelectedFarmersMarkets}
+                            isEditing={isEditMode}
                           />
                         </div>
                         
