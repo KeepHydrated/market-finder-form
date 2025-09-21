@@ -586,6 +586,7 @@ export default function ShopManager() {
             <Tabs defaultValue="overview" className="flex gap-6">
               <TabsList className="flex flex-col h-fit w-48 space-y-1 p-1">
                 <TabsTrigger value="overview" className="w-full justify-start">Shop</TabsTrigger>
+                <TabsTrigger value="products-main" className="w-full justify-start">Products</TabsTrigger>
                 <TabsTrigger value="overview2" className="w-full justify-start">Overview 2</TabsTrigger>
                 <TabsTrigger value="account" className="w-full justify-start">Account</TabsTrigger>
               </TabsList>
@@ -694,6 +695,40 @@ export default function ShopManager() {
                   </div>
                 </TabsContent>
                   </Tabs>
+                </TabsContent>
+
+                <TabsContent value="products-main" className="space-y-6">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <CardTitle>Products</CardTitle>
+                      <Button onClick={() => setShowAddProduct(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Product
+                      </Button>
+                    </CardHeader>
+                    <CardContent>
+                      <ProductGrid
+                        products={products}
+                        onDeleteProduct={handleDeleteProduct}
+                        onDuplicateProduct={handleDuplicateProduct}
+                        onEditProduct={handleEditProduct}
+                        vendorId={shopData?.id || 'temp'}
+                        vendorName={formData.store_name || 'Your Shop'}
+                      />
+                    </CardContent>
+                  </Card>
+
+                  {/* Submit Button */}
+                  <div className="flex justify-center pt-6">
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting}
+                      size="lg"
+                      className="px-8"
+                    >
+                      {isSubmitting ? 'Submitting...' : shopData ? 'Update Submission' : 'Submit for Review'}
+                    </Button>
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="overview2" className="space-y-6">
