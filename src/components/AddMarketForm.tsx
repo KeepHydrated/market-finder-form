@@ -205,7 +205,9 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
     console.log('🔍 Final formatted data before submission:');
     console.log('  - cleanFormData:', JSON.stringify(cleanFormData, null, 2));
     
+    console.log('🔍 About to call onMarketAdded callback');
     onMarketAdded(cleanFormData);
+    console.log('🔍 onMarketAdded callback completed');
     
     // Don't reset form here - let the modal close handler do it
     // This prevents the flash of empty form data
