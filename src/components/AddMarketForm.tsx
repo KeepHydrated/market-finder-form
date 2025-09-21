@@ -478,9 +478,9 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
                   let state = '';
                   
                   // For US addresses: "Street, City, State ZIP, Country"
-                  if (addressParts.length >= 3) {
-                    city = addressParts[addressParts.length - 3] || '';
-                    const stateZip = addressParts[addressParts.length - 2] || '';
+                  if (addressParts.length >= 2) {
+                    city = addressParts[addressParts.length - 2] || '';
+                    const stateZip = addressParts[addressParts.length - 1] || '';
                     state = stateZip.split(' ')[0] || ''; // Extract state from "TX 78212"
                   }
                   
