@@ -132,6 +132,17 @@ export const FarmersMarketSearch = ({
     onMarketsChange(selectedMarkets.filter(market => market.place_id !== marketToRemove.place_id));
   };
 
+  const handleMarketBadgeClick = (market: FarmersMarket) => {
+    if (!isEditing) return;
+    
+    // Populate search with market name and show suggestions
+    const marketName = market.structured_formatting?.main_text || market.name;
+    setSearchQuery(marketName);
+    
+    // Focus the input to show suggestions
+    inputRef.current?.focus();
+  };
+
   // Filter out already selected markets from suggestions
   const filteredSuggestions = suggestions.filter(
     suggestion => !selectedMarkets.some(selected => selected.place_id === suggestion.place_id)
@@ -241,13 +252,21 @@ export const FarmersMarketSearch = ({
                 variant="secondary"
                 className="flex items-center gap-2 px-3 py-2 text-sm"
               >
-                <MapPin className="h-3 w-3" />
-                <span className="truncate max-w-xs">
-                  {market.structured_formatting?.main_text || market.name}
-                </span>
+                <div 
+                  className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => handleMarketBadgeClick(market)}
+                >
+                  <MapPin className="h-3 w-3" />
+                  <span className="truncate max-w-xs">
+                    {market.structured_formatting?.main_text || market.name}
+                  </span>
+                </div>
                 <button
                   type="button"
-                  onClick={() => removeMarket(market)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeMarket(market);
+                  }}
                   disabled={!isEditing}
                   className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
