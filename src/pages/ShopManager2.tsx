@@ -67,6 +67,17 @@ export default function ShopManager() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [originalFormData, setOriginalFormData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>('overview');
+  
+  // Analytics state
+  const [analytics, setAnalytics] = useState({
+    totalOrders: 0,
+    revenue: 0,
+    shopViews: 0,
+    averageRating: 0,
+    reviewCount: 0,
+    recentOrders: [],
+    topProducts: []
+  });
 
   // Form state
   const [formData, setFormData] = useState({
@@ -361,6 +372,72 @@ export default function ShopManager() {
         description: error.message || "Failed to delete submission.",
         variant: "destructive",
       });
+    }
+  };
+
+  const fetchAnalytics = async () => {
+    if (!shopData) return;
+
+    try {
+      // Fetch orders
+      const { data: orders, error: ordersError } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          order_items (*)
+        `)
+        .eq('vendor_id', shopData.id)
+        .order('created_at', { ascending: false });
+
+      if (ordersError) throw ordersError;
+
+      // Fetch reviews
+      const { data: reviews, error: reviewsError } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('vendor_id', shopData.id);
+
+      if (reviewsError) throw reviewsError;
+
+      // Calculate analytics
+      const totalOrders = orders?.length || 0;
+      const revenue = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0;
+      const averageRating = reviews?.length ? 
+        reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length : 0;
+
+      // Get recent orders (last 5)
+      const recentOrders = orders?.slice(0, 5) || [];
+
+      // Calculate top products from order items
+      const productSales: Record<string, { name: string; count: number; price: number }> = {};
+      orders?.forEach(order => {
+        order.order_items?.forEach((item: any) => {
+          if (!productSales[item.product_name]) {
+            productSales[item.product_name] = {
+              name: item.product_name,
+              count: 0,
+              price: item.unit_price
+            };
+          }
+          productSales[item.product_name].count += item.quantity;
+        });
+      });
+
+      const topProducts = Object.values(productSales)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+      setAnalytics({
+        totalOrders,
+        revenue: revenue / 100, // Convert from cents
+        shopViews: 0, // We don't track views yet
+        averageRating,
+        reviewCount: reviews?.length || 0,
+        recentOrders,
+        topProducts
+      });
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
     }
   };
 
@@ -893,9 +970,9 @@ export default function ShopManager() {
                         <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">12</div>
+                        <div className="text-2xl font-bold">{analytics.totalOrders}</div>
                         <p className="text-xs text-muted-foreground">
-                          +3 from last week
+                          Total orders received
                         </p>
                       </CardContent>
                     </Card>
@@ -905,9 +982,9 @@ export default function ShopManager() {
                         <CardTitle className="text-sm font-medium">Revenue</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">$1,247</div>
+                        <div className="text-2xl font-bold">${analytics.revenue.toFixed(2)}</div>
                         <p className="text-xs text-muted-foreground">
-                          +12% from last month
+                          Total revenue earned
                         </p>
                       </CardContent>
                     </Card>
@@ -917,9 +994,9 @@ export default function ShopManager() {
                         <CardTitle className="text-sm font-medium">Shop Views</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">186</div>
+                        <div className="text-2xl font-bold">{products.length}</div>
                         <p className="text-xs text-muted-foreground">
-                          +8% this week
+                          Products available
                         </p>
                       </CardContent>
                     </Card>
@@ -929,9 +1006,11 @@ export default function ShopManager() {
                         <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">4.8</div>
+                        <div className="text-2xl font-bold">
+                          {analytics.reviewCount > 0 ? analytics.averageRating.toFixed(1) : '--'}
+                        </div>
                         <p className="text-xs text-muted-foreground">
-                          Based on 24 reviews
+                          Based on {analytics.reviewCount} reviews
                         </p>
                       </CardContent>
                     </Card>
@@ -943,36 +1022,24 @@ export default function ShopManager() {
                         <CardTitle>Recent Orders</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div>
-                            <p className="font-medium">Order #1001</p>
-                            <p className="text-sm text-muted-foreground">john@example.com</p>
+                        {analytics.recentOrders.length > 0 ? (
+                          analytics.recentOrders.map((order: any) => (
+                            <div key={order.id} className="flex items-center justify-between p-3 border rounded-lg">
+                              <div>
+                                <p className="font-medium">Order #{order.id.slice(-8)}</p>
+                                <p className="text-sm text-muted-foreground">{order.email}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-medium">${(order.total_amount / 100).toFixed(2)}</p>
+                                <p className="text-sm capitalize">{order.status}</p>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-4 text-muted-foreground">
+                            No orders yet
                           </div>
-                          <div className="text-right">
-                            <p className="font-medium">$45.99</p>
-                            <p className="text-sm">Completed</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div>
-                            <p className="font-medium">Order #1002</p>
-                            <p className="text-sm text-muted-foreground">sarah@example.com</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium">$22.50</p>
-                            <p className="text-sm">Pending</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div>
-                            <p className="font-medium">Order #1003</p>
-                            <p className="text-sm text-muted-foreground">mike@example.com</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium">$78.25</p>
-                            <p className="text-sm">Completed</p>
-                          </div>
-                        </div>
+                        )}
                       </CardContent>
                     </Card>
 
@@ -981,36 +1048,24 @@ export default function ShopManager() {
                         <CardTitle>Top Selling Products</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium">Organic Apples</p>
-                            <p className="text-sm text-muted-foreground">Fruits</p>
+                        {analytics.topProducts.length > 0 ? (
+                          analytics.topProducts.map((product: any, index: number) => (
+                            <div key={index} className="flex items-center justify-between">
+                              <div>
+                                <p className="font-medium">{product.name}</p>
+                                <p className="text-sm text-muted-foreground">Product</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-medium">{product.count} sold</p>
+                                <p className="text-sm text-muted-foreground">${(product.price / 100).toFixed(2)} each</p>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-4 text-muted-foreground">
+                            No sales data yet
                           </div>
-                          <div className="text-right">
-                            <p className="font-medium">24 sold</p>
-                            <p className="text-sm text-muted-foreground">$4.50 each</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium">Fresh Bread</p>
-                            <p className="text-sm text-muted-foreground">Bakery</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium">18 sold</p>
-                            <p className="text-sm text-muted-foreground">$6.00 each</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium">Honey Jar</p>
-                            <p className="text-sm text-muted-foreground">Artisan</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium">12 sold</p>
-                            <p className="text-sm text-muted-foreground">$12.99 each</p>
-                          </div>
-                        </div>
+                        )}
                       </CardContent>
                     </Card>
                   </div>
