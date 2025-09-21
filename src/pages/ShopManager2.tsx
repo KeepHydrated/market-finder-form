@@ -592,12 +592,6 @@ export default function ShopManager() {
               <div className="flex-1 space-y-6">
                 <TabsContent value="shop" className="space-y-6 max-w-2xl">
                   <Card>
-                    <CardHeader>
-                      <CardTitle>Shop Information</CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        Fill out your shop details to get started
-                      </p>
-                    </CardHeader>
                     <CardContent className="space-y-6">
                       {/* Farmers Market Search */}
                       <div className="space-y-2">
