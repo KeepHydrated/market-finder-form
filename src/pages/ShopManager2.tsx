@@ -212,6 +212,14 @@ export default function ShopManager() {
       const marketData = data || [];
       setMarkets(marketData);
       
+      // Identify markets submitted by current user
+      if (user?.id) {
+        const userMarketIds = marketData
+          .filter(market => market.user_id === user.id)
+          .map(market => market.id);
+        setUserSubmittedMarketIds(userMarketIds);
+      }
+      
       // Clear selected markets if no markets exist
       if (marketData.length === 0) {
         setSelectedMarkets([]);
