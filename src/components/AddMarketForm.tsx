@@ -171,14 +171,25 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
     let city = addressData.city;
     let state = addressData.state;
     
+    console.log('🔍 Debug address parsing:');
+    console.log('  - addressData.city:', city);
+    console.log('  - addressData.state:', state);
+    console.log('  - addressString:', addressString);
+    
     // If city/state are empty, try to parse from address string
     if (!city || !state) {
+      console.log('🔍 City/state empty, parsing from address string');
       const addressParts = addressString.split(', ');
+      console.log('  - addressParts:', addressParts);
       if (addressParts.length >= 2) {
         city = city || addressParts[addressParts.length - 2] || '';
         const stateZip = addressParts[addressParts.length - 1] || '';
         state = state || stateZip.split(' ')[0] || '';
+        console.log('  - parsed city:', city);
+        console.log('  - parsed state:', state);
       }
+    } else {
+      console.log('🔍 Using city/state from addressData');
     }
     
     // Create clean form data with formatted hours and days
