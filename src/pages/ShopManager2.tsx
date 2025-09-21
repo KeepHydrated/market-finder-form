@@ -401,11 +401,14 @@ export default function ShopManager() {
     });
   };
 
-  const handleReplaceMarket = (marketIndex: number) => {
-    setActiveMarketTab(marketIndex);
+  const handleReplaceMarket = (marketIndex: number, newMarket: any) => {
+    const updatedMarkets = [...selectedMarkets];
+    updatedMarkets[marketIndex] = newMarket;
+    setSelectedMarkets(updatedMarkets);
+    
     toast({
-      title: "Replace Market",
-      description: "Select a new market to replace the current one.",
+      title: "Market Replaced",
+      description: `Replaced with ${newMarket.name}`,
     });
   };
 
@@ -600,7 +603,7 @@ export default function ShopManager() {
                         onMarketTabChange={setActiveMarketTab}
                         onReplaceMarket={(oldMarket, newMarket) => {
                           const marketIndex = selectedMarkets.findIndex(m => m.id === oldMarket.id);
-                          if (marketIndex !== -1) handleReplaceMarket(marketIndex);
+                          if (marketIndex !== -1) handleReplaceMarket(marketIndex, newMarket);
                         }}
                         userSubmittedMarketIds={userSubmittedMarketIds}
                         disabled={false}
