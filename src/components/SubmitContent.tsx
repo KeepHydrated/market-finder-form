@@ -287,7 +287,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
           products: JSON.stringify(products),
           selected_markets: JSON.stringify(selectedMarkets.map(m => m.name)),
           market_data: JSON.stringify(selectedMarkets),
-          status: 'pending'
+          status: 'accepted'
         });
 
       if (error) throw error;
