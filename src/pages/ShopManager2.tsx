@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
-import { Edit, Save, Plus, Trash2 } from 'lucide-react';
+import { Edit, Save, Plus, Trash2, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { ProductGrid } from '@/components/ProductGrid';
@@ -66,6 +66,7 @@ export default function ShopManager() {
   const [userSubmittedMarketIds, setUserSubmittedMarketIds] = useState<number[]>([]);
   const [isEditMode, setIsEditMode] = useState(false);
   const [originalFormData, setOriginalFormData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<string>('overview');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -113,6 +114,11 @@ export default function ShopManager() {
       loadDemoData();
     }
   }, [user, isPublicAccess]);
+
+  useEffect(() => {
+    // Set active tab based on whether shop data exists
+    setActiveTab(shopData ? "overview2" : "overview");
+  }, [shopData]);
 
   const fetchShopData = async () => {
     if (!user) return;
@@ -615,7 +621,7 @@ export default function ShopManager() {
               </div>
             )}
 
-            <Tabs defaultValue={shopData ? "overview2" : "overview"} className="flex gap-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex gap-6">
               <TabsList className="flex flex-col h-fit w-48 space-y-1 p-1">
                 {shopData && (
                   <TabsTrigger value="overview2" className="w-full justify-start">Overview</TabsTrigger>
@@ -692,6 +698,20 @@ export default function ShopManager() {
                             disabled={shopData && !isEditMode}
                           />
                         </div>
+
+                        {/* Continue Button for new submissions */}
+                        {!shopData && (
+                          <div className="pt-6 border-t">
+                            <Button 
+                              onClick={() => setActiveTab('products-main')}
+                              className="w-full"
+                              size="lg"
+                            >
+                              Continue to Products
+                              <ArrowRight className="h-4 w-4 ml-2" />
+                            </Button>
+                          </div>
+                        )}
                       </CardContent>
                   </Card>
 
@@ -759,6 +779,25 @@ export default function ShopManager() {
                         vendorId={shopData?.id || 'temp'}
                         vendorName={formData.store_name || 'Your Shop'}
                       />
+                      
+                      {/* Publish Market Button for new submissions */}
+                      {!shopData && (
+                        <div className="pt-6 border-t mt-6">
+                          <div className="text-center space-y-4">
+                            <p className="text-muted-foreground">
+                              Ready to publish your market? You can always add more products later.
+                            </p>
+                            <Button 
+                              onClick={handleSubmit}
+                              disabled={isSubmitting}
+                              size="lg"
+                              className="w-full max-w-md"
+                            >
+                              {isSubmitting ? 'Publishing...' : 'Publish Your Market'}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
 
