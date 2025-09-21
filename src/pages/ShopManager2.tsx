@@ -13,7 +13,6 @@ import { ProductGrid } from '@/components/ProductGrid';
 import { AddProductForm } from '@/components/AddProductForm';
 import { AddMarketForm } from '@/components/AddMarketForm';
 import { MarketSearch } from '@/components/MarketSearch';
-import { FarmersMarketSearch } from '@/components/FarmersMarketSearch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -630,11 +629,6 @@ export default function ShopManager() {
                       
                       {/* Store Information Section */}
                       <div className="space-y-4 pt-4 border-t">
-                        {/* Farmers Market Search */}
-                        <div className="space-y-2">
-                          <FarmersMarketSearch />
-                        </div>
-                        
                         <div className="space-y-2">
                           <Label htmlFor="store_name">Store Name *</Label>
                           <Input
