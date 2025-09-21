@@ -153,7 +153,7 @@ export const FarmersMarketSearch = () => {
   return (
     <div className="max-w-6xl space-y-6">
       <div className="space-y-4">
-        <h1 className="text-lg font-bold text-foreground text-left">Which farmers markets do you sell at? (Up to 3) *</h1>
+        <h1 className="text-base font-bold text-foreground text-left">Which farmers markets do you sell at? (Up to 3) *</h1>
       </div>
 
       {/* Search Bar */}
