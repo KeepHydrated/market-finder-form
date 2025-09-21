@@ -450,9 +450,15 @@ export default function ShopManager() {
         setMarkets(prev => [...prev, insertData]);
         setUserSubmittedMarketIds(prev => [...prev, insertData.id]);
         
+        // Add the new market to selected markets if under the limit
+        if (selectedMarkets.length < 3) {
+          setSelectedMarkets(prev => [...prev, insertData]);
+          setActiveMarketTab(selectedMarkets.length); // Set as active tab
+        }
+        
         toast({
           title: "Market Added",
-          description: `${marketData.name} has been added to available markets.`,
+          description: `${marketData.name} has been added and selected.`,
         });
       }
 

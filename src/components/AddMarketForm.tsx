@@ -206,6 +206,8 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
     console.log('  - cleanFormData:', JSON.stringify(cleanFormData, null, 2));
     
     console.log('🔍 About to call onMarketAdded callback');
+    console.log('🔍 onMarketAdded callback type:', typeof onMarketAdded);
+    console.log('🔍 onMarketAdded callback function:', onMarketAdded.toString().substring(0, 100));
     onMarketAdded(cleanFormData);
     console.log('🔍 onMarketAdded callback completed');
     
