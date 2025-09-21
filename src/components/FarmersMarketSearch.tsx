@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import { MapPin, Clock, ExternalLink, Search, X } from 'lucide-react';
 
 // Updated: Removed Google Maps functionality
@@ -153,7 +154,7 @@ export const FarmersMarketSearch = () => {
   return (
     <div className="max-w-6xl space-y-6">
       <div className="space-y-4">
-        <h1 className="text-base font-bold text-foreground text-left">Which farmers markets do you sell at? (Up to 3) *</h1>
+        <Label>Which farmers markets do you sell at? (Up to 3) *</Label>
       </div>
 
       {/* Search Bar */}
