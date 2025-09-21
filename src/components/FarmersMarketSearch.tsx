@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Loader } from '@googlemaps/js-api-loader';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,8 +37,6 @@ export const FarmersMarketSearch = () => {
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const mapRef = useRef<HTMLDivElement>(null);
-  const googleMapRef = useRef<google.maps.Map | null>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
   // Get user's location
@@ -62,47 +59,6 @@ export const FarmersMarketSearch = () => {
       setUserLocation({ lat: 29.4241, lng: -98.4936 });
     }
   }, []);
-
-  // Initialize Google Maps
-  useEffect(() => {
-    const initializeMap = async () => {
-      if (!userLocation || !mapRef.current) return;
-
-      try {
-        const { data, error } = await supabase.functions.invoke('get-google-api-key');
-        if (error || !data?.apiKey) {
-          console.error('Failed to get Google API key:', error);
-          return;
-        }
-
-        const loader = new Loader({
-          apiKey: data.apiKey,
-          version: 'weekly',
-          libraries: ['places', 'geometry']
-        });
-
-        await loader.load();
-
-        const map = new google.maps.Map(mapRef.current, {
-          center: userLocation,
-          zoom: 12,
-          styles: [
-            {
-              featureType: 'poi',
-              elementType: 'labels',
-              stylers: [{ visibility: 'off' }]
-            }
-          ]
-        });
-
-        googleMapRef.current = map;
-      } catch (error) {
-        console.error('Error loading Google Maps:', error);
-      }
-    };
-
-    initializeMap();
-  }, [userLocation]);
 
   // Search for farmers markets with debouncing
   useEffect(() => {
@@ -148,31 +104,6 @@ export const FarmersMarketSearch = () => {
     setSelectedMarket(market);
     setSearchQuery(market.structured_formatting?.main_text || market.name);
     setShowSuggestions(false);
-
-    // Add marker to map
-    if (googleMapRef.current && market.geometry?.location) {
-      // Clear existing markers by recreating the map
-      googleMapRef.current = new google.maps.Map(mapRef.current!, {
-        center: market.geometry.location,
-        zoom: 15
-      });
-
-      new google.maps.Marker({
-        position: market.geometry.location,
-        map: googleMapRef.current,
-        title: market.name,
-        icon: {
-          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
-            </svg>
-          `),
-          scaledSize: new google.maps.Size(30, 30)
-        }
-      });
-    }
   };
 
   const openInGoogleMaps = (address: string) => {
@@ -261,16 +192,7 @@ export const FarmersMarketSearch = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Map */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Map View</h2>
-          <div 
-            ref={mapRef} 
-            className="w-full h-96 rounded-lg border bg-muted"
-          />
-        </div>
-
+      <div className="max-w-2xl mx-auto">
         {/* Selected Market Details */}
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold">Market Details</h2>
