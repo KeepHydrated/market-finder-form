@@ -364,17 +364,44 @@ export default function ShopManager() {
     }
   };
 
-  const handleAddProduct = (product: any) => {
+  const handleAddProduct = async (product: any) => {
     console.log('Adding product:', product);
     const updatedProducts = [...products, { ...product, id: Date.now() }];
     console.log('Updated products list:', updatedProducts);
     setProducts(updatedProducts);
     setShowAddProduct(false);
     
-    toast({
-      title: "Product Added",
-      description: `${product.name} has been added to your product list.`,
-    });
+    // If shop is already published, save products to database immediately
+    if (shopData && user) {
+      try {
+        const { error } = await supabase
+          .from('submissions')
+          .update({ 
+            products: updatedProducts,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', shopData.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Product Added & Saved",
+          description: `${product.name} has been added and saved to your shop.`,
+        });
+      } catch (error: any) {
+        console.error('Error saving product:', error);
+        toast({
+          title: "Product Added Locally",
+          description: `${product.name} was added but couldn't be saved. Please try editing your shop to save changes.`,
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "Product Added",
+        description: `${product.name} has been added to your product list.`,
+      });
+    }
   };
 
   const handleEditProduct = (product: any) => {
@@ -382,18 +409,77 @@ export default function ShopManager() {
     setShowAddProduct(true);
   };
 
-  const handleUpdateProduct = (updatedProduct: any) => {
+  const handleUpdateProduct = async (updatedProduct: any) => {
     const updatedProducts = products.map(p => 
       p.id === updatedProduct.id ? updatedProduct : p
     );
     setProducts(updatedProducts);
     setShowAddProduct(false);
     setEditingProduct(null);
+    
+    // If shop is already published, save products to database immediately
+    if (shopData && user) {
+      try {
+        const { error } = await supabase
+          .from('submissions')
+          .update({ 
+            products: updatedProducts,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', shopData.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Product Updated & Saved",
+          description: `${updatedProduct.name} has been updated and saved.`,
+        });
+      } catch (error: any) {
+        console.error('Error saving product:', error);
+        toast({
+          title: "Product Updated Locally",
+          description: `${updatedProduct.name} was updated but couldn't be saved. Please try editing your shop to save changes.`,
+          variant: "destructive",
+        });
+      }
+    }
   };
 
-  const handleDeleteProduct = (productId: number) => {
+  const handleDeleteProduct = async (productId: number) => {
     const updatedProducts = products.filter(p => p.id !== productId);
     setProducts(updatedProducts);
+    
+    // If shop is already published, save products to database immediately
+    if (shopData && user) {
+      try {
+        const { error } = await supabase
+          .from('submissions')
+          .update({ 
+            products: updatedProducts,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', shopData.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Product Deleted & Saved",
+          description: "Product has been deleted and changes saved.",
+        });
+      } catch (error: any) {
+        console.error('Error saving after delete:', error);
+        toast({
+          title: "Product Deleted Locally",
+          description: "Product was deleted but changes couldn't be saved. Please try editing your shop to save changes.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "Product Deleted",
+        description: "Product has been deleted.",
+      });
+    }
   };
 
   const handleDuplicateProduct = (product: any) => {
