@@ -124,13 +124,22 @@ export const FarmersMarketSearch = ({
   }, [searchQuery, userLocation]);
 
   const handleSuggestionClick = (market: FarmersMarket) => {
-    // Check if market is already selected by place_id or name (for additional safety)
-    const isAlreadySelected = selectedMarkets.some(selected => 
-      selected.place_id === market.place_id || 
-      (selected.name === market.name && selected.address === market.address)
-    );
+    // Enhanced duplicate check: compare by place_id OR by name (case-insensitive)
+    const isAlreadySelected = selectedMarkets.some(selected => {
+      // Direct place_id match
+      if (selected.place_id === market.place_id) return true;
+      
+      // Name match (case-insensitive) - handles saved vs new market scenarios
+      const selectedName = (selected.structured_formatting?.main_text || selected.name).toLowerCase().trim();
+      const marketName = (market.structured_formatting?.main_text || market.name).toLowerCase().trim();
+      
+      return selectedName === marketName;
+    });
+    
     if (isAlreadySelected) {
-      console.log('Market already selected, ignoring click');
+      console.log('Market already selected (duplicate detected):', market.name);
+      setSearchQuery(''); // Clear search
+      setShowSuggestions(false);
       return;
     }
     
@@ -162,13 +171,19 @@ export const FarmersMarketSearch = ({
     inputRef.current?.focus();
   };
 
-  // Filter out already selected markets from suggestions with enhanced deduplication
-  const filteredSuggestions = suggestions.filter(
-    suggestion => !selectedMarkets.some(selected => 
-      selected.place_id === suggestion.place_id || 
-      (selected.name === suggestion.name && selected.address === suggestion.address)
-    )
-  );
+  // Filter out already selected markets from suggestions with name-based deduplication
+  const filteredSuggestions = suggestions.filter(suggestion => {
+    return !selectedMarkets.some(selected => {
+      // Direct place_id match
+      if (selected.place_id === suggestion.place_id) return true;
+      
+      // Name match (case-insensitive) - handles saved vs new market scenarios  
+      const selectedName = (selected.structured_formatting?.main_text || selected.name).toLowerCase().trim();
+      const suggestionName = (suggestion.structured_formatting?.main_text || suggestion.name).toLowerCase().trim();
+      
+      return selectedName === suggestionName;
+    });
+  });
 
   const openInGoogleMaps = (address: string) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
