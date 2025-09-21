@@ -276,9 +276,9 @@ export const MarketSearch = ({
         <button
           type="button"
           onClick={() => {
-            // Create a new empty market slot and open dropdown
+            // Clear everything for a fresh new market addition
             onSearchTermChange('');
-            onMarketTabChange?.(selectedMarkets.length); // Set active tab to new slot
+            onMarketTabChange?.(null); // Clear active tab for new addition
             setIsOpen(true);
             setTimeout(() => inputRef.current?.focus(), 0);
           }}
