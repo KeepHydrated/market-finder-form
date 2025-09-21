@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Clock, ExternalLink, Search } from 'lucide-react';
 
+// Updated: Removed Google Maps functionality
+
 interface FarmersMarket {
   place_id: string;
   name: string;
