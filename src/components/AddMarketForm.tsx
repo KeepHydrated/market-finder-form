@@ -167,10 +167,26 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
     
     const formattedDays = formData.days.map(day => dayAbbrevMap[day] || day.slice(0, 3));
     
+    // Parse city and state from address if not already set
+    let city = addressData.city;
+    let state = addressData.state;
+    
+    // If city/state are empty, try to parse from address string
+    if (!city || !state) {
+      const addressParts = addressString.split(', ');
+      if (addressParts.length >= 3) {
+        city = city || addressParts[addressParts.length - 3] || '';
+        const stateZip = addressParts[addressParts.length - 2] || '';
+        state = state || stateZip.split(' ')[0] || '';
+      }
+    }
+    
     // Create clean form data with formatted hours and days
     const cleanFormData = {
       name: name,
-      address: addressString, // This now uses the effective address
+      address: addressString,
+      city: city,
+      state: state,
       days: formattedDays,
       hours: formatHours()
     };
@@ -456,11 +472,23 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
               onLocationSelect={(location) => {
                 console.log('📍 Location selected from Google Places:', location);
                 if (location && location.description) {
+                  // Parse city and state from address description
+                  const addressParts = location.description.split(', ');
+                  let city = '';
+                  let state = '';
+                  
+                  // For US addresses: "Street, City, State ZIP, Country"
+                  if (addressParts.length >= 3) {
+                    city = addressParts[addressParts.length - 3] || '';
+                    const stateZip = addressParts[addressParts.length - 2] || '';
+                    state = stateZip.split(' ')[0] || ''; // Extract state from "TX 78212"
+                  }
+                  
                   setAddressData({
                     value: location.description,
                     isFromGooglePlaces: true,
-                    city: '',
-                    state: ''
+                    city: city,
+                    state: state
                   });
                 }
               }}
