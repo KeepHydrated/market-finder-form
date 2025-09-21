@@ -558,9 +558,6 @@ export default function ShopManager() {
           <div className="text-center py-8">Loading...</div>
         ) : (
           <div className="space-y-6">
-              <h1 className="text-3xl font-bold">
-                {shopData ? 'Manage Your Shop' : 'Submit Your Shop'}
-              </h1>
 
             {isPublicAccess && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
