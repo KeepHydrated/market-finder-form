@@ -87,6 +87,11 @@ export const MarketSearch = ({
     }
   }, [activeMarketTab, selectedMarkets, onSearchTermChange]);
   
+  // Debug logging
+  useEffect(() => {
+    console.log('🔍 MarketSearch selectedMarkets updated:', selectedMarkets);
+  }, [selectedMarkets]);
+   
   // Show all markets in dropdown, but highlight selected ones
   const availableMarkets = markets;
   

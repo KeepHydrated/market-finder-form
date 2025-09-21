@@ -174,9 +174,9 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
     // If city/state are empty, try to parse from address string
     if (!city || !state) {
       const addressParts = addressString.split(', ');
-      if (addressParts.length >= 3) {
-        city = city || addressParts[addressParts.length - 3] || '';
-        const stateZip = addressParts[addressParts.length - 2] || '';
+      if (addressParts.length >= 2) {
+        city = city || addressParts[addressParts.length - 2] || '';
+        const stateZip = addressParts[addressParts.length - 1] || '';
         state = state || stateZip.split(' ')[0] || '';
       }
     }
