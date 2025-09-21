@@ -100,17 +100,22 @@ export const MarketSearch = ({
   
   const showResults = isOpen;
   
-  // Sort available markets
-  const sortedMarkets = [...availableMarkets].sort((a, b) => {
-    const aMatchesSearch = a.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const bMatchesSearch = b.name.toLowerCase().includes(searchTerm.toLowerCase());
+  // Sort and filter available markets based on search term
+  const getFilteredMarkets = () => {
+    if (!searchTerm.trim()) {
+      return availableMarkets; // Show all markets when no search term
+    }
     
-    if (aMatchesSearch && !bMatchesSearch) return -1;
-    if (!aMatchesSearch && bMatchesSearch) return 1;
-    return 0;
-  });
+    const searchLower = searchTerm.toLowerCase();
+    return availableMarkets.filter(market => 
+      market.name.toLowerCase().includes(searchLower) ||
+      market.city.toLowerCase().includes(searchLower) ||
+      market.state.toLowerCase().includes(searchLower) ||
+      market.address.toLowerCase().includes(searchLower)
+    );
+  };
   
-  const visibleMarkets = sortedMarkets;
+  const visibleMarkets = getFilteredMarkets();
   const totalItems = visibleMarkets.length + 1; // +1 for "Add Market" option
   const hasTextInSearch = searchTerm.trim().length > 0;
   const isEditingSubmittedMarket = submittedMarketName && searchTerm.toLowerCase().trim() === submittedMarketName.toLowerCase();
