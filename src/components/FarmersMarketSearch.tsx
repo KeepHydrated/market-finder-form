@@ -226,7 +226,7 @@ export const FarmersMarketSearch = () => {
       {/* Selected Markets */}
       {selectedMarkets.length > 0 && (
         <div className="max-w-2xl space-y-3">
-          <Label>Selected Markets ({selectedMarkets.length}/{maxMarkets})</Label>
+          <Label className="text-muted-foreground">Selected Markets ({selectedMarkets.length}/{maxMarkets})</Label>
           <div className="flex flex-wrap gap-2">
             {selectedMarkets.map((market) => (
               <Badge
