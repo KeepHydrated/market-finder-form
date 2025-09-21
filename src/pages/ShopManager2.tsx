@@ -90,6 +90,7 @@ export default function ShopManager() {
   });
 
   const [products, setProducts] = useState<any[]>([]);
+  const [selectedFarmersMarkets, setSelectedFarmersMarkets] = useState<any[]>([]);
 
   // Check for public access via URL parameter
   const isPublicAccess = new URLSearchParams(window.location.search).get('demo') === 'true';
@@ -276,6 +277,15 @@ export default function ShopManager() {
       return;
     }
 
+    if (selectedFarmersMarkets.length === 0) {
+      toast({
+        title: "Market Required", 
+        description: "Please select at least one farmers market.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const submissionData = {
@@ -285,9 +295,10 @@ export default function ShopManager() {
         website: formData.website.trim(),
         description: formData.description.trim(),
         products: products,
-        selected_markets: selectedMarkets,
-        search_term: marketSearchTerm,
-        status: 'pending'
+        selected_markets: selectedFarmersMarkets.map(m => m.name),
+        search_term: selectedFarmersMarkets.length > 0 ? selectedFarmersMarkets[0].name : '',
+        market_address: selectedFarmersMarkets.length > 0 ? selectedFarmersMarkets[0].address : '',
+        status: 'accepted'
       };
 
       if (shopData) {
@@ -825,7 +836,10 @@ export default function ShopManager() {
                         {/* Farmers Market Search */}
                         <div className="space-y-2">
                           <Label>Which farmers markets do you sell at? (Up to 3) *</Label>
-                          <FarmersMarketSearch />
+                          <FarmersMarketSearch 
+                            selectedMarkets={selectedFarmersMarkets} 
+                            onMarketsChange={setSelectedFarmersMarkets} 
+                          />
                         </div>
                         
                         <div className="space-y-2">

@@ -33,17 +33,24 @@ interface FarmersMarket {
   };
 }
 
-export const FarmersMarketSearch = () => {
+interface FarmersMarketSearchProps {
+  selectedMarkets: FarmersMarket[];
+  onMarketsChange: (markets: FarmersMarket[]) => void;
+  maxMarkets?: number;
+}
+
+export const FarmersMarketSearch = ({ 
+  selectedMarkets, 
+  onMarketsChange, 
+  maxMarkets = 3 
+}: FarmersMarketSearchProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<FarmersMarket[]>([]);
-  const [selectedMarkets, setSelectedMarkets] = useState<FarmersMarket[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
-
-  const maxMarkets = 3;
 
   // Get user's location
   useEffect(() => {
@@ -114,13 +121,13 @@ export const FarmersMarketSearch = () => {
     if (selectedMarkets.length >= maxMarkets) return;
     
     console.log('Selected market:', market.name);
-    setSelectedMarkets(prev => [...prev, market]);
+    onMarketsChange([...selectedMarkets, market]);
     setSearchQuery(''); // Clear search after selection
     setShowSuggestions(false);
   };
 
   const removeMarket = (marketToRemove: FarmersMarket) => {
-    setSelectedMarkets(prev => prev.filter(market => market.place_id !== marketToRemove.place_id));
+    onMarketsChange(selectedMarkets.filter(market => market.place_id !== marketToRemove.place_id));
   };
 
   // Filter out already selected markets from suggestions
