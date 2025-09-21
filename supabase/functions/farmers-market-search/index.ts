@@ -57,7 +57,7 @@ serve(async (req) => {
     }
 
     // Filter and transform results to focus on farmers markets
-    const farmersMarkets = data.results
+    const filteredResults = data.results
       ?.filter((place: any) => {
         const name = place.name?.toLowerCase() || '';
         const types = place.types || [];
@@ -78,26 +78,60 @@ serve(async (req) => {
           place.formatted_address?.toLowerCase().includes('market')
         );
       })
-      .slice(0, 8) // Limit to 8 results for autocomplete
-      .map((place: any) => ({
-        place_id: place.place_id,
-        name: place.name,
-        address: place.formatted_address,
-        rating: place.rating,
-        user_ratings_total: place.user_ratings_total,
-        opening_hours: place.opening_hours,
-        photos: place.photos?.[0] ? [{
-          photo_reference: place.photos[0].photo_reference
-        }] : [],
-        geometry: place.geometry,
-        types: place.types,
-        // Create a display format similar to Google Places autocomplete
-        description: `${place.name}, ${place.formatted_address}`,
-        structured_formatting: {
-          main_text: place.name,
-          secondary_text: place.formatted_address
+      .slice(0, 8) || []; // Limit to 8 results for autocomplete
+
+    // Fetch detailed information for each place to get full opening hours
+    const farmersMarkets = await Promise.all(
+      filteredResults.map(async (place: any) => {
+        try {
+          // Get place details for complete opening hours
+          const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=opening_hours&key=${apiKey}`;
+          const detailsResponse = await fetch(detailsUrl);
+          const detailsData = await detailsResponse.json();
+          
+          return {
+            place_id: place.place_id,
+            name: place.name,
+            address: place.formatted_address,
+            rating: place.rating,
+            user_ratings_total: place.user_ratings_total,
+            opening_hours: detailsData.result?.opening_hours || place.opening_hours,
+            photos: place.photos?.[0] ? [{
+              photo_reference: place.photos[0].photo_reference
+            }] : [],
+            geometry: place.geometry,
+            types: place.types,
+            // Create a display format similar to Google Places autocomplete
+            description: `${place.name}, ${place.formatted_address}`,
+            structured_formatting: {
+              main_text: place.name,
+              secondary_text: place.formatted_address
+            }
+          };
+        } catch (error) {
+          console.error('Error fetching place details for', place.name, error);
+          // Fallback to original data if details fetch fails
+          return {
+            place_id: place.place_id,
+            name: place.name,
+            address: place.formatted_address,
+            rating: place.rating,
+            user_ratings_total: place.user_ratings_total,
+            opening_hours: place.opening_hours,
+            photos: place.photos?.[0] ? [{
+              photo_reference: place.photos[0].photo_reference
+            }] : [],
+            geometry: place.geometry,
+            types: place.types,
+            description: `${place.name}, ${place.formatted_address}`,
+            structured_formatting: {
+              main_text: place.name,
+              secondary_text: place.formatted_address
+            }
+          };
         }
-      })) || [];
+      })
+    );
 
     console.log(`Found ${farmersMarkets.length} farmers markets for query: ${query}`);
 
