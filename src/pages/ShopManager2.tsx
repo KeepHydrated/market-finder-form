@@ -586,45 +586,14 @@ export default function ShopManager() {
 
               <div className="flex-1 space-y-6">
                 <TabsContent value="overview" className="space-y-6">
-                  <Card>
-                    <CardContent className="space-y-6 pt-8">
-                      {shopData && (
-                        <div className="flex justify-end">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              if (isEditMode) {
-                                // If currently editing, save the changes
-                                handleSubmit();
-                                setIsEditMode(false);
-                              } else {
-                                // If starting to edit, save current form data as backup
-                                setOriginalFormData({ ...formData });
-                                setIsEditMode(true);
-                              }
-                            }}
-                            disabled={isSubmitting}
-                          >
-                            {isEditMode ? (
-                              <>
-                                <Save className="h-4 w-4 mr-2" />
-                                {isSubmitting ? 'Saving...' : 'Save'}
-                              </>
-                            ) : (
-                              <>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit
-                              </>
-                            )}
-                          </Button>
+                  <div className="flex gap-4">
+                    <Card className="flex-1">
+                      <CardContent className="space-y-6 pt-8">
+                        {/* Farmers Market Search */}
+                        <div className="space-y-2">
+                          <Label>Which farmers markets do you sell at? (Up to 3) *</Label>
+                          <FarmersMarketSearch />
                         </div>
-                      )}
-                      {/* Farmers Market Search */}
-                      <div className="space-y-2">
-                        <Label>Which farmers markets do you sell at? (Up to 3) *</Label>
-                        <FarmersMarketSearch />
-                      </div>
                         
                         <div className="space-y-2">
                           <Label htmlFor="store_name">Store Name *</Label>
@@ -696,6 +665,41 @@ export default function ShopManager() {
                       </Button>
                     </div>
                   )}
+
+                  {/* Edit Button positioned to the right of the card */}
+                  {shopData && (
+                    <div className="flex justify-center">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          if (isEditMode) {
+                            // If currently editing, save the changes
+                            handleSubmit();
+                            setIsEditMode(false);
+                          } else {
+                            // If starting to edit, save current form data as backup
+                            setOriginalFormData({ ...formData });
+                            setIsEditMode(true);
+                          }
+                        }}
+                        disabled={isSubmitting}
+                      >
+                        {isEditMode ? (
+                          <>
+                            <Save className="h-4 w-4 mr-2" />
+                            {isSubmitting ? 'Saving...' : 'Save'}
+                          </>
+                        ) : (
+                          <>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="products-main" className="space-y-6">
