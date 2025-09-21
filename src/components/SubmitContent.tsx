@@ -120,6 +120,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
   }, []);
 
   const handleMarketAdded = useCallback(async (marketData: any) => {
+    console.log('🔍 handleMarketAdded called with:', marketData);
     try {
       // Extract city and state from address
       const addressParts = marketData.address.split(',').map((part: string) => part.trim());
@@ -154,8 +155,11 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
         .single();
 
       if (error) {
+        console.error('🚨 Database error:', error);
         throw error;
       }
+
+      console.log('✅ Market inserted successfully:', data);
 
       // Add new market to local state
       const newMarket: Market = {
@@ -168,8 +172,16 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
         hours: data.hours || ''
       };
       
-      setMarkets(prev => [...prev, newMarket]);
+      console.log('🔍 Creating newMarket object:', newMarket);
+      
+      setMarkets(prev => {
+        console.log('🔍 Previous markets:', prev);
+        const updated = [...prev, newMarket];
+        console.log('🔍 Updated markets:', updated);
+        return updated;
+      });
       setSelectedMarkets(prev => {
+        console.log('🔍 Previous selectedMarkets:', prev);
         const updated = [...prev, newMarket];
         console.log('🔍 Updated selectedMarkets:', updated);
         return updated;
