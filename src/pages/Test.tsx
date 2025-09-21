@@ -1,7 +1,9 @@
+import { FarmersMarketSearch } from '@/components/FarmersMarketSearch';
+
 const Test = () => {
   return (
-    <div className="min-h-screen">
-      {/* Blank test page */}
+    <div className="min-h-screen bg-background">
+      <FarmersMarketSearch />
     </div>
   );
 };
