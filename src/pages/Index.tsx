@@ -181,24 +181,13 @@ const Index = () => {
     setShowAddProductForm(false);
   };
 
-  const handleProductAdded = async (product: { name: string; description: string; price: number; images: File[] }) => {
-    // Convert File objects to base64 strings for persistence
-    const imagePromises = product.images.map(file => {
-      return new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.readAsDataURL(file);
-      });
-    });
-
-    const imageBase64Array = await Promise.all(imagePromises);
-
+  const handleProductAdded = (product: { name: string; description: string; price: number; images: string[] }) => {
     const newProduct: Product = {
       id: Date.now(), // Simple ID generation
       name: product.name,
       description: product.description,
       price: product.price,
-      images: imageBase64Array
+      images: product.images // Now already URLs from storage
     };
     
     setProducts(prev => [...prev, newProduct]);

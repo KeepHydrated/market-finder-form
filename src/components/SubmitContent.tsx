@@ -212,22 +212,13 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
     setShowAddProductForm(true);
   }, []);
 
-  const handleProductAdded = useCallback(async (product: { name: string; description: string; price: number; images: File[] }) => {
-    const imagePromises = product.images.map(file => {
-      return new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.readAsDataURL(file);
-      });
-    });
-
-    const imageBase64Array = await Promise.all(imagePromises);
+  const handleProductAdded = useCallback((product: { name: string; description: string; price: number; images: string[] }) => {
     const newProduct: Product = {
       id: Date.now(),
       name: product.name,
       description: product.description,
       price: product.price,
-      images: imageBase64Array
+      images: product.images // Now already URLs from storage
     };
     
     setProducts(prev => [...prev, newProduct]);

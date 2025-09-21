@@ -7,11 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Upload, X, ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AddProductFormProps {
   open: boolean;
   onClose: () => void;
-  onProductAdded: (product: { name: string; description: string; price: number; images: File[] }) => void;
+  onProductAdded: (product: { name: string; description: string; price: number; images: string[] }) => void;
   editingProduct?: { id: number; name: string; description: string; price: number; images: string[] } | null;
 }
 
@@ -22,7 +24,9 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
   const [images, setImages] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>(editingProduct?.images || []);
   const [websiteSaleEnabled, setWebsiteSaleEnabled] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Update form when editingProduct changes
   useEffect(() => {
@@ -62,7 +66,30 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
     setExistingImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
+  const uploadImages = async (imageFiles: File[]): Promise<string[]> => {
+    if (!user) return [];
+    
+    const uploadPromises = imageFiles.map(async (image, index) => {
+      const fileExt = image.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}-${index}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('product-images')
+        .upload(fileName, image);
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    });
+
+    return Promise.all(uploadPromises);
+  };
+
+  const handleSubmit = async () => {
     if (!productName || !description || !price) {
       toast({
         title: "Missing information",
@@ -72,32 +99,63 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
       return;
     }
 
-    // Combine existing images (as base64) and new images (as Files)
-    const combinedImages = [...existingImages, ...images];
-    
-    const productData = {
-      name: productName,
-      description,
-      price: parseFloat(price),
-      images: combinedImages as any, // Mix of base64 strings and File objects
-      websiteSaleEnabled
-    };
-
-    // Include the ID when editing an existing product
-    if (editingProduct) {
-      (productData as any).id = editingProduct.id;
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to add products.",
+        variant: "destructive",
+      });
+      return;
     }
+
+    setIsUploading(true);
     
-    onProductAdded(productData);
-    
-    // Reset form
-    setProductName('');
-    setDescription('');
-    setPrice('');
-    setImages([]);
-    setExistingImages([]);
-    setWebsiteSaleEnabled(true);
-    onClose();
+    try {
+      // Upload new images to storage
+      const uploadedImageUrls = images.length > 0 ? await uploadImages(images) : [];
+      
+      // Combine existing images with newly uploaded ones
+      const allImageUrls = [...existingImages, ...uploadedImageUrls];
+      
+      const productData = {
+        name: productName,
+        description,
+        price: parseFloat(price),
+        images: allImageUrls,
+        websiteSaleEnabled
+      };
+
+      // Include the ID when editing an existing product
+      if (editingProduct) {
+        (productData as any).id = editingProduct.id;
+      }
+      
+      onProductAdded(productData);
+      
+      // Reset form
+      setProductName('');
+      setDescription('');
+      setPrice('');
+      setImages([]);
+      setExistingImages([]);
+      setWebsiteSaleEnabled(true);
+      onClose();
+      
+      toast({
+        title: editingProduct ? "Product updated" : "Product added",
+        description: editingProduct ? "Product has been updated successfully." : "Product has been added successfully.",
+      });
+      
+    } catch (error: any) {
+      console.error('Error uploading images:', error);
+      toast({
+        title: "Upload failed",
+        description: error.message || "Failed to upload images. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -249,11 +307,11 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
         </div>
 
         <div className="flex justify-end gap-3 pt-6 border-t mt-6">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={isUploading}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>
-            {editingProduct ? 'Update Product' : 'Add Product'}
+          <Button onClick={handleSubmit} disabled={isUploading}>
+            {isUploading ? 'Uploading...' : (editingProduct ? 'Update Product' : 'Add Product')}
           </Button>
         </div>
       </DialogContent>
