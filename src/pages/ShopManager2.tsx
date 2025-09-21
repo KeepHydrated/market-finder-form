@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
 import { Plus } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/auth/AuthForm';
@@ -906,29 +907,29 @@ export default function ShopManager() {
                             Temporarily hide your store from customers
                           </p>
                         </div>
-                        <Button
-                          variant={shopData?.vacation_mode ? "default" : "outline"}
-                          onClick={async () => {
+                        <Switch
+                          checked={shopData?.vacation_mode || false}
+                          onCheckedChange={async (checked) => {
                             if (!user || !shopData) return;
                             
                             try {
                               const { error } = await supabase
                                 .from('submissions')
                                 .update({ 
-                                  vacation_mode: !shopData.vacation_mode,
+                                  vacation_mode: checked,
                                   updated_at: new Date().toISOString()
                                 })
                                 .eq('id', shopData.id);
 
                               if (error) throw error;
 
-                              setShopData(prev => prev ? {...prev, vacation_mode: !prev.vacation_mode} : null);
+                              setShopData(prev => prev ? {...prev, vacation_mode: checked} : null);
                               
                               toast({
-                                title: shopData.vacation_mode ? "Vacation Mode Disabled" : "Vacation Mode Enabled",
-                                description: shopData.vacation_mode 
-                                  ? "Your store is now visible to customers"
-                                  : "Your store is now hidden from customers"
+                                title: checked ? "Vacation Mode Enabled" : "Vacation Mode Disabled",
+                                description: checked 
+                                  ? "Your store is now hidden from customers"
+                                  : "Your store is now visible to customers"
                               });
                             } catch (error: any) {
                               toast({
@@ -938,9 +939,7 @@ export default function ShopManager() {
                               });
                             }
                           }}
-                        >
-                          {shopData?.vacation_mode ? 'Disable' : 'Enable'}
-                        </Button>
+                        />
                       </div>
 
                       <div className="p-4 border border-destructive rounded-lg bg-destructive/5">
