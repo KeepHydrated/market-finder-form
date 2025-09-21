@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
-import { Plus } from 'lucide-react';
+import { Edit, Save, Plus } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { ProductGrid } from '@/components/ProductGrid';
@@ -64,6 +64,8 @@ export default function ShopManager() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [activeMarketTab, setActiveMarketTab] = useState<number | null>(null);
   const [userSubmittedMarketIds, setUserSubmittedMarketIds] = useState<number[]>([]);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [originalFormData, setOriginalFormData] = useState<any>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -570,6 +572,39 @@ export default function ShopManager() {
               </div>
             )}
 
+            <div className="flex items-center justify-between mb-6">
+              <div></div>
+              {shopData && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (isEditMode) {
+                      // If currently editing, save the changes
+                      handleSubmit();
+                      setIsEditMode(false);
+                    } else {
+                      // If starting to edit, save current form data as backup
+                      setOriginalFormData({ ...formData });
+                      setIsEditMode(true);
+                    }
+                  }}
+                  disabled={isSubmitting}
+                >
+                  {isEditMode ? (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      {isSubmitting ? 'Saving...' : 'Save'}
+                    </>
+                  ) : (
+                    <>
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+
             <Tabs defaultValue={shopData ? "overview2" : "overview"} className="flex gap-6">
               <TabsList className="flex flex-col h-fit w-48 space-y-1 p-1">
                 {shopData && (
@@ -598,6 +633,7 @@ export default function ShopManager() {
                             value={formData.store_name}
                             onChange={(e) => setFormData(prev => ({ ...prev, store_name: e.target.value }))}
                             placeholder="Enter your store name"
+                            disabled={shopData && !isEditMode}
                           />
                         </div>
 
@@ -606,6 +642,7 @@ export default function ShopManager() {
                           <Select
                             value={formData.primary_specialty}
                             onValueChange={(value) => setFormData(prev => ({ ...prev, primary_specialty: value }))}
+                            disabled={shopData && !isEditMode}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select a specialty" />
@@ -628,6 +665,7 @@ export default function ShopManager() {
                             value={formData.website}
                             onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
                             placeholder="https://example.com"
+                            disabled={shopData && !isEditMode}
                           />
                         </div>
 
@@ -639,22 +677,25 @@ export default function ShopManager() {
                             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                             placeholder="Tell us about your shop..."
                             rows={4}
+                            disabled={shopData && !isEditMode}
                           />
                         </div>
                       </CardContent>
                   </Card>
 
-                  {/* Submit Button */}
-                  <div className="flex justify-center pt-6">
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={isSubmitting}
-                      size="lg"
-                      className="px-8"
-                    >
-                      {isSubmitting ? 'Submitting...' : shopData ? 'Update Submission' : 'Submit for Review'}
-                    </Button>
-                  </div>
+                  {/* Submit Button - Only show if no shopData or in edit mode */}
+                  {(!shopData || isEditMode) && (
+                    <div className="flex justify-center pt-6">
+                      <Button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        size="lg"
+                        className="px-8"
+                      >
+                        {isSubmitting ? 'Submitting...' : shopData ? 'Update Submission' : 'Submit for Review'}
+                      </Button>
+                    </div>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="products-main" className="space-y-6">
