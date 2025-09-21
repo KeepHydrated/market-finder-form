@@ -63,13 +63,6 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 Farmer's Market Hub
               </h1>
             </Link>
-            {user?.email === 'nadiachibri@gmail.com' && (
-              <Link to="/submissions" className="ml-6">
-                <Button variant={location.pathname === '/submissions' ? "default" : "outline"}>
-                  Submissions
-                </Button>
-              </Link>
-            )}
           </div>
           <div className="flex items-center space-x-4">
             <Link to="/likes">
