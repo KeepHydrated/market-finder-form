@@ -365,9 +365,16 @@ export default function ShopManager() {
   };
 
   const handleAddProduct = (product: any) => {
+    console.log('Adding product:', product);
     const updatedProducts = [...products, { ...product, id: Date.now() }];
+    console.log('Updated products list:', updatedProducts);
     setProducts(updatedProducts);
     setShowAddProduct(false);
+    
+    toast({
+      title: "Product Added",
+      description: `${product.name} has been added to your product list.`,
+    });
   };
 
   const handleEditProduct = (product: any) => {
