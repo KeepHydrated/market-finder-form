@@ -5,12 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Store, Package, ShoppingCart, DollarSign, Edit, Plus, Calendar, Trash2, User } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { ProductGrid } from '@/components/ProductGrid';
@@ -27,27 +23,11 @@ interface ShopData {
   website: string;
   description: string;
   products: any[];
-  selected_market: string;
+  selected_markets: any[];
   search_term: string;
-  market_address?: string;
-  market_days?: string[];
-  market_hours?: any; // Changed from Record to any for flexibility
-  status: string;
-  vacation_mode?: boolean;
-}
-
-interface Order {
-  id: string;
-  email: string;
-  total_amount: number;
   status: string;
   created_at: string;
-  order_items: {
-    product_name: string;
-    quantity: number;
-    unit_price: number;
-    total_price: number;
-  }[];
+  updated_at: string;
 }
 
 const SPECIALTY_CATEGORIES = [
@@ -69,11 +49,8 @@ export default function ShopManager() {
   const { user, loading } = useAuth();
   const { toast } = useToast();
   const [shopData, setShopData] = useState<ShopData | null>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setSaving] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadingShop, setLoadingShop] = useState(true);
-  const [loadingOrders, setLoadingOrders] = useState(true);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [markets, setMarkets] = useState<any[]>([]);
@@ -83,11 +60,18 @@ export default function ShopManager() {
   const [editingMarket, setEditingMarket] = useState<any>(null);
   const [replacementMarket, setReplacementMarket] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
-  const [vacationMode, setVacationMode] = useState(false);
   const [activeMarketTab, setActiveMarketTab] = useState<number | null>(null);
   const [userSubmittedMarketIds, setUserSubmittedMarketIds] = useState<number[]>([]);
+
+  // Form state
+  const [formData, setFormData] = useState({
+    store_name: '',
+    primary_specialty: '',
+    website: '',
+    description: '',
+  });
+
+  const [products, setProducts] = useState<any[]>([]);
 
   // Check for public access via URL parameter
   const isPublicAccess = new URLSearchParams(window.location.search).get('demo') === 'true';
@@ -116,70 +100,39 @@ export default function ShopManager() {
     }
   };
 
-  // Form state
-  const [formData, setFormData] = useState({
-    store_name: '',
-    primary_specialty: '',
-    website: '',
-    description: '',
-  });
-
   useEffect(() => {
     if (user) {
       fetchShopData();
       fetchMarkets();
       fetchUserProfile();
     } else if (isPublicAccess) {
-      // Load demo data for public access
       loadDemoData();
     }
   }, [user, isPublicAccess]);
-
-  useEffect(() => {
-    if (shopData) {
-      fetchOrders();
-    }
-  }, [shopData]);
 
   const fetchShopData = async () => {
     if (!user) return;
 
     try {
+      // Check if user has any existing submissions
       const { data, error } = await supabase
         .from('submissions')
         .select('*')
         .eq('user_id', user.id)
-        .eq('status', 'accepted')
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
 
       if (error) {
         console.error('Error fetching shop data:', error);
+        setLoadingShop(false);
         return;
       }
 
       if (data) {
-        console.log('Raw data from database:', [data]); // Debug log
         const parsedData = {
           ...data,
           products: typeof data.products === 'string' ? JSON.parse(data.products) : data.products || [],
-          market_hours: (() => {
-            try {
-              if (typeof data.market_hours === 'string') {
-                // Remove extra quotes if present
-                let hoursString = data.market_hours;
-                if (hoursString.startsWith('"') && hoursString.endsWith('"')) {
-                  hoursString = hoursString.slice(1, -1);
-                }
-                return hoursString;
-              }
-              return data.market_hours || null;
-            } catch (e) {
-              console.error('Error parsing market_hours:', e);
-              return data.market_hours || null;
-            }
-          })(),
           selected_markets: (() => {
             try {
               return Array.isArray(data.selected_markets) ? data.selected_markets : [];
@@ -189,9 +142,10 @@ export default function ShopManager() {
             }
           })()
         };
-        console.log('Parsed submissions:', [parsedData]); // Debug log
+        
         setShopData(parsedData);
         setSelectedMarkets(parsedData.selected_markets || []);
+        setProducts(parsedData.products || []);
         setFormData({
           store_name: parsedData.store_name || '',
           primary_specialty: parsedData.primary_specialty || '',
@@ -199,7 +153,6 @@ export default function ShopManager() {
           description: parsedData.description || '',
         });
         setMarketSearchTerm(parsedData.search_term || '');
-        setVacationMode(parsedData.vacation_mode ?? false);
       }
     } catch (error) {
       console.error('Error fetching shop data:', error);
@@ -214,7 +167,7 @@ export default function ShopManager() {
       store_name: 'Demo Fresh Market',
       primary_specialty: 'Organic Produce',
       website: 'https://demo-fresh-market.com',
-      description: 'A demonstration shop showcasing fresh, organic produce and artisanal goods. This is a demo version for testing purposes.',
+      description: 'A demonstration shop showcasing fresh, organic produce and artisanal goods.',
       products: [
         {
           id: 1,
@@ -223,74 +176,17 @@ export default function ShopManager() {
           category: 'Fruits',
           description: 'Fresh organic apples from local orchards',
           image: '/placeholder.svg'
-        },
-        {
-          id: 2,
-          name: 'Farm Fresh Eggs',
-          price: 650,
-          category: 'Dairy',
-          description: 'Free-range eggs from happy chickens',
-          image: '/placeholder.svg'
-        },
-        {
-          id: 3,
-          name: 'Artisan Bread',
-          price: 550,
-          category: 'Bakery',
-          description: 'Handcrafted sourdough bread',
-          image: '/placeholder.svg'
         }
       ],
-      selected_market: 'Downtown Farmers Market',
+      selected_markets: [],
       search_term: 'Downtown Farmers Market',
-      market_address: '123 Main St, Downtown',
-      market_days: ['Saturday', 'Sunday'],
-      market_hours: { saturday: '8AM-2PM', sunday: '9AM-1PM' },
-      status: 'accepted',
-      vacation_mode: false
+      status: 'pending',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
 
-    const demoOrders: Order[] = [
-      {
-        id: 'demo-order-1',
-        email: 'customer@example.com',
-        total_amount: 1100,
-        status: 'completed',
-        created_at: new Date(Date.now() - 86400000).toISOString(),
-        order_items: [
-          {
-            product_name: 'Organic Apples',
-            quantity: 2,
-            unit_price: 450,
-            total_price: 900
-          },
-          {
-            product_name: 'Farm Fresh Eggs',
-            quantity: 1,
-            unit_price: 650,
-            total_price: 650
-          }
-        ]
-      },
-      {
-        id: 'demo-order-2',
-        email: 'another@example.com',
-        total_amount: 550,
-        status: 'completed',
-        created_at: new Date(Date.now() - 172800000).toISOString(),
-        order_items: [
-          {
-            product_name: 'Artisan Bread',
-            quantity: 1,
-            unit_price: 550,
-            total_price: 550
-          }
-        ]
-      }
-    ];
-
     setShopData(demoShop);
-    setOrders(demoOrders);
+    setProducts(demoShop.products || []);
     setFormData({
       store_name: demoShop.store_name,
       primary_specialty: demoShop.primary_specialty,
@@ -298,9 +194,7 @@ export default function ShopManager() {
       description: demoShop.description,
     });
     setMarketSearchTerm(demoShop.search_term);
-    setVacationMode(demoShop.vacation_mode || false);
     setLoadingShop(false);
-    setLoadingOrders(false);
   };
 
   const fetchMarkets = async () => {
@@ -318,110 +212,100 @@ export default function ShopManager() {
       const marketData = data || [];
       setMarkets(marketData);
       
-      // Clear selected markets, tabs, and search term if no markets exist
+      // Clear selected markets if no markets exist
       if (marketData.length === 0) {
         setSelectedMarkets([]);
         setActiveMarketTab(null);
         setMarketSearchTerm('');
-        
-        // Also update the database to clear selected markets and search term
-        if (user && shopData) {
-          const { error: updateError } = await supabase
-            .from('submissions')
-            .update({ 
-              selected_markets: [],
-              search_term: '',
-              updated_at: new Date().toISOString()
-            })
-            .eq('user_id', user.id);
-
-          if (updateError) {
-            console.error('❌ Error clearing selected markets and search term:', updateError);
-          }
-        }
       }
     } catch (error) {
       console.error('Error fetching markets:', error);
     }
   };
 
-  const fetchOrders = async () => {
-    if (!user || !shopData) return;
+  const handleSubmit = async () => {
+    if (!user) return;
 
+    // Validation
+    if (!formData.store_name.trim()) {
+      toast({
+        title: "Store Name Required",
+        description: "Please enter a store name.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.primary_specialty) {
+      toast({
+        title: "Specialty Required", 
+        description: "Please select a primary specialty.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select(`
-          id,
-          email,
-          total_amount,
-          status,
-          created_at,
-          order_items (
-            product_name,
-            quantity,
-            unit_price,
-            total_price
-          )
-        `)
-        .eq('vendor_id', shopData.id) // Use shop ID instead of user ID
-        .order('created_at', { ascending: false });
+      const submissionData = {
+        user_id: user.id,
+        store_name: formData.store_name.trim(),
+        primary_specialty: formData.primary_specialty,
+        website: formData.website.trim(),
+        description: formData.description.trim(),
+        products: products,
+        selected_markets: selectedMarkets,
+        search_term: marketSearchTerm,
+        status: 'pending'
+      };
 
-      if (error) {
-        console.error('Error fetching orders:', error);
-        return;
+      if (shopData) {
+        // Update existing submission
+        const { error } = await supabase
+          .from('submissions')
+          .update({
+            ...submissionData,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', shopData.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Submission Updated",
+          description: "Your submission has been updated successfully.",
+        });
+      } else {
+        // Create new submission
+        const { error } = await supabase
+          .from('submissions')
+          .insert([submissionData]);
+
+        if (error) throw error;
+
+        toast({
+          title: "Submission Created",
+          description: "Your submission has been created and is pending review.",
+        });
       }
 
-      setOrders(data || []);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-    } finally {
-      setLoadingOrders(false);
-    }
-  };
-
-  const handleSaveShop = async () => {
-    if (!user || !shopData) return;
-
-    setSaving(true);
-    try {
-      const { error } = await supabase
-        .from('submissions')
-        .update({
-          store_name: formData.store_name,
-          primary_specialty: formData.primary_specialty,
-          website: formData.website,
-          description: formData.description,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', shopData.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Shop Updated",
-        description: "Your shop information has been successfully updated.",
-      });
-
-      setIsEditing(false);
-      fetchShopData(); // Refresh data
+      // Refresh data
+      await fetchShopData();
     } catch (error: any) {
-      console.error('Error updating shop:', error);
+      console.error('Error submitting:', error);
       toast({
-        title: "Update Failed",
-        description: error.message || "Failed to update shop information.",
+        title: "Submission Failed",
+        description: error.message || "Failed to submit your information.",
         variant: "destructive",
       });
     } finally {
-      setSaving(false);
+      setIsSubmitting(false);
     }
   };
 
   const handleAddProduct = (product: any) => {
-    if (!shopData) return;
-
-    const updatedProducts = [...(shopData.products || []), { ...product, id: Date.now() }];
-    updateProducts(updatedProducts);
+    const updatedProducts = [...products, { ...product, id: Date.now() }];
+    setProducts(updatedProducts);
     setShowAddProduct(false);
   };
 
@@ -431,69 +315,31 @@ export default function ShopManager() {
   };
 
   const handleUpdateProduct = (updatedProduct: any) => {
-    if (!shopData) return;
-
-    const updatedProducts = shopData.products.map(p => 
+    const updatedProducts = products.map(p => 
       p.id === updatedProduct.id ? updatedProduct : p
     );
-    updateProducts(updatedProducts);
+    setProducts(updatedProducts);
     setShowAddProduct(false);
     setEditingProduct(null);
   };
 
   const handleDeleteProduct = (productId: number) => {
-    if (!shopData) return;
-
-    const updatedProducts = shopData.products.filter(p => p.id !== productId);
-    updateProducts(updatedProducts);
+    const updatedProducts = products.filter(p => p.id !== productId);
+    setProducts(updatedProducts);
   };
 
   const handleDuplicateProduct = (product: any) => {
-    if (!shopData) return;
-
     const newProduct = {
       ...product,
       id: Date.now(),
       name: `${product.name} (Copy)`
     };
-    const updatedProducts = [newProduct, ...shopData.products];
-    updateProducts(updatedProducts);
-  };
-
-  const updateProducts = async (products: any[]) => {
-    if (!shopData || !user) return;
-
-    try {
-      const { error } = await supabase
-        .from('submissions')
-        .update({
-          products: JSON.stringify(products),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', shopData.id);
-
-      if (error) throw error;
-
-      setShopData(prev => prev ? { ...prev, products } : null);
-      
-      toast({
-        title: "Products Updated",
-        description: "Your product list has been updated.",
-      });
-    } catch (error: any) {
-      console.error('Error updating products:', error);
-      toast({
-        title: "Update Failed",
-        description: "Failed to update products.",
-        variant: "destructive",
-      });
-    }
+    const updatedProducts = [newProduct, ...products];
+    setProducts(updatedProducts);
   };
 
   const handleMarketSelect = async (market: any) => {
-    if (!shopData) return;
-
-    // Check if market is already selected, but allow if we're replacing a market
+    // Check if market is already selected
     if (selectedMarkets.some(m => m.id === market.id) && activeMarketTab === null) {
       toast({
         title: "Market Already Selected",
@@ -508,33 +354,12 @@ export default function ShopManager() {
       const newSelectedMarkets = [...selectedMarkets];
       newSelectedMarkets[activeMarketTab] = market;
       setSelectedMarkets(newSelectedMarkets);
+      setActiveMarketTab(null);
       
-      try {
-        setSaving(true);
-        const { error } = await supabase
-          .from('submissions')
-          .update({ 
-            selected_markets: newSelectedMarkets,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', user?.id);
-
-        if (error) throw error;
-
-        toast({
-          title: "Market Updated",
-          description: `Successfully replaced with ${market.name}`,
-        });
-      } catch (error) {
-        console.error('Error updating markets:', error);
-        toast({
-          title: "Error",
-          description: "Failed to update market selection.",
-          variant: "destructive",
-        });
-      } finally {
-        setSaving(false);
-      }
+      toast({
+        title: "Market Updated",
+        description: `Market has been updated in your selection.`,
+      });
       return;
     }
 
@@ -542,127 +367,46 @@ export default function ShopManager() {
     if (selectedMarkets.length >= 3) {
       toast({
         title: "Maximum Markets Reached",
-        description: "You can only select up to 3 farmers markets. Remove one to add a different market.",
+        description: "You can select up to 3 markets. Remove a market first or replace an existing one.",
         variant: "destructive",
       });
       return;
     }
 
-    try {
-      const newSelectedMarkets = [...selectedMarkets, market];
-      
-      const { error } = await supabase
-        .from('submissions')
-        .update({
-          selected_markets: newSelectedMarkets,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', shopData.id);
-
-      if (error) throw error;
-
-      setSelectedMarkets(newSelectedMarkets);
-      setShopData(prev => prev ? {
-        ...prev,
-        selected_markets: newSelectedMarkets,
-      } : null);
-
-      toast({
-        title: "Market Added",
-        description: `You've joined ${market.name}. ${3 - newSelectedMarkets.length} market slots remaining.`,
-      });
-    } catch (error: any) {
-      console.error('Error selecting market:', error);
-      toast({
-        title: "Selection Failed",
-        description: error.message || "Failed to select market.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleRemoveMarket = async (marketToRemove: any) => {
-    if (!shopData) return;
-
-    try {
-      const newSelectedMarkets = selectedMarkets.filter(m => m.id !== marketToRemove.id);
-      
-      // Clear search term when removing a market
-      setMarketSearchTerm('');
-      
-      const { error } = await supabase
-        .from('submissions')
-        .update({
-          selected_markets: newSelectedMarkets,
-          search_term: '', // Clear search term in database
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', shopData.id);
-
-      if (error) throw error;
-
-      setSelectedMarkets(newSelectedMarkets);
-      setShopData(prev => prev ? {
-        ...prev,
-        selected_markets: newSelectedMarkets,
-        search_term: '', // Clear search term in shop data
-      } : null);
-
-      toast({
-        title: "Market Removed",
-        description: `${marketToRemove.name} has been removed from your selected markets.`,
-      });
-    } catch (error: any) {
-      console.error('Error removing market:', error);
-      toast({
-        title: "Removal Failed",
-        description: error.message || "Failed to remove market.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleReplaceMarket = async (oldMarket: any, newMarket: any) => {
-    console.log('handleReplaceMarket called:', {
-      oldMarket: oldMarket.name,
-      newMarket: newMarket.name,
-      currentSelectedMarkets: selectedMarkets.map((m: any) => m.name)
-    });
+    // Add new market
+    const newSelectedMarkets = [...selectedMarkets, market];
+    setSelectedMarkets(newSelectedMarkets);
+    setActiveMarketTab(newSelectedMarkets.length - 1);
     
-    if (!shopData) return;
+    toast({
+      title: "Market Added",
+      description: `${market.name} has been added to your selected markets.`,
+    });
+  };
 
-    try {
-      const newSelectedMarkets = selectedMarkets.map(m => m.id === oldMarket.id ? newMarket : m);
-      
-      const { error } = await supabase
-        .from('submissions')
-        .update({
-          selected_markets: newSelectedMarkets,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', shopData.id);
-
-      if (error) throw error;
-
-      console.log('Updated selected markets:', newSelectedMarkets.map((m: any) => m.name));
-      setSelectedMarkets(newSelectedMarkets);
-      setShopData(prev => prev ? {
-        ...prev,
-        selected_markets: newSelectedMarkets,
-      } : null);
-
-      toast({
-        title: "Market Replaced",
-        description: `${oldMarket.name} has been replaced with ${newMarket.name}.`,
-      });
-    } catch (error: any) {
-      console.error('Error replacing market:', error);
-      toast({
-        title: "Replacement Failed",
-        description: error.message || "Failed to replace market.",
-        variant: "destructive",
-      });
+  const handleRemoveMarket = (marketIndex: number) => {
+    const newSelectedMarkets = selectedMarkets.filter((_, index) => index !== marketIndex);
+    setSelectedMarkets(newSelectedMarkets);
+    
+    // Reset active tab if needed
+    if (activeMarketTab === marketIndex) {
+      setActiveMarketTab(null);
+    } else if (activeMarketTab !== null && activeMarketTab > marketIndex) {
+      setActiveMarketTab(activeMarketTab - 1);
     }
+    
+    toast({
+      title: "Market Removed",
+      description: "Market has been removed from your selection.",
+    });
+  };
+
+  const handleReplaceMarket = (marketIndex: number) => {
+    setActiveMarketTab(marketIndex);
+    toast({
+      title: "Replace Market",
+      description: "Select a new market to replace the current one.",
+    });
   };
 
   const handleEditMarket = (market: any) => {
@@ -671,65 +415,20 @@ export default function ShopManager() {
   };
 
   const handleAddMarket = async (marketData: any) => {
-    console.log('handleAddMarket called with:', marketData);
-    console.log('EditingMarket:', editingMarket);
-    
     try {
-      // Format the hours object as JSON string for database storage
-      const formattedMarketData = {
-        name: marketData.name,
-        address: marketData.address,
-        city: marketData.city || '',
-        state: marketData.state || '',
-        days: marketData.days,
-        hours: JSON.stringify(marketData.hours)
-      };
-
-      console.log('Formatted market data:', formattedMarketData);
-
-      let data;
       if (editingMarket) {
         // Update existing market
         const { data: updateData, error } = await supabase
           .from('markets')
-          .update(formattedMarketData)
+          .update(marketData)
           .eq('id', editingMarket.id)
           .select()
           .single();
 
         if (error) throw error;
-        data = updateData;
-
+        
         // Update the markets list
-        setMarkets(prev => prev.map(m => m.id === editingMarket.id ? data : m));
-        
-        // Also update selectedMarkets if this market is in the selection
-        const updatedSelectedMarkets = selectedMarkets.map(m => 
-          m.id === editingMarket.id ? data : m
-        );
-        
-        if (updatedSelectedMarkets.some(m => m.id === editingMarket.id)) {
-          console.log('🔍 Updating selected markets with new data');
-          setSelectedMarkets(updatedSelectedMarkets);
-          
-          // Update the database with new selected markets data
-          const { error: updateError } = await supabase
-            .from('submissions')
-            .update({ 
-              selected_markets: updatedSelectedMarkets,
-              updated_at: new Date().toISOString()
-            })
-            .eq('user_id', user?.id);
-
-          if (updateError) {
-            console.error('❌ Error updating selected markets:', updateError);
-          }
-          
-          setShopData(prev => prev ? {
-            ...prev,
-            selected_markets: updatedSelectedMarkets,
-          } : null);
-        }
+        setMarkets(prev => prev.map(m => m.id === editingMarket.id ? updateData : m));
         
         toast({
           title: "Market Updated",
@@ -740,86 +439,21 @@ export default function ShopManager() {
         const { data: insertData, error } = await supabase
           .from('markets')
           .insert([{
-            ...formattedMarketData,
+            ...marketData,
             user_id: user?.id // Track who created this market
           }])
           .select()
           .single();
 
         if (error) throw error;
-        data = insertData;
 
-        setMarkets(prev => [...prev, data]);
-        
-        // Track this as a user-submitted market
-        setUserSubmittedMarketIds(prev => [...prev, data.id]);
+        setMarkets(prev => [...prev, insertData]);
+        setUserSubmittedMarketIds(prev => [...prev, insertData.id]);
         
         toast({
           title: "Market Added",
           description: `${marketData.name} has been added to available markets.`,
         });
-      }
-
-      // Handle replacement logic when replacementMarket is set (replacement scenario)
-      if (replacementMarket) {
-        // Find the market to replace in selectedMarkets
-        const marketIndex = selectedMarkets.findIndex(m => m.id === replacementMarket.id);
-        if (marketIndex !== -1) {
-          const newSelectedMarkets = [...selectedMarkets];
-          newSelectedMarkets[marketIndex] = data;
-          
-          // Update the database
-          const { error: updateError } = await supabase
-            .from('submissions')
-            .update({ 
-              selected_markets: newSelectedMarkets,
-              updated_at: new Date().toISOString()
-            })
-            .eq('user_id', user?.id);
-
-          if (updateError) throw updateError;
-
-          setSelectedMarkets(newSelectedMarkets);
-          setShopData(prev => prev ? {
-            ...prev,
-            selected_markets: newSelectedMarkets,
-          } : null);
-
-          toast({
-            title: "Market Replaced",
-            description: `${replacementMarket.name} has been replaced with ${marketData.name}.`,
-          });
-        }
-      } else if (!editingMarket) {
-        // For new market creation without replacement, add to selected markets if under limit
-        if (selectedMarkets.length < 3) {
-          const newSelectedMarkets = [...selectedMarkets, data];
-          
-          // Update the database
-          const { error: updateError } = await supabase
-            .from('submissions')
-            .update({ 
-              selected_markets: newSelectedMarkets,
-              updated_at: new Date().toISOString()
-            })
-            .eq('user_id', user?.id);
-
-          if (updateError) throw updateError;
-
-          setSelectedMarkets(newSelectedMarkets);
-          setShopData(prev => prev ? {
-            ...prev,
-            selected_markets: newSelectedMarkets,
-          } : null);
-
-          // Set the newly added market as the active tab
-          setActiveMarketTab(newSelectedMarkets.length - 1);
-          
-          toast({
-            title: "Market Added to Selection",
-            description: `${marketData.name} has been added to your selected markets.`,
-          });
-        }
       }
 
       setShowAddMarket(false);
@@ -857,18 +491,6 @@ export default function ShopManager() {
       
       // Clear search term since we're deleting markets
       setMarketSearchTerm('');
-      
-      // Update database if it was in selected markets or clear search term
-      if (selectedMarkets.some(m => m.id === market.id) || marketSearchTerm) {
-        await supabase
-          .from('submissions')
-          .update({ 
-            selected_markets: updatedSelectedMarkets,
-            search_term: '', // Clear search term
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', user?.id);
-      }
 
       // Reset active tab if needed
       if (activeMarketTab !== null && selectedMarkets[activeMarketTab]?.id === market.id) {
@@ -892,330 +514,186 @@ export default function ShopManager() {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    if (!user) return;
-
-    setIsDeletingAccount(true);
-    try {
-      // First delete user's profile and related data
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('user_id', user.id);
-
-      if (profileError) throw profileError;
-
-      // Delete user's submissions (shops)
-      const { error: submissionsError } = await supabase
-        .from('submissions')
-        .delete()
-        .eq('user_id', user.id);
-
-      if (submissionsError) throw submissionsError;
-
-      // Delete the auth user account
-      const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
-      
-      if (authError) throw authError;
-
-      toast({
-        title: "Account Deleted",
-        description: "Your account has been permanently deleted.",
-      });
-
-      // Sign out and redirect to homepage
-      await supabase.auth.signOut();
-      window.location.href = '/';
-    } catch (error: any) {
-      console.error('Error deleting account:', error);
-      toast({
-        title: "Delete Failed",
-        description: error.message || "Failed to delete account.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsDeletingAccount(false);
-    }
-  };
-
-  const handleDeleteShop = async () => {
-    if (!user || !shopData) return;
-
-    setIsDeleting(true);
-    try {
-      const { error } = await supabase
-        .from('submissions')
-        .delete()
-        .eq('id', shopData.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Shop Deleted",
-        description: "Your shop has been permanently deleted.",
-      });
-
-      // Navigate to homepage after deletion
-      window.location.href = '/';
-    } catch (error: any) {
-      console.error('Error deleting shop:', error);
-      toast({
-        title: "Delete Failed",
-        description: error.message || "Failed to delete shop.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const handleVacationModeToggle = async (enabled: boolean) => {
-    if (!user || !shopData || isPublicAccess) return;
-
-    try {
-      const { error } = await supabase
-        .from('submissions')
-        .update({
-          vacation_mode: enabled,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', shopData.id);
-
-      if (error) throw error;
-
-      setVacationMode(enabled);
-      setShopData(prev => prev ? { ...prev, vacation_mode: enabled } : null);
-
-      toast({
-        title: enabled ? "Vacation Mode Enabled" : "Vacation Mode Disabled",
-        description: enabled 
-          ? "Your shop is now marked as on vacation and won't appear in search results." 
-          : "Your shop is now active and visible to customers.",
-      });
-    } catch (error: any) {
-      console.error('Error updating vacation mode:', error);
-      toast({
-        title: "Update Failed",
-        description: error.message || "Failed to update vacation mode.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const formatPrice = (cents: number) => {
-    return `$${(cents / 100).toFixed(2)}`;
-  };
-
-  const getTotalRevenue = () => {
-    return orders
-      .filter(order => order.status === 'completed')
-      .reduce((sum, order) => sum + order.total_amount, 0);
-  };
-
-  const getTotalOrders = () => {
-    return orders.filter(order => order.status === 'completed').length;
-  };
-
-  if (loading || loadingShop) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!user && !isPublicAccess) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Sign In Required</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Please sign in to manage your shop.
-            </p>
-            <AuthForm />
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!shopData) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>No Shop Found</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              You don't have an approved shop yet. Please complete the vendor application process first.
-            </p>
-            <Button onClick={() => window.location.href = '/profile'}>
-              Go to Application
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+  if (loading) {
+    return <div className="text-center py-8">Loading...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          {isPublicAccess && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <p className="text-blue-800 font-medium">
-                🎯 Demo Mode - This is a demonstration of the shop manager interface
-              </p>
-              <p className="text-blue-600 text-sm mt-1">
-                All data shown is sample data for demonstration purposes
-              </p>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-6xl mx-auto p-6">
+        {!user && !isPublicAccess ? (
+          <div className="flex items-center justify-center min-h-screen">
+            <AuthForm />
+          </div>
+        ) : loadingShop ? (
+          <div className="text-center py-8">Loading...</div>
+        ) : (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h1 className="text-3xl font-bold">
+                {shopData ? `Update Submission - ${shopData.status}` : 'Submit Your Shop'}
+              </h1>
+              {shopData && (
+                <div className="text-right">
+                  <p className="text-sm text-muted-foreground">
+                    Status: <span className="font-medium capitalize">{shopData.status}</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Last updated: {new Date(shopData.updated_at).toLocaleDateString()}
+                  </p>
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        <Tabs defaultValue="products" className="flex gap-6">
-          <TabsList className="flex flex-col h-fit w-48 space-y-1 p-1">
-            <TabsTrigger value="shop" className="w-full justify-start">Shop Information</TabsTrigger>
-            <TabsTrigger value="products" className="w-full justify-start">Products</TabsTrigger>
-          </TabsList>
+            {isPublicAccess && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-blue-800 font-medium">
+                  🚧 Demo Mode - This is a preview of the submission interface
+                </p>
+                <p className="text-blue-600 text-sm mt-1">
+                  All data shown is sample data for demonstration purposes
+                </p>
+              </div>
+            )}
 
-          <div className="flex-1 space-y-6">
+            <Tabs defaultValue="shop" className="flex gap-6">
+              <TabsList className="flex flex-col h-fit w-48 space-y-1 p-1">
+                <TabsTrigger value="shop" className="w-full justify-start">Shop Information</TabsTrigger>
+                <TabsTrigger value="products" className="w-full justify-start">Products</TabsTrigger>
+              </TabsList>
 
-
-          <TabsContent value="shop" className="space-y-6 max-w-2xl">
-            <div className="flex gap-4 items-start">
-              <Card className="flex-1">
-                <CardContent className="space-y-6 pt-6">
-                  {/* Farmers Markets Section */}
-                  <MarketSearch
-                    markets={markets}
-                    searchTerm={marketSearchTerm}
-                    onSearchTermChange={setMarketSearchTerm}
-                    onSelectMarket={handleMarketSelect}
+              <div className="flex-1 space-y-6">
+                <TabsContent value="shop" className="space-y-6 max-w-2xl">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Shop Information</CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        Fill out your shop details to get started
+                      </p>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Farmers Markets Section */}
+                      <MarketSearch
+                        markets={markets}
+                        searchTerm={marketSearchTerm}
+                        onSearchTermChange={setMarketSearchTerm}
+                        onSelectMarket={handleMarketSelect}
                         onAddMarket={(replacementMarket) => {
-                          // Clear any previous state and ensure form is blank
                           setReplacementMarket(null);
-                          setEditingMarket(null); // Keep null so form shows as "Add Market"
+                          setEditingMarket(null);
                           setShowAddMarket(true);
                         }}
-                    onEditMarket={handleEditMarket}
-                    submittedMarketName={shopData?.selected_market}
-                    selectedMarkets={selectedMarkets}
-                    onRemoveMarket={handleRemoveMarket}
-                    activeMarketTab={activeMarketTab}
-                    onMarketTabChange={setActiveMarketTab}
-                    onReplaceMarket={handleReplaceMarket}
-                    userSubmittedMarketIds={userSubmittedMarketIds}
-                    disabled={!isEditing}
-                  />
-                  
-                  {/* Store Information Section */}
-                  <div className="space-y-4 pt-4 border-t">
-                    <div className="space-y-2">
-                      <Label htmlFor="store_name">Store Name</Label>
-                      <Input
-                        id="store_name"
-                        value={formData.store_name}
-                        onChange={(e) => setFormData(prev => ({ ...prev, store_name: e.target.value }))}
-                        disabled={!isEditing}
+                        onEditMarket={handleEditMarket}
+                        submittedMarketName={undefined}
+                        selectedMarkets={selectedMarkets}
+                        onRemoveMarket={(market) => {
+                          const marketIndex = selectedMarkets.findIndex(m => m.id === market.id);
+                          if (marketIndex !== -1) handleRemoveMarket(marketIndex);
+                        }}
+                        activeMarketTab={activeMarketTab}
+                        onMarketTabChange={setActiveMarketTab}
+                        onReplaceMarket={(oldMarket, newMarket) => {
+                          const marketIndex = selectedMarkets.findIndex(m => m.id === oldMarket.id);
+                          if (marketIndex !== -1) handleReplaceMarket(marketIndex);
+                        }}
+                        userSubmittedMarketIds={userSubmittedMarketIds}
+                        disabled={false}
                       />
-                    </div>
+                      
+                      {/* Store Information Section */}
+                      <div className="space-y-4 pt-4 border-t">
+                        <div className="space-y-2">
+                          <Label htmlFor="store_name">Store Name *</Label>
+                          <Input
+                            id="store_name"
+                            value={formData.store_name}
+                            onChange={(e) => setFormData(prev => ({ ...prev, store_name: e.target.value }))}
+                            placeholder="Enter your store name"
+                          />
+                        </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="specialty">Primary Specialty</Label>
-                      <Select
-                        value={formData.primary_specialty}
-                        onValueChange={(value) => setFormData(prev => ({ ...prev, primary_specialty: value }))}
-                        disabled={!isEditing}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a specialty" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {SPECIALTY_CATEGORIES.map((category) => (
-                            <SelectItem key={category} value={category}>
-                              {category}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="specialty">Primary Specialty *</Label>
+                          <Select
+                            value={formData.primary_specialty}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, primary_specialty: value }))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a specialty" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {SPECIALTY_CATEGORIES.map((category) => (
+                                <SelectItem key={category} value={category}>
+                                  {category}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="website">Website</Label>
-                      <Input
-                        id="website"
-                        type="url"
-                        value={formData.website}
-                        onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
-                        disabled={!isEditing}
-                        placeholder="https://example.com"
+                        <div className="space-y-2">
+                          <Label htmlFor="website">Website</Label>
+                          <Input
+                            id="website"
+                            type="url"
+                            value={formData.website}
+                            onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
+                            placeholder="https://example.com"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="description">Description</Label>
+                          <Textarea
+                            id="description"
+                            value={formData.description}
+                            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                            placeholder="Tell us about your shop..."
+                            rows={4}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="products" className="space-y-6">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <CardTitle>Products</CardTitle>
+                      <Button onClick={() => setShowAddProduct(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Product
+                      </Button>
+                    </CardHeader>
+                    <CardContent>
+                      <ProductGrid
+                        products={products}
+                        onDeleteProduct={handleDeleteProduct}
+                        onDuplicateProduct={handleDuplicateProduct}
+                        onEditProduct={handleEditProduct}
+                        vendorId={shopData?.id || 'temp'}
+                        vendorName={formData.store_name || 'Your Shop'}
                       />
-                    </div>
+                    </CardContent>
+                  </Card>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Description</Label>
-                      <Textarea
-                        id="description"
-                        value={formData.description}
-                        onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                        disabled={!isEditing}
-                        rows={4}
-                      />
-                    </div>
+                  {/* Submit Button */}
+                  <div className="flex justify-center pt-6">
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting}
+                      size="lg"
+                      className="px-8"
+                    >
+                      {isSubmitting ? 'Submitting...' : shopData ? 'Update Submission' : 'Submit for Review'}
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
-              
-              {/* Edit button positioned to the side of the card */}
-              <Button
-                variant={isEditing ? "outline" : "default"}
-                onClick={() => {
-                  if (isEditing) {
-                    handleSaveShop();
-                  } else {
-                    setIsEditing(true);
-                  }
-                }}
-                disabled={isSaving}
-                className="shrink-0"
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                {isEditing ? (isSaving ? 'Saving...' : 'Save') : 'Edit'}
-              </Button>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="products" className="space-y-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Product Management</CardTitle>
-                <Button onClick={() => setShowAddProduct(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Product
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <ProductGrid
-                  products={shopData.products || []}
-                  onDeleteProduct={handleDeleteProduct}
-                  onDuplicateProduct={handleDuplicateProduct}
-                  onEditProduct={handleEditProduct}
-                  vendorId={shopData.id}
-                  vendorName={shopData.store_name}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-
+                </TabsContent>
+              </div>
+            </Tabs>
           </div>
-        </Tabs>
+        )}
       </div>
 
       <AddProductForm
