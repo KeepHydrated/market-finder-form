@@ -86,8 +86,14 @@ serve(async (req) => {
         try {
           // Get place details for complete opening hours
           const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=opening_hours&key=${apiKey}`;
+          console.log(`Fetching details for ${place.name} from:`, detailsUrl);
           const detailsResponse = await fetch(detailsUrl);
           const detailsData = await detailsResponse.json();
+          
+          console.log(`Details response for ${place.name}:`, JSON.stringify(detailsData, null, 2));
+          
+          const combinedOpeningHours = detailsData.result?.opening_hours || place.opening_hours;
+          console.log(`Combined opening hours for ${place.name}:`, JSON.stringify(combinedOpeningHours, null, 2));
           
           return {
             place_id: place.place_id,
@@ -95,7 +101,7 @@ serve(async (req) => {
             address: place.formatted_address,
             rating: place.rating,
             user_ratings_total: place.user_ratings_total,
-            opening_hours: detailsData.result?.opening_hours || place.opening_hours,
+            opening_hours: combinedOpeningHours,
             photos: place.photos?.[0] ? [{
               photo_reference: place.photos[0].photo_reference
             }] : [],

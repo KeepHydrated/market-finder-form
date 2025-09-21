@@ -144,6 +144,7 @@ export const FarmersMarketSearch = () => {
   }, [searchQuery, userLocation]);
 
   const handleSuggestionClick = (market: FarmersMarket) => {
+    console.log('Selected market opening hours:', market.opening_hours);
     setSelectedMarket(market);
     setSearchQuery(market.structured_formatting?.main_text || market.name);
     setShowSuggestions(false);
@@ -303,7 +304,7 @@ export const FarmersMarketSearch = () => {
                         {selectedMarket.opening_hours.open_now ? 'Open now' : 'Closed'}
                       </span>
                     </div>
-                    {selectedMarket.opening_hours.weekday_text && selectedMarket.opening_hours.weekday_text.length > 0 && (
+                    {selectedMarket.opening_hours.weekday_text && selectedMarket.opening_hours.weekday_text.length > 0 ? (
                       <div className="text-sm space-y-1">
                         <div className="font-medium text-foreground">Hours:</div>
                         {selectedMarket.opening_hours.weekday_text.map((hours, index) => (
@@ -311,6 +312,10 @@ export const FarmersMarketSearch = () => {
                             {hours}
                           </div>
                         ))}
+                      </div>
+                    ) : (
+                      <div className="text-xs text-muted-foreground">
+                        Detailed hours not available - check Google Maps for more info
                       </div>
                     )}
                   </div>
