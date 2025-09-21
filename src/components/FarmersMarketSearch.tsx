@@ -135,11 +135,15 @@ export const FarmersMarketSearch = ({
   const handleMarketBadgeClick = (market: FarmersMarket) => {
     if (!isEditing) return;
     
-    // Populate search with market name and show suggestions
+    // Populate search with market name and show only this specific market
     const marketName = market.structured_formatting?.main_text || market.name;
     setSearchQuery(marketName);
     
-    // Focus the input to show suggestions
+    // Show only the clicked market in suggestions
+    setSuggestions([market]);
+    setShowSuggestions(true);
+    
+    // Focus the input
     inputRef.current?.focus();
   };
 
