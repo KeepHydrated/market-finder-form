@@ -9,7 +9,7 @@ import { MapPin, Clock, ExternalLink, Search, X } from 'lucide-react';
 
 // Updated: Removed Google Maps functionality
 
-export interface FarmersMarket {
+interface FarmersMarket {
   place_id: string;
   name: string;
   address: string;

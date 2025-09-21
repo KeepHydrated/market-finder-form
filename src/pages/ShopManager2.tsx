@@ -14,7 +14,6 @@ import { ProductGrid } from '@/components/ProductGrid';
 import { AddProductForm } from '@/components/AddProductForm';
 import { AddMarketForm } from '@/components/AddMarketForm';
 import { FarmersMarketSearch } from '@/components/FarmersMarketSearch';
-import type { FarmersMarket } from '@/components/FarmersMarketSearch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -172,29 +171,16 @@ export default function ShopManager() {
         setSelectedMarkets(parsedData.selected_markets || []);
         setProducts(parsedData.products || []);
         
-        // Handle selected_markets - could be array of strings (old format) or array of objects (new format)
-        let farmersMarkets: FarmersMarket[] = [];
-        if (parsedData.selected_markets && Array.isArray(parsedData.selected_markets)) {
-          farmersMarkets = parsedData.selected_markets.map((market: any, index: number) => {
-            // If it's already a full market object, use it as is
-            if (typeof market === 'object' && market.place_id) {
-              return market;
-            }
-            // If it's just a string (old format), convert it to a basic object
-            if (typeof market === 'string') {
-              return {
-                place_id: `saved-${index}-${market.replace(/\s+/g, '-').toLowerCase()}`,
-                name: market,
-                address: '', // We don't have address data for old saved markets
-                structured_formatting: {
-                  main_text: market,
-                  secondary_text: ''
-                }
-              };
-            }
-            return market;
-          });
-        }
+        // Convert selected_markets array to FarmersMarket objects for the FarmersMarketSearch component
+        const farmersMarkets = (parsedData.selected_markets || []).map((marketName: string, index: number) => ({
+          place_id: `saved-${index}-${marketName.replace(/\s+/g, '-').toLowerCase()}`,
+          name: marketName,
+          address: '', // We don't have address data for saved markets
+          structured_formatting: {
+            main_text: marketName,
+            secondary_text: ''
+          }
+        }));
         setSelectedFarmersMarkets(farmersMarkets);
         
         setFormData({
@@ -322,7 +308,7 @@ export default function ShopManager() {
         website: formData.website.trim(),
         description: formData.description.trim(),
         products: products,
-        selected_markets: selectedFarmersMarkets, // Save full market objects
+        selected_markets: selectedFarmersMarkets.map(m => m.name),
         search_term: selectedFarmersMarkets.length > 0 ? selectedFarmersMarkets[0].name : '',
         market_address: selectedFarmersMarkets.length > 0 ? selectedFarmersMarkets[0].address : '',
         status: 'accepted'
