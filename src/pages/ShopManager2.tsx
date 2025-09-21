@@ -705,7 +705,6 @@ export default function ShopManager() {
                     <Card>
                       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-                        <div className="h-4 w-4 text-muted-foreground">📦</div>
                       </CardHeader>
                       <CardContent>
                         <div className="text-2xl font-bold">12</div>
@@ -718,7 +717,6 @@ export default function ShopManager() {
                     <Card>
                       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-                        <div className="h-4 w-4 text-muted-foreground">💰</div>
                       </CardHeader>
                       <CardContent>
                         <div className="text-2xl font-bold">$1,247</div>
@@ -731,7 +729,6 @@ export default function ShopManager() {
                     <Card>
                       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Shop Views</CardTitle>
-                        <div className="h-4 w-4 text-muted-foreground">👁️</div>
                       </CardHeader>
                       <CardContent>
                         <div className="text-2xl font-bold">186</div>
@@ -744,7 +741,6 @@ export default function ShopManager() {
                     <Card>
                       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
-                        <div className="h-4 w-4 text-muted-foreground">⭐</div>
                       </CardHeader>
                       <CardContent>
                         <div className="text-2xl font-bold">4.8</div>
@@ -768,7 +764,7 @@ export default function ShopManager() {
                           </div>
                           <div className="text-right">
                             <p className="font-medium">$45.99</p>
-                            <p className="text-sm text-green-600">Completed</p>
+                            <p className="text-sm">Completed</p>
                           </div>
                         </div>
                         <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -778,7 +774,7 @@ export default function ShopManager() {
                           </div>
                           <div className="text-right">
                             <p className="font-medium">$22.50</p>
-                            <p className="text-sm text-yellow-600">Pending</p>
+                            <p className="text-sm">Pending</p>
                           </div>
                         </div>
                         <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -788,7 +784,7 @@ export default function ShopManager() {
                           </div>
                           <div className="text-right">
                             <p className="font-medium">$78.25</p>
-                            <p className="text-sm text-green-600">Completed</p>
+                            <p className="text-sm">Completed</p>
                           </div>
                         </div>
                       </CardContent>
@@ -840,19 +836,19 @@ export default function ShopManager() {
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-blue-600">{products.length}</div>
+                          <div className="text-2xl font-bold">{products.length}</div>
                           <p className="text-sm text-muted-foreground">Products Listed</p>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-green-600">{selectedMarkets.length}</div>
+                          <div className="text-2xl font-bold">{selectedMarkets.length}</div>
                           <p className="text-sm text-muted-foreground">Markets Active</p>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-purple-600">89%</div>
+                          <div className="text-2xl font-bold">89%</div>
                           <p className="text-sm text-muted-foreground">Order Success Rate</p>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-orange-600">2.3</div>
+                          <div className="text-2xl font-bold">2.3</div>
                           <p className="text-sm text-muted-foreground">Avg. Items/Order</p>
                         </div>
                       </div>
