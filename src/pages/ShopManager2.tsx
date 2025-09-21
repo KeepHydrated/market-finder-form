@@ -652,20 +652,6 @@ export default function ShopManager() {
                       </CardContent>
                   </Card>
 
-                  {/* Submit Button - Only show if no shopData or in edit mode */}
-                  {(!shopData || isEditMode) && (
-                    <div className="flex justify-center pt-6">
-                      <Button
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        size="lg"
-                        className="px-8"
-                      >
-                        {isSubmitting ? 'Submitting...' : shopData ? 'Update Submission' : 'Submit for Review'}
-                      </Button>
-                    </div>
-                  )}
-
                   {/* Edit Button positioned to the right of the card */}
                   {shopData && (
                     <div className="flex justify-center">
