@@ -16,7 +16,6 @@ import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
 import ShopManager2 from "./pages/ShopManager2";
 import Markets from "./pages/Markets";
-import Tet from "./pages/Tet";
 import Test from "./pages/Test";
 
 const queryClient = new QueryClient();
@@ -38,7 +37,6 @@ const App = () => (
                 <Route path="/homepage" element={<Homepage />} />
                 <Route path="/vendor/:id" element={<Vendor />} />
                 <Route path="/market" element={<VendorDuplicate />} />
-                <Route path="/tet" element={<Tet />} />
                 <Route path="/likes" element={<Likes />} />
                 <Route path="/order-success" element={<OrderSuccess />} />
                 <Route path="/shop-manager" element={<ShopManager2 />} />
