@@ -715,9 +715,9 @@ export default function ShopManager() {
                       </CardContent>
                   </Card>
 
-                   {/* Edit and Delete Buttons positioned to the right of the card */}
+                   {/* Edit Button positioned to the right of the card */}
                    {shopData && (
-                     <div className="flex justify-center gap-2">
+                     <div className="flex justify-center">
                        <Button
                          variant="outline"
                          size="sm"
@@ -745,16 +745,6 @@ export default function ShopManager() {
                              Edit
                            </>
                          )}
-                       </Button>
-                       
-                       <Button
-                         variant="destructive"
-                         size="sm"
-                         onClick={handleDeleteSubmission}
-                         disabled={isSubmitting}
-                       >
-                         <Trash2 className="h-4 w-4 mr-2" />
-                         Delete
                        </Button>
                      </div>
                    )}
