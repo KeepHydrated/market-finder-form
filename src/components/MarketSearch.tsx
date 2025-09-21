@@ -301,29 +301,6 @@ export const MarketSearch = ({
             )}
           </div>
         ))}
-        
-        {/* Add Market Plus Button */}
-        <button
-          type="button"
-          onClick={() => {
-            // Clear everything for a fresh new market addition
-            onSearchTermChange('');
-            onMarketTabChange?.(-1); // Use -1 to indicate "adding new market" mode
-            setIsOpen(true);
-            setTimeout(() => inputRef.current?.focus(), 0);
-          }}
-          disabled={maxMarketsReached || disabled}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 border border-dashed rounded-full transition-colors",
-            maxMarketsReached || disabled
-              ? "bg-muted/20 border-muted-foreground/40 text-muted-foreground cursor-not-allowed opacity-50"
-              : "bg-background border-muted-foreground/50 hover:bg-muted text-foreground hover:text-foreground"
-          )}
-          title={maxMarketsReached ? "Maximum 3 markets allowed" : disabled ? "Click Edit to modify markets" : "Add another market"}
-        >
-          <Plus className="h-4 w-4" />
-          <span className="text-sm">Add</span>
-        </button>
       </div>
       
       <div className="relative w-full" ref={dropdownRef}>
