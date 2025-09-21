@@ -572,39 +572,6 @@ export default function ShopManager() {
               </div>
             )}
 
-            <div className="flex items-center justify-between mb-6">
-              <div></div>
-              {shopData && (
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    if (isEditMode) {
-                      // If currently editing, save the changes
-                      handleSubmit();
-                      setIsEditMode(false);
-                    } else {
-                      // If starting to edit, save current form data as backup
-                      setOriginalFormData({ ...formData });
-                      setIsEditMode(true);
-                    }
-                  }}
-                  disabled={isSubmitting}
-                >
-                  {isEditMode ? (
-                    <>
-                      <Save className="h-4 w-4 mr-2" />
-                      {isSubmitting ? 'Saving...' : 'Save'}
-                    </>
-                  ) : (
-                    <>
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit
-                    </>
-                  )}
-                </Button>
-              )}
-            </div>
-
             <Tabs defaultValue={shopData ? "overview2" : "overview"} className="flex gap-6">
               <TabsList className="flex flex-col h-fit w-48 space-y-1 p-1">
                 {shopData && (
@@ -620,6 +587,39 @@ export default function ShopManager() {
               <div className="flex-1 space-y-6">
                 <TabsContent value="overview" className="space-y-6">
                   <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div></div>
+                      {shopData && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            if (isEditMode) {
+                              // If currently editing, save the changes
+                              handleSubmit();
+                              setIsEditMode(false);
+                            } else {
+                              // If starting to edit, save current form data as backup
+                              setOriginalFormData({ ...formData });
+                              setIsEditMode(true);
+                            }
+                          }}
+                          disabled={isSubmitting}
+                        >
+                          {isEditMode ? (
+                            <>
+                              <Save className="h-4 w-4 mr-2" />
+                              {isSubmitting ? 'Saving...' : 'Save'}
+                            </>
+                          ) : (
+                            <>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </CardHeader>
                     <CardContent className="space-y-6">
                       {/* Farmers Market Search */}
                       <div className="space-y-2">
