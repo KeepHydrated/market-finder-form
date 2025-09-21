@@ -26,6 +26,7 @@ interface ShopData {
   selected_markets: any[];
   search_term: string;
   status: string;
+  vacation_mode?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -890,6 +891,110 @@ export default function ShopManager() {
                           </div>
                         </div>
                       )}
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Store Settings</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="flex items-center justify-between p-4 border rounded-lg">
+                        <div>
+                          <h3 className="font-medium">Vacation Mode</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Temporarily hide your store from customers
+                          </p>
+                        </div>
+                        <Button
+                          variant={shopData?.vacation_mode ? "default" : "outline"}
+                          onClick={async () => {
+                            if (!user || !shopData) return;
+                            
+                            try {
+                              const { error } = await supabase
+                                .from('submissions')
+                                .update({ 
+                                  vacation_mode: !shopData.vacation_mode,
+                                  updated_at: new Date().toISOString()
+                                })
+                                .eq('id', shopData.id);
+
+                              if (error) throw error;
+
+                              setShopData(prev => prev ? {...prev, vacation_mode: !prev.vacation_mode} : null);
+                              
+                              toast({
+                                title: shopData.vacation_mode ? "Vacation Mode Disabled" : "Vacation Mode Enabled",
+                                description: shopData.vacation_mode 
+                                  ? "Your store is now visible to customers"
+                                  : "Your store is now hidden from customers"
+                              });
+                            } catch (error: any) {
+                              toast({
+                                title: "Error",
+                                description: "Failed to update vacation mode",
+                                variant: "destructive"
+                              });
+                            }
+                          }}
+                        >
+                          {shopData?.vacation_mode ? 'Disable' : 'Enable'}
+                        </Button>
+                      </div>
+
+                      <div className="p-4 border border-destructive rounded-lg bg-destructive/5">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h3 className="font-medium text-destructive">Delete Store</h3>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Permanently delete your store and all associated data. This action cannot be undone.
+                            </p>
+                          </div>
+                          <Button
+                            variant="destructive"
+                            onClick={async () => {
+                              if (!user || !shopData) return;
+                              
+                              if (!confirm('Are you sure you want to delete your store? This action cannot be undone.')) {
+                                return;
+                              }
+                              
+                              try {
+                                const { error } = await supabase
+                                  .from('submissions')
+                                  .delete()
+                                  .eq('id', shopData.id);
+
+                                if (error) throw error;
+
+                                setShopData(null);
+                                setProducts([]);
+                                setSelectedMarkets([]);
+                                setFormData({
+                                  store_name: '',
+                                  primary_specialty: '',
+                                  website: '',
+                                  description: '',
+                                });
+                                
+                                toast({
+                                  title: "Store Deleted",
+                                  description: "Your store has been permanently deleted"
+                                });
+                              } catch (error: any) {
+                                toast({
+                                  title: "Error",
+                                  description: "Failed to delete store",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                          >
+                            Delete Store
+                          </Button>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 </TabsContent>
