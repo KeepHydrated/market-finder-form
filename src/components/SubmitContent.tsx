@@ -121,6 +121,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
 
   const handleMarketAdded = useCallback(async (marketData: any) => {
     console.log('🔍 handleMarketAdded called with:', marketData);
+    console.log('🔍 handleMarketAdded function actually executing!');
     try {
       // Extract city and state from address
       const addressParts = marketData.address.split(',').map((part: string) => part.trim());
