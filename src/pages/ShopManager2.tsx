@@ -588,41 +588,41 @@ export default function ShopManager() {
                 <TabsContent value="overview" className="space-y-6">
                   <Card>
                     <CardContent className="space-y-6 pt-8">
+                      {shopData && (
+                        <div className="flex justify-end">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (isEditMode) {
+                                // If currently editing, save the changes
+                                handleSubmit();
+                                setIsEditMode(false);
+                              } else {
+                                // If starting to edit, save current form data as backup
+                                setOriginalFormData({ ...formData });
+                                setIsEditMode(true);
+                              }
+                            }}
+                            disabled={isSubmitting}
+                          >
+                            {isEditMode ? (
+                              <>
+                                <Save className="h-4 w-4 mr-2" />
+                                {isSubmitting ? 'Saving...' : 'Save'}
+                              </>
+                            ) : (
+                              <>
+                                <Edit className="h-4 w-4 mr-2" />
+                                Edit
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      )}
                       {/* Farmers Market Search */}
                       <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Label>Which farmers markets do you sell at? (Up to 3) *</Label>
-                          {shopData && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                if (isEditMode) {
-                                  // If currently editing, save the changes
-                                  handleSubmit();
-                                  setIsEditMode(false);
-                                } else {
-                                  // If starting to edit, save current form data as backup
-                                  setOriginalFormData({ ...formData });
-                                  setIsEditMode(true);
-                                }
-                              }}
-                              disabled={isSubmitting}
-                            >
-                              {isEditMode ? (
-                                <>
-                                  <Save className="h-4 w-4 mr-2" />
-                                  {isSubmitting ? 'Saving...' : 'Save'}
-                                </>
-                              ) : (
-                                <>
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Edit
-                                </>
-                              )}
-                            </Button>
-                          )}
-                        </div>
+                        <Label>Which farmers markets do you sell at? (Up to 3) *</Label>
                         <FarmersMarketSearch />
                       </div>
                         
