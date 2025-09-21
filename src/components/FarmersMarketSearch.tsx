@@ -101,7 +101,16 @@ export const FarmersMarketSearch = ({
           return;
         }
 
-        setSuggestions(data.predictions || []);
+        // Deduplicate suggestions by place_id and name+address combination
+        const rawSuggestions = data.predictions || [];
+        const uniqueSuggestions = rawSuggestions.filter((suggestion: FarmersMarket, index: number, self: FarmersMarket[]) => 
+          index === self.findIndex((s) => 
+            s.place_id === suggestion.place_id || 
+            (s.name === suggestion.name && s.address === suggestion.address)
+          )
+        );
+        
+        setSuggestions(uniqueSuggestions);
         setShowSuggestions(true);
       } catch (error) {
         console.error('Error searching farmers markets:', error);
@@ -115,14 +124,20 @@ export const FarmersMarketSearch = ({
   }, [searchQuery, userLocation]);
 
   const handleSuggestionClick = (market: FarmersMarket) => {
-    // Check if market is already selected
-    const isAlreadySelected = selectedMarkets.some(selected => selected.place_id === market.place_id);
-    if (isAlreadySelected) return;
+    // Check if market is already selected by place_id or name (for additional safety)
+    const isAlreadySelected = selectedMarkets.some(selected => 
+      selected.place_id === market.place_id || 
+      (selected.name === market.name && selected.address === market.address)
+    );
+    if (isAlreadySelected) {
+      console.log('Market already selected, ignoring click');
+      return;
+    }
     
     // Check if we've reached the maximum
     if (selectedMarkets.length >= maxMarkets) return;
     
-    console.log('Selected market:', market.name);
+    console.log('Selected market:', market.name, 'place_id:', market.place_id);
     onMarketsChange([...selectedMarkets, market]);
     setSearchQuery(''); // Clear search after selection
     setShowSuggestions(false);
@@ -147,9 +162,12 @@ export const FarmersMarketSearch = ({
     inputRef.current?.focus();
   };
 
-  // Filter out already selected markets from suggestions
+  // Filter out already selected markets from suggestions with enhanced deduplication
   const filteredSuggestions = suggestions.filter(
-    suggestion => !selectedMarkets.some(selected => selected.place_id === suggestion.place_id)
+    suggestion => !selectedMarkets.some(selected => 
+      selected.place_id === suggestion.place_id || 
+      (selected.name === suggestion.name && selected.address === suggestion.address)
+    )
   );
 
   const openInGoogleMaps = (address: string) => {
