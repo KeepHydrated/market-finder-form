@@ -593,13 +593,6 @@ export default function ShopManager() {
 
               <div className="flex-1 space-y-6">
                 <TabsContent value="overview" className="space-y-6">
-                  <Tabs defaultValue="shop" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="shop">Shop Information</TabsTrigger>
-                      <TabsTrigger value="products">Products</TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="shop" className="space-y-6 max-w-2xl mt-6">
                   <Card>
                     <CardContent className="space-y-6">
                       {/* Farmers Market Search */}
@@ -659,28 +652,6 @@ export default function ShopManager() {
                         </div>
                       </CardContent>
                   </Card>
-                </TabsContent>
-
-                <TabsContent value="products" className="space-y-6">
-                  <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                      <CardTitle>Products</CardTitle>
-                      <Button onClick={() => setShowAddProduct(true)}>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Product
-                      </Button>
-                    </CardHeader>
-                    <CardContent>
-                      <ProductGrid
-                        products={products}
-                        onDeleteProduct={handleDeleteProduct}
-                        onDuplicateProduct={handleDuplicateProduct}
-                        onEditProduct={handleEditProduct}
-                        vendorId={shopData?.id || 'temp'}
-                        vendorName={formData.store_name || 'Your Shop'}
-                      />
-                    </CardContent>
-                  </Card>
 
                   {/* Submit Button */}
                   <div className="flex justify-center pt-6">
@@ -693,8 +664,6 @@ export default function ShopManager() {
                       {isSubmitting ? 'Submitting...' : shopData ? 'Update Submission' : 'Submit for Review'}
                     </Button>
                   </div>
-                </TabsContent>
-                  </Tabs>
                 </TabsContent>
 
                 <TabsContent value="products-main" className="space-y-6">
