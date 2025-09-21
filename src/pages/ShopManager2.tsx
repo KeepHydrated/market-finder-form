@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
-import { Edit, Save, Plus } from 'lucide-react';
+import { Edit, Save, Plus, Trash2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { ProductGrid } from '@/components/ProductGrid';
@@ -312,6 +312,49 @@ export default function ShopManager() {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteSubmission = async () => {
+    if (!user || !shopData) return;
+
+    if (!confirm('Are you sure you want to delete your submission? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('submissions')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      // Reset all state
+      setShopData(null);
+      setProducts([]);
+      setSelectedMarkets([]);
+      setFormData({
+        store_name: '',
+        primary_specialty: '',
+        website: '',
+        description: '',
+      });
+      setMarketSearchTerm('');
+      setIsEditMode(false);
+
+      toast({
+        title: "Submission Deleted",
+        description: "Your submission has been successfully deleted. You can now start fresh.",
+      });
+
+    } catch (error: any) {
+      console.error('Error deleting submission:', error);
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete submission.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -652,39 +695,49 @@ export default function ShopManager() {
                       </CardContent>
                   </Card>
 
-                  {/* Edit Button positioned to the right of the card */}
-                  {shopData && (
-                    <div className="flex justify-center">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          if (isEditMode) {
-                            // If currently editing, save the changes
-                            handleSubmit();
-                            setIsEditMode(false);
-                          } else {
-                            // If starting to edit, save current form data as backup
-                            setOriginalFormData({ ...formData });
-                            setIsEditMode(true);
-                          }
-                        }}
-                        disabled={isSubmitting}
-                      >
-                        {isEditMode ? (
-                          <>
-                            <Save className="h-4 w-4 mr-2" />
-                            {isSubmitting ? 'Saving...' : 'Save'}
-                          </>
-                        ) : (
-                          <>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  )}
+                   {/* Edit and Delete Buttons positioned to the right of the card */}
+                   {shopData && (
+                     <div className="flex justify-center gap-2">
+                       <Button
+                         variant="outline"
+                         size="sm"
+                         onClick={() => {
+                           if (isEditMode) {
+                             // If currently editing, save the changes
+                             handleSubmit();
+                             setIsEditMode(false);
+                           } else {
+                             // If starting to edit, save current form data as backup
+                             setOriginalFormData({ ...formData });
+                             setIsEditMode(true);
+                           }
+                         }}
+                         disabled={isSubmitting}
+                       >
+                         {isEditMode ? (
+                           <>
+                             <Save className="h-4 w-4 mr-2" />
+                             {isSubmitting ? 'Saving...' : 'Save'}
+                           </>
+                         ) : (
+                           <>
+                             <Edit className="h-4 w-4 mr-2" />
+                             Edit
+                           </>
+                         )}
+                       </Button>
+                       
+                       <Button
+                         variant="destructive"
+                         size="sm"
+                         onClick={handleDeleteSubmission}
+                         disabled={isSubmitting}
+                       >
+                         <Trash2 className="h-4 w-4 mr-2" />
+                         Delete
+                       </Button>
+                     </div>
+                   )}
                   </div>
                 </TabsContent>
 
