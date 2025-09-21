@@ -558,21 +558,9 @@ export default function ShopManager() {
           <div className="text-center py-8">Loading...</div>
         ) : (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
               <h1 className="text-3xl font-bold">
-                {shopData ? `Update Submission - ${shopData.status}` : 'Submit Your Shop'}
+                {shopData ? 'Manage Your Shop' : 'Submit Your Shop'}
               </h1>
-              {shopData && (
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">
-                    Status: <span className="font-medium capitalize">{shopData.status}</span>
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Last updated: {new Date(shopData.updated_at).toLocaleDateString()}
-                  </p>
-                </div>
-              )}
-            </div>
 
             {isPublicAccess && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
