@@ -296,11 +296,23 @@ export const FarmersMarketSearch = () => {
                 )}
                 
                 {selectedMarket.opening_hours && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="h-4 w-4" />
-                    <span className={selectedMarket.opening_hours.open_now ? 'text-green-600' : 'text-red-600'}>
-                      {selectedMarket.opening_hours.open_now ? 'Open now' : 'Closed'}
-                    </span>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Clock className="h-4 w-4" />
+                      <span className={selectedMarket.opening_hours.open_now ? 'text-green-600' : 'text-red-600'}>
+                        {selectedMarket.opening_hours.open_now ? 'Open now' : 'Closed'}
+                      </span>
+                    </div>
+                    {selectedMarket.opening_hours.weekday_text && selectedMarket.opening_hours.weekday_text.length > 0 && (
+                      <div className="text-sm space-y-1">
+                        <div className="font-medium text-foreground">Hours:</div>
+                        {selectedMarket.opening_hours.weekday_text.map((hours, index) => (
+                          <div key={index} className="text-muted-foreground text-xs">
+                            {hours}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
                 
