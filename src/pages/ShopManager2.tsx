@@ -170,6 +170,19 @@ export default function ShopManager() {
         setShopData(parsedData);
         setSelectedMarkets(parsedData.selected_markets || []);
         setProducts(parsedData.products || []);
+        
+        // Convert selected_markets array to FarmersMarket objects for the FarmersMarketSearch component
+        const farmersMarkets = (parsedData.selected_markets || []).map((marketName: string, index: number) => ({
+          place_id: `saved-${index}-${marketName.replace(/\s+/g, '-').toLowerCase()}`,
+          name: marketName,
+          address: '', // We don't have address data for saved markets
+          structured_formatting: {
+            main_text: marketName,
+            secondary_text: ''
+          }
+        }));
+        setSelectedFarmersMarkets(farmersMarkets);
+        
         setFormData({
           store_name: parsedData.store_name || '',
           primary_specialty: parsedData.primary_specialty || '',
