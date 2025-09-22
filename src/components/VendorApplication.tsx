@@ -64,6 +64,7 @@ export const VendorApplication = ({ data, onChange, readOnly = false }: VendorAp
             placeholder="e.g., Fresh Produce Stand"
             className="h-14 text-lg border-2 border-border rounded-xl"
             disabled={readOnly}
+            maxLength={20}
           />
         </div>
 
