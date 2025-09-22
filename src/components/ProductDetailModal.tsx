@@ -110,7 +110,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden">
         {/* Heart button positioned at top right of entire modal */}
         <Button
           variant="ghost"
@@ -161,7 +161,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
           {/* Left side - Images */}
           <div className="md:w-1/2 relative">
 
-              <div className="aspect-square bg-muted relative group">
+              <div className="aspect-[4/3] bg-muted relative group">
                 {product.images.length > 0 ? (
                   <>
                     <img
