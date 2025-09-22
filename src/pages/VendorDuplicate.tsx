@@ -302,8 +302,6 @@ const VendorDuplicate = () => {
     if (!acceptedSubmission?.selected_market) return;
 
     try {
-      console.log('Fetching opening hours for market:', acceptedSubmission.selected_market);
-      
       const response = await supabase.functions.invoke('farmers-market-search', {
         body: { 
           query: acceptedSubmission.selected_market,
@@ -311,16 +309,9 @@ const VendorDuplicate = () => {
         }
       });
 
-      console.log('Full response:', response);
-      console.log('Response data:', response.data);
-
       if (response.data?.predictions && response.data.predictions.length > 0) {
         const market = response.data.predictions[0];
-        console.log('Market opening hours data:', market.opening_hours);
-        console.log('Weekday text:', market.opening_hours?.weekday_text);
         setMarketOpeningHours(market.opening_hours);
-      } else {
-        console.log('No predictions found in response');
       }
     } catch (error) {
       console.error('Error fetching market opening hours:', error);
@@ -328,20 +319,13 @@ const VendorDuplicate = () => {
   };
 
   const formatSchedule = (marketDays?: string[], marketHours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>) => {
-    console.log('formatSchedule called with:');
-    console.log('marketOpeningHours:', marketOpeningHours);
-    console.log('marketDays:', marketDays);
-    console.log('marketHours:', marketHours);
-    
     // First, try to use Google Maps opening hours if available
     if (marketOpeningHours?.weekday_text && marketOpeningHours.weekday_text.length > 0) {
-      console.log('Using Google Maps weekday_text:', marketOpeningHours.weekday_text);
-      return marketOpeningHours.weekday_text.join('\n');
+      return marketOpeningHours.weekday_text;
     }
 
-    console.log('Falling back to stored hours');
     // Fallback to stored hours if Google Maps data is not available
-    if (!marketDays || !marketHours) return "Schedule TBD";
+    if (!marketDays || !marketHours) return ["Schedule TBD"];
     
     const dayNames = {
       'mon': 'Monday', 'tue': 'Tuesday', 'wed': 'Wednesday', 
@@ -376,7 +360,7 @@ const VendorDuplicate = () => {
       return `${fullDayName}, ${formatTime(hours.start, hours.startPeriod)} - ${formatTime(hours.end, hours.endPeriod)}`;
     }).filter(Boolean);
     
-    return schedules.join('\n') || "Schedule TBD";
+    return schedules;
   };
 
   if (loading || loadingData) {
@@ -470,7 +454,9 @@ const VendorDuplicate = () => {
                 </div>
               )}
               <div>
-                {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours)}
+                {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => (
+                  <div key={index}>{line}</div>
+                ))}
               </div>
             </div>
           </div>
