@@ -311,10 +311,16 @@ const VendorDuplicate = () => {
         }
       });
 
+      console.log('Full response:', response);
+      console.log('Response data:', response.data);
+
       if (response.data?.predictions && response.data.predictions.length > 0) {
         const market = response.data.predictions[0];
         console.log('Market opening hours data:', market.opening_hours);
+        console.log('Weekday text:', market.opening_hours?.weekday_text);
         setMarketOpeningHours(market.opening_hours);
+      } else {
+        console.log('No predictions found in response');
       }
     } catch (error) {
       console.error('Error fetching market opening hours:', error);
@@ -322,11 +328,18 @@ const VendorDuplicate = () => {
   };
 
   const formatSchedule = (marketDays?: string[], marketHours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>) => {
+    console.log('formatSchedule called with:');
+    console.log('marketOpeningHours:', marketOpeningHours);
+    console.log('marketDays:', marketDays);
+    console.log('marketHours:', marketHours);
+    
     // First, try to use Google Maps opening hours if available
     if (marketOpeningHours?.weekday_text && marketOpeningHours.weekday_text.length > 0) {
+      console.log('Using Google Maps weekday_text:', marketOpeningHours.weekday_text);
       return marketOpeningHours.weekday_text.join('\n');
     }
 
+    console.log('Falling back to stored hours');
     // Fallback to stored hours if Google Maps data is not available
     if (!marketDays || !marketHours) return "Schedule TBD";
     
