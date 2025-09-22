@@ -673,9 +673,9 @@ const Homepage = () => {
                         {submission.store_name}
                       </h3>
                       
-                      <div className="flex items-start gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                        <p className="text-sm text-muted-foreground text-left">
+                      <div className="flex items-center gap-2 mt-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground">
                           {submission.market_address || submission.selected_market || submission.search_term || "Location TBD"}
                         </p>
                       </div>
@@ -902,8 +902,8 @@ const Homepage = () => {
                         {market.name}
                       </h3>
                       
-                      <div className="flex items-start gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <p className="text-sm text-muted-foreground">
                           {market.address}
                         </p>
