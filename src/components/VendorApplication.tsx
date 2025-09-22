@@ -19,6 +19,8 @@ interface VendorApplicationProps {
 }
 
 export const VendorApplication = ({ data, onChange, readOnly = false }: VendorApplicationProps) => {
+  console.log('VendorApplication rendered with:', { data, onChange: !!onChange, readOnly });
+  
   const currentData = data || {
     storeName: "",
     primarySpecialty: "",
@@ -27,6 +29,9 @@ export const VendorApplication = ({ data, onChange, readOnly = false }: VendorAp
   };
 
   const updateData = (field: keyof VendorApplicationData, value: string) => {
+    console.log(`updateData called - field: ${field}, value: "${value}", length: ${value.length}`);
+    console.log('onChange exists:', !!onChange, 'readOnly:', readOnly);
+    
     if (onChange && !readOnly) {
       console.log(`Updating ${field}: original length = ${value.length}, value = "${value}"`);
       
@@ -42,6 +47,8 @@ export const VendorApplication = ({ data, onChange, readOnly = false }: VendorAp
         ...currentData,
         [field]: value
       });
+    } else {
+      console.log('Not updating because onChange is missing or readOnly is true');
     }
   };
 
