@@ -673,9 +673,15 @@ const Homepage = () => {
                         {submission.store_name}
                       </h3>
                       
-                      {/* Market Details Section */}
+                      {submission.primary_specialty && (
+                        <p className="text-sm text-foreground text-left">
+                          {submission.primary_specialty}
+                        </p>
+                      )}
+
+                      {/* Market Details Section - Moved to bottom */}
                       <div className="mt-2">
-                        <h4 className="text-base font-medium text-foreground mb-1">
+                        <h4 className="text-xs font-semibold text-foreground mb-1">
                           {submission.selected_market || submission.search_term || "Farmers Market"}
                         </h4>
                         {submission.market_address && (
@@ -687,12 +693,6 @@ const Homepage = () => {
                           </div>
                         )}
                       </div>
-                      
-                      {submission.primary_specialty && (
-                        <p className="text-sm text-foreground text-left">
-                          {submission.primary_specialty}
-                        </p>
-                      )}
                     </div>
                   </Card>
                 ))}
