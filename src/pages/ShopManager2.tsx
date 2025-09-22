@@ -936,7 +936,7 @@ export default function ShopManager() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="specialty">Primary Specialty *</Label>
+                          <Label htmlFor="specialty">Category *</Label>
                           <Select
                             value={formData.primary_specialty}
                             onValueChange={(value) => setFormData(prev => ({ ...prev, primary_specialty: value }))}
