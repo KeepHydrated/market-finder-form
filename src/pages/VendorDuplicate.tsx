@@ -366,6 +366,12 @@ const VendorDuplicate = () => {
     return schedules;
   };
 
+  const cleanAddress = (address?: string) => {
+    if (!address) return "Address TBD";
+    // Remove "United States" and any trailing comma/space
+    return address.replace(/,\s*United States\s*$/i, '').trim();
+  };
+
   if (loading || loadingData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -440,7 +446,7 @@ const VendorDuplicate = () => {
           <div className="flex items-start gap-2">
             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
             <p className="text-muted-foreground text-base font-normal">
-              {acceptedSubmission.market_address || "Address TBD"}
+              {cleanAddress(acceptedSubmission.market_address)}
             </p>
           </div>
 
@@ -631,7 +637,7 @@ const VendorDuplicate = () => {
                   <div className="flex items-start gap-2">
                     <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                     <p className="text-sm text-muted-foreground text-left">
-                      {vendor.market_address || vendor.selected_market || vendor.search_term || "Location TBD"}
+                      {cleanAddress(vendor.market_address) || vendor.selected_market || vendor.search_term || "Location TBD"}
                     </p>
                   </div>
                   
