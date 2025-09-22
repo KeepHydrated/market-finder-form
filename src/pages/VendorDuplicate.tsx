@@ -79,8 +79,10 @@ const VendorDuplicate = () => {
   const [marketOpeningHours, setMarketOpeningHours] = useState<any>(null);
 
   useEffect(() => {
+    console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
     // Check if data was passed from navigation
     if (location.state) {
+      console.log('Using location state data');
       const { type, selectedVendor, selectedMarket, allVendors } = location.state as {
         type: 'vendor' | 'market';
         selectedVendor?: AcceptedSubmission;
@@ -100,6 +102,7 @@ const VendorDuplicate = () => {
         setSelectedVendor(null); // Start with vendor grid view
       }
     } else {
+      console.log('No location state, fetching all vendors...');
       // Fallback to loading all vendors if no state passed
       fetchAllVendors();
     }
