@@ -67,6 +67,7 @@ export default function ShopManager() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [originalFormData, setOriginalFormData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>('overview');
+  const [preventAutoRedirect, setPreventAutoRedirect] = useState(false);
   
   // Analytics state
   const [analytics, setAnalytics] = useState({
@@ -130,9 +131,15 @@ export default function ShopManager() {
   }, [user, isPublicAccess]);
 
   useEffect(() => {
-    // Set active tab based on whether shop data exists
-    setActiveTab(shopData ? "overview2" : "overview");
-  }, [shopData]);
+    // Set active tab based on whether shop data exists, but only if we're not preventing auto-redirect
+    if (!preventAutoRedirect) {
+      setActiveTab(shopData ? "overview2" : "overview");
+    }
+    // Reset the flag after checking
+    if (preventAutoRedirect) {
+      setPreventAutoRedirect(false);
+    }
+  }, [shopData, preventAutoRedirect]);
 
   const fetchShopData = async () => {
     if (!user) return;
@@ -930,26 +937,25 @@ export default function ShopManager() {
                    {/* Edit Button positioned to the right of the card */}
                    {shopData && (
                      <div className="flex justify-center">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={async () => {
-                            if (isEditMode) {
-                              // If currently editing, save the changes and stay on Shop tab
-                              const currentTab = activeTab;
-                              await handleSubmit();
-                              setIsEditMode(false);
-                              // Keep user on the Shop tab after saving
-                              if (currentTab === 'overview') {
-                                setActiveTab('overview');
-                              }
-                            } else {
-                              // If starting to edit, save current form data as backup
-                              setOriginalFormData({ ...formData });
-                              setIsEditMode(true);
-                            }
-                          }}
-                          disabled={isSubmitting}
+                         <Button
+                           variant="outline"
+                           size="sm"
+                           onClick={async () => {
+                             if (isEditMode) {
+                               // If currently editing, save the changes and stay on Shop tab
+                               const currentTab = activeTab;
+                               if (currentTab === 'overview') {
+                                 setPreventAutoRedirect(true);
+                               }
+                               await handleSubmit();
+                               setIsEditMode(false);
+                             } else {
+                               // If starting to edit, save current form data as backup
+                               setOriginalFormData({ ...formData });
+                               setIsEditMode(true);
+                             }
+                           }}
+                           disabled={isSubmitting}
                        >
                          {isEditMode ? (
                            <>
