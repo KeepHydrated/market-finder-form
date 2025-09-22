@@ -255,6 +255,50 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
     setShowAddProductForm(true);
   }, []);
 
+  const handleDeleteShop = useCallback(async () => {
+    try {
+      // Clear localStorage
+      localStorage.removeItem('farmer-market-products');
+      
+      // Delete user's submissions from database
+      if (user) {
+        const { error } = await supabase
+          .from('submissions')
+          .delete()
+          .eq('user_id', user.id);
+        
+        if (error) throw error;
+      }
+      
+      // Reset all state
+      setProducts([]);
+      setSelectedMarkets([]);
+      setVendorApplicationData({
+        storeName: "",
+        primarySpecialty: "",
+        website: "",
+        description: ""
+      });
+      setCustomMarketData(null);
+      setIsSubmitted(false);
+      setSearchTerm("");
+      setSubmittedMarketName(null);
+      setActiveMarketTab(null);
+      
+      toast({
+        title: "Shop Deleted",
+        description: "All shop data has been successfully deleted.",
+      });
+    } catch (error: any) {
+      console.error('Error deleting shop:', error);
+      toast({
+        title: "Error",
+        description: `Failed to delete shop: ${error.message || 'Unknown error'}`,
+        variant: "destructive"
+      });
+    }
+  }, [user, toast]);
+
   const handleSubmit = useCallback(async () => {
     if (!user || !vendorApplicationData.storeName.trim() || !vendorApplicationData.description.trim()) {
       toast({
@@ -363,21 +407,39 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
         />
       </Card>
 
-      <div className="mt-8 flex justify-center">
+      <div className="mt-8 flex justify-center gap-4">
         {!isSubmitted ? (
-          <Button 
-            className="bg-blue-500 hover:bg-blue-600 text-white px-12 py-3 text-lg"
-            onClick={handleSubmit}
-          >
-            Submit Application
-          </Button>
+          <>
+            <Button 
+              variant="destructive"
+              onClick={handleDeleteShop}
+              className="px-8 py-3 text-lg"
+            >
+              Delete Shop
+            </Button>
+            <Button 
+              className="bg-blue-500 hover:bg-blue-600 text-white px-12 py-3 text-lg"
+              onClick={handleSubmit}
+            >
+              Submit Application
+            </Button>
+          </>
         ) : (
-          <div className="flex items-center gap-3 px-12 py-3 bg-green-100 text-green-700 rounded-md">
-            <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs">✓</span>
+          <>
+            <Button 
+              variant="destructive"
+              onClick={handleDeleteShop}
+              className="px-8 py-3 text-lg"
+            >
+              Delete Shop
+            </Button>
+            <div className="flex items-center gap-3 px-12 py-3 bg-green-100 text-green-700 rounded-md">
+              <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs">✓</span>
+              </div>
+              <span className="text-lg font-medium">Application Submitted</span>
             </div>
-            <span className="text-lg font-medium">Application Submitted</span>
-          </div>
+          </>
         )}
       </div>
 
