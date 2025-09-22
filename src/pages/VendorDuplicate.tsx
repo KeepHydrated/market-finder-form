@@ -447,9 +447,13 @@ const VendorDuplicate = () => {
           <div className="flex items-start gap-2">
             <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div className="text-muted-foreground text-base font-normal whitespace-pre-line">
-              {marketOpeningHours?.open_now && (
-                <div className="inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 bg-green-100 text-green-800">
-                  Open Now
+              {marketOpeningHours?.open_now !== undefined && (
+                <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
+                  marketOpeningHours.open_now 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {marketOpeningHours.open_now ? 'Open Now' : 'Currently Closed'}
                 </div>
               )}
               <div>
