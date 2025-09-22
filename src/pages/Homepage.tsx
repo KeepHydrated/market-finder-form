@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -677,9 +678,9 @@ const Homepage = () => {
                       </h3>
                       
                       {submission.primary_specialty && (
-                        <p className="text-sm text-foreground text-left">
+                        <Badge variant="secondary" className="text-xs">
                           {submission.primary_specialty}
-                        </p>
+                        </Badge>
                       )}
 
                       {/* Market Details Section - Moved to bottom */}
