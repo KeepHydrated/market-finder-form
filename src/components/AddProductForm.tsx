@@ -19,7 +19,7 @@ interface AddProductFormProps {
 
 export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }: AddProductFormProps) => {
   // Character limits
-  const NAME_LIMIT = 30;
+  const NAME_LIMIT = 20;
   const DESCRIPTION_LIMIT = 200;
   
   const [productName, setProductName] = useState(editingProduct?.name || '');
