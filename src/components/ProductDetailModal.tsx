@@ -214,31 +214,31 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
             </div>
 
             {/* Right side - Product info */}
-            <div className="w-full lg:w-2/5 p-8 flex flex-col justify-start bg-white border-l border-gray-100">
-              <h2 className="text-3xl font-bold mb-6 text-gray-900">{product.name}</h2>
+            <div className="w-full lg:w-2/5 p-6 flex flex-col justify-start bg-white border-l border-gray-100">
+              <h2 className="text-xl font-bold mb-4 text-gray-900">{product.name}</h2>
               
-              <div className="space-y-6 flex-1">
+              <div className="space-y-4 flex-1">
                 <div>
-                  <span className="text-4xl font-bold text-green-600">
+                  <span className="text-2xl font-bold text-green-600">
                     ${product.price.toFixed(2)}
                   </span>
                 </div>
                 
                 <div>
-                  <h3 className="text-xl font-semibold mb-3 text-gray-900">Description</h3>
-                  <p className="text-gray-700 leading-relaxed text-base">
+                  <h3 className="text-lg font-semibold mb-2 text-gray-900">Description</h3>
+                  <p className="text-gray-700 leading-relaxed text-sm">
                     {product.description}
                   </p>
                 </div>
 
                 {/* Add to Cart Section */}
                 {vendorId && vendorName && (
-                  <div className="space-y-4 pt-6 border-t border-gray-200 mt-auto">
+                  <div className="space-y-4 pt-4 border-t border-gray-200 mt-auto">
                     <Button
-                      className="w-full h-12 text-lg font-semibold"
+                      className="w-full h-10"
                       onClick={handleAddToCart}
                     >
-                      <ShoppingCart className="h-5 w-5 mr-2" />
+                      <ShoppingCart className="h-4 w-4 mr-2" />
                       Add to Cart
                     </Button>
                   </div>
