@@ -131,12 +131,16 @@ export default function ShopManager() {
   }, [user, isPublicAccess]);
 
   useEffect(() => {
+    console.log('useEffect triggered - shopData:', !!shopData, 'preventAutoRedirect:', preventAutoRedirect, 'activeTab:', activeTab);
     // Set active tab based on whether shop data exists, but only if we're not preventing auto-redirect
     if (!preventAutoRedirect) {
-      setActiveTab(shopData ? "overview2" : "overview");
+      const newTab = shopData ? "overview2" : "overview";
+      console.log('Setting activeTab to:', newTab);
+      setActiveTab(newTab);
     }
     // Reset the flag after checking
     if (preventAutoRedirect) {
+      console.log('Resetting preventAutoRedirect flag');
       setPreventAutoRedirect(false);
     }
   }, [shopData, preventAutoRedirect]);
@@ -351,7 +355,10 @@ export default function ShopManager() {
         });
       }
 
-      // Refresh data
+      // Refresh data but don't auto-redirect if we're staying on current tab
+      if (activeTab === 'overview') {
+        setPreventAutoRedirect(true);
+      }
       await fetchShopData();
     } catch (error: any) {
       console.error('Error submitting:', error);
@@ -944,7 +951,9 @@ export default function ShopManager() {
                              if (isEditMode) {
                                // If currently editing, save the changes and stay on Shop tab
                                const currentTab = activeTab;
+                               console.log('Save clicked - currentTab:', currentTab);
                                if (currentTab === 'overview') {
+                                 console.log('Setting preventAutoRedirect to true');
                                  setPreventAutoRedirect(true);
                                }
                                await handleSubmit();
