@@ -921,9 +921,14 @@ export default function ShopManager() {
                           <Input
                             id="store_name"
                             value={formData.store_name}
-                            onChange={(e) => setFormData(prev => ({ ...prev, store_name: e.target.value }))}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const limitedValue = value.length > 20 ? value.slice(0, 20) : value;
+                              setFormData(prev => ({ ...prev, store_name: limitedValue }));
+                            }}
                             placeholder="Enter your store name"
                             disabled={shopData && !isEditMode}
+                            maxLength={20}
                           />
                         </div>
 
