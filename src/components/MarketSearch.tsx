@@ -267,6 +267,7 @@ export const MarketSearch = ({
                   onMarketTabChange?.(index);
                   const marketInfo = `${market.name} - ${market.address}, ${market.city}, ${market.state}`;
                   onSearchTermChange(marketInfo);
+                  setIsOpen(true); // Open dropdown to show market details
                 }
               }}
               className="text-sm font-medium"
@@ -359,21 +360,37 @@ export const MarketSearch = ({
                      )}
                      disabled={!canSelect}
                    >
-                    <div className={cn(
-                      "font-medium text-foreground",
-                      isActiveTab && "text-primary font-semibold",
-                      isAlreadySelected && !isActiveTab && "text-muted-foreground"
-                    )}>
-                      {market.name}
-                      {isActiveTab && <span className="ml-2 text-xs text-primary">(Selected)</span>}
-                      {isAlreadySelected && !isActiveTab && <span className="ml-2 text-xs text-muted-foreground">(Already added)</span>}
-                    </div>
-                    <div className={cn(
-                      "text-sm text-muted-foreground",
-                      isAlreadySelected && !isActiveTab && "text-muted-foreground"
-                    )}>
-                      {market.city}, {market.state}
-                    </div>
+                     <div className={cn(
+                       "font-medium text-foreground text-base mb-2",
+                       isActiveTab && "text-primary font-semibold",
+                       isAlreadySelected && !isActiveTab && "text-muted-foreground"
+                     )}>
+                       {market.name}
+                       {isActiveTab && <span className="ml-2 text-xs text-primary">(Selected)</span>}
+                       {isAlreadySelected && !isActiveTab && <span className="ml-2 text-xs text-muted-foreground">(Already added)</span>}
+                     </div>
+                     <div className={cn(
+                       "text-sm text-muted-foreground mb-1",
+                       isAlreadySelected && !isActiveTab && "text-muted-foreground"
+                     )}>
+                       📍 {market.address}, {market.city}, {market.state}
+                     </div>
+                     {market.days && market.days.length > 0 && (
+                       <div className={cn(
+                         "text-sm text-muted-foreground mb-1",
+                         isAlreadySelected && !isActiveTab && "text-muted-foreground"
+                       )}>
+                         📅 {market.days.join(', ')}
+                       </div>
+                     )}
+                     {market.hours && (
+                       <div className={cn(
+                         "text-sm text-muted-foreground",
+                         isAlreadySelected && !isActiveTab && "text-muted-foreground"
+                       )}>
+                         🕒 {market.hours}
+                       </div>
+                     )}
                   </button>
                 );
               })}

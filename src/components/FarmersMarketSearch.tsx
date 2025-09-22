@@ -159,11 +159,11 @@ export const FarmersMarketSearch = ({
   const handleMarketBadgeClick = (market: FarmersMarket) => {
     if (!isEditing) return;
     
-    // Populate search with market name and show only this specific market
+    // Populate search with market name
     const marketName = market.structured_formatting?.main_text || market.name;
     setSearchQuery(marketName);
     
-    // Show only the clicked market in suggestions
+    // Show only the clicked market in suggestions with full details
     setSuggestions([market]);
     setShowSuggestions(true);
     
@@ -247,22 +247,63 @@ export const FarmersMarketSearch = ({
             {filteredSuggestions.map((market) => (
               <div
                 key={market.place_id}
-                className="flex items-center p-3 hover:bg-muted cursor-pointer border-b border-border last:border-b-0"
+                className="flex items-start p-4 hover:bg-muted cursor-pointer border-b border-border last:border-b-0"
                 onClick={() => handleSuggestionClick(market)}
               >
-                <MapPin className="h-4 w-4 text-muted-foreground mr-3 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-foreground truncate">
+                <MapPin className="h-5 w-5 text-muted-foreground mr-4 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="font-semibold text-foreground text-base">
                     {market.structured_formatting?.main_text || market.name}
                   </div>
-                  <div className="text-sm text-muted-foreground truncate">
-                    {market.structured_formatting?.secondary_text || market.address}
-                  </div>
-                  {market.rating && (
-                    <div className="text-xs text-muted-foreground mt-1">
-                      ⭐ {market.rating.toFixed(1)}
-                      {market.user_ratings_total && ` (${market.user_ratings_total} reviews)`}
+                  <div className="text-sm text-muted-foreground">
+                    <div className="flex items-start gap-2">
+                      <MapPin className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                      <span>{market.structured_formatting?.secondary_text || market.address}</span>
                     </div>
+                  </div>
+                  {market.opening_hours?.weekday_text && (
+                    <div className="text-sm text-muted-foreground">
+                      <div className="flex items-start gap-2">
+                        <Clock className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <div className="font-medium mb-1">Hours:</div>
+                          <div className="space-y-0.5">
+                            {market.opening_hours.weekday_text.slice(0, 3).map((hours, idx) => (
+                              <div key={idx} className="text-xs">{hours}</div>
+                            ))}
+                            {market.opening_hours.weekday_text.length > 3 && (
+                              <div className="text-xs text-muted-foreground/70">
+                                +{market.opening_hours.weekday_text.length - 3} more days
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {market.rating && (
+                    <div className="text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <span>⭐ {market.rating.toFixed(1)}</span>
+                        {market.user_ratings_total && (
+                          <span className="text-xs">({market.user_ratings_total} reviews)</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {market.structured_formatting?.secondary_text && (
+                    <Button
+                      variant="outline" 
+                      size="sm"
+                      className="mt-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openInGoogleMaps(market.structured_formatting?.secondary_text || market.address);
+                      }}
+                    >
+                      <ExternalLink className="h-3 w-3 mr-1" />
+                      View on Map
+                    </Button>
                   )}
                 </div>
               </div>
