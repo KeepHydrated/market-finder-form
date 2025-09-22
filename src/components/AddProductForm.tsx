@@ -18,6 +18,10 @@ interface AddProductFormProps {
 }
 
 export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }: AddProductFormProps) => {
+  // Character limits
+  const NAME_LIMIT = 50;
+  const DESCRIPTION_LIMIT = 200;
+  
   const [productName, setProductName] = useState(editingProduct?.name || '');
   const [description, setDescription] = useState(editingProduct?.description || '');
   const [price, setPrice] = useState(editingProduct?.price?.toString() || '');
@@ -94,6 +98,24 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
       toast({
         title: "Missing information",
         description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (productName.length > NAME_LIMIT) {
+      toast({
+        title: "Product name too long",
+        description: `Product name cannot exceed ${NAME_LIMIT} characters.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (description.length > DESCRIPTION_LIMIT) {
+      toast({
+        title: "Description too long",
+        description: `Description cannot exceed ${DESCRIPTION_LIMIT} characters.`,
         variant: "destructive",
       });
       return;
@@ -250,23 +272,45 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="product-name">Product Name *</Label>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="product-name">Product Name *</Label>
+              <span className="text-xs text-muted-foreground">
+                {productName.length}/{NAME_LIMIT}
+              </span>
+            </div>
             <Input
               id="product-name"
               value={productName}
-              onChange={(e) => setProductName(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.length <= NAME_LIMIT) {
+                  setProductName(value);
+                }
+              }}
               placeholder="Enter product name"
+              maxLength={NAME_LIMIT}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description *</Label>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="description">Description *</Label>
+              <span className="text-xs text-muted-foreground">
+                {description.length}/{DESCRIPTION_LIMIT}
+              </span>
+            </div>
             <Textarea
               id="description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.length <= DESCRIPTION_LIMIT) {
+                  setDescription(value);
+                }
+              }}
               placeholder="Describe your product..."
               className="min-h-[100px] resize-none"
+              maxLength={DESCRIPTION_LIMIT}
             />
           </div>
 
