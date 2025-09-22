@@ -673,11 +673,23 @@ const Homepage = () => {
                         {submission.store_name}
                       </h3>
                       
-                      <div className="flex items-center gap-2 mt-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        <p className="text-sm text-muted-foreground">
-                          {submission.market_address || submission.selected_market || submission.search_term || "Location TBD"}
-                        </p>
+                      <div className="flex items-start gap-2 mt-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                        <div className="flex flex-col">
+                          <p className="text-sm font-medium text-foreground">
+                            {submission.selected_market || submission.search_term || "Farmers Market"}
+                          </p>
+                          {submission.market_address && (
+                            <p className="text-xs text-muted-foreground">
+                              {submission.market_address}
+                            </p>
+                          )}
+                          {submission.market_days && submission.market_days.length > 0 && (
+                            <p className="text-xs text-muted-foreground">
+                              {submission.market_days.join(', ')}
+                            </p>
+                          )}
+                        </div>
                       </div>
                       
                       {submission.primary_specialty && (
