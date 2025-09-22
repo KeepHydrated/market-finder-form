@@ -930,21 +930,26 @@ export default function ShopManager() {
                    {/* Edit Button positioned to the right of the card */}
                    {shopData && (
                      <div className="flex justify-center">
-                       <Button
-                         variant="outline"
-                         size="sm"
-                         onClick={() => {
-                           if (isEditMode) {
-                             // If currently editing, save the changes
-                             handleSubmit();
-                             setIsEditMode(false);
-                           } else {
-                             // If starting to edit, save current form data as backup
-                             setOriginalFormData({ ...formData });
-                             setIsEditMode(true);
-                           }
-                         }}
-                         disabled={isSubmitting}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={async () => {
+                            if (isEditMode) {
+                              // If currently editing, save the changes and stay on Shop tab
+                              const currentTab = activeTab;
+                              await handleSubmit();
+                              setIsEditMode(false);
+                              // Keep user on the Shop tab after saving
+                              if (currentTab === 'overview') {
+                                setActiveTab('overview');
+                              }
+                            } else {
+                              // If starting to edit, save current form data as backup
+                              setOriginalFormData({ ...formData });
+                              setIsEditMode(true);
+                            }
+                          }}
+                          disabled={isSubmitting}
                        >
                          {isEditMode ? (
                            <>
