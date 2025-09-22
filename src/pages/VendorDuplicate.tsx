@@ -38,6 +38,8 @@ interface AcceptedSubmission {
     }>;
   };
   market_place_id?: string;
+  google_rating?: number;
+  google_rating_count?: number;
   created_at: string;
 }
 
@@ -407,14 +409,14 @@ const VendorDuplicate = () => {
               >
                 {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
               </span>
-              {/* Rating display */}
+              {/* Google Maps Rating display */}
               <div className="flex items-center gap-2">
                 <Star className="h-4 w-4 text-yellow-500 fill-current" />
                 <span className="text-foreground font-medium">
-                  {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'}
+                  {acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
                 </span>
                 <span className="text-muted-foreground">
-                  ({reviewStats.totalReviews})
+                  ({acceptedSubmission.google_rating_count || 0})
                 </span>
               </div>
             </div>
@@ -489,10 +491,10 @@ const VendorDuplicate = () => {
                   >
                     <Star className="h-5 w-5 text-yellow-500 fill-current" />
                     <span className="text-foreground font-medium">
-                      {reviewStats.totalReviews > 0 ? reviewStats.averageRating : 'No rating'}
+                      {acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : 'No rating'}
                     </span>
                     <span className="text-muted-foreground">
-                      ({reviewStats.totalReviews})
+                      ({acceptedSubmission.google_rating_count || 0})
                     </span>
                   </div>
                 </div>

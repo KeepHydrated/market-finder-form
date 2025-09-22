@@ -230,6 +230,8 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          google_rating: number | null
+          google_rating_count: number | null
           id: string
           market_address: string | null
           market_days: string[] | null
@@ -249,6 +251,8 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
           id?: string
           market_address?: string | null
           market_days?: string[] | null
@@ -268,6 +272,8 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
           id?: string
           market_address?: string | null
           market_days?: string[] | null
