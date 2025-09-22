@@ -244,7 +244,7 @@ export const FarmersMarketSearch = ({
             ref={suggestionsRef}
             className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 max-h-96 overflow-y-auto mt-1"
           >
-            {filteredSuggestions.map((market) => (
+            {(searchQuery && suggestions.length === 1 ? suggestions : filteredSuggestions).map((market) => (
               <div
                 key={market.place_id}
                 className="flex items-start p-4 hover:bg-muted cursor-pointer border-b border-border last:border-b-0"
