@@ -670,7 +670,10 @@ const Homepage = () => {
                     {/* Store Information */}
                     <div className="p-4 space-y-3">
                       <h3 className="text-lg font-semibold text-foreground text-left">
-                        {submission.store_name}
+                        {submission.store_name.length > 20 
+                          ? `${submission.store_name.slice(0, 20)}...`
+                          : submission.store_name
+                        }
                       </h3>
                       
                       {submission.primary_specialty && (
