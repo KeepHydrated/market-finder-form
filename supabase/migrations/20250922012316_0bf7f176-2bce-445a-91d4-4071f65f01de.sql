@@ -1,0 +1,1 @@
+UPDATE submissions SET products = '[]'::jsonb WHERE products IS NOT NULL AND products != '[]'::jsonb;
