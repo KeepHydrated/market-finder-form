@@ -110,7 +110,34 @@ export const FarmersMarketSearch = ({
           )
         );
         
-        setSuggestions(uniqueSuggestions);
+        // Sort suggestions to prioritize exact matches
+        const sortedSuggestions = uniqueSuggestions.sort((a: FarmersMarket, b: FarmersMarket) => {
+          const aName = (a.structured_formatting?.main_text || a.name).toLowerCase();
+          const bName = (b.structured_formatting?.main_text || b.name).toLowerCase();
+          const query = searchQuery.toLowerCase();
+          
+          // Exact matches first
+          const aExact = aName === query;
+          const bExact = bName === query;
+          if (aExact && !bExact) return -1;
+          if (!aExact && bExact) return 1;
+          
+          // Starts with query next
+          const aStarts = aName.startsWith(query);
+          const bStarts = bName.startsWith(query);
+          if (aStarts && !bStarts) return -1;
+          if (!aStarts && bStarts) return 1;
+          
+          // Contains query last
+          const aContains = aName.includes(query);
+          const bContains = bName.includes(query);
+          if (aContains && !bContains) return -1;
+          if (!aContains && bContains) return 1;
+          
+          return 0;
+        });
+        
+        setSuggestions(sortedSuggestions);
         setShowSuggestions(true);
       } catch (error) {
         console.error('Error searching farmers markets:', error);
