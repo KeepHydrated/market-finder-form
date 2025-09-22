@@ -157,10 +157,10 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
           </Button>
         )}
 
-        <div className="flex flex-col lg:flex-row w-full bg-white min-h-[400px]">
+        <div className="flex flex-row w-full bg-white min-h-[400px]">
           {/* Left side - Images */}
-          <div className="w-full lg:w-3/5 relative bg-gray-50">
-            <div className="aspect-square lg:h-[400px] bg-muted relative group">
+          <div className="w-3/5 relative bg-gray-50">
+            <div className="h-[400px] bg-muted relative group">
                 {product.images.length > 0 ? (
                   <>
                     <img
@@ -214,7 +214,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
             </div>
 
             {/* Right side - Product info */}
-            <div className="w-full lg:w-2/5 p-4 flex flex-col justify-start bg-white border-l border-gray-100">
+            <div className="w-2/5 p-4 flex flex-col justify-start bg-white border-l border-gray-100">
               <h2 className="text-lg font-bold mb-3 text-gray-900">{product.name}</h2>
               
               <div className="space-y-3 flex-1">
