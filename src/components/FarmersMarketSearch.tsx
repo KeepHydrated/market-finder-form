@@ -187,7 +187,7 @@ export const FarmersMarketSearch = ({
   };
 
   const handleMarketBadgeClick = async (market: FarmersMarket) => {
-    if (!isEditing) return;
+    // Always allow viewing market details, regardless of editing state
     
     // Set badge click flag to prevent search from overriding
     setIsBadgeClick(true);
