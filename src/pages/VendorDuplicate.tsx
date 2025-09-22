@@ -135,6 +135,12 @@ const VendorDuplicate = () => {
           : undefined
       })) || [];
       
+      console.log('Fetched submissions with ratings:', parsedSubmissions.map(s => ({
+        name: s.store_name,
+        google_rating: s.google_rating,
+        google_rating_count: s.google_rating_count
+      })));
+      
       setAllVendors(parsedSubmissions);
       // Set the first vendor as the market representative and selected vendor
       if (parsedSubmissions.length > 0) {
