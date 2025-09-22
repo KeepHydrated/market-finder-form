@@ -609,6 +609,54 @@ export default function ShopManager() {
     }
   };
 
+  const handleDeleteAllProducts = async () => {
+    if (products.length === 0) {
+      toast({
+        title: "No Products",
+        description: "There are no products to delete.",
+      });
+      return;
+    }
+
+    if (!window.confirm(`Are you sure you want to delete all ${products.length} products? This action cannot be undone.`)) {
+      return;
+    }
+
+    setProducts([]);
+    
+    // If shop is already published, save empty products array to database immediately
+    if (shopData && user) {
+      try {
+        const { error } = await supabase
+          .from('submissions')
+          .update({ 
+            products: [],
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', shopData.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "All Products Deleted & Saved",
+          description: "All products have been deleted and changes saved.",
+        });
+      } catch (error: any) {
+        console.error('Error saving after delete all:', error);
+        toast({
+          title: "All Products Deleted Locally",
+          description: "Products were deleted but changes couldn't be saved. Please try editing your shop to save changes.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "All Products Deleted",
+        description: "All products have been deleted.",
+      });
+    }
+  };
+
   const handleDuplicateProduct = (product: any) => {
     const newProduct = {
       ...product,
@@ -985,10 +1033,22 @@ export default function ShopManager() {
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                       <CardTitle>Products</CardTitle>
-                      <Button onClick={() => setShowAddProduct(true)}>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Product
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        {products.length > 0 && (
+                          <Button 
+                            variant="destructive" 
+                            onClick={handleDeleteAllProducts}
+                            size="sm"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete All
+                          </Button>
+                        )}
+                        <Button onClick={() => setShowAddProduct(true)}>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Product
+                        </Button>
+                      </div>
                     </CardHeader>
                     <CardContent>
                       <ProductGrid
