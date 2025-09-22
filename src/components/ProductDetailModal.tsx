@@ -110,7 +110,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden">
         {/* Heart button positioned at top right of entire modal */}
         <Button
           variant="ghost"
@@ -157,11 +157,10 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
           </Button>
         )}
 
-        <div className="flex flex-col md:flex-row min-h-0 w-full">
+        <div className="flex flex-col md:flex-row min-h-[500px] w-full">
           {/* Left side - Images */}
-          <div className="md:w-1/2 relative">
-
-              <div className="aspect-[4/3] bg-muted relative group">
+          <div className="w-full md:w-1/2 relative">
+              <div className="aspect-[4/3] md:h-full bg-muted relative group">
                 {product.images.length > 0 ? (
                   <>
                     <img
@@ -215,17 +214,18 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
             </div>
 
             {/* Right side - Product info */}
-            <div className="md:w-1/2 p-6 flex flex-col">
-              <h2 className="text-2xl font-bold mb-6">{product.name}</h2>
+            <div className="w-full md:w-1/2 p-6 flex flex-col justify-start bg-white">
+              <h2 className="text-2xl font-bold mb-4">{product.name}</h2>
               
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div>
-                  <span className="text-xl font-medium text-foreground">
+                  <span className="text-3xl font-bold text-foreground">
                     ${product.price.toFixed(2)}
                   </span>
                 </div>
                 
                 <div>
+                  <h3 className="text-lg font-semibold mb-2">Description</h3>
                   <p className="text-foreground leading-relaxed">
                     {product.description}
                   </p>
