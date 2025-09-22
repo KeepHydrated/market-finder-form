@@ -605,7 +605,13 @@ const Homepage = () => {
                   <Card 
                     key={submission.id} 
                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]" 
-                    onClick={() => navigate(`/vendor/${submission.id}`)}
+                    onClick={() => navigate('/market', { 
+                      state: { 
+                        type: 'vendor', 
+                        selectedVendor: submission,
+                        allVendors: selectedMarket ? selectedMarket.vendors : acceptedSubmissions 
+                      } 
+                    })}
                   >
                     {/* Product Image */}
                     <div className="aspect-[4/3] bg-muted relative">
@@ -712,14 +718,17 @@ const Homepage = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                 {groupVendorsByMarket().map((market, index) => (
-                  <Card 
-                     key={index}
-                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]"
-                     onClick={() => {
-                       setSelectedMarket(market);
-                       setViewMode('vendors');
-                     }}
-                  >
+                   <Card 
+                      key={index}
+                      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]"
+                      onClick={() => navigate('/market', { 
+                        state: { 
+                          type: 'market', 
+                          selectedMarket: market,
+                          allVendors: market.vendors 
+                        } 
+                      })}
+                   >
                     {/* Vendor Images Collage */}
                     <div className="aspect-[4/3] bg-muted relative overflow-hidden">
                       {market.vendors.length === 1 ? (

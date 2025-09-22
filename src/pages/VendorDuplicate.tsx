@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,6 +49,7 @@ interface ReviewStats {
 
 const VendorDuplicate = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, profile, loading } = useAuth();
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
@@ -66,8 +67,31 @@ const VendorDuplicate = () => {
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
 
   useEffect(() => {
-    fetchAllVendors();
-  }, []);
+    // Check if data was passed from navigation
+    if (location.state) {
+      const { type, selectedVendor, selectedMarket, allVendors } = location.state as {
+        type: 'vendor' | 'market';
+        selectedVendor?: AcceptedSubmission;
+        selectedMarket?: { name: string; address: string; vendors: AcceptedSubmission[] };
+        allVendors: AcceptedSubmission[];
+      };
+      
+      setAllVendors(allVendors);
+      setLoadingData(false);
+      
+      if (type === 'vendor' && selectedVendor) {
+        setAcceptedSubmission(selectedVendor);
+        setSelectedVendor(selectedVendor);
+      } else if (type === 'market' && selectedMarket) {
+        // For market view, use the first vendor as the market representative
+        setAcceptedSubmission(selectedMarket.vendors[0]);
+        setSelectedVendor(null); // Start with vendor grid view
+      }
+    } else {
+      // Fallback to loading all vendors if no state passed
+      fetchAllVendors();
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (selectedVendor) {
