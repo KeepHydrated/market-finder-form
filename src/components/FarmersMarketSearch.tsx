@@ -51,6 +51,7 @@ export const FarmersMarketSearch = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [isBadgeClick, setIsBadgeClick] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -78,9 +79,11 @@ export const FarmersMarketSearch = ({
   // Search for farmers markets with debouncing
   useEffect(() => {
     const searchFarmersMarkets = async () => {
-      if (!searchQuery.trim() || searchQuery.length < 2) {
-        setSuggestions([]);
-        setShowSuggestions(false);
+      if (!searchQuery.trim() || searchQuery.length < 2 || isBadgeClick) {
+        if (!isBadgeClick) {
+          setSuggestions([]);
+          setShowSuggestions(false);
+        }
         return;
       }
 
@@ -186,6 +189,9 @@ export const FarmersMarketSearch = ({
   const handleMarketBadgeClick = (market: FarmersMarket) => {
     if (!isEditing) return;
     
+    // Set badge click flag to prevent search from overriding
+    setIsBadgeClick(true);
+    
     // Populate search with market name
     const marketName = market.structured_formatting?.main_text || market.name;
     setSearchQuery(marketName);
@@ -252,7 +258,10 @@ export const FarmersMarketSearch = ({
                   : "Edit to change markets"
             }
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setIsBadgeClick(false);
+              setSearchQuery(e.target.value);
+            }}
             onFocus={() => suggestions.length > 0 && isEditing && setShowSuggestions(true)}
             className="pl-10 pr-4 py-3 text-lg"
             autoComplete="off"
