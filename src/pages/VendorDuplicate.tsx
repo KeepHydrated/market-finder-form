@@ -321,7 +321,7 @@ const VendorDuplicate = () => {
   const formatSchedule = (marketDays?: string[], marketHours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>) => {
     // First, try to use Google Maps opening hours if available
     if (marketOpeningHours?.weekday_text && marketOpeningHours.weekday_text.length > 0) {
-      return marketOpeningHours.weekday_text;
+      return marketOpeningHours.weekday_text.filter(day => !day.toLowerCase().includes('closed'));
     }
 
     // Fallback to stored hours if Google Maps data is not available
