@@ -9,7 +9,6 @@ import { ShoppingCartProvider } from "@/contexts/ShoppingCartContext";
 import { ShoppingCart } from "@/components/shopping/ShoppingCart";
 import Index from "./pages/Index";
 import Homepage from "./pages/Homepage";
-import Vendor from "./pages/Vendor";
 import VendorDuplicate from "./pages/VendorDuplicate";
 import Likes from "./pages/Likes";
 import NotFound from "./pages/NotFound";
@@ -35,7 +34,6 @@ const App = () => (
                 <Route path="/" element={<Navigate to="/profile" replace />} />
                 <Route path="/profile" element={<Index />} />
                 <Route path="/homepage" element={<Homepage />} />
-                <Route path="/vendor/:id" element={<Vendor />} />
                 <Route path="/market" element={<VendorDuplicate />} />
                 <Route path="/likes" element={<Likes />} />
                 <Route path="/order-success" element={<OrderSuccess />} />
