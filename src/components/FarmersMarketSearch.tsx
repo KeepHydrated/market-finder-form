@@ -186,7 +186,7 @@ export const FarmersMarketSearch = ({
     onMarketsChange(selectedMarkets.filter(market => market.place_id !== marketToRemove.place_id));
   };
 
-  const handleMarketBadgeClick = (market: FarmersMarket) => {
+  const handleMarketBadgeClick = async (market: FarmersMarket) => {
     if (!isEditing) return;
     
     // Set badge click flag to prevent search from overriding
@@ -196,8 +196,39 @@ export const FarmersMarketSearch = ({
     const marketName = market.structured_formatting?.main_text || market.name;
     setSearchQuery(marketName);
     
-    // Show only the clicked market in suggestions with full details
-    setSuggestions([market]);
+    // If market doesn't have detailed info, search for it to get full details
+    if (!market.opening_hours || !market.rating) {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('farmers-market-search', {
+          body: {
+            query: marketName,
+            location: userLocation
+          }
+        });
+
+        if (!error && data.predictions?.length > 0) {
+          // Find the exact market match
+          const detailedMarket = data.predictions.find((p: FarmersMarket) => 
+            p.place_id === market.place_id || 
+            (p.structured_formatting?.main_text || p.name).toLowerCase() === marketName.toLowerCase()
+          ) || data.predictions[0];
+          
+          setSuggestions([detailedMarket]);
+        } else {
+          setSuggestions([market]);
+        }
+      } catch (error) {
+        console.error('Error fetching market details:', error);
+        setSuggestions([market]);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Market already has details, show it directly
+      setSuggestions([market]);
+    }
+    
     setShowSuggestions(true);
     
     // Focus the input
