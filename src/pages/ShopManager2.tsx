@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -67,7 +67,7 @@ export default function ShopManager() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [originalFormData, setOriginalFormData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>('overview');
-  const [preventAutoRedirect, setPreventAutoRedirect] = useState(false);
+  const isSavingRef = useRef(false);
   
   // Analytics state
   const [analytics, setAnalytics] = useState({
@@ -131,19 +131,17 @@ export default function ShopManager() {
   }, [user, isPublicAccess]);
 
   useEffect(() => {
-    console.log('useEffect triggered - shopData:', !!shopData, 'preventAutoRedirect:', preventAutoRedirect, 'activeTab:', activeTab);
-    // Set active tab based on whether shop data exists, but only if we're not preventing auto-redirect
-    if (!preventAutoRedirect) {
+    console.log('useEffect triggered - shopData:', !!shopData, 'isSaving:', isSavingRef.current, 'activeTab:', activeTab);
+    // Set active tab based on whether shop data exists, but only if we're not in a save operation
+    if (!isSavingRef.current) {
       const newTab = shopData ? "overview2" : "overview";
       console.log('Setting activeTab to:', newTab);
       setActiveTab(newTab);
+    } else {
+      console.log('Skipping auto-redirect because we are saving');
+      isSavingRef.current = false; // Reset the flag
     }
-    // Reset the flag after checking
-    if (preventAutoRedirect) {
-      console.log('Resetting preventAutoRedirect flag');
-      setPreventAutoRedirect(false);
-    }
-  }, [shopData, preventAutoRedirect]);
+  }, [shopData]);
 
   const fetchShopData = async () => {
     if (!user) return;
@@ -357,7 +355,7 @@ export default function ShopManager() {
 
       // Refresh data but don't auto-redirect if we're staying on current tab
       if (activeTab === 'overview') {
-        setPreventAutoRedirect(true);
+        isSavingRef.current = true;
       }
       await fetchShopData();
     } catch (error: any) {
@@ -950,12 +948,12 @@ export default function ShopManager() {
                            onClick={async () => {
                              if (isEditMode) {
                                // If currently editing, save the changes and stay on Shop tab
-                               const currentTab = activeTab;
-                               console.log('Save clicked - currentTab:', currentTab);
-                               if (currentTab === 'overview') {
-                                 console.log('Setting preventAutoRedirect to true');
-                                 setPreventAutoRedirect(true);
-                               }
+                                const currentTab = activeTab;
+                                console.log('Save clicked - currentTab:', currentTab);
+                                if (currentTab === 'overview') {
+                                  console.log('Setting isSaving to true');
+                                  isSavingRef.current = true;
+                                }
                                await handleSubmit();
                                setIsEditMode(false);
                              } else {
