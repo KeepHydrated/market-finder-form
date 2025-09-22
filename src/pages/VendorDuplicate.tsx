@@ -111,6 +111,14 @@ const VendorDuplicate = () => {
   useEffect(() => {
     if (acceptedSubmission) {
       fetchMarketOpeningHours();
+      // Debug log for current accepted submission
+      console.log('Current acceptedSubmission ratings:', {
+        store_name: acceptedSubmission.store_name,
+        google_rating: acceptedSubmission.google_rating,
+        google_rating_count: acceptedSubmission.google_rating_count,
+        google_rating_type: typeof acceptedSubmission.google_rating,
+        google_rating_count_type: typeof acceptedSubmission.google_rating_count
+      });
     }
   }, [acceptedSubmission]);
 
@@ -141,8 +149,13 @@ const VendorDuplicate = () => {
       console.log('Fetched submissions with ratings:', parsedSubmissions.map(s => ({
         name: s.store_name,
         google_rating: s.google_rating,
-        google_rating_count: s.google_rating_count
+        google_rating_count: s.google_rating_count,
+        google_rating_type: typeof s.google_rating,
+        google_rating_count_type: typeof s.google_rating_count
       })));
+      
+      // Also log the full objects to see their structure
+      console.log('Full parsed submissions:', parsedSubmissions);
       
       setAllVendors(parsedSubmissions);
       // Set the first vendor as the market representative and selected vendor
