@@ -87,7 +87,7 @@ export const VendorApplication = ({ data, onChange, readOnly = false }: VendorAp
 
         <div className="space-y-2">
           <Label htmlFor="primary-specialty" className="text-lg font-medium text-foreground">
-            Primary Specialty
+            Category *
           </Label>
           <Select 
             value={currentData.primarySpecialty} 
