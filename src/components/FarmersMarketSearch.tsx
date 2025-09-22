@@ -226,7 +226,7 @@ export const FarmersMarketSearch = ({
             }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => filteredSuggestions.length > 0 && isEditing && setShowSuggestions(true)}
+            onFocus={() => suggestions.length > 0 && isEditing && setShowSuggestions(true)}
             className="pl-10 pr-4 py-3 text-lg"
             autoComplete="off"
             disabled={selectedMarkets.length >= maxMarkets || !isEditing}
