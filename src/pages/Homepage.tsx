@@ -906,7 +906,7 @@ const Homepage = () => {
 
                     {/* Market Information */}
                     <div className="p-4 space-y-3">
-                      <h3 className="text-lg font-semibold text-foreground">
+                      <h3 className="text-base font-semibold text-foreground">
                         {market.name}
                       </h3>
                       
