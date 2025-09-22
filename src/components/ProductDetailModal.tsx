@@ -110,7 +110,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[900px] max-h-[85vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white">
         {/* Heart button positioned at top right of entire modal */}
         <Button
           variant="ghost"
@@ -157,10 +157,10 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
           </Button>
         )}
 
-        <div className="flex flex-col lg:flex-row w-full bg-white min-h-[600px]">
+        <div className="flex flex-col lg:flex-row w-full bg-white min-h-[400px]">
           {/* Left side - Images */}
           <div className="w-full lg:w-3/5 relative bg-gray-50">
-            <div className="aspect-square lg:h-[600px] bg-muted relative group">
+            <div className="aspect-square lg:h-[400px] bg-muted relative group">
                 {product.images.length > 0 ? (
                   <>
                     <img
@@ -214,31 +214,31 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
             </div>
 
             {/* Right side - Product info */}
-            <div className="w-full lg:w-2/5 p-6 flex flex-col justify-start bg-white border-l border-gray-100">
-              <h2 className="text-xl font-bold mb-4 text-gray-900">{product.name}</h2>
+            <div className="w-full lg:w-2/5 p-4 flex flex-col justify-start bg-white border-l border-gray-100">
+              <h2 className="text-lg font-bold mb-3 text-gray-900">{product.name}</h2>
               
-              <div className="space-y-4 flex-1">
+              <div className="space-y-3 flex-1">
                 <div>
-                  <span className="text-2xl font-bold text-green-600">
+                  <span className="text-xl font-bold text-green-600">
                     ${product.price.toFixed(2)}
                   </span>
                 </div>
                 
                 <div>
-                  <h3 className="text-lg font-semibold mb-2 text-gray-900">Description</h3>
-                  <p className="text-gray-700 leading-relaxed text-sm">
+                  <h3 className="text-base font-semibold mb-2 text-gray-900">Description</h3>
+                  <p className="text-gray-700 leading-relaxed text-xs">
                     {product.description}
                   </p>
                 </div>
 
                 {/* Add to Cart Section */}
                 {vendorId && vendorName && (
-                  <div className="space-y-4 pt-4 border-t border-gray-200 mt-auto">
+                  <div className="space-y-3 pt-3 border-t border-gray-200 mt-auto">
                     <Button
-                      className="w-full h-10"
+                      className="w-full h-8 text-sm"
                       onClick={handleAddToCart}
                     >
-                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      <ShoppingCart className="h-3 w-3 mr-2" />
                       Add to Cart
                     </Button>
                   </div>
