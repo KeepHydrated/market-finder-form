@@ -681,7 +681,7 @@ const Homepage = () => {
 
                       {/* Market Details Section - Moved to bottom */}
                       <div className="mt-2">
-                        <h4 className="text-xs font-semibold text-foreground mb-1">
+                        <h4 className="text-sm font-semibold text-foreground mb-1">
                           {submission.selected_market || submission.search_term || "Farmers Market"}
                         </h4>
                         {submission.market_address && (
