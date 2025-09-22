@@ -2,9 +2,15 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { CartButton } from "@/components/shopping/CartButton";
-import { ArrowLeft, Heart, Store } from "lucide-react";
+import { ArrowLeft, Heart, Store, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface HeaderProps {
   user: any;
@@ -47,7 +53,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
     <header className="bg-card shadow-sm border-b sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
             {showBackButton && onBackClick && (
               <Button
                 variant="ghost"
@@ -63,6 +69,51 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 Farmer's Market Hub
               </h1>
             </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="ml-4">
+                  Categories
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuItem>
+                  <Link to="/homepage?category=fruits" className="w-full">
+                    Fruits
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/homepage?category=vegetables" className="w-full">
+                    Vegetables
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/homepage?category=herbs" className="w-full">
+                    Herbs & Spices
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/homepage?category=dairy" className="w-full">
+                    Dairy & Eggs
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/homepage?category=baked" className="w-full">
+                    Baked Goods
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/homepage?category=meat" className="w-full">
+                    Meat & Poultry
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/homepage?category=crafts" className="w-full">
+                    Crafts & Goods
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <div className="flex items-center space-x-4">
             <Link to="/likes">
