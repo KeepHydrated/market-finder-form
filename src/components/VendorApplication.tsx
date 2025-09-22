@@ -28,6 +28,11 @@ export const VendorApplication = ({ data, onChange, readOnly = false }: VendorAp
 
   const updateData = (field: keyof VendorApplicationData, value: string) => {
     if (onChange && !readOnly) {
+      // Apply character limit for storeName
+      if (field === 'storeName' && value.length > 20) {
+        value = value.slice(0, 20);
+      }
+      
       onChange({
         ...currentData,
         [field]: value
