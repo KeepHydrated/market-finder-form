@@ -29,6 +29,15 @@ interface AcceptedSubmission {
   market_address?: string;
   market_days?: string[];
   market_hours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
+  google_opening_hours?: {
+    weekday_text?: string[];
+    open_now?: boolean;
+    periods?: Array<{
+      close?: { day: number; time: string };
+      open?: { day: number; time: string };
+    }>;
+  };
+  market_place_id?: string;
   created_at: string;
 }
 
@@ -65,6 +74,7 @@ const VendorDuplicate = () => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const [marketOpeningHours, setMarketOpeningHours] = useState<any>(null);
 
   useEffect(() => {
     // Check if data was passed from navigation
@@ -92,6 +102,12 @@ const VendorDuplicate = () => {
       fetchAllVendors();
     }
   }, [location.state]);
+
+  useEffect(() => {
+    if (acceptedSubmission) {
+      fetchMarketOpeningHours();
+    }
+  }, [acceptedSubmission]);
 
   useEffect(() => {
     if (selectedVendor) {
@@ -282,7 +298,36 @@ const VendorDuplicate = () => {
     setSelectedPhotos(prev => prev.filter((_, i) => i !== index));
   };
 
+  const fetchMarketOpeningHours = async () => {
+    if (!acceptedSubmission?.selected_market) return;
+
+    try {
+      console.log('Fetching opening hours for market:', acceptedSubmission.selected_market);
+      
+      const response = await supabase.functions.invoke('farmers-market-search', {
+        body: { 
+          query: acceptedSubmission.selected_market,
+          location: null 
+        }
+      });
+
+      if (response.data?.predictions && response.data.predictions.length > 0) {
+        const market = response.data.predictions[0];
+        console.log('Market opening hours data:', market.opening_hours);
+        setMarketOpeningHours(market.opening_hours);
+      }
+    } catch (error) {
+      console.error('Error fetching market opening hours:', error);
+    }
+  };
+
   const formatSchedule = (marketDays?: string[], marketHours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>) => {
+    // First, try to use Google Maps opening hours if available
+    if (marketOpeningHours?.weekday_text && marketOpeningHours.weekday_text.length > 0) {
+      return marketOpeningHours.weekday_text.join('\n');
+    }
+
+    // Fallback to stored hours if Google Maps data is not available
     if (!marketDays || !marketHours) return "Schedule TBD";
     
     const dayNames = {
@@ -401,9 +446,20 @@ const VendorDuplicate = () => {
 
           <div className="flex items-start gap-2">
             <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <span className="text-muted-foreground text-base font-normal whitespace-pre-line">
-              {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours)}
-            </span>
+            <div className="text-muted-foreground text-base font-normal whitespace-pre-line">
+              {marketOpeningHours?.open_now !== undefined && (
+                <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
+                  marketOpeningHours.open_now 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {marketOpeningHours.open_now ? 'Open Now' : 'Closed'}
+                </div>
+              )}
+              <div>
+                {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours)}
+              </div>
+            </div>
           </div>
         </div>
       </div>
