@@ -26,6 +26,7 @@ interface ShopData {
   products: any[];
   selected_markets: any[];
   search_term: string;
+  market_address?: string;
   status: string;
   vacation_mode?: boolean;
   created_at: string;
@@ -319,7 +320,9 @@ export default function ShopManager() {
         products: products,
         selected_markets: selectedFarmersMarkets.map(m => m.name),
         search_term: selectedFarmersMarkets.length > 0 ? selectedFarmersMarkets[0].name : '',
-        market_address: selectedFarmersMarkets.length > 0 ? selectedFarmersMarkets[0].address : '',
+        market_address: selectedFarmersMarkets.length > 0 && selectedFarmersMarkets[0].address 
+          ? selectedFarmersMarkets[0].address 
+          : (shopData?.market_address || ''),
         status: 'accepted'
       };
 
