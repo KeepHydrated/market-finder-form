@@ -71,45 +71,70 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             </Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="ml-4">
-                  Categories
+                 <Button variant="ghost" size="sm" className="ml-4">
+                  Category
                   <ChevronDown className="h-4 w-4 ml-1" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=fruits" className="w-full">
-                    Fruits
+                  <Link to="/homepage?category=Fresh Flowers & Plants" className="w-full">
+                    Fresh Flowers & Plants
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=vegetables" className="w-full">
-                    Vegetables
+                  <Link to="/homepage?category=Bakery" className="w-full">
+                    Bakery
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=herbs" className="w-full">
-                    Herbs & Spices
+                  <Link to="/homepage?category=Dairy" className="w-full">
+                    Dairy
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=dairy" className="w-full">
-                    Dairy & Eggs
+                  <Link to="/homepage?category=Rancher" className="w-full">
+                    Rancher
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=baked" className="w-full">
-                    Baked Goods
+                  <Link to="/homepage?category=Beverages" className="w-full">
+                    Beverages
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=meat" className="w-full">
-                    Meat & Poultry
+                  <Link to="/homepage?category=Seasonings & Spices" className="w-full">
+                    Seasonings & Spices
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=crafts" className="w-full">
-                    Crafts & Goods
+                  <Link to="/homepage?category=Pets" className="w-full">
+                    Pets
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/homepage?category=Home Goods" className="w-full">
+                    Home Goods
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/homepage?category=Farmers" className="w-full">
+                    Farmers
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/homepage?category=Ready to Eat" className="w-full">
+                    Ready to Eat
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/homepage?category=Packaged Goods & Snacks" className="w-full">
+                    Packaged Goods & Snacks
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/homepage?category=Artisan" className="w-full">
+                    Artisan
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
