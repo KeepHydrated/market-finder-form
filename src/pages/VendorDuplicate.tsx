@@ -494,18 +494,6 @@ const VendorDuplicate = () => {
             </div>
           </div>
 
-          {/* Google Reviews Section */}
-          <div className="flex items-start gap-2">
-            <div className="flex items-center gap-2 mt-0.5">
-              <Star className="h-4 w-4 text-yellow-500 fill-current" />
-              <span className="text-foreground font-semibold text-lg">
-                {acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
-              </span>
-              <span className="text-muted-foreground text-sm">
-                ({acceptedSubmission.google_rating_count || 0}) Google reviews
-              </span>
-            </div>
-          </div>
         </div>
       </div>
       
