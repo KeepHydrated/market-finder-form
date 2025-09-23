@@ -117,7 +117,8 @@ const VendorDuplicate = () => {
         google_rating: acceptedSubmission.google_rating,
         google_rating_count: acceptedSubmission.google_rating_count,
         google_rating_type: typeof acceptedSubmission.google_rating,
-        google_rating_count_type: typeof acceptedSubmission.google_rating_count
+        google_rating_count_type: typeof acceptedSubmission.google_rating_count,
+        selected_market: acceptedSubmission.selected_market
       });
     }
   }, [acceptedSubmission]);
@@ -326,6 +327,8 @@ const VendorDuplicate = () => {
     if (!acceptedSubmission?.selected_market) return;
 
     try {
+      console.log('Fetching market opening hours for:', acceptedSubmission.selected_market);
+      
       const response = await supabase.functions.invoke('farmers-market-search', {
         body: { 
           query: acceptedSubmission.selected_market,
@@ -333,9 +336,14 @@ const VendorDuplicate = () => {
         }
       });
 
+      console.log('Market search response:', response);
+
       if (response.data?.predictions && response.data.predictions.length > 0) {
         const market = response.data.predictions[0];
+        console.log('Market opening hours data:', market.opening_hours);
         setMarketOpeningHours(market.opening_hours);
+      } else {
+        console.log('No market predictions found');
       }
     } catch (error) {
       console.error('Error fetching market opening hours:', error);
@@ -345,14 +353,48 @@ const VendorDuplicate = () => {
   const formatSchedule = (marketDays?: string[], marketHours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>) => {
     // First, try to use Google Maps opening hours if available
     if (marketOpeningHours?.weekday_text && marketOpeningHours.weekday_text.length > 0) {
+      console.log('Using Google Maps weekday_text:', marketOpeningHours.weekday_text);
       const openDays = marketOpeningHours.weekday_text.filter(day => 
         !day.toLowerCase().includes('closed') && day.trim().length > 0
       );
       return openDays.length > 0 ? openDays : ["Schedule TBD"];
     }
 
+    // Check for periods array format as backup
+    if (marketOpeningHours?.periods && marketOpeningHours.periods.length > 0) {
+      console.log('Using Google Maps periods:', marketOpeningHours.periods);
+      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const scheduleMap = new Map();
+      
+      marketOpeningHours.periods.forEach((period: any) => {
+        if (period.open) {
+          const dayName = dayNames[period.open.day] || 'Unknown';
+          const openTime = period.open.time || '0000';
+          const closeTime = period.close?.time || '2359';
+          
+          const formatTime = (time: string) => {
+            const hour = parseInt(time.substring(0, 2));
+            const minute = time.substring(2, 4);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+            return `${displayHour}:${minute} ${ampm}`;
+          };
+          
+          const schedule = `${formatTime(openTime)} - ${formatTime(closeTime)}`;
+          scheduleMap.set(dayName, schedule);
+        }
+      });
+      
+      if (scheduleMap.size > 0) {
+        return Array.from(scheduleMap.entries()).map(([day, time]) => `${day}: ${time}`);
+      }
+    }
+
     // Fallback to stored hours if Google Maps data is not available
-    if (!marketDays || !marketHours) return ["Schedule TBD"];
+    if (!marketDays || !marketHours) {
+      console.log('No market data available, showing TBD');
+      return ["Schedule TBD"];
+    }
     
     const dayNames = {
       'mon': 'Monday', 'tue': 'Tuesday', 'wed': 'Wednesday', 
