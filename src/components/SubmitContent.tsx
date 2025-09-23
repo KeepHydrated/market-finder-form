@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { MarketSearch } from "@/components/MarketSearch";
-import { MarketDetails } from "@/components/MarketDetails";
-import { AddMarketForm } from "@/components/AddMarketForm";
+import { FarmersMarketSearch } from "@/components/FarmersMarketSearch";
 import { AddProductForm } from "@/components/AddProductForm";
 import { ProductGrid } from "@/components/ProductGrid";
 import { Card } from "@/components/ui/card";
@@ -12,14 +10,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { Plus } from "lucide-react";
 
 
-interface Market {
-  id: number;
+interface FarmersMarket {
+  place_id: string;
   name: string;
   address: string;
-  city: string;
-  state: string;
-  days: string[];
-  hours: string;
+  rating?: number;
+  user_ratings_total?: number;
+  opening_hours?: {
+    open_now: boolean;
+    weekday_text: string[];
+  };
+  photos?: { photo_reference: string }[];
+  geometry?: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
+  description: string;
+  structured_formatting?: {
+    main_text: string;
+    secondary_text: string;
+  };
 }
 
 interface Product {
@@ -36,13 +48,8 @@ interface SubmitContentProps {
 
 export const SubmitContent = ({ user }: SubmitContentProps) => {
   const { toast } = useToast();
-  const [markets, setMarkets] = useState<Market[]>([]);
-  const [selectedMarkets, setSelectedMarkets] = useState<Market[]>([]);
-  const [activeMarketTab, setActiveMarketTab] = useState<number | null>(null);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedMarkets, setSelectedMarkets] = useState<FarmersMarket[]>([]);
   const [showAddProductForm, setShowAddProductForm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [submittedMarketName, setSubmittedMarketName] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [vendorApplicationData, setVendorApplicationData] = useState<VendorApplicationData>({
     storeName: "",
@@ -50,7 +57,6 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
     website: "",
     description: ""
   });
-  const [customMarketData, setCustomMarketData] = useState<any>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
@@ -73,26 +79,10 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
     }
   }, []);
 
-  // Load markets from database
-  const loadMarkets = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('markets')
-        .select('*')
-        .order('name');
-      
-      if (error) throw error;
-      setMarkets(data || []);
-    } catch (error) {
-      console.error('Error loading markets:', error);
-    }
-  }, []);
-
   // Load products once on mount
   useEffect(() => {
     loadProducts();
-    loadMarkets();
-  }, [loadProducts, loadMarkets]);
+  }, [loadProducts]);
 
   // Save products when they change
   useEffect(() => {
@@ -101,112 +91,9 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
     }
   }, [products, saveProducts]);
 
-  const handleSelectMarket = useCallback((market: Market) => {
-    setSelectedMarkets(prev => [...prev, market]);
+  const handleMarketsChange = useCallback((markets: FarmersMarket[]) => {
+    setSelectedMarkets(markets);
   }, []);
-
-  const handleRemoveMarket = useCallback((market: Market) => {
-    setSelectedMarkets(prev => prev.filter(m => m.id !== market.id));
-  }, []);
-
-  const handleReplaceMarket = useCallback((oldMarket: Market, newMarket: Market) => {
-    setSelectedMarkets(prev => prev.map(m => m.id === oldMarket.id ? newMarket : m));
-  }, []);
-
-  const handleAddMarket = useCallback((replacementMarket?: Market) => {
-    setShowAddForm(true);
-    // TODO: Store replacement market context for when the submission is approved
-    // This will be used to replace the selected market if there is one
-  }, []);
-
-  const handleMarketAdded = useCallback(async (marketData: any) => {
-    console.log('🔍 handleMarketAdded called with:', marketData);
-    console.log('🔍 handleMarketAdded function actually executing!');
-    try {
-      // Extract city and state from address
-      const addressParts = marketData.address.split(',').map((part: string) => part.trim());
-      let city = '';
-      let state = '';
-      
-      if (addressParts.length >= 2) {
-        // For format like "Place, Street, City, State" or "Place, City, State"
-        city = addressParts[addressParts.length - 2] || '';
-        const lastPart = addressParts[addressParts.length - 1] || '';
-        // Extract state (first 2 chars if it contains state abbreviation)
-        const stateMatch = lastPart.match(/\b[A-Z]{2}\b/);
-        state = stateMatch ? stateMatch[0] : lastPart.substring(0, 2).toUpperCase();
-      }
-      
-      // Normalize days array (ensure it's an array)
-      const normalizedDays = Array.isArray(marketData.days) ? marketData.days : 
-                            marketData.days ? [marketData.days] : [];
-      
-      // Insert market into database
-      const { data, error } = await supabase
-        .from('markets')
-        .insert({
-          name: marketData.name,
-          address: marketData.address,
-          city: city || 'Unknown',
-          state: state || 'Unknown',
-          days: normalizedDays,
-          hours: marketData.hours || null
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('🚨 Database error:', error);
-        throw error;
-      }
-
-      console.log('✅ Market inserted successfully:', data);
-
-      // Add new market to local state
-      const newMarket: Market = {
-        id: data.id,
-        name: data.name,
-        address: data.address,
-        city: data.city,
-        state: data.state,
-        days: data.days,
-        hours: data.hours || ''
-      };
-      
-      console.log('🔍 Creating newMarket object:', newMarket);
-      
-      setMarkets(prev => {
-        console.log('🔍 Previous markets:', prev);
-        const updated = [...prev, newMarket];
-        console.log('🔍 Updated markets:', updated);
-        return updated;
-      });
-      setSelectedMarkets(prev => {
-        console.log('🔍 Previous selectedMarkets:', prev);
-        const updated = [...prev, newMarket];
-        console.log('🔍 Updated selectedMarkets:', updated);
-        return updated;
-      });
-      setSearchTerm(marketData.name);
-      setSubmittedMarketName(marketData.name);
-      setCustomMarketData(marketData);
-      setShowAddForm(false);
-      
-      toast({
-        title: "Market Created Successfully",
-        description: "Your market has been added and is now available in the list.",
-      });
-
-    } catch (error: any) {
-      console.error('Error adding market:', error);
-      toast({
-        title: "Error Adding Market",
-        description: `Failed to add market: ${error.message || 'Unknown error'}`,
-        variant: "destructive"
-      });
-      // Don't close the modal on error so user can try again
-    }
-  }, [toast]);
 
   const handleAddProduct = useCallback(() => {
     setShowAddProductForm(true);
@@ -279,11 +166,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
         website: "",
         description: ""
       });
-      setCustomMarketData(null);
       setIsSubmitted(false);
-      setSearchTerm("");
-      setSubmittedMarketName(null);
-      setActiveMarketTab(null);
       
       toast({
         title: "Shop Deleted",
@@ -329,7 +212,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
           website: vendorApplicationData.website,
           description: vendorApplicationData.description,
           products: JSON.stringify(products),
-          selected_markets: JSON.stringify(selectedMarkets.map(m => m.name)),
+          selected_markets: JSON.stringify(selectedMarkets.map(m => m.structured_formatting?.main_text || m.name)),
           market_data: JSON.stringify(selectedMarkets),
           status: 'accepted'
         });
@@ -366,20 +249,17 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
         </div>
       )}
 
-      <MarketSearch 
-        markets={markets}
-        onSelectMarket={handleSelectMarket}
-        onAddMarket={handleAddMarket}
-        searchTerm={searchTerm}
-        onSearchTermChange={setSearchTerm}
-        submittedMarketName={submittedMarketName}
-        disabled={isSubmitted}
-        selectedMarkets={selectedMarkets}
-        onRemoveMarket={handleRemoveMarket}
-        activeMarketTab={activeMarketTab}
-        onMarketTabChange={setActiveMarketTab}
-        onReplaceMarket={handleReplaceMarket}
-      />
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-foreground">
+          Which farmers markets do you sell at? (Up to 3) *
+        </label>
+        <FarmersMarketSearch 
+          selectedMarkets={selectedMarkets}
+          onMarketsChange={handleMarketsChange}
+          maxMarkets={3}
+          isEditing={!isSubmitted}
+        />
+      </div>
       
       <Card className="mt-8 p-8 bg-card border-border">
         <VendorApplication 
@@ -443,11 +323,6 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
         )}
       </div>
 
-      <AddMarketForm 
-        open={showAddForm} 
-        onClose={() => setShowAddForm(false)}
-        onMarketAdded={handleMarketAdded}
-      />
       
       <AddProductForm 
         open={showAddProductForm} 
