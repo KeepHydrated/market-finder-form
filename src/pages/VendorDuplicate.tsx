@@ -431,16 +431,6 @@ const VendorDuplicate = () => {
               >
                 {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
               </span>
-              {/* Google Maps Rating display */}
-              <div className="flex items-center gap-2">
-                <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                <span className="text-foreground font-medium">
-                  {acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
-                </span>
-                <span className="text-muted-foreground">
-                  ({acceptedSubmission.google_rating_count || 0})
-                </span>
-              </div>
             </div>
             {/* Heart icon */}
             <Button
