@@ -35,22 +35,23 @@ export const VendorApplication = ({ data, onChange, readOnly = false }: VendorAp
     if (onChange && !readOnly) {
       console.log(`Updating ${field}: original length = ${value.length}, value = "${value}"`);
       
-      // Apply character limits
+      // Apply character limits immediately
+      let truncatedValue = value;
       if (field === 'storeName' && value.length > 20) {
-        value = value.slice(0, 20);
-        console.log(`Truncated storeName to: "${value}" (${value.length} chars)`);
+        truncatedValue = value.slice(0, 20);
+        console.log(`Truncated storeName to: "${truncatedValue}" (${truncatedValue.length} chars)`);
       }
       
       if (field === 'description' && value.length > 500) {
-        value = value.slice(0, 500);
-        console.log(`Truncated description to: "${value}" (${value.length} chars)`);
+        truncatedValue = value.slice(0, 500);
+        console.log(`Truncated description to: "${truncatedValue}" (${truncatedValue.length} chars)`);
       }
       
-      console.log(`Final value for ${field}: "${value}"`);
+      console.log(`Final value for ${field}: "${truncatedValue}"`);
       
       onChange({
         ...currentData,
-        [field]: value
+        [field]: truncatedValue
       });
     } else {
       console.log('Not updating because onChange is missing or readOnly is true');
