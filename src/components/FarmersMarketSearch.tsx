@@ -78,8 +78,13 @@ export const FarmersMarketSearch = ({
 
   // Search for farmers markets with debouncing
   useEffect(() => {
+    console.log('useEffect triggered with searchQuery:', searchQuery, 'isBadgeClick:', isBadgeClick);
+    
     const searchFarmersMarkets = async () => {
+      console.log('searchFarmersMarkets called with query:', searchQuery);
+      
       if (!searchQuery.trim() || searchQuery.length < 2 || isBadgeClick) {
+        console.log('Skipping search - query too short or badge click');
         if (!isBadgeClick) {
           setSuggestions([]);
           setShowSuggestions(false);
@@ -87,6 +92,7 @@ export const FarmersMarketSearch = ({
         return;
       }
 
+      console.log('Proceeding with search for:', searchQuery);
       setLoading(true);
       try {
         console.log('Calling farmers-market-search function with query:', searchQuery);
