@@ -143,7 +143,7 @@ export const VendorApplication = ({ data, onChange, readOnly = false }: VendorAp
             disabled={readOnly}
             maxLength={500}
           />
-          <div className="text-sm text-muted-foreground text-right">
+          <div className="text-sm text-muted-foreground text-right mt-1">
             {currentData.description.length}/500 characters
           </div>
         </div>
