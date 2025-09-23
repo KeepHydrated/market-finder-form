@@ -35,10 +35,15 @@ export const VendorApplication = ({ data, onChange, readOnly = false }: VendorAp
     if (onChange && !readOnly) {
       console.log(`Updating ${field}: original length = ${value.length}, value = "${value}"`);
       
-      // Apply character limit for storeName
+      // Apply character limits
       if (field === 'storeName' && value.length > 20) {
         value = value.slice(0, 20);
         console.log(`Truncated storeName to: "${value}" (${value.length} chars)`);
+      }
+      
+      if (field === 'description' && value.length > 500) {
+        value = value.slice(0, 500);
+        console.log(`Truncated description to: "${value}" (${value.length} chars)`);
       }
       
       console.log(`Final value for ${field}: "${value}"`);
@@ -83,6 +88,9 @@ export const VendorApplication = ({ data, onChange, readOnly = false }: VendorAp
             disabled={readOnly}
             maxLength={20}
           />
+          <div className="text-sm text-muted-foreground text-right">
+            {currentData.storeName.length}/20 characters
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -133,7 +141,11 @@ export const VendorApplication = ({ data, onChange, readOnly = false }: VendorAp
             placeholder="Tell us about your business..."
             className="min-h-[120px] text-lg border-2 border-border rounded-xl resize-none"
             disabled={readOnly}
+            maxLength={500}
           />
+          <div className="text-sm text-muted-foreground text-right">
+            {currentData.description.length}/500 characters
+          </div>
         </div>
       </div>
     </div>
