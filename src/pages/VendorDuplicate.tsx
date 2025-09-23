@@ -324,14 +324,22 @@ const VendorDuplicate = () => {
   };
 
   const fetchMarketOpeningHours = async () => {
-    if (!acceptedSubmission?.selected_market) return;
+    console.log('fetchMarketOpeningHours called with acceptedSubmission:', acceptedSubmission);
+    
+    const marketQuery = acceptedSubmission?.selected_market || acceptedSubmission?.search_term;
+    console.log('Market query (selected_market || search_term):', marketQuery);
+    
+    if (!marketQuery) {
+      console.log('No market query found, skipping API call');
+      return;
+    }
 
     try {
-      console.log('Fetching market opening hours for:', acceptedSubmission.selected_market);
+      console.log('Fetching market opening hours for:', marketQuery);
       
       const response = await supabase.functions.invoke('farmers-market-search', {
         body: { 
-          query: acceptedSubmission.selected_market,
+          query: marketQuery,
           location: null 
         }
       });
@@ -343,7 +351,7 @@ const VendorDuplicate = () => {
         console.log('Market opening hours data:', market.opening_hours);
         setMarketOpeningHours(market.opening_hours);
       } else {
-        console.log('No market predictions found');
+        console.log('No market predictions found in response:', response.data);
       }
     } catch (error) {
       console.error('Error fetching market opening hours:', error);
