@@ -915,7 +915,7 @@ export default function ShopManager() {
                           <FarmersMarketSearch 
                             selectedMarkets={selectedFarmersMarkets} 
                             onMarketsChange={setSelectedFarmersMarkets}
-                            isEditing={isEditMode}
+                            isEditing={!shopData || isEditMode}
                           />
                         </div>
                         
