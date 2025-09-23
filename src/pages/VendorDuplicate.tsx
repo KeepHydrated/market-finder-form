@@ -557,14 +557,12 @@ const VendorDuplicate = () => {
                 </Button>
               </div>
 
-              {/* Category badges */}
-              <div className="flex gap-2 mb-4">
-                {selectedVendor.primary_specialty && (
-                  <Badge variant="secondary">{selectedVendor.primary_specialty}</Badge>
-                )}
-                <Badge variant="secondary">Fresh Produce</Badge>
-                <Badge variant="secondary">Local</Badge>
-              </div>
+               {/* Category badges */}
+               <div className="flex gap-2 mb-4">
+                 {selectedVendor.primary_specialty && (
+                   <Badge variant="secondary">{selectedVendor.primary_specialty}</Badge>
+                 )}
+               </div>
               
               {/* Description */}
               <p className="text-muted-foreground mb-4">
