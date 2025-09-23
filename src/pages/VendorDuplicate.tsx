@@ -571,19 +571,19 @@ const VendorDuplicate = () => {
                 {selectedVendor.description || "Quality produce from local farmers."}
               </p>
 
-              {/* Website */}
-              {selectedVendor.website && (
-                <div className="mb-4">
-                  <a 
-                    href={selectedVendor.website} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    Visit Website
-                  </a>
-                </div>
-              )}
+               {/* Website */}
+               {selectedVendor.website && (
+                 <div className="mb-4">
+                   <a 
+                     href={selectedVendor.website} 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="text-primary hover:underline"
+                   >
+                     {selectedVendor.website}
+                   </a>
+                 </div>
+               )}
             </div>
 
             {/* Products Section */}
