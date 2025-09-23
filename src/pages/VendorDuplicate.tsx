@@ -77,6 +77,7 @@ const VendorDuplicate = () => {
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [marketOpeningHours, setMarketOpeningHours] = useState<any>(null);
+  const [marketReviews, setMarketReviews] = useState<{rating?: number; reviewCount?: number} | null>(null);
 
   useEffect(() => {
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
@@ -348,8 +349,15 @@ const VendorDuplicate = () => {
 
       if (response.data?.predictions && response.data.predictions.length > 0) {
         const market = response.data.predictions[0];
+        console.log('Market data:', market);
         console.log('Market opening hours data:', market.opening_hours);
+        console.log('Market rating data:', { rating: market.rating, reviewCount: market.user_ratings_total });
+        
         setMarketOpeningHours(market.opening_hours);
+        setMarketReviews({
+          rating: market.rating,
+          reviewCount: market.user_ratings_total
+        });
       } else {
         console.log('No market predictions found in response:', response.data);
       }
@@ -539,10 +547,11 @@ const VendorDuplicate = () => {
             <div className="flex items-center gap-2 mt-0.5">
               <Star className="h-4 w-4 text-yellow-500 fill-current" />
               <span className="text-foreground font-semibold text-lg">
-                {acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
+                {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
+                 acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
               </span>
               <span className="text-muted-foreground text-sm">
-                ({acceptedSubmission.google_rating_count || 0}) Google reviews
+                ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0}) Google reviews
               </span>
             </div>
           </div>
