@@ -235,7 +235,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
                 {/* Add to Cart Section */}
                 {vendorId && vendorName && (
-                  <div className="space-y-3 pt-3 border-t border-gray-200 mt-auto">
+                  <div className="pt-3 border-t border-gray-200 mt-auto">
                     <Button
                       className="w-full h-8 text-sm"
                       onClick={handleAddToCart}
@@ -243,24 +243,28 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
                       <ShoppingCart className="h-3 w-3 mr-2" />
                       Add to Cart
                     </Button>
-                    
-                    {/* Store name link in bottom right */}
-                    <div className="flex justify-end">
-                      <button
-                        onClick={() => {
-                          onClose();
-                          navigate(`/market?vendor=${vendorId}`);
-                        }}
-                        className="text-xs text-blue-600 hover:text-blue-800 underline"
-                      >
-                        {vendorName}
-                      </button>
-                    </div>
                   </div>
                 )}
               </div>
             </div>
           </div>
+          
+          {/* Store name at the very bottom of modal */}
+          {vendorId && vendorName && (
+            <div className="p-4 border-t border-gray-200 bg-gray-50">
+              <div className="flex justify-end">
+                <button
+                  onClick={() => {
+                    onClose();
+                    navigate(`/market?vendor=${vendorId}`);
+                  }}
+                  className="text-sm text-blue-600 hover:text-blue-800 underline"
+                >
+                  {vendorName}
+                </button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
   );
