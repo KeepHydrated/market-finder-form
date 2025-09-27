@@ -21,7 +21,7 @@ serve(async (req) => {
       );
     }
 
-    const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY');
+    const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
     if (!apiKey) {
       console.log('No Google Maps API key found, returning mock coordinates');
       // Return mock coordinates for testing
