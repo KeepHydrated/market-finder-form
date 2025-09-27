@@ -362,11 +362,6 @@ const Homepage = () => {
         });
         setLocationZipcode(data.postal || '');
         setLocationMethod('ip');
-        
-        toast({
-          title: "📡 Using IP Location", 
-          description: `Approximate location: ${data.city}, ${data.region}. Enable GPS for precise distances.`
-        });
       } else {
         console.log('❌ IP geolocation data missing coordinates, using default location');
         // Set a default location (San Antonio area) for testing
