@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { calculateDistance, getGoogleMapsDistance, cacheVendorCoordinates } from "@/lib/geocoding";
 import { useToast } from "@/hooks/use-toast";
+import { ProductDetailModal } from "@/components/ProductDetailModal";
 
 type TabType = "markets" | "vendors" | "products";
 
@@ -66,6 +67,10 @@ const Likes = () => {
   const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
   const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
   const [locationMethod, setLocationMethod] = useState<'ip' | 'gps'>('ip');
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [currentVendorProducts, setCurrentVendorProducts] = useState<any[]>([]);
+  const [currentVendorInfo, setCurrentVendorInfo] = useState<{id: string; name: string} | null>(null);
 
   const tabs = [
     { id: "markets" as TabType, title: "Markets", icon: MapPin },
@@ -407,6 +412,16 @@ const Likes = () => {
           <Card 
             key={index}
             className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            onClick={() => {
+              // Set up the product modal data
+              const vendor = acceptedSubmissions.find(v => v.id === product.vendorId);
+              if (vendor && vendor.products) {
+                setCurrentVendorProducts(vendor.products);
+                setCurrentVendorInfo({ id: vendor.id, name: vendor.store_name });
+                setSelectedProduct(product);
+                setIsProductModalOpen(true);
+              }
+            }}
           >
             <div className="aspect-[4/3] overflow-hidden bg-muted relative group">
               {product.images && product.images.length > 0 ? (
@@ -904,6 +919,20 @@ const Likes = () => {
           </div>
         </main>
       </div>
+      
+      {/* Product Detail Modal */}
+      <ProductDetailModal
+        product={selectedProduct}
+        products={currentVendorProducts}
+        open={isProductModalOpen}
+        onClose={() => {
+          setIsProductModalOpen(false);
+          setSelectedProduct(null);
+        }}
+        onProductChange={(product) => setSelectedProduct(product)}
+        vendorId={currentVendorInfo?.id}
+        vendorName={currentVendorInfo?.name}
+      />
     </SidebarProvider>
   );
 };
