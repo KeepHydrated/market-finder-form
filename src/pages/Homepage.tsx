@@ -294,7 +294,7 @@ const Homepage = () => {
   const getLocationFromIP = async () => {
     try {
       console.log('Attempting IP geolocation...');
-      const response = await fetch('https://api.bigdatacloud.net/data/client-ip');
+      const response = await fetch('https://ipapi.co/json/');
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -309,9 +309,15 @@ const Homepage = () => {
           lat: data.latitude, 
           lng: data.longitude 
         });
-        setLocationZipcode(data.postcode || data.postalCode || '');
+        setLocationZipcode(data.postal || '');
       } else {
-        console.log('IP geolocation data missing coordinates:', data);
+        console.log('IP geolocation data missing coordinates, using default location');
+        // Set a default location (San Antonio area) for testing
+        console.log('Using default San Antonio coordinates for testing');
+        setUserCoordinates({ 
+          lat: 29.4241, 
+          lng: -98.4936 
+        });
       }
     } catch (error) {
       console.log('IP geolocation failed:', error);
