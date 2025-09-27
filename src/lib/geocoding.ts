@@ -7,14 +7,53 @@ interface SubmissionWithCoords {
   longitude?: number;
 };
 
-// Haversine formula to calculate distance between two points
+// Get Google Maps distance between two points
+export async function getGoogleMapsDistance(
+  userLat: number, 
+  userLng: number, 
+  targetLat: number, 
+  targetLng: number
+): Promise<{ distance: string, distanceMiles: number } | null> {
+  try {
+    console.log('🗺️ GOOGLE MAPS DISTANCE CALCULATION:');
+    console.log('🗺️ User coordinates:', { lat: userLat, lng: userLng });
+    console.log('🗺️ Target coordinates:', { lat: targetLat, lng: targetLng });
+    
+    const { data, error } = await supabase.functions.invoke('get-distance', {
+      body: { 
+        origin: { lat: userLat, lng: userLng },
+        destination: { lat: targetLat, lng: targetLng }
+      }
+    });
+
+    if (error) {
+      console.error('Error getting Google Maps distance:', error);
+      return null;
+    }
+
+    if (data?.distance && data?.distanceMiles) {
+      console.log('🗺️ Google Maps distance:', data.distance, `(${data.distanceMiles} miles)`);
+      return {
+        distance: data.distance,
+        distanceMiles: data.distanceMiles
+      };
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error in getGoogleMapsDistance:', error);
+    return null;
+  }
+}
+
+// Haversine formula to calculate distance between two points (fallback)
 export function calculateDistance(
   userLat: number, 
   userLng: number, 
   targetLat: number, 
   targetLng: number
 ): number {
-  console.log('🧮 MANUAL DISTANCE CALCULATION:');
+  console.log('🧮 HAVERSINE DISTANCE CALCULATION (FALLBACK):');
   console.log('🧮 User coordinates:', { lat: userLat, lng: userLng });
   console.log('🧮 Target coordinates:', { lat: targetLat, lng: targetLng });
   
@@ -29,15 +68,6 @@ export function calculateDistance(
   const distance = R * c;
   
   console.log('🧮 Calculated distance:', distance, 'miles');
-  
-  // Manual verification using approximate formula for small distances
-  const latDiff = Math.abs(targetLat - userLat);
-  const lngDiff = Math.abs(targetLng - userLng);
-  const approxMiles = Math.sqrt(
-    Math.pow(latDiff * 69, 2) + 
-    Math.pow(lngDiff * 54.6, 2) // approximate longitude miles at this latitude
-  );
-  console.log('🧮 Approximate verification:', approxMiles, 'miles');
   
   return distance;
 }

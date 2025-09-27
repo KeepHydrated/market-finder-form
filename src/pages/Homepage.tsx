@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLikes } from "@/hooks/useLikes";
-import { calculateDistance, cacheVendorCoordinates } from "@/lib/geocoding";
+import { calculateDistance, getGoogleMapsDistance, cacheVendorCoordinates } from "@/lib/geocoding";
 
 interface AcceptedSubmission {
   id: string;
@@ -244,17 +244,34 @@ const Homepage = () => {
           console.log('User coords:', userCoords);
           console.log('Vendor coords:', vendorCoords);
           
-          const distanceInMiles = calculateDistance(
+          // Try Google Maps distance first, fall back to Haversine calculation
+          const googleDistance = await getGoogleMapsDistance(
             userCoords.lat, 
             userCoords.lng, 
             vendorCoords.lat, 
             vendorCoords.lng
           );
           
-          console.log('Calculated distance:', distanceInMiles, 'miles');
+          let finalDistance: string;
+          
+          if (googleDistance) {
+            console.log('✅ Using Google Maps distance:', googleDistance.distance);
+            finalDistance = googleDistance.distance;
+          } else {
+            console.log('⚠️ Google Maps failed, using Haversine calculation');
+            const distanceInMiles = calculateDistance(
+              userCoords.lat, 
+              userCoords.lng, 
+              vendorCoords.lat, 
+              vendorCoords.lng
+            );
+            finalDistance = `${distanceInMiles.toFixed(1)} miles`;
+          }
+          
+          console.log('Final distance:', finalDistance);
           console.log('Google Maps equivalent: https://maps.google.com/maps?saddr=' + userCoords.lat + ',' + userCoords.lng + '&daddr=' + vendorCoords.lat + ',' + vendorCoords.lng);
           
-          distances[vendor.id] = `${distanceInMiles.toFixed(1)} miles`;
+          distances[vendor.id] = finalDistance;
         } else {
           console.log('No coordinates returned for vendor:', vendor.id);
           distances[vendor.id] = '-- miles';
