@@ -571,29 +571,6 @@ const Index = () => {
                         />
                       </div>
 
-                      {/* Location */}
-                      <div>
-                        <h2 className="text-xl font-semibold mb-4">Location</h2>
-                        <div className="flex gap-4 items-center mb-2">
-                          <Input 
-                            value={profileData.zipcode}
-                            onChange={(e) => setProfileData(prev => ({ ...prev, zipcode: e.target.value }))}
-                            placeholder="Zipcode will appear here..." 
-                            className={isEditing ? "bg-background" : "bg-muted"}
-                            disabled={!isEditing}
-                          />
-                          <Button 
-                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2"
-                            onClick={getCurrentLocation}
-                            disabled={isLoadingLocation || !isEditing}
-                          >
-                            <RotateCcw className={`h-4 w-4 ${isLoadingLocation ? 'animate-spin' : ''}`} />
-                          </Button>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {isEditing ? "Click the button to get your current zipcode." : "Enable editing to update your location."}
-                        </p>
-                      </div>
 
                       {/* Edit Profile Button */}
                       <div className="pt-4">
