@@ -588,12 +588,13 @@ const VendorDuplicate = () => {
           <div className="flex items-start gap-2">
             <div className="flex items-center gap-2 mt-0.5">
               <Star className="h-4 w-4 text-yellow-500 fill-current" />
-               <span className="text-foreground font-semibold text-lg">
-                 {vendorReviews?.rating ? vendorReviews.rating.toFixed(1) : 'No rating'}
-               </span>
-               <span className="text-muted-foreground text-sm">
-                 ({vendorReviews?.reviewCount ?? 0}) {vendorReviews?.reviewCount === 1 ? 'review' : 'reviews'}
-               </span>
+              <span className="text-foreground font-semibold text-lg">
+                {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
+                 acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
+              </span>
+              <span className="text-muted-foreground text-sm">
+                ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0}) Google reviews
+              </span>
             </div>
           </div>
         </div>
@@ -616,10 +617,10 @@ const VendorDuplicate = () => {
                   >
                     <Star className="h-5 w-5 text-yellow-500 fill-current" />
                     <span className="text-foreground font-medium">
-                      {acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : 'No rating'}
+                      {vendorReviews?.rating ? vendorReviews.rating.toFixed(1) : 'No rating'}
                     </span>
                     <span className="text-muted-foreground">
-                      ({acceptedSubmission.google_rating_count || 0})
+                      ({vendorReviews?.reviewCount ?? 0}) {vendorReviews?.reviewCount === 1 ? 'review' : 'reviews'}
                     </span>
                   </div>
                 </div>
