@@ -297,8 +297,19 @@ const Homepage = () => {
   };
 
   useEffect(() => {
+    console.log('🚀 Homepage useEffect running...');
     fetchAcceptedSubmissions();
-    tryGPSLocationFirst(); // Try GPS first, fallback to IP
+    
+    // Add immediate test log
+    console.log('📍 About to try GPS location detection...');
+    
+    // Try GPS with error handling
+    try {
+      tryGPSLocationFirst();
+    } catch (error) {
+      console.error('❌ Error in tryGPSLocationFirst:', error);
+      getLocationFromIP(); // Fallback to IP
+    }
   }, []);
 
   // Calculate distances when vendors or user coordinates change
@@ -363,71 +374,78 @@ const Homepage = () => {
 
   // Try GPS location first, fallback to IP if denied or fails
   const tryGPSLocationFirst = async () => {
-    console.log('🌍 Starting location detection...');
-    
-    if (!navigator.geolocation) {
-      console.log('❌ Geolocation not supported, using IP fallback');
-      getLocationFromIP();
-      return;
-    }
-
-    console.log('📍 Requesting GPS permission...');
-    
-    // Try GPS first with a short timeout
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude, accuracy } = position.coords;
-          
-          console.log('✅ GPS Location Success!');
-          console.log('📍 GPS Coordinates:', { lat: latitude, lng: longitude, accuracy: `${accuracy}m` });
-          
-          // Store user coordinates for distance calculations
-          setUserCoordinates({ lat: latitude, lng: longitude });
-          setLocationMethod('gps');
-          
-          // Get zipcode from GPS coordinates
-          const response = await fetch(
-            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
-          );
-          
-          if (response.ok) {
-            const data = await response.json();
-            const zipcode = data.postcode || data.postalCode || '';
-            const city = data.city || data.locality || '';
-            setLocationZipcode(zipcode);
-            
-            console.log('📮 Location Details:', { city, zipcode, lat: latitude, lng: longitude });
-            
-            toast({
-              title: "📍 GPS Location Active",
-              description: `Using precise location in ${city}${zipcode ? `, ${zipcode}` : ''}`,
-            });
-          }
-        } catch (error) {
-          console.error('GPS geocoding error:', error);
-          // Still keep the GPS coordinates even if zipcode lookup fails
-        }
-      },
-      (error) => {
-        // GPS failed or denied, fallback to IP
-        console.log('❌ GPS location failed/denied:', error.message);
-        console.log('🔄 Falling back to IP location...');
-        
-        toast({
-          title: "Location Permission Needed",
-          description: "Using approximate IP location. Allow GPS for precise distances.",
-          variant: "destructive"
-        });
-        
+    try {
+      console.log('🌍 Starting location detection...');
+      
+      if (!navigator.geolocation) {
+        console.log('❌ Geolocation not supported, using IP fallback');
         getLocationFromIP();
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 8000, // Longer timeout for better accuracy
-        maximumAge: 60000 // 1 minute cache
+        return;
       }
-    );
+
+      console.log('📍 Requesting GPS permission...');
+      console.log('📍 Navigator.geolocation available:', !!navigator.geolocation);
+      
+      // Try GPS first with a short timeout
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude, accuracy } = position.coords;
+            
+            console.log('✅ GPS Location Success!');
+            console.log('📍 GPS Coordinates:', { lat: latitude, lng: longitude, accuracy: `${accuracy}m` });
+            
+            // Store user coordinates for distance calculations
+            setUserCoordinates({ lat: latitude, lng: longitude });
+            setLocationMethod('gps');
+            
+            // Get zipcode from GPS coordinates
+            const response = await fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+            );
+            
+            if (response.ok) {
+              const data = await response.json();
+              const zipcode = data.postcode || data.postalCode || '';
+              const city = data.city || data.locality || '';
+              setLocationZipcode(zipcode);
+              
+              console.log('📮 Location Details:', { city, zipcode, lat: latitude, lng: longitude });
+              
+              toast({
+                title: "📍 GPS Location Active",
+                description: `Using precise location in ${city}${zipcode ? `, ${zipcode}` : ''}`,
+              });
+            }
+          } catch (error) {
+            console.error('❌ GPS geocoding error:', error);
+            // Still keep the GPS coordinates even if zipcode lookup fails
+          }
+        },
+        (error) => {
+          // GPS failed or denied, fallback to IP
+          console.log('❌ GPS location failed/denied:', error.message);
+          console.log('🔄 Falling back to IP location...');
+          
+          toast({
+            title: "Location Permission Needed",
+            description: "Using approximate IP location. Allow GPS for precise distances.",
+            variant: "destructive"
+          });
+          
+          getLocationFromIP();
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 8000, // Longer timeout for better accuracy
+          maximumAge: 60000 // 1 minute cache
+        }
+      );
+    } catch (error) {
+      console.error('❌ Error in tryGPSLocationFirst function:', error);
+      console.log('🔄 Falling back to IP location due to error...');
+      getLocationFromIP();
+    }
   };
 
   // Refresh data when component becomes visible
