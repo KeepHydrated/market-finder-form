@@ -14,6 +14,10 @@ export function calculateDistance(
   targetLat: number, 
   targetLng: number
 ): number {
+  console.log('🧮 MANUAL DISTANCE CALCULATION:');
+  console.log('🧮 User coordinates:', { lat: userLat, lng: userLng });
+  console.log('🧮 Target coordinates:', { lat: targetLat, lng: targetLng });
+  
   const R = 3959; // Earth's radius in miles
   const dLat = (targetLat - userLat) * Math.PI / 180;
   const dLon = (targetLng - userLng) * Math.PI / 180;
@@ -22,7 +26,20 @@ export function calculateDistance(
     Math.cos(userLat * Math.PI / 180) * Math.cos(targetLat * Math.PI / 180) * 
     Math.sin(dLon/2) * Math.sin(dLon/2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
+  const distance = R * c;
+  
+  console.log('🧮 Calculated distance:', distance, 'miles');
+  
+  // Manual verification using approximate formula for small distances
+  const latDiff = Math.abs(targetLat - userLat);
+  const lngDiff = Math.abs(targetLng - userLng);
+  const approxMiles = Math.sqrt(
+    Math.pow(latDiff * 69, 2) + 
+    Math.pow(lngDiff * 54.6, 2) // approximate longitude miles at this latitude
+  );
+  console.log('🧮 Approximate verification:', approxMiles, 'miles');
+  
+  return distance;
 }
 
 // Get coordinates for an address (with caching)
