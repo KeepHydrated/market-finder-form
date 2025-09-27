@@ -211,17 +211,23 @@ const Homepage = () => {
 
   // Calculate distances for all vendors
   const calculateVendorDistances = async (vendors: AcceptedSubmission[], userCoords: {lat: number, lng: number}) => {
+    console.log('Starting distance calculations for', vendors.length, 'vendors with user coords:', userCoords);
     const distances: Record<string, string> = {};
     
     for (const vendor of vendors) {
+      console.log('Processing vendor:', vendor.store_name, 'address:', vendor.market_address);
+      
       if (!vendor.market_address) {
+        console.log('No market address for vendor:', vendor.store_name);
         distances[vendor.id] = '-- miles';
         continue;
       }
 
       try {
+        console.log('Getting coordinates for vendor:', vendor.id);
         // Get coordinates for this vendor (with caching)
         const vendorCoords = await cacheVendorCoordinates(vendor.id, vendor.market_address);
+        console.log('Vendor coordinates result:', vendorCoords);
         
         if (vendorCoords) {
           const distanceInMiles = calculateDistance(
@@ -230,8 +236,10 @@ const Homepage = () => {
             vendorCoords.lat, 
             vendorCoords.lng
           );
+          console.log('Calculated distance:', distanceInMiles, 'miles');
           distances[vendor.id] = `${distanceInMiles.toFixed(1)} miles`;
         } else {
+          console.log('No coordinates returned for vendor:', vendor.id);
           distances[vendor.id] = '-- miles';
         }
       } catch (error) {
@@ -240,6 +248,7 @@ const Homepage = () => {
       }
     }
     
+    console.log('Final distances:', distances);
     setVendorDistances(distances);
   };
 
@@ -284,18 +293,34 @@ const Homepage = () => {
   // Get location from IP address automatically
   const getLocationFromIP = async () => {
     try {
+      console.log('Attempting IP geolocation...');
       const response = await fetch('https://api.bigdatacloud.net/data/client-ip');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log('IP geolocation response:', data);
       
       if (data.latitude && data.longitude) {
+        console.log('Setting user coordinates from IP:', { lat: data.latitude, lng: data.longitude });
         setUserCoordinates({ 
           lat: data.latitude, 
           lng: data.longitude 
         });
         setLocationZipcode(data.postcode || data.postalCode || '');
+      } else {
+        console.log('IP geolocation data missing coordinates:', data);
       }
     } catch (error) {
-      console.log('IP geolocation not available, user can manually set location');
+      console.log('IP geolocation failed:', error);
+      // Set a default location (San Antonio area) for testing
+      console.log('Using default San Antonio coordinates for testing');
+      setUserCoordinates({ 
+        lat: 29.4241, 
+        lng: -98.4936 
+      });
     }
   };
 

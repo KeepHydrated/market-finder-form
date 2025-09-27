@@ -28,9 +28,12 @@ export function calculateDistance(
 // Get coordinates for an address (with caching)
 export async function getCoordinatesForAddress(address: string): Promise<{lat: number, lng: number} | null> {
   try {
+    console.log('Calling geocode-distance function for address:', address);
     const { data, error } = await supabase.functions.invoke('geocode-distance', {
       body: { address }
     });
+
+    console.log('Geocode function response - data:', data, 'error:', error);
 
     if (error) {
       console.error('Error geocoding address:', error);
@@ -38,12 +41,15 @@ export async function getCoordinatesForAddress(address: string): Promise<{lat: n
     }
 
     if (data?.latitude && data?.longitude) {
-      return {
+      const result = {
         lat: data.latitude,
         lng: data.longitude
       };
+      console.log('Returning coordinates:', result);
+      return result;
     }
 
+    console.log('No coordinates in response data:', data);
     return null;
   } catch (error) {
     console.error('Error in getCoordinatesForAddress:', error);
