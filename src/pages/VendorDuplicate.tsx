@@ -831,12 +831,6 @@ const VendorDuplicate = () => {
                     />
                   </Button>
 
-                  {/* Distance Badge */}
-                  <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                    <span className="text-xs font-medium text-gray-700">
-                      {`${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 9)} miles`}
-                    </span>
-                  </div>
                 </div>
                 
                  {/* Store Information */}
