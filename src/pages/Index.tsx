@@ -102,6 +102,8 @@ const Index = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingProfilePic, setIsEditingProfilePic] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [originalUsername, setOriginalUsername] = useState("");
+  const [originalAvatarUrl, setOriginalAvatarUrl] = useState("");
   const [vendorApplicationData, setVendorApplicationData] = useState<VendorApplicationData>({
     storeName: "",
     primarySpecialty: "",
@@ -470,21 +472,36 @@ const Index = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">Profile Pic</h2>
                   {isEditingProfilePic ? (
-                    <Button 
-                      size="sm" 
-                      className="bg-green-500 hover:bg-green-600 text-white"
-                      onClick={() => {
-                        handleSaveProfile();
-                        setIsEditingProfilePic(false);
-                      }}
-                    >
-                      Save
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          setProfileData(prev => ({ ...prev, avatarUrl: originalAvatarUrl }));
+                          setIsEditingProfilePic(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-green-500 hover:bg-green-600 text-white"
+                        onClick={() => {
+                          handleSaveProfile();
+                          setIsEditingProfilePic(false);
+                        }}
+                      >
+                        Save
+                      </Button>
+                    </div>
                   ) : (
                     <Button 
                       size="sm" 
                       variant="outline"
-                      onClick={() => setIsEditingProfilePic(true)}
+                      onClick={() => {
+                        setOriginalAvatarUrl(profileData.avatarUrl);
+                        setIsEditingProfilePic(true);
+                      }}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -522,21 +539,36 @@ const Index = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">Username</h2>
                   {isEditingUsername ? (
-                    <Button 
-                      size="sm" 
-                      className="bg-green-500 hover:bg-green-600 text-white"
-                      onClick={() => {
-                        handleSaveProfile();
-                        setIsEditingUsername(false);
-                      }}
-                    >
-                      Save
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          setProfileData(prev => ({ ...prev, username: originalUsername }));
+                          setIsEditingUsername(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-green-500 hover:bg-green-600 text-white"
+                        onClick={() => {
+                          handleSaveProfile();
+                          setIsEditingUsername(false);
+                        }}
+                      >
+                        Save
+                      </Button>
+                    </div>
                   ) : (
                     <Button 
                       size="sm" 
                       variant="outline"
-                      onClick={() => setIsEditingUsername(true)}
+                      onClick={() => {
+                        setOriginalUsername(profileData.username);
+                        setIsEditingUsername(true);
+                      }}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
