@@ -461,22 +461,24 @@ const Likes = () => {
               <div className="flex items-start justify-between mb-2">
                 <h3 className="font-normal text-sm flex-1 text-black">{product.name}</h3>
               </div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-muted-foreground">
                   ${product.price ? product.price.toFixed(2) : '0.00'}
                 </span>
               </div>
-              <div className="flex justify-end">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/market?vendor=${product.vendorId}`);
-                  }}
-                  className="text-xs text-blue-600 hover:text-blue-800 underline"
-                >
-                  {product.vendorName}
-                </button>
-              </div>
+              {product.vendorName && (
+                <div className="mt-2 pt-2 border-t border-border">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/market?vendor=${product.vendorId}`);
+                    }}
+                    className="text-xs text-primary hover:underline cursor-pointer"
+                  >
+                    {product.vendorName}
+                  </button>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
