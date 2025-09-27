@@ -1,8 +1,9 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { CartButton } from "@/components/shopping/CartButton";
-import { ArrowLeft, Heart, Store, ChevronDown } from "lucide-react";
+import { ArrowLeft, Heart, Store, ChevronDown, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -21,7 +22,9 @@ interface HeaderProps {
 
 export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [hasAnySubmission, setHasAnySubmission] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const checkAnySubmission = async () => {
@@ -48,6 +51,13 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
 
     checkAnySubmission();
   }, [user]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/homepage?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
     <header className="bg-card shadow-sm border-b sticky top-0 z-50">
@@ -140,6 +150,20 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+          
+          <div className="flex-1 max-w-md mx-8">
+            <form onSubmit={handleSearch} className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                type="text"
+                placeholder="Search vendors, products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-background/50 border-border"
+              />
+            </form>
+          </div>
+          
           <div className="flex items-center space-x-4">
             <Link to="/likes">
               <Button variant="ghost" size="sm">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -55,13 +55,16 @@ const SPECIALTY_CATEGORIES = [
 
 const Homepage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<AcceptedSubmission[]>([]);
+  const [filteredSubmissions, setFilteredSubmissions] = useState<AcceptedSubmission[]>([]);
   const [vendorRatings, setVendorRatings] = useState<Record<string, VendorRating>>({});
   const [loading, setLoading] = useState(true);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [dayTimeSelections, setDayTimeSelections] = useState<Record<string, {
     startTime: string;
     startPeriod: 'AM' | 'PM';
@@ -81,6 +84,50 @@ const Homepage = () => {
   const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
   const [locationMethod, setLocationMethod] = useState<'ip' | 'gps'>('ip');
   const [isGettingGPSLocation, setIsGettingGPSLocation] = useState(false);
+
+  // Handle URL parameters
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    const searchParam = searchParams.get('search');
+    
+    if (categoryParam && !selectedCategories.includes(categoryParam)) {
+      setSelectedCategories([categoryParam]);
+    }
+    
+    if (searchParam) {
+      setSearchQuery(searchParam);
+    }
+  }, [searchParams]);
+
+  // Filter submissions based on search query and other filters
+  useEffect(() => {
+    let filtered = acceptedSubmissions;
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(submission => 
+        submission.store_name.toLowerCase().includes(query) ||
+        submission.primary_specialty.toLowerCase().includes(query) ||
+        submission.description.toLowerCase().includes(query) ||
+        submission.products.some((product: any) => 
+          product.name?.toLowerCase().includes(query) ||
+          product.description?.toLowerCase().includes(query)
+        )
+      );
+    }
+
+    // Apply category filter
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(submission =>
+        selectedCategories.includes(submission.primary_specialty)
+      );
+    }
+
+    // Apply other existing filters here if needed (days, location, etc.)
+    
+    setFilteredSubmissions(filtered);
+  }, [acceptedSubmissions, searchQuery, selectedCategories]);
 
   const toggleDay = (day: string) => {
     setSelectedDays(prev => {
@@ -295,7 +342,7 @@ const Homepage = () => {
       vendors: AcceptedSubmission[];
     }> = {};
 
-    acceptedSubmissions.forEach(submission => {
+    filteredSubmissions.forEach(submission => {
       const marketKey = submission.selected_market || submission.search_term || 'Unknown Market';
       const marketAddress = submission.market_address || 'Address not available';
       
@@ -757,7 +804,7 @@ const Homepage = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-                {(selectedMarket ? selectedMarket.vendors : acceptedSubmissions).map((submission) => (
+                {(selectedMarket ? selectedMarket.vendors : filteredSubmissions).map((submission) => (
                    <Card 
                      key={submission.id} 
                      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]" 
@@ -771,7 +818,7 @@ const Homepage = () => {
                          state: { 
                            type: 'vendor', 
                            selectedVendor: submission,
-                           allVendors: selectedMarket ? selectedMarket.vendors : acceptedSubmissions,
+                           allVendors: selectedMarket ? selectedMarket.vendors : filteredSubmissions,
                            marketCoordinates: cachedCoords // Pass the exact coordinates used for "2.1 mi"
                          } 
                        });
@@ -872,7 +919,7 @@ const Homepage = () => {
           </div>
         ) : (
           <div className="flex justify-center">
-            {acceptedSubmissions.length === 0 ? (
+            {filteredSubmissions.length === 0 ? (
               <div className="text-center">
                 <p className="text-muted-foreground">No markets available yet.</p>
               </div>
