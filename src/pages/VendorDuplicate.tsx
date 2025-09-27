@@ -171,29 +171,38 @@ const VendorDuplicate = () => {
             
             let marketCoords = null;
             
-            // If we have a place_id, use it to get exact coordinates (same as FarmersMarketSearch)
-            if (acceptedSubmission.market_place_id) {
-              try {
-                const response = await supabase.functions.invoke('farmers-market-search', {
-                  body: { 
-                    place_id: acceptedSubmission.market_place_id
-                  }
-                });
-                
-                if (response.data?.geometry?.location) {
-                  marketCoords = {
-                    lat: response.data.geometry.location.lat,
-                    lng: response.data.geometry.location.lng
-                  };
+            // First try to use Google Places API to get precise coordinates
+            try {
+              const response = await supabase.functions.invoke('farmers-market-search', {
+                body: { 
+                  query: acceptedSubmission.selected_market || acceptedSubmission.search_term
                 }
-              } catch (error) {
-                console.error('Error getting coordinates from place_id:', error);
+              });
+              
+              if (response.data?.predictions?.length > 0) {
+                // Find the matching market by name or address
+                const foundMarket = response.data.predictions.find((m: any) => 
+                  m.name === acceptedSubmission.selected_market ||
+                  m.name === acceptedSubmission.search_term ||
+                  (acceptedSubmission.market_address && m.formatted_address?.includes(acceptedSubmission.market_address.split(',')[0]))
+                );
+                
+                if (foundMarket?.geometry?.location) {
+                  marketCoords = {
+                    lat: foundMarket.geometry.location.lat,
+                    lng: foundMarket.geometry.location.lng
+                  };
+                  console.log('🗺️ Using Google Places coordinates:', marketCoords);
+                }
               }
+            } catch (error) {
+              console.error('Error getting coordinates from Places API:', error);
             }
             
-            // Fallback to geocoding address if no place_id or place_id lookup failed
+            // Fallback to geocoding address if Places API lookup failed
             if (!marketCoords) {
               marketCoords = await getCoordinatesForAddress(acceptedSubmission.market_address!);
+              console.log('🗺️ Using geocoded coordinates:', marketCoords);
             }
             
             if (marketCoords) {

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, MapPin, ArrowLeft, Navigation } from "lucide-react";
 import { getGoogleMapsDistance, calculateDistance, getCoordinatesForAddress } from "@/lib/geocoding";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Market {
   id: number;
@@ -43,8 +44,38 @@ export const MarketDetails = ({ market, onBack }: MarketDetailsProps) => {
               };
               setUserCoordinates(userCoords);
               
-              // Get market coordinates
-              const marketCoords = await getCoordinatesForAddress(marketAddress);
+              // Use Google Places API to get precise coordinates (same as FarmersMarketSearch)
+              let marketCoords = null;
+              
+              try {
+                const response = await supabase.functions.invoke('farmers-market-search', {
+                  body: { 
+                    query: market.name
+                  }
+                });
+                
+                if (response.data?.predictions?.length > 0) {
+                  const foundMarket = response.data.predictions.find((m: any) => 
+                    m.name === market.name || 
+                    m.address?.includes(market.address) ||
+                    m.formatted_address?.includes(market.address)
+                  );
+                  
+                  if (foundMarket?.geometry?.location) {
+                    marketCoords = {
+                      lat: foundMarket.geometry.location.lat,
+                      lng: foundMarket.geometry.location.lng
+                    };
+                  }
+                }
+              } catch (error) {
+                console.error('Error getting coordinates from Places API:', error);
+              }
+              
+              // Fallback to geocoding address if Places API lookup failed
+              if (!marketCoords) {
+                marketCoords = await getCoordinatesForAddress(marketAddress);
+              }
               
               if (marketCoords) {
                 // Use Google Maps Distance Matrix API exclusively
