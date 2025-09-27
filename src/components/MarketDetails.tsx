@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, MapPin, ArrowLeft } from "lucide-react";
+import { Clock, MapPin, ArrowLeft, Navigation } from "lucide-react";
+import { getGoogleMapsDistance, calculateDistance, getCoordinatesForAddress } from "@/lib/geocoding";
 
 interface Market {
   id: number;
@@ -20,6 +21,73 @@ interface MarketDetailsProps {
 }
 
 export const MarketDetails = ({ market, onBack }: MarketDetailsProps) => {
+  const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
+  const [distance, setDistance] = useState<string>('');
+  const [isLoadingDistance, setIsLoadingDistance] = useState(false);
+
+  // Get user location and calculate distance
+  useEffect(() => {
+    const getUserLocationAndCalculateDistance = async () => {
+      setIsLoadingDistance(true);
+      
+      try {
+        // Get user location
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              const userCoords = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              };
+              setUserCoordinates(userCoords);
+              
+              // Get market coordinates
+              const marketAddress = `${market.address}, ${market.city}, ${market.state}`;
+              const marketCoords = await getCoordinatesForAddress(marketAddress);
+              
+              if (marketCoords) {
+                // Try Google Maps distance first, fall back to Haversine
+                const googleDistance = await getGoogleMapsDistance(
+                  userCoords.lat, 
+                  userCoords.lng, 
+                  marketCoords.lat, 
+                  marketCoords.lng
+                );
+                
+                if (googleDistance) {
+                  setDistance(googleDistance.distance);
+                } else {
+                  // Fallback to Haversine calculation
+                  const distanceInMiles = calculateDistance(
+                    userCoords.lat, 
+                    userCoords.lng, 
+                    marketCoords.lat, 
+                    marketCoords.lng
+                  );
+                  setDistance(`${distanceInMiles.toFixed(1)} miles`);
+                }
+              }
+              
+              setIsLoadingDistance(false);
+            },
+            (error) => {
+              console.error('Error getting user location:', error);
+              setIsLoadingDistance(false);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+          );
+        } else {
+          setIsLoadingDistance(false);
+        }
+      } catch (error) {
+        console.error('Error calculating distance:', error);
+        setIsLoadingDistance(false);
+      }
+    };
+
+    getUserLocationAndCalculateDistance();
+  }, [market]);
+
   return (
     <div className="space-y-6">
       <Button 
@@ -41,6 +109,15 @@ export const MarketDetails = ({ market, onBack }: MarketDetailsProps) => {
             <div>
               <p className="text-foreground font-medium">{market.address}</p>
               <p className="text-muted-foreground">{market.city}, {market.state}</p>
+              {distance && (
+                <div className="flex items-center gap-1 mt-1">
+                  <Navigation className="h-3 w-3 text-muted-foreground" />
+                  <p className="text-muted-foreground text-sm">{distance}</p>
+                </div>
+              )}
+              {isLoadingDistance && (
+                <p className="text-muted-foreground text-sm mt-1">Calculating distance...</p>
+              )}
             </div>
           </div>
           
