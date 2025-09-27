@@ -85,7 +85,7 @@ interface Product {
 
 const Index = () => {
   // Fixed: Ensure proper state initialization
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, refreshProfile } = useAuth();
   const { toast } = useToast();
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -383,15 +383,9 @@ const Index = () => {
   const handleSaveProfile = async () => {
     if (!user) return;
 
-    if (!isEditing) {
-      // Switch to edit mode
-      setIsEditing(true);
-      return;
-    }
-
-    // Save the changes
     try {
-      const { error } = await supabase
+      // First, try to update existing profile
+      const { error: updateError } = await supabase
         .from('profiles')
         .update({
           full_name: profileData.username,
@@ -400,31 +394,37 @@ const Index = () => {
         })
         .eq('user_id', user.id);
 
-      if (error) {
-        console.error('Profile update error:', error);
-        throw error;
+      // If profile doesn't exist, create it
+      if (updateError && updateError.code === 'PGRST116') {
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: user.id,
+            full_name: profileData.username,
+            avatar_url: profileData.avatarUrl,
+            zipcode: profileData.zipcode
+          });
+
+        if (insertError) {
+          throw insertError;
+        }
+      } else if (updateError) {
+        throw updateError;
       }
 
-      // Refetch the profile data to update it everywhere in the app
-      const { data: updatedProfile, error: fetchError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (fetchError) {
-        console.error('Error fetching updated profile:', fetchError);
-      }
+      // Refresh profile data in the auth context
+      await refreshProfile();
 
       toast({
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
       });
       
-      setIsEditing(false); // Exit edit mode after saving
+      // Exit all edit modes
+      setIsEditing(false);
+      setIsEditingProfilePic(false);
+      setIsEditingUsername(false);
       
-      // Refresh the page to ensure all components see the updated profile
-      window.location.reload();
     } catch (error) {
       console.error('Save profile error:', error);
       toast({
@@ -483,14 +483,14 @@ const Index = () => {
                       >
                         Cancel
                       </Button>
-                      <Button 
-                        size="sm" 
-                        className="bg-green-500 hover:bg-green-600 text-white"
-                        onClick={() => {
-                          handleSaveProfile();
-                          setIsEditingProfilePic(false);
-                        }}
-                      >
+                       <Button 
+                         size="sm" 
+                         className="bg-green-500 hover:bg-green-600 text-white"
+                         onClick={async () => {
+                           await handleSaveProfile();
+                           setIsEditingProfilePic(false);
+                         }}
+                       >
                         Save
                       </Button>
                     </div>
@@ -550,14 +550,14 @@ const Index = () => {
                       >
                         Cancel
                       </Button>
-                      <Button 
-                        size="sm" 
-                        className="bg-green-500 hover:bg-green-600 text-white"
-                        onClick={() => {
-                          handleSaveProfile();
-                          setIsEditingUsername(false);
-                        }}
-                      >
+                       <Button 
+                         size="sm" 
+                         className="bg-green-500 hover:bg-green-600 text-white"
+                         onClick={async () => {
+                           await handleSaveProfile();
+                           setIsEditingUsername(false);
+                         }}
+                       >
                         Save
                       </Button>
                     </div>
