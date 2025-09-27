@@ -428,11 +428,6 @@ const Homepage = () => {
               setLocationZipcode(zipcode);
               
               console.log('📮 Location Details:', { city, zipcode, lat: latitude, lng: longitude });
-              
-              toast({
-                title: "📍 GPS Location Active",
-                description: `Using precise location in ${city}${zipcode ? `, ${zipcode}` : ''}`,
-              });
             }
           } catch (error) {
             console.error('❌ GPS geocoding error:', error);
