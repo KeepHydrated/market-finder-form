@@ -617,10 +617,10 @@ const VendorDuplicate = () => {
                   >
                     <Star className="h-5 w-5 text-yellow-500 fill-current" />
                     <span className="text-foreground font-medium">
-                      4.6
+                      {vendorReviews?.rating ? vendorReviews.rating.toFixed(1) : 'No rating'}
                     </span>
                     <span className="text-muted-foreground">
-                      (12) reviews
+                      ({vendorReviews?.reviewCount ?? 0}) {vendorReviews?.reviewCount === 1 ? 'review' : 'reviews'}
                     </span>
                   </div>
                 </div>
