@@ -509,7 +509,21 @@ const Likes = () => {
           <Card 
             key={vendor.id}
             className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]" 
-            onClick={() => navigate('/vendor')}
+            onClick={async () => {
+              // Get the same cached coordinates used for distance calculation
+              const cachedCoords = vendor.market_address 
+                ? await cacheVendorCoordinates(vendor.id, vendor.market_address)
+                : null;
+              
+              navigate('/market', { 
+                state: { 
+                  type: 'vendor', 
+                  selectedVendor: vendor,
+                  allVendors: acceptedSubmissions,
+                  marketCoordinates: cachedCoords
+                } 
+              });
+            }}
           >
             {/* Product Image */}
             <div className="aspect-[4/3] bg-muted relative">
