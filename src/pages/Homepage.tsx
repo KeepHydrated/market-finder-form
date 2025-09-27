@@ -336,15 +336,15 @@ const Homepage = () => {
     setVendorDistances(distances);
   };
 
-  // Calculate distances for all markets (independent of vendor distances)
+  // Calculate distances for all markets (using same coordinates as vendors)
   const calculateMarketDistances = async (markets: Array<{name: string, address: string, vendors: AcceptedSubmission[]}>, userCoords: {lat: number, lng: number}) => {
     console.log('=== MARKET DISTANCE CALCULATION DEBUG ===');
     console.log('User coordinates:', userCoords);
-    console.log('Starting independent parallel distance calculations for', markets.length, 'markets');
+    console.log('Starting coordinate-consistent distance calculations for', markets.length, 'markets');
     
     setIsLoadingMarketDistances(true);
     
-    // Process all market distance calculations in parallel, completely independent
+    // Process all market distance calculations in parallel, using vendor coordinates for consistency
     const marketPromises = markets.map(async (market) => {
       console.log('\n--- Processing market:', market.name);
       console.log('Market address:', market.address);
@@ -352,43 +352,50 @@ const Homepage = () => {
       try {
         const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
         
-        // Always calculate fresh coordinates and distance (no dependency on vendor distances)
-        const marketCoords = await cacheVendorCoordinates(marketId, market.address);
-        console.log('Market coordinates result:', marketCoords);
-        
-        if (marketCoords) {
-          console.log('=== MARKET DISTANCE CALCULATION ===');
-          console.log('User coords:', userCoords);
-          console.log('Market coords:', marketCoords);
+        // Use the first vendor's coordinates to ensure consistency with vendor distances
+        const firstVendor = market.vendors[0];
+        if (firstVendor) {
+          // Use the same coordinate caching approach as vendors
+          const marketCoords = await cacheVendorCoordinates(firstVendor.id, firstVendor.market_address || market.address);
+          console.log('Using vendor-consistent coordinates for market:', marketCoords);
           
-          // Try Google Maps distance first, fall back to Haversine calculation
-          const googleDistance = await getGoogleMapsDistance(
-            userCoords.lat, 
-            userCoords.lng, 
-            marketCoords.lat, 
-            marketCoords.lng
-          );
-          
-          let finalDistance: string;
-          
-          if (googleDistance) {
-            console.log('✅ Using Google Maps distance for market:', googleDistance.distance);
-            finalDistance = googleDistance.distance;
-          } else {
-            console.log('⚠️ Google Maps failed for market, using Haversine calculation');
-            const distanceInMiles = calculateDistance(
+          if (marketCoords) {
+            console.log('=== MARKET DISTANCE CALCULATION (VENDOR-CONSISTENT) ===');
+            console.log('User coords:', userCoords);
+            console.log('Market coords (from vendor cache):', marketCoords);
+            
+            // Try Google Maps distance first, fall back to Haversine calculation
+            const googleDistance = await getGoogleMapsDistance(
               userCoords.lat, 
               userCoords.lng, 
               marketCoords.lat, 
               marketCoords.lng
             );
-            finalDistance = `${distanceInMiles.toFixed(1)} mi`;
+            
+            let finalDistance: string;
+            
+            if (googleDistance) {
+              console.log('✅ Using Google Maps distance for market:', googleDistance.distance);
+              finalDistance = googleDistance.distance;
+            } else {
+              console.log('⚠️ Google Maps failed for market, using Haversine calculation');
+              const distanceInMiles = calculateDistance(
+                userCoords.lat, 
+                userCoords.lng, 
+                marketCoords.lat, 
+                marketCoords.lng
+              );
+              finalDistance = `${distanceInMiles.toFixed(1)} mi`;
+            }
+            
+            console.log('Final market distance (vendor-consistent):', finalDistance);
+            return { marketId, distance: finalDistance };
+          } else {
+            console.log('No coordinates returned for market vendor:', firstVendor.store_name);
+            return { marketId, distance: '-- mi' };
           }
-          
-          console.log('Final market distance:', finalDistance);
-          return { marketId, distance: finalDistance };
         } else {
-          console.log('No coordinates returned for market:', market.name);
+          console.log('No vendors found for market:', market.name);
           return { marketId, distance: '-- mi' };
         }
       } catch (error) {
@@ -408,7 +415,7 @@ const Homepage = () => {
         distances[marketId] = distance;
       });
       
-      console.log('Final market distances:', distances);
+      console.log('Final market distances (vendor-consistent):', distances);
       console.log('=== END MARKET DISTANCE DEBUG ===');
       setMarketDistances(distances);
     } catch (error) {
