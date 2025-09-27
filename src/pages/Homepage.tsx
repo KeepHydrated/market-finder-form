@@ -351,44 +351,53 @@ const Homepage = () => {
         // Create a unique market ID by combining market name and address
         const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
         
-        // Get coordinates for the market using the same caching system as vendors
-        const marketCoords = await cacheVendorCoordinates(marketId, market.address);
-        console.log('Market coordinates result:', marketCoords);
-        
-        if (marketCoords) {
-          console.log('=== MARKET DISTANCE CALCULATION ===');
-          console.log('User coords:', userCoords);
-          console.log('Market coords:', marketCoords);
+        // For consistency, use the same cache key approach as vendors
+        // Use the first vendor's ID from this market as the cache key to ensure same coordinates
+        const firstVendor = market.vendors[0];
+        if (firstVendor && vendorDistances[firstVendor.id]) {
+          // If we already have the distance for a vendor at this market, use the same distance
+          console.log('✅ Using existing vendor distance for market:', vendorDistances[firstVendor.id]);
+          distances[marketId] = vendorDistances[firstVendor.id];
+        } else {
+          // Fallback: calculate distance using the market address
+          const marketCoords = await cacheVendorCoordinates(marketId, market.address);
+          console.log('Market coordinates result:', marketCoords);
           
-          // Try Google Maps distance first, fall back to Haversine calculation
-          const googleDistance = await getGoogleMapsDistance(
-            userCoords.lat, 
-            userCoords.lng, 
-            marketCoords.lat, 
-            marketCoords.lng
-          );
-          
-          let finalDistance: string;
-          
-          if (googleDistance) {
-            console.log('✅ Using Google Maps distance for market:', googleDistance.distance);
-            finalDistance = googleDistance.distance;
-          } else {
-            console.log('⚠️ Google Maps failed for market, using Haversine calculation');
-            const distanceInMiles = calculateDistance(
+          if (marketCoords) {
+            console.log('=== MARKET DISTANCE CALCULATION ===');
+            console.log('User coords:', userCoords);
+            console.log('Market coords:', marketCoords);
+            
+            // Try Google Maps distance first, fall back to Haversine calculation
+            const googleDistance = await getGoogleMapsDistance(
               userCoords.lat, 
               userCoords.lng, 
               marketCoords.lat, 
               marketCoords.lng
             );
-            finalDistance = `${distanceInMiles.toFixed(1)} miles`;
+            
+            let finalDistance: string;
+            
+            if (googleDistance) {
+              console.log('✅ Using Google Maps distance for market:', googleDistance.distance);
+              finalDistance = googleDistance.distance;
+            } else {
+              console.log('⚠️ Google Maps failed for market, using Haversine calculation');
+              const distanceInMiles = calculateDistance(
+                userCoords.lat, 
+                userCoords.lng, 
+                marketCoords.lat, 
+                marketCoords.lng
+              );
+              finalDistance = `${distanceInMiles.toFixed(1)} miles`;
+            }
+            
+            console.log('Final market distance:', finalDistance);
+            distances[marketId] = finalDistance;
+          } else {
+            console.log('No coordinates returned for market:', market.name);
+            distances[marketId] = '-- miles';
           }
-          
-          console.log('Final market distance:', finalDistance);
-          distances[marketId] = finalDistance;
-        } else {
-          console.log('No coordinates returned for market:', market.name);
-          distances[marketId] = '-- miles';
         }
       } catch (error) {
         console.error(`Error calculating distance for market ${market.name}:`, error);
