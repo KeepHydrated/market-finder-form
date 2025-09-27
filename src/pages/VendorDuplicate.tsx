@@ -713,18 +713,18 @@ const VendorDuplicate = () => {
                     </div>
                   )}
                   
-                  {/* Rating - Top Left */}
-                  <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                    <div className="flex items-center gap-1">
-                      <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                      <span className="text-xs font-medium">
-                        {Math.floor(Math.random() * 2) + 4}.{Math.floor(Math.random() * 9)}
-                      </span>
-                      <span className="text-xs text-gray-600">
-                        ({Math.floor(Math.random() * 50) + 10})
-                      </span>
-                    </div>
-                  </div>
+                   {/* Rating - Top Left */}
+                   <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                     <div className="flex items-center gap-1">
+                       <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                       <span className="text-xs font-medium">
+                         No rating
+                       </span>
+                       <span className="text-xs text-gray-600">
+                         (0)
+                       </span>
+                     </div>
+                   </div>
                   
                   {/* Like Button */}
                   <Button
