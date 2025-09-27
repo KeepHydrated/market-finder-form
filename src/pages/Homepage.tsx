@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLikes } from "@/hooks/useLikes";
+import { calculateDistance, cacheVendorCoordinates } from "@/lib/geocoding";
 
 interface AcceptedSubmission {
   id: string;
@@ -77,6 +78,7 @@ const Homepage = () => {
     address: string;
     vendors: AcceptedSubmission[];
   } | null>(null);
+  const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
 
   const toggleDay = (day: string) => {
     setSelectedDays(prev => {
@@ -207,17 +209,38 @@ const Homepage = () => {
     );
   };
 
-  // Function to calculate distance between two points using Haversine formula
-  const calculateDistance = (userCoords: {lat: number, lng: number}, marketAddress?: string): string => {
-    if (!userCoords || !marketAddress) {
-      return '-- miles';
+  // Calculate distances for all vendors
+  const calculateVendorDistances = async (vendors: AcceptedSubmission[], userCoords: {lat: number, lng: number}) => {
+    const distances: Record<string, string> = {};
+    
+    for (const vendor of vendors) {
+      if (!vendor.market_address) {
+        distances[vendor.id] = '-- miles';
+        continue;
+      }
+
+      try {
+        // Get coordinates for this vendor (with caching)
+        const vendorCoords = await cacheVendorCoordinates(vendor.id, vendor.market_address);
+        
+        if (vendorCoords) {
+          const distanceInMiles = calculateDistance(
+            userCoords.lat, 
+            userCoords.lng, 
+            vendorCoords.lat, 
+            vendorCoords.lng
+          );
+          distances[vendor.id] = `${distanceInMiles.toFixed(1)} miles`;
+        } else {
+          distances[vendor.id] = '-- miles';
+        }
+      } catch (error) {
+        console.error(`Error calculating distance for vendor ${vendor.id}:`, error);
+        distances[vendor.id] = '-- miles';
+      }
     }
     
-    // For now, return a placeholder distance since we don't have market coordinates
-    // In the future, this could geocode the market address to get exact coordinates
-    const sampleDistances = ['0.5', '1.2', '2.1', '3.4', '5.8'];
-    const randomIndex = Math.abs(marketAddress.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % sampleDistances.length;
-    return `${sampleDistances[randomIndex]} miles`;
+    setVendorDistances(distances);
   };
 
   // Group vendors by market
@@ -666,10 +689,7 @@ const Homepage = () => {
                       {/* Distance Badge */}
                       <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
                         <span className="text-xs font-medium text-gray-700">
-                          {userCoordinates 
-                            ? calculateDistance(userCoordinates, submission.market_address)
-                            : `${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 9)} miles`
-                          }
+                          {vendorDistances[submission.id] || '-- miles'}
                         </span>
                       </div>
                     </div>
@@ -910,7 +930,7 @@ const Homepage = () => {
                       <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
                         <span className="text-xs font-medium text-gray-700">
                           {userCoordinates 
-                            ? calculateDistance(userCoordinates, market.address)
+                            ? `${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 9)} miles`
                             : `${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 9)} miles`
                           }
                         </span>
