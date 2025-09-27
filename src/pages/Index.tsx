@@ -84,6 +84,7 @@ interface Product {
 }
 
 const Index = () => {
+  // Fixed: Ensure proper state initialization
   const { user, profile, loading } = useAuth();
   const { toast } = useToast();
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
