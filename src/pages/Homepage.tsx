@@ -83,6 +83,7 @@ const Homepage = () => {
   } | null>(null);
   const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
   const [marketDistances, setMarketDistances] = useState<Record<string, string>>({});
+  const [isLoadingMarketDistances, setIsLoadingMarketDistances] = useState(false);
   const [locationMethod, setLocationMethod] = useState<'ip' | 'gps'>('ip');
   const [isGettingGPSLocation, setIsGettingGPSLocation] = useState(false);
 
@@ -335,88 +336,93 @@ const Homepage = () => {
     setVendorDistances(distances);
   };
 
-  // Calculate distances for all markets
+  // Calculate distances for all markets (independent of vendor distances)
   const calculateMarketDistances = async (markets: Array<{name: string, address: string, vendors: AcceptedSubmission[]}>, userCoords: {lat: number, lng: number}) => {
     console.log('=== MARKET DISTANCE CALCULATION DEBUG ===');
     console.log('User coordinates:', userCoords);
-    console.log('Starting parallel distance calculations for', markets.length, 'markets');
+    console.log('Starting independent parallel distance calculations for', markets.length, 'markets');
     
-    // Process all market distance calculations in parallel
+    setIsLoadingMarketDistances(true);
+    
+    // Process all market distance calculations in parallel, completely independent
     const marketPromises = markets.map(async (market) => {
       console.log('\n--- Processing market:', market.name);
       console.log('Market address:', market.address);
       
       try {
-        // Create a unique market ID by combining market name and address
         const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
         
-        // For consistency, use the same cache key approach as vendors
-        // Use the first vendor's ID from this market as the cache key to ensure same coordinates
-        const firstVendor = market.vendors[0];
-        if (firstVendor && vendorDistances[firstVendor.id]) {
-          // If we already have the distance for a vendor at this market, use the same distance
-          console.log('✅ Using existing vendor distance for market:', vendorDistances[firstVendor.id]);
-          return { marketId, distance: vendorDistances[firstVendor.id] };
-        } else {
-          // Fallback: calculate distance using the market address
-          const marketCoords = await cacheVendorCoordinates(marketId, market.address);
-          console.log('Market coordinates result:', marketCoords);
+        // Always calculate fresh coordinates and distance (no dependency on vendor distances)
+        const marketCoords = await cacheVendorCoordinates(marketId, market.address);
+        console.log('Market coordinates result:', marketCoords);
+        
+        if (marketCoords) {
+          console.log('=== MARKET DISTANCE CALCULATION ===');
+          console.log('User coords:', userCoords);
+          console.log('Market coords:', marketCoords);
           
-          if (marketCoords) {
-            console.log('=== MARKET DISTANCE CALCULATION ===');
-            console.log('User coords:', userCoords);
-            console.log('Market coords:', marketCoords);
-            
-            // Try Google Maps distance first, fall back to Haversine calculation
-            const googleDistance = await getGoogleMapsDistance(
+          // Try Google Maps distance first, fall back to Haversine calculation
+          const googleDistance = await getGoogleMapsDistance(
+            userCoords.lat, 
+            userCoords.lng, 
+            marketCoords.lat, 
+            marketCoords.lng
+          );
+          
+          let finalDistance: string;
+          
+          if (googleDistance) {
+            console.log('✅ Using Google Maps distance for market:', googleDistance.distance);
+            finalDistance = googleDistance.distance;
+          } else {
+            console.log('⚠️ Google Maps failed for market, using Haversine calculation');
+            const distanceInMiles = calculateDistance(
               userCoords.lat, 
               userCoords.lng, 
               marketCoords.lat, 
               marketCoords.lng
             );
-            
-            let finalDistance: string;
-            
-            if (googleDistance) {
-              console.log('✅ Using Google Maps distance for market:', googleDistance.distance);
-              finalDistance = googleDistance.distance;
-            } else {
-              console.log('⚠️ Google Maps failed for market, using Haversine calculation');
-              const distanceInMiles = calculateDistance(
-                userCoords.lat, 
-                userCoords.lng, 
-                marketCoords.lat, 
-                marketCoords.lng
-              );
-              finalDistance = `${distanceInMiles.toFixed(1)} miles`;
-            }
-            
-            console.log('Final market distance:', finalDistance);
-            return { marketId, distance: finalDistance };
-          } else {
-            console.log('No coordinates returned for market:', market.name);
-            return { marketId, distance: '-- miles' };
+            finalDistance = `${distanceInMiles.toFixed(1)} mi`;
           }
+          
+          console.log('Final market distance:', finalDistance);
+          return { marketId, distance: finalDistance };
+        } else {
+          console.log('No coordinates returned for market:', market.name);
+          return { marketId, distance: '-- mi' };
         }
       } catch (error) {
         console.error(`Error calculating distance for market ${market.name}:`, error);
         const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-        return { marketId, distance: '-- miles' };
+        return { marketId, distance: '-- mi' };
       }
     });
 
     // Wait for all distance calculations to complete
-    const marketResults = await Promise.all(marketPromises);
-    
-    // Convert results back to the distances object
-    const distances: Record<string, string> = {};
-    marketResults.forEach(({ marketId, distance }) => {
-      distances[marketId] = distance;
-    });
-    
-    console.log('Final market distances:', distances);
-    console.log('=== END MARKET DISTANCE DEBUG ===');
-    setMarketDistances(distances);
+    try {
+      const marketResults = await Promise.all(marketPromises);
+      
+      // Convert results back to the distances object
+      const distances: Record<string, string> = {};
+      marketResults.forEach(({ marketId, distance }) => {
+        distances[marketId] = distance;
+      });
+      
+      console.log('Final market distances:', distances);
+      console.log('=== END MARKET DISTANCE DEBUG ===');
+      setMarketDistances(distances);
+    } catch (error) {
+      console.error('Error in parallel market distance calculation:', error);
+      // Set fallback distances for all markets
+      const fallbackDistances: Record<string, string> = {};
+      markets.forEach(market => {
+        const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+        fallbackDistances[marketId] = '-- mi';
+      });
+      setMarketDistances(fallbackDistances);
+    } finally {
+      setIsLoadingMarketDistances(false);
+    }
   };
 
   // Group vendors by market
@@ -465,10 +471,15 @@ const Homepage = () => {
   useEffect(() => {
     if (acceptedSubmissions.length > 0 && userCoordinates) {
       calculateVendorDistances(acceptedSubmissions, userCoordinates);
-      
-      // Also calculate market distances
+    }
+  }, [acceptedSubmissions, userCoordinates]);
+
+  // Calculate market distances independently and immediately
+  useEffect(() => {
+    if (acceptedSubmissions.length > 0 && userCoordinates) {
       const markets = groupVendorsByMarket();
       if (markets.length > 0) {
+        // Start market distance calculation immediately without waiting for vendor distances
         calculateMarketDistances(markets, userCoordinates);
       }
     }
@@ -1208,10 +1219,14 @@ const Homepage = () => {
                       {/* Distance Badge - Bottom Right */}
                       <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
                         <span className="text-xs font-medium text-gray-700">
-                          {(() => {
-                            const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-                            return marketDistances[marketId] || '-- miles';
-                          })()}
+                          {isLoadingMarketDistances ? (
+                            <span className="animate-pulse">Loading...</span>
+                          ) : (
+                            (() => {
+                              const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+                              return marketDistances[marketId] || '-- mi';
+                            })()
+                          )}
                         </span>
                       </div>
                     </div>
