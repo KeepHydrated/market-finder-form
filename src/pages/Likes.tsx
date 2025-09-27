@@ -508,7 +508,7 @@ const Likes = () => {
         {likedVendors.map((vendor) => (
           <Card 
             key={vendor.id}
-            className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]" 
+            className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
             onClick={async () => {
               // Get the same cached coordinates used for distance calculation
               const cachedCoords = vendor.market_address 
