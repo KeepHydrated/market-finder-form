@@ -82,6 +82,7 @@ const Homepage = () => {
     vendors: AcceptedSubmission[];
   } | null>(null);
   const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
+  const [marketDistances, setMarketDistances] = useState<Record<string, string>>({});
   const [locationMethod, setLocationMethod] = useState<'ip' | 'gps'>('ip');
   const [isGettingGPSLocation, setIsGettingGPSLocation] = useState(false);
 
@@ -334,6 +335,73 @@ const Homepage = () => {
     setVendorDistances(distances);
   };
 
+  // Calculate distances for all markets
+  const calculateMarketDistances = async (markets: Array<{name: string, address: string, vendors: AcceptedSubmission[]}>, userCoords: {lat: number, lng: number}) => {
+    console.log('=== MARKET DISTANCE CALCULATION DEBUG ===');
+    console.log('User coordinates:', userCoords);
+    console.log('Starting distance calculations for', markets.length, 'markets');
+    
+    const distances: Record<string, string> = {};
+    
+    for (const market of markets) {
+      console.log('\n--- Processing market:', market.name);
+      console.log('Market address:', market.address);
+      
+      try {
+        // Create a unique market ID by combining market name and address
+        const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+        
+        // Get coordinates for the market using the same caching system as vendors
+        const marketCoords = await cacheVendorCoordinates(marketId, market.address);
+        console.log('Market coordinates result:', marketCoords);
+        
+        if (marketCoords) {
+          console.log('=== MARKET DISTANCE CALCULATION ===');
+          console.log('User coords:', userCoords);
+          console.log('Market coords:', marketCoords);
+          
+          // Try Google Maps distance first, fall back to Haversine calculation
+          const googleDistance = await getGoogleMapsDistance(
+            userCoords.lat, 
+            userCoords.lng, 
+            marketCoords.lat, 
+            marketCoords.lng
+          );
+          
+          let finalDistance: string;
+          
+          if (googleDistance) {
+            console.log('✅ Using Google Maps distance for market:', googleDistance.distance);
+            finalDistance = googleDistance.distance;
+          } else {
+            console.log('⚠️ Google Maps failed for market, using Haversine calculation');
+            const distanceInMiles = calculateDistance(
+              userCoords.lat, 
+              userCoords.lng, 
+              marketCoords.lat, 
+              marketCoords.lng
+            );
+            finalDistance = `${distanceInMiles.toFixed(1)} miles`;
+          }
+          
+          console.log('Final market distance:', finalDistance);
+          distances[marketId] = finalDistance;
+        } else {
+          console.log('No coordinates returned for market:', market.name);
+          distances[marketId] = '-- miles';
+        }
+      } catch (error) {
+        console.error(`Error calculating distance for market ${market.name}:`, error);
+        const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+        distances[marketId] = '-- miles';
+      }
+    }
+    
+    console.log('Final market distances:', distances);
+    console.log('=== END MARKET DISTANCE DEBUG ===');
+    setMarketDistances(distances);
+  };
+
   // Group vendors by market
   const groupVendorsByMarket = () => {
     const markets: Record<string, {
@@ -380,6 +448,12 @@ const Homepage = () => {
   useEffect(() => {
     if (acceptedSubmissions.length > 0 && userCoordinates) {
       calculateVendorDistances(acceptedSubmissions, userCoordinates);
+      
+      // Also calculate market distances
+      const markets = groupVendorsByMarket();
+      if (markets.length > 0) {
+        calculateMarketDistances(markets, userCoordinates);
+      }
     }
   }, [acceptedSubmissions, userCoordinates]);
 
@@ -1117,10 +1191,10 @@ const Homepage = () => {
                       {/* Distance Badge - Bottom Right */}
                       <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
                         <span className="text-xs font-medium text-gray-700">
-                          {userCoordinates 
-                            ? `${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 9)} miles`
-                            : `${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 9)} miles`
-                          }
+                          {(() => {
+                            const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+                            return marketDistances[marketId] || '-- miles';
+                          })()}
                         </span>
                       </div>
                     </div>
