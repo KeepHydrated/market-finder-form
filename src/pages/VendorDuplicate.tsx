@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera } from "lucide-react";
+import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useLikes } from "@/hooks/useLikes";
 import { cn } from "@/lib/utils";
+import { getGoogleMapsDistance, calculateDistance, getCoordinatesForAddress } from "@/lib/geocoding";
 
 interface AcceptedSubmission {
   id: string;
@@ -79,6 +80,8 @@ const VendorDuplicate = () => {
   const [marketOpeningHours, setMarketOpeningHours] = useState<any>(null);
   const [marketReviews, setMarketReviews] = useState<{rating?: number; reviewCount?: number} | null>(null);
   const [vendorReviews, setVendorReviews] = useState<{rating?: number; reviewCount?: number} | null>(null);
+  const [distance, setDistance] = useState<string>('');
+  const [isLoadingDistance, setIsLoadingDistance] = useState(false);
 
   useEffect(() => {
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
@@ -154,6 +157,7 @@ const VendorDuplicate = () => {
     if (acceptedSubmission) {
       fetchMarketOpeningHours();
       fetchVendorReviews();
+      calculateDistanceToMarket();
       // Debug log for current accepted submission
       console.log('Current acceptedSubmission ratings:', {
         store_name: acceptedSubmission.store_name,
@@ -490,6 +494,65 @@ const VendorDuplicate = () => {
     return schedules;
   };
 
+  // Calculate distance to market
+  const calculateDistanceToMarket = async () => {
+    if (!acceptedSubmission?.market_address) return;
+    
+    setIsLoadingDistance(true);
+    
+    try {
+      // Get user location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const userCoords = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            
+            // Get market coordinates
+            const marketCoords = await getCoordinatesForAddress(acceptedSubmission.market_address!);
+            
+            if (marketCoords) {
+              // Try Google Maps distance first, fall back to Haversine
+              const googleDistance = await getGoogleMapsDistance(
+                userCoords.lat, 
+                userCoords.lng, 
+                marketCoords.lat, 
+                marketCoords.lng
+              );
+              
+              if (googleDistance) {
+                setDistance(googleDistance.distance);
+              } else {
+                // Fallback to Haversine calculation
+                const distanceInMiles = calculateDistance(
+                  userCoords.lat, 
+                  userCoords.lng, 
+                  marketCoords.lat, 
+                  marketCoords.lng
+                );
+                setDistance(`${distanceInMiles.toFixed(1)} miles`);
+              }
+            }
+            
+            setIsLoadingDistance(false);
+          },
+          (error) => {
+            console.error('Error getting user location:', error);
+            setIsLoadingDistance(false);
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+        );
+      } else {
+        setIsLoadingDistance(false);
+      }
+    } catch (error) {
+      console.error('Error calculating distance:', error);
+      setIsLoadingDistance(false);
+    }
+  };
+
   const cleanAddress = (address?: string) => {
     if (!address) return "Address TBD";
     // Remove "United States" and any trailing comma/space
@@ -559,9 +622,20 @@ const VendorDuplicate = () => {
 
           <div className="flex items-start gap-2">
             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <p className="text-muted-foreground text-base font-normal">
-              {cleanAddress(acceptedSubmission.market_address)}
-            </p>
+            <div>
+              <p className="text-muted-foreground text-base font-normal">
+                {cleanAddress(acceptedSubmission.market_address)}
+              </p>
+              {distance && (
+                <div className="flex items-center gap-1 mt-1">
+                  <Navigation className="h-3 w-3 text-muted-foreground" />
+                  <p className="text-muted-foreground text-sm">{distance}</p>
+                </div>
+              )}
+              {isLoadingDistance && (
+                <p className="text-muted-foreground text-sm mt-1">Calculating distance...</p>
+              )}
+            </div>
           </div>
 
           <div className="flex items-start gap-2">
