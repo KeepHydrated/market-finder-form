@@ -55,21 +55,26 @@ export function UserMenu({ user, profile }: UserMenuProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={profile?.avatar_url} alt="Avatar" />
-              <AvatarFallback className="text-xs">{getInitials(profile?.full_name)}</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">
-                {profile?.full_name || 'User'}
-              </p>
-              <p className="text-xs leading-none text-muted-foreground">
-                {user?.email}
-              </p>
+        <DropdownMenuLabel className="font-normal p-0">
+          <button
+            onClick={handleProfileClick}
+            className="w-full p-2 text-left hover:bg-muted/50 rounded-md transition-colors"
+          >
+            <div className="flex items-center space-x-3">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={profile?.avatar_url} alt="Avatar" />
+                <AvatarFallback className="text-xs">{getInitials(profile?.full_name)}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none">
+                  {profile?.full_name || 'User'}
+                </p>
+                <p className="text-xs leading-none text-muted-foreground">
+                  {user?.email}
+                </p>
+              </div>
             </div>
-          </div>
+          </button>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleProfileClick}>
