@@ -1,0 +1,1 @@
+UPDATE submissions SET latitude = 29.495294, longitude = -98.480526 WHERE id = '98a4dcd8-ee9d-4786-98ec-303aecba4cd3';
