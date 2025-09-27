@@ -110,7 +110,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white relative">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white">
         {/* Heart button positioned at top right of entire modal */}
         <Button
           variant="ghost"
@@ -141,8 +141,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
             variant="secondary"
             size="lg"
             onClick={goToPrevious}
-            className="absolute left-[-70px] top-1/2 transform -translate-y-1/2 z-50 h-12 w-12 p-0 bg-black/80 hover:bg-black text-white shadow-lg rounded-full"
-            style={{ left: '-70px' }}
+            className="fixed left-[10px] top-1/2 transform -translate-y-1/2 z-[70] h-12 w-12 p-0 bg-black/80 hover:bg-black text-white shadow-lg rounded-full"
           >
             <ChevronLeft className="h-6 w-6" />
           </Button>
@@ -153,8 +152,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
             variant="secondary"
             size="lg" 
             onClick={goToNext}
-            className="absolute right-[-70px] top-1/2 transform -translate-y-1/2 z-50 h-12 w-12 p-0 bg-black/80 hover:bg-black text-white shadow-lg rounded-full"
-            style={{ right: '-70px' }}
+            className="fixed right-[10px] top-1/2 transform -translate-y-1/2 z-[70] h-12 w-12 p-0 bg-black/80 hover:bg-black text-white shadow-lg rounded-full"
           >
             <ChevronRight className="h-6 w-6" />
           </Button>
