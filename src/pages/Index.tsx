@@ -454,125 +454,104 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sidebar and Main Content */}
-      <div className="flex">
-        {/* Left Sidebar - Navigation Tabs */}
-        <div className="w-64 bg-card border-r border-border min-h-[calc(100vh-4rem)]">
-          <div className="p-4 space-y-2">
-            <div 
-              className="bg-primary/10 text-primary font-medium border border-primary/20 px-4 py-3 rounded-md"
-            >
-              Profile
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1">
-          <main className="py-12">
-            <div className="container mx-auto px-4">
-              {selectedMarket ? (
-                <MarketDetails 
-                  market={selectedMarket} 
-                  onBack={handleBackToSearch} 
-                />
-              ) : (
-                <>
-                  <div className="max-w-2xl mx-auto space-y-8">
-                    {/* Profile Picture */}
-                    <div>
-                      <h2 className="text-xl font-semibold mb-4">Profile Pic</h2>
-                      <div className="flex items-center gap-4">
-                        <div className="relative">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleProfilePictureUpload}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                          />
-                          <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center border-2 border-dashed border-muted-foreground/30 overflow-hidden">
-                            {profileData.avatarUrl ? (
-                              <img 
-                                src={profileData.avatarUrl} 
-                                alt="Profile" 
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <Upload className="h-8 w-8 text-muted-foreground" />
-                            )}
-                          </div>
-                        </div>
-                        <div className="text-muted-foreground">
-                          JPG, PNG or GIF (max 5MB)
-                        </div>
-                      </div>
+      <main className="py-12">
+        <div className="container mx-auto px-4">
+          {selectedMarket ? (
+            <MarketDetails 
+              market={selectedMarket} 
+              onBack={handleBackToSearch} 
+            />
+          ) : (
+            <div className="max-w-2xl mx-auto space-y-8">
+              {/* Profile Picture */}
+              <div>
+                <h2 className="text-xl font-semibold mb-4">Profile Pic</h2>
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfilePictureUpload}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center border-2 border-dashed border-muted-foreground/30 overflow-hidden">
+                      {profileData.avatarUrl ? (
+                        <img 
+                          src={profileData.avatarUrl} 
+                          alt="Profile" 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Upload className="h-8 w-8 text-muted-foreground" />
+                      )}
                     </div>
-
-                    {/* Username */}
-                    <div>
-                      <h2 className="text-xl font-semibold mb-4">Username</h2>
-                      <Input 
-                        value={profileData.username} 
-                        onChange={(e) => setProfileData(prev => ({ ...prev, username: e.target.value }))}
-                        className={isEditing ? "bg-background" : "bg-muted"}
-                        placeholder="Enter your username"
-                        disabled={!isEditing}
-                      />
-                    </div>
-
-                    {/* Email Address */}
-                    <div>
-                      <h2 className="text-xl font-semibold mb-4">Email Address</h2>
-                      <div className="bg-muted p-4 rounded-md mb-2 text-muted-foreground">
-                        {user?.email}
-                      </div>
-                      <p className="text-sm text-muted-foreground">Your email address cannot be changed</p>
-                    </div>
-
-                    {/* Password */}
-                    <div>
-                      <h2 className="text-xl font-semibold mb-4">Password</h2>
-                      <div className="flex gap-4 items-center mb-2">
-                        <div className="bg-muted p-4 rounded-md flex-1 text-muted-foreground tracking-widest">
-                          ••••••••••••
-                        </div>
-                        <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-                          Change Password
-                        </Button>
-                      </div>
-                      <p className="text-sm text-muted-foreground">Click to receive a password reset link via email</p>
-                    </div>
-
-                    {/* Edit Profile Button */}
-                    <div className="pt-4">
-                      <Button 
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3"
-                        onClick={handleSaveProfile}
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        {isEditing ? "Save" : "Edit Profile"}
-                      </Button>
-                    </div>
-
-                    {/* Danger Zone */}
-                    <div className="border-t pt-8">
-                      <h2 className="text-xl font-semibold mb-4 text-red-600">Danger Zone</h2>
-                      <p className="text-muted-foreground mb-4">
-                        Once you delete your account, there is no going back. Please be certain.
-                      </p>
-                      <Button className="bg-red-600 hover:bg-red-700 text-white">
-                        Delete Account
-                      </Button>
-                    </div>
-
                   </div>
+                  <div className="text-muted-foreground">
+                    JPG, PNG or GIF (max 5MB)
+                  </div>
+                </div>
+              </div>
 
-                </>
-              )}
+              {/* Username */}
+              <div>
+                <h2 className="text-xl font-semibold mb-4">Username</h2>
+                <Input 
+                  value={profileData.username} 
+                  onChange={(e) => setProfileData(prev => ({ ...prev, username: e.target.value }))}
+                  className={isEditing ? "bg-background" : "bg-muted"}
+                  placeholder="Enter your username"
+                  disabled={!isEditing}
+                />
+              </div>
+
+              {/* Email Address */}
+              <div>
+                <h2 className="text-xl font-semibold mb-4">Email Address</h2>
+                <div className="bg-muted p-4 rounded-md mb-2 text-muted-foreground">
+                  {user?.email}
+                </div>
+                <p className="text-sm text-muted-foreground">Your email address cannot be changed</p>
+              </div>
+
+              {/* Password */}
+              <div>
+                <h2 className="text-xl font-semibold mb-4">Password</h2>
+                <div className="flex gap-4 items-center mb-2">
+                  <div className="bg-muted p-4 rounded-md flex-1 text-muted-foreground tracking-widest">
+                    ••••••••••••
+                  </div>
+                  <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+                    Change Password
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">Click to receive a password reset link via email</p>
+              </div>
+
+              {/* Edit Profile Button */}
+              <div className="pt-4">
+                <Button 
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3"
+                  onClick={handleSaveProfile}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  {isEditing ? "Save" : "Edit Profile"}
+                </Button>
+              </div>
+
+              {/* Danger Zone */}
+              <div className="border-t pt-8">
+                <h2 className="text-xl font-semibold mb-4 text-red-600">Danger Zone</h2>
+                <p className="text-muted-foreground mb-4">
+                  Once you delete your account, there is no going back. Please be certain.
+                </p>
+                <Button className="bg-red-600 hover:bg-red-700 text-white">
+                  Delete Account
+                </Button>
+              </div>
             </div>
-          </main>
+          )}
         </div>
-      </div>
+      </main>
 
       <AddMarketForm 
         open={showAddForm} 
