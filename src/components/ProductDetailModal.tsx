@@ -250,7 +250,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
               {/* Store name at the very bottom of right column */}
               {vendorId && vendorName && (
                 <div className="mt-auto pt-3 border-t border-gray-200">
-                  <div className="flex justify-end">
+                  <div className="flex justify-start">
                     <button
                       onClick={() => {
                         onClose();
