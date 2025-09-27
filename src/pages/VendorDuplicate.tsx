@@ -90,12 +90,13 @@ const VendorDuplicate = () => {
     // Check if data was passed from navigation
     if (location.state) {
       console.log('Using location state data');
-      const { type, selectedVendor, selectedMarket, allVendors, marketCoordinates } = location.state as {
+      const { type, selectedVendor, selectedMarket, allVendors, marketCoordinates, marketDistance } = location.state as {
         type: 'vendor' | 'market';
         selectedVendor?: AcceptedSubmission;
         selectedMarket?: { name: string; address: string; vendors: AcceptedSubmission[] };
         allVendors: AcceptedSubmission[];
         marketCoordinates?: { lat: number; lng: number } | null;
+        marketDistance?: string;
       };
       
       setAllVendors(allVendors);
@@ -111,6 +112,13 @@ const VendorDuplicate = () => {
       if (marketCoordinates) {
         setCachedMarketCoordinates(marketCoordinates);
         console.log('🗺️ Using passed market coordinates:', marketCoordinates);
+      }
+      
+      // Use the pre-calculated distance from Homepage if available
+      if (marketDistance) {
+        console.log('🗺️ Using pre-calculated distance from Homepage:', marketDistance);
+        setDistance(marketDistance);
+        setIsLoadingDistance(false);
       }
       
       if (type === 'vendor' && selectedVendor) {
@@ -234,7 +242,10 @@ const VendorDuplicate = () => {
     if (acceptedSubmission) {
       fetchMarketOpeningHours();
       fetchVendorReviews();
-      calculateDistanceToMarket();
+      // Only calculate distance if it wasn't passed from Homepage
+      if (!distance) {
+        calculateDistanceToMarket();
+      }
       // Debug log for current accepted submission
       console.log('Current acceptedSubmission ratings:', {
         store_name: acceptedSubmission.store_name,

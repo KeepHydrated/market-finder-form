@@ -1038,13 +1038,19 @@ const Homepage = () => {
                    <Card 
                       key={index}
                       className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]"
-                      onClick={() => navigate('/market', { 
-                        state: { 
-                          type: 'market', 
-                          selectedMarket: market,
-                          allVendors: market.vendors 
-                        } 
-                      })}
+                       onClick={() => {
+                         const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+                         const marketDistance = marketDistances[marketId];
+                         
+                         navigate('/market', { 
+                           state: { 
+                             type: 'market', 
+                             selectedMarket: market,
+                             allVendors: market.vendors,
+                             marketDistance: marketDistance // Pass the calculated distance
+                           } 
+                         });
+                       }}
                    >
                     {/* Vendor Images Collage */}
                     <div className="aspect-[4/3] bg-muted relative overflow-hidden">
