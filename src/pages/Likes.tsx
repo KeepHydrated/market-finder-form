@@ -467,13 +467,13 @@ const Likes = () => {
                 </span>
               </div>
               {product.vendorName && (
-                <div className="mt-2 pt-2 border-t border-border">
+                <div className="mt-2 pt-2 border-t border-black">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/market?vendor=${product.vendorId}`);
                     }}
-                    className="text-xs text-primary hover:underline cursor-pointer"
+                    className="text-xs text-black hover:underline cursor-pointer"
                   >
                     {product.vendorName}
                   </button>
