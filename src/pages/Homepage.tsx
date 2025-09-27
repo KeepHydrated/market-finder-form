@@ -273,6 +273,13 @@ const Homepage = () => {
     fetchAcceptedSubmissions();
   }, []);
 
+  // Calculate distances when vendors or user coordinates change
+  useEffect(() => {
+    if (acceptedSubmissions.length > 0 && userCoordinates) {
+      calculateVendorDistances(acceptedSubmissions, userCoordinates);
+    }
+  }, [acceptedSubmissions, userCoordinates]);
+
   // Refresh data when component becomes visible
   useEffect(() => {
     const handleVisibilityChange = () => {
