@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
-import { MapPin, Clock, ExternalLink, Search, X } from 'lucide-react';
+import { MapPin, Clock, ExternalLink, Search, X, Navigation } from 'lucide-react';
+import { getGoogleMapsDistance } from '@/lib/geocoding';
 
 // Updated: Removed Google Maps functionality
 
@@ -52,6 +53,8 @@ export const FarmersMarketSearch = ({
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isBadgeClick, setIsBadgeClick] = useState(false);
+  const [marketDistances, setMarketDistances] = useState<Record<string, string>>({});
+  const [isLoadingDistances, setIsLoadingDistances] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -75,6 +78,45 @@ export const FarmersMarketSearch = ({
       setUserLocation({ lat: 29.4241, lng: -98.4936 });
     }
   }, []);
+
+  // Calculate distances for suggestions
+  const calculateDistances = async (markets: FarmersMarket[]) => {
+    if (!userLocation || markets.length === 0) return;
+    
+    setIsLoadingDistances(true);
+    const distances: Record<string, string> = {};
+    
+    for (const market of markets) {
+      if (!market.geometry?.location) {
+        distances[market.place_id] = '-- mi';
+        continue;
+      }
+      
+      try {
+        const googleDistance = await getGoogleMapsDistance(
+          userLocation.lat,
+          userLocation.lng,
+          market.geometry.location.lat,
+          market.geometry.location.lng
+        );
+        
+        if (googleDistance) {
+          const displayText = googleDistance.duration 
+            ? `${googleDistance.distance} (${googleDistance.duration})`
+            : googleDistance.distance;
+          distances[market.place_id] = displayText;
+        } else {
+          distances[market.place_id] = '-- mi';
+        }
+      } catch (error) {
+        console.error('Error calculating distance for market:', market.name, error);
+        distances[market.place_id] = '-- mi';
+      }
+    }
+    
+    setMarketDistances(distances);
+    setIsLoadingDistances(false);
+  };
 
   // Search for farmers markets with debouncing
   useEffect(() => {
@@ -148,6 +190,9 @@ export const FarmersMarketSearch = ({
         
         setSuggestions(sortedSuggestions);
         setShowSuggestions(true);
+        
+        // Calculate distances for the new suggestions
+        calculateDistances(sortedSuggestions);
       } catch (error) {
         console.error('Error searching farmers markets:', error);
       } finally {
@@ -221,18 +266,22 @@ export const FarmersMarketSearch = ({
           ) || data.predictions[0];
           
           setSuggestions([detailedMarket]);
+          calculateDistances([detailedMarket]);
         } else {
           setSuggestions([market]);
+          calculateDistances([market]);
         }
       } catch (error) {
         console.error('Error fetching market details:', error);
         setSuggestions([market]);
+        calculateDistances([market]);
       } finally {
         setLoading(false);
       }
     } else {
       // Market already has details, show it directly
       setSuggestions([market]);
+      calculateDistances([market]);
     }
     
     setShowSuggestions(true);
@@ -334,6 +383,20 @@ export const FarmersMarketSearch = ({
                       <span>{market.structured_formatting?.secondary_text || market.address}</span>
                     </div>
                   </div>
+                  
+                  {/* Distance Display */}
+                  {marketDistances[market.place_id] && (
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Navigation className="h-3 w-3" />
+                      <span>{marketDistances[market.place_id]}</span>
+                    </div>
+                  )}
+                  {isLoadingDistances && !marketDistances[market.place_id] && (
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Navigation className="h-3 w-3" />
+                      <span>Calculating distance...</span>
+                    </div>
+                  )}
                   {market.opening_hours?.weekday_text && (
                     <div className="text-sm text-muted-foreground">
                       <div className="flex items-start gap-2">
