@@ -527,17 +527,6 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">Click to receive a password reset link via email</p>
               </div>
 
-              {/* Edit Profile Button */}
-              <div className="pt-4">
-                <Button 
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3"
-                  onClick={handleSaveProfile}
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  {isEditing ? "Save" : "Edit Profile"}
-                </Button>
-              </div>
-
               {/* Danger Zone */}
               <div className="border-t pt-8">
                 <h2 className="text-xl font-semibold mb-4 text-red-600">Danger Zone</h2>
