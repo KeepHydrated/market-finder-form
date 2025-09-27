@@ -603,7 +603,7 @@ const Homepage = () => {
                   <TabsTrigger value="times">Times</TabsTrigger>
                   <TabsTrigger value="categories">Categories</TabsTrigger>
                 </TabsList>
-                <TabsContent value="times" className="p-4">
+                <TabsContent value="times" className="p-8">
                   <div className="space-y-4">
                     <div className="flex flex-wrap gap-2">
                       {DAYS.map((day) => (
@@ -700,7 +700,7 @@ const Homepage = () => {
                     </div>
                   </div>
                 </TabsContent>
-                <TabsContent value="categories" className="p-4">
+                <TabsContent value="categories" className="p-8">
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-2">
                       {SPECIALTY_CATEGORIES.map((category) => (
