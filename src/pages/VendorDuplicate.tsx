@@ -153,6 +153,65 @@ const VendorDuplicate = () => {
     }
   };
 
+  // Calculate distance to market
+  const calculateDistanceToMarket = async () => {
+    if (!acceptedSubmission?.market_address) return;
+    
+    setIsLoadingDistance(true);
+    
+    try {
+      // Get user location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const userCoords = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            
+            // Get market coordinates
+            const marketCoords = await getCoordinatesForAddress(acceptedSubmission.market_address!);
+            
+            if (marketCoords) {
+              // Try Google Maps distance first, fall back to Haversine
+              const googleDistance = await getGoogleMapsDistance(
+                userCoords.lat, 
+                userCoords.lng, 
+                marketCoords.lat, 
+                marketCoords.lng
+              );
+              
+              if (googleDistance) {
+                setDistance(googleDistance.distance);
+              } else {
+                // Fallback to Haversine calculation
+                const distanceInMiles = calculateDistance(
+                  userCoords.lat, 
+                  userCoords.lng, 
+                  marketCoords.lat, 
+                  marketCoords.lng
+                );
+                setDistance(`${distanceInMiles.toFixed(1)} miles`);
+              }
+            }
+            
+            setIsLoadingDistance(false);
+          },
+          (error) => {
+            console.error('Error getting user location:', error);
+            setIsLoadingDistance(false);
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+        );
+      } else {
+        setIsLoadingDistance(false);
+      }
+    } catch (error) {
+      console.error('Error calculating distance:', error);
+      setIsLoadingDistance(false);
+    }
+  };
+
   useEffect(() => {
     if (acceptedSubmission) {
       fetchMarketOpeningHours();
@@ -492,65 +551,6 @@ const VendorDuplicate = () => {
     }).filter(Boolean);
     
     return schedules;
-  };
-
-  // Calculate distance to market
-  const calculateDistanceToMarket = async () => {
-    if (!acceptedSubmission?.market_address) return;
-    
-    setIsLoadingDistance(true);
-    
-    try {
-      // Get user location
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const userCoords = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
-            
-            // Get market coordinates
-            const marketCoords = await getCoordinatesForAddress(acceptedSubmission.market_address!);
-            
-            if (marketCoords) {
-              // Try Google Maps distance first, fall back to Haversine
-              const googleDistance = await getGoogleMapsDistance(
-                userCoords.lat, 
-                userCoords.lng, 
-                marketCoords.lat, 
-                marketCoords.lng
-              );
-              
-              if (googleDistance) {
-                setDistance(googleDistance.distance);
-              } else {
-                // Fallback to Haversine calculation
-                const distanceInMiles = calculateDistance(
-                  userCoords.lat, 
-                  userCoords.lng, 
-                  marketCoords.lat, 
-                  marketCoords.lng
-                );
-                setDistance(`${distanceInMiles.toFixed(1)} miles`);
-              }
-            }
-            
-            setIsLoadingDistance(false);
-          },
-          (error) => {
-            console.error('Error getting user location:', error);
-            setIsLoadingDistance(false);
-          },
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
-        );
-      } else {
-        setIsLoadingDistance(false);
-      }
-    } catch (error) {
-      console.error('Error calculating distance:', error);
-      setIsLoadingDistance(false);
-    }
   };
 
   const cleanAddress = (address?: string) => {
