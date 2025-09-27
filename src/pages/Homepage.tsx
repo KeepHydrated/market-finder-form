@@ -311,7 +311,7 @@ const Homepage = () => {
   // Get location from IP address automatically
   const getLocationFromIP = async () => {
     try {
-      console.log('Attempting IP geolocation...');
+      console.log('🌐 Attempting IP geolocation...');
       const response = await fetch('https://ipapi.co/json/');
       
       if (!response.ok) {
@@ -319,20 +319,30 @@ const Homepage = () => {
       }
       
       const data = await response.json();
-      console.log('IP geolocation response:', data);
+      console.log('🌐 IP geolocation response:', data);
       
       if (data.latitude && data.longitude) {
-        console.log('Setting user coordinates from IP:', { lat: data.latitude, lng: data.longitude });
+        console.log('📍 Setting user coordinates from IP:', { 
+          lat: data.latitude, 
+          lng: data.longitude,
+          city: data.city,
+          region: data.region 
+        });
         setUserCoordinates({ 
           lat: data.latitude, 
           lng: data.longitude 
         });
         setLocationZipcode(data.postal || '');
         setLocationMethod('ip');
+        
+        toast({
+          title: "📡 Using IP Location", 
+          description: `Approximate location: ${data.city}, ${data.region}. Enable GPS for precise distances.`
+        });
       } else {
-        console.log('IP geolocation data missing coordinates, using default location');
+        console.log('❌ IP geolocation data missing coordinates, using default location');
         // Set a default location (San Antonio area) for testing
-        console.log('Using default San Antonio coordinates for testing');
+        console.log('🏠 Using default San Antonio coordinates for testing');
         setUserCoordinates({ 
           lat: 29.4241, 
           lng: -98.4936 
@@ -340,9 +350,9 @@ const Homepage = () => {
         setLocationMethod('ip');
       }
     } catch (error) {
-      console.log('IP geolocation failed:', error);
+      console.log('❌ IP geolocation failed:', error);
       // Set a default location (San Antonio area) for testing
-      console.log('Using default San Antonio coordinates for testing');
+      console.log('🏠 Using default San Antonio coordinates for testing');
       setUserCoordinates({ 
         lat: 29.4241, 
         lng: -98.4936 
@@ -353,17 +363,24 @@ const Homepage = () => {
 
   // Try GPS location first, fallback to IP if denied or fails
   const tryGPSLocationFirst = async () => {
+    console.log('🌍 Starting location detection...');
+    
     if (!navigator.geolocation) {
-      console.log('Geolocation not supported, using IP fallback');
+      console.log('❌ Geolocation not supported, using IP fallback');
       getLocationFromIP();
       return;
     }
 
+    console.log('📍 Requesting GPS permission...');
+    
     // Try GPS first with a short timeout
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         try {
-          const { latitude, longitude } = position.coords;
+          const { latitude, longitude, accuracy } = position.coords;
+          
+          console.log('✅ GPS Location Success!');
+          console.log('📍 GPS Coordinates:', { lat: latitude, lng: longitude, accuracy: `${accuracy}m` });
           
           // Store user coordinates for distance calculations
           setUserCoordinates({ lat: latitude, lng: longitude });
@@ -377,9 +394,15 @@ const Homepage = () => {
           if (response.ok) {
             const data = await response.json();
             const zipcode = data.postcode || data.postalCode || '';
+            const city = data.city || data.locality || '';
             setLocationZipcode(zipcode);
             
-            console.log('GPS location acquired automatically:', { lat: latitude, lng: longitude, zipcode });
+            console.log('📮 Location Details:', { city, zipcode, lat: latitude, lng: longitude });
+            
+            toast({
+              title: "📍 GPS Location Active",
+              description: `Using precise location in ${city}${zipcode ? `, ${zipcode}` : ''}`,
+            });
           }
         } catch (error) {
           console.error('GPS geocoding error:', error);
@@ -388,13 +411,21 @@ const Homepage = () => {
       },
       (error) => {
         // GPS failed or denied, fallback to IP
-        console.log('GPS location failed/denied, falling back to IP:', error.message);
+        console.log('❌ GPS location failed/denied:', error.message);
+        console.log('🔄 Falling back to IP location...');
+        
+        toast({
+          title: "Location Permission Needed",
+          description: "Using approximate IP location. Allow GPS for precise distances.",
+          variant: "destructive"
+        });
+        
         getLocationFromIP();
       },
       {
         enableHighAccuracy: true,
-        timeout: 5000, // Shorter timeout for automatic request
-        maximumAge: 300000 // 5 minutes
+        timeout: 8000, // Longer timeout for better accuracy
+        maximumAge: 60000 // 1 minute cache
       }
     );
   };
