@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { calculateDistance, getGoogleMapsDistance, cacheVendorCoordinates } from "@/lib/geocoding";
+import { useToast } from "@/hooks/use-toast";
 
 type TabType = "markets" | "vendors" | "products";
 
@@ -55,11 +57,15 @@ const tabToLikeType = (tab: TabType): LikeType => {
 const Likes = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<TabType>("markets");
   const { likes, loading, toggleLike, isLiked } = useLikes();
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<AcceptedSubmission[]>([]);
   const [vendorRatings, setVendorRatings] = useState<Record<string, VendorRating>>({});
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
+  const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
+  const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
+  const [locationMethod, setLocationMethod] = useState<'ip' | 'gps'>('ip');
 
   const tabs = [
     { id: "markets" as TabType, title: "Markets", icon: MapPin },
@@ -72,6 +78,18 @@ const Likes = () => {
       fetchAcceptedSubmissions();
     }
   }, [user, activeTab]);
+
+  // Calculate distances when vendors or user coordinates change
+  useEffect(() => {
+    if (acceptedSubmissions.length > 0 && userCoordinates) {
+      calculateVendorDistances(acceptedSubmissions, userCoordinates);
+    }
+  }, [acceptedSubmissions, userCoordinates]);
+
+  // Initialize location detection
+  useEffect(() => {
+    tryGPSLocationFirst();
+  }, []);
 
   const fetchAcceptedSubmissions = async () => {
     setLoadingSubmissions(true);
@@ -144,6 +162,130 @@ const Likes = () => {
       setVendorRatings(ratingsMap);
     } catch (error) {
       console.error('Error fetching vendor ratings:', error);
+    }
+  };
+
+  // Calculate distances for all vendors
+  const calculateVendorDistances = async (vendors: AcceptedSubmission[], userCoords: {lat: number, lng: number}) => {
+    const distances: Record<string, string> = {};
+    
+    for (const vendor of vendors) {
+      if (!vendor.market_address) {
+        distances[vendor.id] = '-- miles';
+        continue;
+      }
+
+      try {
+        // Get coordinates for this vendor (with caching)
+        const vendorCoords = await cacheVendorCoordinates(vendor.id, vendor.market_address);
+        
+        if (vendorCoords) {
+          // Try Google Maps distance first, fall back to Haversine calculation
+          const googleDistance = await getGoogleMapsDistance(
+            userCoords.lat, 
+            userCoords.lng, 
+            vendorCoords.lat, 
+            vendorCoords.lng
+          );
+          
+          let finalDistance: string;
+          
+          if (googleDistance) {
+            finalDistance = googleDistance.distance;
+          } else {
+            const distanceInMiles = calculateDistance(
+              userCoords.lat, 
+              userCoords.lng, 
+              vendorCoords.lat, 
+              vendorCoords.lng
+            );
+            finalDistance = `${distanceInMiles.toFixed(1)} miles`;
+          }
+          
+          distances[vendor.id] = finalDistance;
+        } else {
+          distances[vendor.id] = '-- miles';
+        }
+      } catch (error) {
+        console.error(`Error calculating distance for vendor ${vendor.id}:`, error);
+        distances[vendor.id] = '-- miles';
+      }
+    }
+    
+    setVendorDistances(distances);
+  };
+
+  // Get location from IP address automatically
+  const getLocationFromIP = async () => {
+    try {
+      const response = await fetch('https://ipapi.co/json/');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.latitude && data.longitude) {
+        setUserCoordinates({ 
+          lat: data.latitude, 
+          lng: data.longitude 
+        });
+        setLocationMethod('ip');
+      } else {
+        // Set a default location (San Antonio area) for testing
+        setUserCoordinates({ 
+          lat: 29.4241, 
+          lng: -98.4936 
+        });
+        setLocationMethod('ip');
+      }
+    } catch (error) {
+      console.log('IP geolocation failed, using default location');
+      // Set a default location (San Antonio area) for testing
+      setUserCoordinates({ 
+        lat: 29.4241, 
+        lng: -98.4936 
+      });
+      setLocationMethod('ip');
+    }
+  };
+
+  // Try GPS location first, fallback to IP if denied or fails
+  const tryGPSLocationFirst = async () => {
+    try {
+      if (!navigator.geolocation) {
+        getLocationFromIP();
+        return;
+      }
+
+      // Try GPS first with a short timeout
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            
+            // Store user coordinates for distance calculations
+            setUserCoordinates({ lat: latitude, lng: longitude });
+            setLocationMethod('gps');
+          } catch (error) {
+            console.error('GPS geocoding error:', error);
+            // Still keep the GPS coordinates even if zipcode lookup fails
+          }
+        },
+        (error) => {
+          // GPS failed or denied, fallback to IP
+          getLocationFromIP();
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 60000
+        }
+      );
+    } catch (error) {
+      console.error('Error in tryGPSLocationFirst function:', error);
+      getLocationFromIP();
     }
   };
 
@@ -419,7 +561,7 @@ const Likes = () => {
               {/* Distance Badge */}
               <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
                 <span className="text-xs font-medium text-gray-700">
-                  {`${Math.floor(Math.random() * 5) + 1}.${Math.floor(Math.random() * 9)} miles`}
+                  {vendorDistances[vendor.id] || '-- miles'}
                 </span>
               </div>
             </div>
