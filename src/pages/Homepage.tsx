@@ -271,6 +271,7 @@ const Homepage = () => {
 
   useEffect(() => {
     fetchAcceptedSubmissions();
+    getLocationFromIP(); // Auto-detect location on page load
   }, []);
 
   // Calculate distances when vendors or user coordinates change
@@ -279,6 +280,24 @@ const Homepage = () => {
       calculateVendorDistances(acceptedSubmissions, userCoordinates);
     }
   }, [acceptedSubmissions, userCoordinates]);
+
+  // Get location from IP address automatically
+  const getLocationFromIP = async () => {
+    try {
+      const response = await fetch('https://api.bigdatacloud.net/data/client-ip');
+      const data = await response.json();
+      
+      if (data.latitude && data.longitude) {
+        setUserCoordinates({ 
+          lat: data.latitude, 
+          lng: data.longitude 
+        });
+        setLocationZipcode(data.postcode || data.postalCode || '');
+      }
+    } catch (error) {
+      console.log('IP geolocation not available, user can manually set location');
+    }
+  };
 
   // Refresh data when component becomes visible
   useEffect(() => {
