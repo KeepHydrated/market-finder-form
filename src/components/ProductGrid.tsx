@@ -31,9 +31,10 @@ interface ProductCardProps {
   onDuplicateProduct?: (product: Product) => void;
   onEditProduct?: (product: Product) => void;
   vendorId?: string;
+  vendorName?: string;
 }
 
-const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId }: ProductCardProps) => {
+const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId, vendorName }: ProductCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { toggleLike, isLiked } = useLikes();
 
@@ -190,6 +191,16 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProd
             ${product.price.toFixed(2)}
           </span>
         </div>
+        {vendorName && (
+          <div className="mt-2 pt-2 border-t border-border">
+            <button 
+              onClick={(e) => e.stopPropagation()}
+              className="text-xs text-primary hover:underline cursor-pointer"
+            >
+              {vendorName}
+            </button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -229,6 +240,7 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
             onDuplicateProduct={onDuplicateProduct}
             onEditProduct={onEditProduct}
             vendorId={vendorId}
+            vendorName={vendorName}
           />
         ))}
       </div>
