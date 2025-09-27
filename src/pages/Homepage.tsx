@@ -599,11 +599,13 @@ const Homepage = () => {
             </DialogTrigger>
             <DialogContent className="w-[800px] max-w-none p-0 bg-background border shadow-lg">
               <Tabs defaultValue="times" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
-                  <TabsTrigger value="times">Times</TabsTrigger>
-                  <TabsTrigger value="categories">Categories</TabsTrigger>
-                </TabsList>
-                <TabsContent value="times" className="px-8 pb-8 pt-12">
+                <div className="pt-8">
+                  <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
+                    <TabsTrigger value="times">Times</TabsTrigger>
+                    <TabsTrigger value="categories">Categories</TabsTrigger>
+                  </TabsList>
+                </div>
+                <TabsContent value="times" className="px-8 pb-8 pt-8">
                   <div className="space-y-4">
                     <div className="flex flex-wrap gap-2">
                       {DAYS.map((day) => (
@@ -700,7 +702,7 @@ const Homepage = () => {
                     </div>
                   </div>
                 </TabsContent>
-                <TabsContent value="categories" className="px-8 pb-8 pt-12">
+                <TabsContent value="categories" className="px-8 pb-8 pt-8">
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-2">
                       {SPECIALTY_CATEGORIES.map((category) => (
