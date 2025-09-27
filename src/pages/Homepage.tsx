@@ -339,11 +339,10 @@ const Homepage = () => {
   const calculateMarketDistances = async (markets: Array<{name: string, address: string, vendors: AcceptedSubmission[]}>, userCoords: {lat: number, lng: number}) => {
     console.log('=== MARKET DISTANCE CALCULATION DEBUG ===');
     console.log('User coordinates:', userCoords);
-    console.log('Starting distance calculations for', markets.length, 'markets');
+    console.log('Starting parallel distance calculations for', markets.length, 'markets');
     
-    const distances: Record<string, string> = {};
-    
-    for (const market of markets) {
+    // Process all market distance calculations in parallel
+    const marketPromises = markets.map(async (market) => {
       console.log('\n--- Processing market:', market.name);
       console.log('Market address:', market.address);
       
@@ -357,7 +356,7 @@ const Homepage = () => {
         if (firstVendor && vendorDistances[firstVendor.id]) {
           // If we already have the distance for a vendor at this market, use the same distance
           console.log('✅ Using existing vendor distance for market:', vendorDistances[firstVendor.id]);
-          distances[marketId] = vendorDistances[firstVendor.id];
+          return { marketId, distance: vendorDistances[firstVendor.id] };
         } else {
           // Fallback: calculate distance using the market address
           const marketCoords = await cacheVendorCoordinates(marketId, market.address);
@@ -393,18 +392,27 @@ const Homepage = () => {
             }
             
             console.log('Final market distance:', finalDistance);
-            distances[marketId] = finalDistance;
+            return { marketId, distance: finalDistance };
           } else {
             console.log('No coordinates returned for market:', market.name);
-            distances[marketId] = '-- miles';
+            return { marketId, distance: '-- miles' };
           }
         }
       } catch (error) {
         console.error(`Error calculating distance for market ${market.name}:`, error);
         const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-        distances[marketId] = '-- miles';
+        return { marketId, distance: '-- miles' };
       }
-    }
+    });
+
+    // Wait for all distance calculations to complete
+    const marketResults = await Promise.all(marketPromises);
+    
+    // Convert results back to the distances object
+    const distances: Record<string, string> = {};
+    marketResults.forEach(({ marketId, distance }) => {
+      distances[marketId] = distance;
+    });
     
     console.log('Final market distances:', distances);
     console.log('=== END MARKET DISTANCE DEBUG ===');
