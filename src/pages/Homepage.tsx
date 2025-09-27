@@ -336,100 +336,174 @@ const Homepage = () => {
     setVendorDistances(distances);
   };
 
-  // Calculate distances for all markets (optimized with caching)
+  // Enhanced local storage cache for distances
+  const DISTANCE_CACHE_KEY = 'market_distance_cache';
+  const CACHE_EXPIRY_HOURS = 24; // Cache expires after 24 hours
+  
+  // Load cached distances from localStorage
+  const loadCachedDistances = () => {
+    try {
+      const cached = localStorage.getItem(DISTANCE_CACHE_KEY);
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        const isExpired = Date.now() - timestamp > CACHE_EXPIRY_HOURS * 60 * 60 * 1000;
+        if (!isExpired) {
+          return data;
+        }
+      }
+    } catch (error) {
+      console.warn('Error loading cached distances:', error);
+    }
+    return {};
+  };
+  
+  // Save distances to localStorage
+  const saveCachedDistances = (distances: Record<string, string>) => {
+    try {
+      const cacheData = {
+        data: distances,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(DISTANCE_CACHE_KEY, JSON.stringify(cacheData));
+    } catch (error) {
+      console.warn('Error saving cached distances:', error);
+    }
+  };
+
+  // Calculate distances for all markets (super optimized with multiple caching layers)
   const calculateMarketDistances = async (markets: Array<{name: string, address: string, vendors: AcceptedSubmission[]}>, userCoords: {lat: number, lng: number}) => {
-    console.log('=== OPTIMIZED MARKET DISTANCE CALCULATION ===');
+    console.log('=== SUPER OPTIMIZED MARKET DISTANCE CALCULATION ===');
     console.log('User coordinates:', userCoords);
-    console.log('Starting optimized distance calculations for', markets.length, 'markets');
+    console.log('Starting super optimized distance calculations for', markets.length, 'markets');
     
     setIsLoadingMarketDistances(true);
     
-    // First, quickly set any available vendor distances for immediate display
+    // Layer 1: Load cached distances from localStorage
+    const cachedDistances = loadCachedDistances();
+    
+    // Layer 2: Use vendor distances as immediate fallback
     const quickDistances: Record<string, string> = {};
+    
     markets.forEach(market => {
       const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-      const firstVendor = market.vendors[0];
-      if (firstVendor && vendorDistances[firstVendor.id]) {
-        quickDistances[marketId] = vendorDistances[firstVendor.id];
+      
+      // First try cached distance
+      if (cachedDistances[marketId]) {
+        quickDistances[marketId] = cachedDistances[marketId];
+      }
+      // Fallback to vendor distance if available
+      else {
+        const firstVendor = market.vendors[0];
+        if (firstVendor && vendorDistances[firstVendor.id]) {
+          quickDistances[marketId] = vendorDistances[firstVendor.id];
+        }
       }
     });
     
-    // Set quick distances immediately if available
+    // Set all available distances immediately for instant display
     if (Object.keys(quickDistances).length > 0) {
+      console.log('Setting instant distances:', Object.keys(quickDistances).length, 'markets');
       setMarketDistances(prev => ({ ...prev, ...quickDistances }));
     }
     
-    // Then calculate remaining distances in parallel
-    const marketPromises = markets
-      .filter(market => {
-        const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-        return !quickDistances[marketId]; // Only calculate if not already set
-      })
-      .map(async (market) => {
-        console.log('\n--- Processing market:', market.name);
-        
-        try {
+    // Layer 3: Calculate remaining distances in optimized batches
+    const marketsNeedingCalculation = markets.filter(market => {
+      const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+      return !quickDistances[marketId]; // Only calculate if not already available
+    });
+    
+    if (marketsNeedingCalculation.length === 0) {
+      console.log('All market distances available from cache/vendors!');
+      setIsLoadingMarketDistances(false);
+      return;
+    }
+    
+    console.log(`Need to calculate distances for ${marketsNeedingCalculation.length} markets`);
+    
+    // Process in smaller batches to prevent API rate limits and improve perceived performance
+    const BATCH_SIZE = 3; // Process 3 markets at a time
+    const batches = [];
+    
+    for (let i = 0; i < marketsNeedingCalculation.length; i += BATCH_SIZE) {
+      batches.push(marketsNeedingCalculation.slice(i, i + BATCH_SIZE));
+    }
+    
+    // Process batches sequentially but markets within each batch in parallel
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+      const batch = batches[batchIndex];
+      console.log(`Processing batch ${batchIndex + 1}/${batches.length} with ${batch.length} markets`);
+      
+      try {
+        const batchPromises = batch.map(async (market) => {
           const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
           
-          // Use market address directly for consistent coordinates
-          const marketCoords = await cacheVendorCoordinates(marketId, market.address);
-          console.log('Market coordinates:', marketCoords);
-          
-          if (marketCoords) {
-            // Calculate distance using Google Maps
-            const googleDistance = await getGoogleMapsDistance(
-              userCoords.lat, 
-              userCoords.lng, 
-              marketCoords.lat, 
-              marketCoords.lng
-            );
+          try {
+            // Use market address directly for consistent coordinates
+            const marketCoords = await cacheVendorCoordinates(marketId, market.address);
             
-            let finalDistance: string;
-            
-            if (googleDistance) {
-              finalDistance = googleDistance.distance;
-            } else {
-              const distanceInMiles = calculateDistance(
+            if (marketCoords) {
+              // Calculate distance using Google Maps
+              const googleDistance = await getGoogleMapsDistance(
                 userCoords.lat, 
                 userCoords.lng, 
                 marketCoords.lat, 
                 marketCoords.lng
               );
-              finalDistance = `${distanceInMiles.toFixed(1)} mi`;
+              
+              let finalDistance: string;
+              
+              if (googleDistance) {
+                finalDistance = googleDistance.distance;
+              } else {
+                const distanceInMiles = calculateDistance(
+                  userCoords.lat, 
+                  userCoords.lng, 
+                  marketCoords.lat, 
+                  marketCoords.lng
+                );
+                finalDistance = `${distanceInMiles.toFixed(1)} mi`;
+              }
+              
+              return { marketId, distance: finalDistance };
+            } else {
+              return { marketId, distance: '-- mi' };
             }
-            
-            return { marketId, distance: finalDistance };
-          } else {
+          } catch (error) {
+            console.error(`Error calculating distance for ${market.name}:`, error);
             return { marketId, distance: '-- mi' };
           }
-        } catch (error) {
-          console.error(`Error calculating distance for market ${market.name}:`, error);
-          const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-          return { marketId, distance: '-- mi' };
-        }
-      });
-
-    // Process remaining calculations
-    if (marketPromises.length > 0) {
-      try {
-        const marketResults = await Promise.all(marketPromises);
+        });
         
+        const batchResults = await Promise.all(batchPromises);
+        
+        // Update distances immediately after each batch
         const newDistances: Record<string, string> = {};
-        marketResults.forEach(({ marketId, distance }) => {
+        batchResults.forEach(({ marketId, distance }) => {
           newDistances[marketId] = distance;
         });
         
-        // Merge with existing distances
-        setMarketDistances(prev => ({ ...prev, ...newDistances }));
+        // Update state and cache
+        setMarketDistances(prev => {
+          const updated = { ...prev, ...newDistances };
+          // Save to cache for future use
+          saveCachedDistances({ ...cachedDistances, ...updated });
+          return updated;
+        });
         
-        console.log('Added new market distances:', newDistances);
+        console.log(`Batch ${batchIndex + 1} completed:`, newDistances);
+        
+        // Small delay between batches to be respectful to API limits
+        if (batchIndex < batches.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
       } catch (error) {
-        console.error('Error in market distance calculation:', error);
+        console.error(`Error in batch ${batchIndex + 1}:`, error);
       }
     }
     
     setIsLoadingMarketDistances(false);
-    console.log('=== END OPTIMIZED MARKET DISTANCE CALCULATION ===');
+    console.log('=== END SUPER OPTIMIZED MARKET DISTANCE CALCULATION ===');
   };
 
   // Group vendors by market
@@ -471,6 +545,15 @@ const Homepage = () => {
     } catch (error) {
       console.error('❌ Error in tryGPSLocationFirst:', error);
       getLocationFromIP(); // Fallback to IP
+    }
+  }, []);
+
+  // Initialize cached distances on component mount for instant display
+  useEffect(() => {
+    const cachedDistances = loadCachedDistances();
+    if (Object.keys(cachedDistances).length > 0) {
+      console.log('Loading cached distances for instant display:', Object.keys(cachedDistances).length, 'markets');
+      setMarketDistances(cachedDistances);
     }
   }, []);
 
