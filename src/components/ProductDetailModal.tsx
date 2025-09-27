@@ -225,7 +225,6 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
                 </div>
                 
                 <div>
-                  <h3 className="text-base font-semibold mb-2 text-gray-900">Description</h3>
                   <p className="text-gray-700 leading-relaxed text-xs">
                     {product.description}
                   </p>
