@@ -211,11 +211,15 @@ const Homepage = () => {
 
   // Calculate distances for all vendors
   const calculateVendorDistances = async (vendors: AcceptedSubmission[], userCoords: {lat: number, lng: number}) => {
-    console.log('Starting distance calculations for', vendors.length, 'vendors with user coords:', userCoords);
+    console.log('=== DISTANCE CALCULATION DEBUG ===');
+    console.log('User coordinates:', userCoords);
+    console.log('Starting distance calculations for', vendors.length, 'vendors');
+    
     const distances: Record<string, string> = {};
     
     for (const vendor of vendors) {
-      console.log('Processing vendor:', vendor.store_name, 'address:', vendor.market_address);
+      console.log('\n--- Processing vendor:', vendor.store_name);
+      console.log('Market address:', vendor.market_address);
       
       if (!vendor.market_address) {
         console.log('No market address for vendor:', vendor.store_name);
@@ -230,13 +234,20 @@ const Homepage = () => {
         console.log('Vendor coordinates result:', vendorCoords);
         
         if (vendorCoords) {
+          console.log('=== DISTANCE CALCULATION ===');
+          console.log('User coords:', userCoords);
+          console.log('Vendor coords:', vendorCoords);
+          
           const distanceInMiles = calculateDistance(
             userCoords.lat, 
             userCoords.lng, 
             vendorCoords.lat, 
             vendorCoords.lng
           );
+          
           console.log('Calculated distance:', distanceInMiles, 'miles');
+          console.log('Google Maps equivalent: https://maps.google.com/maps?saddr=' + userCoords.lat + ',' + userCoords.lng + '&daddr=' + vendorCoords.lat + ',' + vendorCoords.lng);
+          
           distances[vendor.id] = `${distanceInMiles.toFixed(1)} miles`;
         } else {
           console.log('No coordinates returned for vendor:', vendor.id);
@@ -249,6 +260,7 @@ const Homepage = () => {
     }
     
     console.log('Final distances:', distances);
+    console.log('=== END DISTANCE DEBUG ===');
     setVendorDistances(distances);
   };
 
