@@ -754,25 +754,18 @@ const VendorDuplicate = () => {
                   </div>
                 </div>
                 
-                {/* Store Information */}
-                <div className="p-4 space-y-3">
-                  <h3 className="text-lg font-semibold text-foreground text-left">
-                    {vendor.store_name}
-                  </h3>
-                  
-                  <div className="flex items-start gap-2">
-                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-muted-foreground text-left">
-                      {cleanAddress(vendor.market_address) || vendor.selected_market || vendor.search_term || "Location TBD"}
-                    </p>
-                  </div>
-                  
-                  {vendor.primary_specialty && (
-                    <p className="text-sm text-foreground text-left">
-                      {vendor.primary_specialty}
-                    </p>
-                  )}
-                </div>
+                 {/* Store Information */}
+                 <div className="p-4 space-y-3">
+                   <h3 className="text-lg font-semibold text-foreground text-left">
+                     {vendor.store_name}
+                   </h3>
+                   
+                   {vendor.primary_specialty && (
+                     <p className="text-sm text-foreground text-left">
+                       {vendor.primary_specialty}
+                     </p>
+                   )}
+                 </div>
               </Card>
             ))}
           </div>
