@@ -16,6 +16,7 @@ import { useLikes, LikeType } from "@/hooks/useLikes";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -365,11 +366,11 @@ const Likes = () => {
         {likedVendors.map((vendor) => (
           <Card 
             key={vendor.id}
-            className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
+            className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]" 
             onClick={() => navigate('/vendor')}
           >
             {/* Product Image */}
-            <div className="aspect-video bg-muted relative">
+            <div className="aspect-[4/3] bg-muted relative">
               {vendor.products && vendor.products.length > 0 && vendor.products[0].images && vendor.products[0].images.length > 0 ? (
                 <img 
                   src={vendor.products[0].images[0]} 
@@ -425,22 +426,33 @@ const Likes = () => {
             
             {/* Store Information */}
             <div className="p-4 space-y-3">
-              <h3 className="text-lg font-semibold text-black text-left">
-                {vendor.store_name}
+              <h3 className="text-lg font-semibold text-foreground text-left">
+                {vendor.store_name.length > 20 
+                  ? `${vendor.store_name.slice(0, 20)}...`
+                  : vendor.store_name
+                }
               </h3>
               
-              <div className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-muted-foreground text-left">
-                  {vendor.market_address || vendor.selected_market || vendor.search_term || "Location TBD"}
-                </p>
-              </div>
-              
               {vendor.primary_specialty && (
-                <p className="text-sm text-black text-left">
+                <Badge variant="secondary" className="text-xs">
                   {vendor.primary_specialty}
-                </p>
+                </Badge>
               )}
+
+              {/* Market Details Section - Moved to bottom */}
+              <div className="mt-2">
+                <h4 className="text-sm font-semibold text-foreground mb-1">
+                  {vendor.selected_market || vendor.search_term || "Farmers Market"}
+                </h4>
+                {vendor.market_address && (
+                  <div className="flex items-start gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-muted-foreground">
+                      {vendor.market_address}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </Card>
         ))}
