@@ -825,7 +825,6 @@ const VendorDuplicate = () => {
                 <ProductGrid 
                   products={selectedVendor.products} 
                   vendorId={selectedVendor.id}
-                  vendorName={selectedVendor.store_name}
                 />
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
