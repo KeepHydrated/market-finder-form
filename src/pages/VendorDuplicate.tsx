@@ -110,6 +110,46 @@ const VendorDuplicate = () => {
     }
   }, [location.state]);
 
+  const fetchVendorReviews = async () => {
+    if (!acceptedSubmission?.id) {
+      console.log('No vendor ID found, skipping reviews fetch');
+      return;
+    }
+
+    try {
+      console.log('Fetching vendor reviews for vendor ID:', acceptedSubmission.id);
+      
+      const { data: reviews, error } = await supabase
+        .from('reviews')
+        .select('rating')
+        .eq('vendor_id', acceptedSubmission.id);
+
+      if (error) {
+        console.error('Error fetching vendor reviews:', error);
+        return;
+      }
+
+      console.log('Vendor reviews data:', reviews);
+
+      if (reviews && reviews.length > 0) {
+        const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+        setVendorReviews({
+          rating: averageRating,
+          reviewCount: reviews.length
+        });
+        console.log('Calculated vendor rating:', { rating: averageRating, count: reviews.length });
+      } else {
+        setVendorReviews({
+          rating: 0,
+          reviewCount: 0
+        });
+        console.log('No reviews found for vendor');
+      }
+    } catch (error) {
+      console.error('Error fetching vendor reviews:', error);
+    }
+  };
+
   useEffect(() => {
     if (acceptedSubmission) {
       fetchMarketOpeningHours();
@@ -365,46 +405,6 @@ const VendorDuplicate = () => {
       }
     } catch (error) {
       console.error('Error fetching market opening hours:', error);
-    }
-  };
-
-  const fetchVendorReviews = async () => {
-    if (!acceptedSubmission?.id) {
-      console.log('No vendor ID found, skipping reviews fetch');
-      return;
-    }
-
-    try {
-      console.log('Fetching vendor reviews for vendor ID:', acceptedSubmission.id);
-      
-      const { data: reviews, error } = await supabase
-        .from('reviews')
-        .select('rating')
-        .eq('vendor_id', acceptedSubmission.id);
-
-      if (error) {
-        console.error('Error fetching vendor reviews:', error);
-        return;
-      }
-
-      console.log('Vendor reviews data:', reviews);
-
-      if (reviews && reviews.length > 0) {
-        const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
-        setVendorReviews({
-          rating: averageRating,
-          reviewCount: reviews.length
-        });
-        console.log('Calculated vendor rating:', { rating: averageRating, count: reviews.length });
-      } else {
-        setVendorReviews({
-          rating: 0,
-          reviewCount: 0
-        });
-        console.log('No reviews found for vendor');
-      }
-    } catch (error) {
-      console.error('Error fetching vendor reviews:', error);
     }
   };
 
