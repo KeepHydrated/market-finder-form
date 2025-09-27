@@ -82,21 +82,29 @@ const VendorDuplicate = () => {
   const [vendorReviews, setVendorReviews] = useState<{rating?: number; reviewCount?: number} | null>(null);
   const [distance, setDistance] = useState<string>('');
   const [isLoadingDistance, setIsLoadingDistance] = useState(false);
+  const [cachedMarketCoordinates, setCachedMarketCoordinates] = useState<{lat: number; lng: number} | null>(null);
 
   useEffect(() => {
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
     // Check if data was passed from navigation
     if (location.state) {
       console.log('Using location state data');
-      const { type, selectedVendor, selectedMarket, allVendors } = location.state as {
+      const { type, selectedVendor, selectedMarket, allVendors, marketCoordinates } = location.state as {
         type: 'vendor' | 'market';
         selectedVendor?: AcceptedSubmission;
         selectedMarket?: { name: string; address: string; vendors: AcceptedSubmission[] };
         allVendors: AcceptedSubmission[];
+        marketCoordinates?: { lat: number; lng: number } | null;
       };
       
       setAllVendors(allVendors);
       setLoadingData(false);
+      
+      // Store cached coordinates if passed
+      if (marketCoordinates) {
+        setCachedMarketCoordinates(marketCoordinates);
+        console.log('🗺️ Using passed market coordinates:', marketCoordinates);
+      }
       
       if (type === 'vendor' && selectedVendor) {
         setAcceptedSubmission(selectedVendor);
@@ -171,42 +179,18 @@ const VendorDuplicate = () => {
             
             let marketCoords = null;
             
-            // First try to use Google Places API to get precise coordinates
-            try {
-              const response = await supabase.functions.invoke('farmers-market-search', {
-                body: { 
-                  query: acceptedSubmission.selected_market || acceptedSubmission.search_term
-                }
-              });
-              
-              if (response.data?.predictions?.length > 0) {
-                // Find the matching market by name or address
-                const foundMarket = response.data.predictions.find((m: any) => 
-                  m.name === acceptedSubmission.selected_market ||
-                  m.name === acceptedSubmission.search_term ||
-                  (acceptedSubmission.market_address && m.formatted_address?.includes(acceptedSubmission.market_address.split(',')[0]))
-                );
-                
-                if (foundMarket?.geometry?.location) {
-                  marketCoords = {
-                    lat: foundMarket.geometry.location.lat,
-                    lng: foundMarket.geometry.location.lng
-                  };
-                  console.log('🗺️ Using Google Places coordinates:', marketCoords);
-                }
-              }
-            } catch (error) {
-              console.error('Error getting coordinates from Places API:', error);
-            }
-            
-            // Fallback to geocoding address if Places API lookup failed
-            if (!marketCoords) {
+            // Use cached coordinates if available (same as vendor card)
+            if (cachedMarketCoordinates) {
+              marketCoords = cachedMarketCoordinates;
+              console.log('🗺️ Using cached coordinates from vendor card:', marketCoords);
+            } else {
+              // Fallback to geocoding if no cached coordinates
               marketCoords = await getCoordinatesForAddress(acceptedSubmission.market_address!);
               console.log('🗺️ Using geocoded coordinates:', marketCoords);
             }
             
             if (marketCoords) {
-              // Use Google Maps Distance Matrix API exclusively
+              // Use Google Maps Distance Matrix API (same calculation as vendor card)
               const googleDistance = await getGoogleMapsDistance(
                 userCoords.lat, 
                 userCoords.lng, 
@@ -215,10 +199,8 @@ const VendorDuplicate = () => {
               );
               
               if (googleDistance) {
-                const displayText = googleDistance.duration 
-                  ? `${googleDistance.distance} (${googleDistance.duration})`
-                  : googleDistance.distance;
-                setDistance(displayText);
+                // Show just distance without duration to match vendor card format
+                setDistance(googleDistance.distance);
               } else {
                 setDistance('Distance unavailable');
               }

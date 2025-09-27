@@ -14,6 +14,12 @@ interface Market {
   state: string;
   days: string[];
   hours: string;
+  geometry?: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
 }
 
 interface MarketDetailsProps {
@@ -26,11 +32,9 @@ export const MarketDetails = ({ market, onBack }: MarketDetailsProps) => {
   const [distance, setDistance] = useState<string>('');
   const [isLoadingDistance, setIsLoadingDistance] = useState(false);
 
-  // Calculate distance to market (using same logic as VendorDuplicate)
+  // Calculate distance to market (using same coordinates as vendor card)
   useEffect(() => {
     const calculateDistanceToMarket = async () => {
-      const marketAddress = `${market.address}, ${market.city}, ${market.state}`;
-      
       setIsLoadingDistance(true);
       
       try {
@@ -44,41 +48,54 @@ export const MarketDetails = ({ market, onBack }: MarketDetailsProps) => {
               };
               setUserCoordinates(userCoords);
               
-              // Use Google Places API to get precise coordinates (same as FarmersMarketSearch)
+              // Use the exact same coordinates that were used in the vendor card
               let marketCoords = null;
               
-              try {
-                const response = await supabase.functions.invoke('farmers-market-search', {
-                  body: { 
-                    query: market.name
-                  }
-                });
-                
-                if (response.data?.predictions?.length > 0) {
-                  const foundMarket = response.data.predictions.find((m: any) => 
-                    m.name === market.name || 
-                    m.address?.includes(market.address) ||
-                    m.formatted_address?.includes(market.address)
-                  );
+              // If we have geometry coordinates passed from the vendor card, use those directly
+              if (market.geometry?.location) {
+                marketCoords = {
+                  lat: market.geometry.location.lat,
+                  lng: market.geometry.location.lng
+                };
+                console.log('🗺️ Using passed geometry coordinates:', marketCoords);
+              } else {
+                // Fallback: try to get coordinates from Places API
+                const marketAddress = `${market.address}, ${market.city}, ${market.state}`;
+                try {
+                  const response = await supabase.functions.invoke('farmers-market-search', {
+                    body: { 
+                      query: market.name
+                    }
+                  });
                   
-                  if (foundMarket?.geometry?.location) {
-                    marketCoords = {
-                      lat: foundMarket.geometry.location.lat,
-                      lng: foundMarket.geometry.location.lng
-                    };
+                  if (response.data?.predictions?.length > 0) {
+                    const foundMarket = response.data.predictions.find((m: any) => 
+                      m.name === market.name || 
+                      m.address?.includes(market.address) ||
+                      m.formatted_address?.includes(market.address)
+                    );
+                    
+                    if (foundMarket?.geometry?.location) {
+                      marketCoords = {
+                        lat: foundMarket.geometry.location.lat,
+                        lng: foundMarket.geometry.location.lng
+                      };
+                      console.log('🗺️ Using Places API coordinates:', marketCoords);
+                    }
                   }
+                } catch (error) {
+                  console.error('Error getting coordinates from Places API:', error);
                 }
-              } catch (error) {
-                console.error('Error getting coordinates from Places API:', error);
-              }
-              
-              // Fallback to geocoding address if Places API lookup failed
-              if (!marketCoords) {
-                marketCoords = await getCoordinatesForAddress(marketAddress);
+                
+                // Final fallback to geocoding address
+                if (!marketCoords) {
+                  marketCoords = await getCoordinatesForAddress(marketAddress);
+                  console.log('🗺️ Using geocoded coordinates:', marketCoords);
+                }
               }
               
               if (marketCoords) {
-                // Use Google Maps Distance Matrix API exclusively
+                // Use Google Maps Distance Matrix API (same as vendor card)
                 const googleDistance = await getGoogleMapsDistance(
                   userCoords.lat, 
                   userCoords.lng, 
@@ -87,10 +104,8 @@ export const MarketDetails = ({ market, onBack }: MarketDetailsProps) => {
                 );
                 
                 if (googleDistance) {
-                  const displayText = googleDistance.duration 
-                    ? `${googleDistance.distance} (${googleDistance.duration})`
-                    : googleDistance.distance;
-                  setDistance(displayText);
+                  // Show just the distance without duration to match vendor card format
+                  setDistance(googleDistance.distance);
                 } else {
                   setDistance('Distance unavailable');
                 }

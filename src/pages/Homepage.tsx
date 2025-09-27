@@ -843,16 +843,24 @@ const Homepage = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                 {(selectedMarket ? selectedMarket.vendors : acceptedSubmissions).map((submission) => (
-                  <Card 
-                    key={submission.id} 
-                    className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]" 
-                    onClick={() => navigate('/market', { 
-                      state: { 
-                        type: 'vendor', 
-                        selectedVendor: submission,
-                        allVendors: selectedMarket ? selectedMarket.vendors : acceptedSubmissions 
-                      } 
-                    })}
+                   <Card 
+                     key={submission.id} 
+                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]" 
+                     onClick={async () => {
+                       // Get the same cached coordinates used for distance calculation
+                       const cachedCoords = submission.market_address 
+                         ? await cacheVendorCoordinates(submission.id, submission.market_address)
+                         : null;
+                       
+                       navigate('/market', { 
+                         state: { 
+                           type: 'vendor', 
+                           selectedVendor: submission,
+                           allVendors: selectedMarket ? selectedMarket.vendors : acceptedSubmissions,
+                           marketCoordinates: cachedCoords // Pass the exact coordinates used for "2.1 mi"
+                         } 
+                       });
+                     }}
                   >
                     {/* Product Image */}
                     <div className="aspect-[4/3] bg-muted relative">
