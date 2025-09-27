@@ -78,6 +78,7 @@ const VendorDuplicate = () => {
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [marketOpeningHours, setMarketOpeningHours] = useState<any>(null);
   const [marketReviews, setMarketReviews] = useState<{rating?: number; reviewCount?: number} | null>(null);
+  const [vendorReviews, setVendorReviews] = useState<{rating?: number; reviewCount?: number} | null>(null);
 
   useEffect(() => {
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
@@ -112,6 +113,7 @@ const VendorDuplicate = () => {
   useEffect(() => {
     if (acceptedSubmission) {
       fetchMarketOpeningHours();
+      fetchVendorReviews();
       // Debug log for current accepted submission
       console.log('Current acceptedSubmission ratings:', {
         store_name: acceptedSubmission.store_name,
@@ -366,6 +368,46 @@ const VendorDuplicate = () => {
     }
   };
 
+  const fetchVendorReviews = async () => {
+    if (!acceptedSubmission?.id) {
+      console.log('No vendor ID found, skipping reviews fetch');
+      return;
+    }
+
+    try {
+      console.log('Fetching vendor reviews for vendor ID:', acceptedSubmission.id);
+      
+      const { data: reviews, error } = await supabase
+        .from('reviews')
+        .select('rating')
+        .eq('vendor_id', acceptedSubmission.id);
+
+      if (error) {
+        console.error('Error fetching vendor reviews:', error);
+        return;
+      }
+
+      console.log('Vendor reviews data:', reviews);
+
+      if (reviews && reviews.length > 0) {
+        const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+        setVendorReviews({
+          rating: averageRating,
+          reviewCount: reviews.length
+        });
+        console.log('Calculated vendor rating:', { rating: averageRating, count: reviews.length });
+      } else {
+        setVendorReviews({
+          rating: 0,
+          reviewCount: 0
+        });
+        console.log('No reviews found for vendor');
+      }
+    } catch (error) {
+      console.error('Error fetching vendor reviews:', error);
+    }
+  };
+
   const formatSchedule = (marketDays?: string[], marketHours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>) => {
     // First, try to use Google Maps opening hours if available
     if (marketOpeningHours?.weekday_text && marketOpeningHours.weekday_text.length > 0) {
@@ -546,13 +588,12 @@ const VendorDuplicate = () => {
           <div className="flex items-start gap-2">
             <div className="flex items-center gap-2 mt-0.5">
               <Star className="h-4 w-4 text-yellow-500 fill-current" />
-              <span className="text-foreground font-semibold text-lg">
-                {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
-                 acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
-              </span>
-              <span className="text-muted-foreground text-sm">
-                ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0}) Google reviews
-              </span>
+               <span className="text-foreground font-semibold text-lg">
+                 {vendorReviews?.rating ? vendorReviews.rating.toFixed(1) : 'No rating'}
+               </span>
+               <span className="text-muted-foreground text-sm">
+                 ({vendorReviews?.reviewCount ?? 0}) {vendorReviews?.reviewCount === 1 ? 'review' : 'reviews'}
+               </span>
             </div>
           </div>
         </div>
