@@ -8,6 +8,7 @@ import { useShoppingCart } from "@/contexts/ShoppingCartContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLikes } from "@/hooks/useLikes";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface Product {
   id: number;
@@ -32,6 +33,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   const { addItem } = useShoppingCart();
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
+  const navigate = useNavigate();
 
   if (!product || !products.length) return null;
 
@@ -241,6 +243,19 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
                       <ShoppingCart className="h-3 w-3 mr-2" />
                       Add to Cart
                     </Button>
+                    
+                    {/* Store name link in bottom right */}
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => {
+                          onClose();
+                          navigate(`/market?vendor=${vendorId}`);
+                        }}
+                        className="text-xs text-blue-600 hover:text-blue-800 underline"
+                      >
+                        {vendorName}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
