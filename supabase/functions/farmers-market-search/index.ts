@@ -13,19 +13,51 @@ serve(async (req) => {
   }
 
   try {
-    const { query, location } = await req.json();
+    const { query, location, place_id } = await req.json();
     
-    if (!query || query.length < 2) {
-      return new Response(JSON.stringify({ error: 'Query must be at least 2 characters' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
     const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
     if (!apiKey) {
       return new Response(JSON.stringify({ error: 'Google Places API key not configured' }), {
         status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // If place_id is provided, fetch place details directly
+    if (place_id) {
+      const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&fields=geometry,name,formatted_address,opening_hours,rating,user_ratings_total&key=${apiKey}`;
+      console.log('Fetching place details for place_id:', place_id);
+      
+      const response = await fetch(detailsUrl);
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Google Places Details API error:', data);
+        return new Response(JSON.stringify({ 
+          error: 'Google Places Details API error', 
+          details: data 
+        }), {
+          status: response.status,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      if (data.result) {
+        return new Response(JSON.stringify(data.result), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      } else {
+        return new Response(JSON.stringify({ error: 'Place not found' }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+    }
+    
+    // Original query-based search logic
+    if (!query || query.length < 2) {
+      return new Response(JSON.stringify({ error: 'Query must be at least 2 characters' }), {
+        status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }

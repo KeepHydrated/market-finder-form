@@ -169,8 +169,32 @@ const VendorDuplicate = () => {
               lng: position.coords.longitude
             };
             
-            // Get market coordinates
-            const marketCoords = await getCoordinatesForAddress(acceptedSubmission.market_address!);
+            let marketCoords = null;
+            
+            // If we have a place_id, use it to get exact coordinates (same as FarmersMarketSearch)
+            if (acceptedSubmission.market_place_id) {
+              try {
+                const response = await supabase.functions.invoke('farmers-market-search', {
+                  body: { 
+                    place_id: acceptedSubmission.market_place_id
+                  }
+                });
+                
+                if (response.data?.geometry?.location) {
+                  marketCoords = {
+                    lat: response.data.geometry.location.lat,
+                    lng: response.data.geometry.location.lng
+                  };
+                }
+              } catch (error) {
+                console.error('Error getting coordinates from place_id:', error);
+              }
+            }
+            
+            // Fallback to geocoding address if no place_id or place_id lookup failed
+            if (!marketCoords) {
+              marketCoords = await getCoordinatesForAddress(acceptedSubmission.market_address!);
+            }
             
             if (marketCoords) {
               // Use Google Maps Distance Matrix API exclusively
