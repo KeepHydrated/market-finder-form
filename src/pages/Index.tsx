@@ -465,7 +465,16 @@ const Index = () => {
             <div className="max-w-2xl mx-auto space-y-8">
               {/* Profile Picture */}
               <div>
-                <h2 className="text-xl font-semibold mb-4">Profile Pic</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold">Profile Pic</h2>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => setIsEditing(!isEditing)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </div>
                 <div className="flex items-center gap-4">
                   <div className="relative">
                     <input
@@ -473,6 +482,7 @@ const Index = () => {
                       accept="image/*"
                       onChange={handleProfilePictureUpload}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      disabled={!isEditing}
                     />
                     <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center border-2 border-dashed border-muted-foreground/30 overflow-hidden">
                       {profileData.avatarUrl ? (
@@ -494,7 +504,16 @@ const Index = () => {
 
               {/* Username */}
               <div>
-                <h2 className="text-xl font-semibold mb-4">Username</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold">Username</h2>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => setIsEditing(!isEditing)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </div>
                 <Input 
                   value={profileData.username} 
                   onChange={(e) => setProfileData(prev => ({ ...prev, username: e.target.value }))}
@@ -502,6 +521,14 @@ const Index = () => {
                   placeholder="Enter your username"
                   disabled={!isEditing}
                 />
+                {isEditing && (
+                  <Button 
+                    className="bg-green-500 hover:bg-green-600 text-white mt-2"
+                    onClick={handleSaveProfile}
+                  >
+                    Save Changes
+                  </Button>
+                )}
               </div>
 
               {/* Email Address */}
