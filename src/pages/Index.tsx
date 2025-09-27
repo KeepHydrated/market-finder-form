@@ -100,6 +100,8 @@ const Index = () => {
   });
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingProfilePic, setIsEditingProfilePic] = useState(false);
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [vendorApplicationData, setVendorApplicationData] = useState<VendorApplicationData>({
     storeName: "",
     primarySpecialty: "",
@@ -467,13 +469,26 @@ const Index = () => {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">Profile Pic</h2>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => setIsEditing(!isEditing)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
+                  {isEditingProfilePic ? (
+                    <Button 
+                      size="sm" 
+                      className="bg-green-500 hover:bg-green-600 text-white"
+                      onClick={() => {
+                        handleSaveProfile();
+                        setIsEditingProfilePic(false);
+                      }}
+                    >
+                      Save
+                    </Button>
+                  ) : (
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => setIsEditingProfilePic(true)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="relative">
@@ -482,7 +497,7 @@ const Index = () => {
                       accept="image/*"
                       onChange={handleProfilePictureUpload}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      disabled={!isEditing}
+                      disabled={!isEditingProfilePic}
                     />
                     <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center border-2 border-dashed border-muted-foreground/30 overflow-hidden">
                       {profileData.avatarUrl ? (
@@ -506,29 +521,34 @@ const Index = () => {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">Username</h2>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => setIsEditing(!isEditing)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
+                  {isEditingUsername ? (
+                    <Button 
+                      size="sm" 
+                      className="bg-green-500 hover:bg-green-600 text-white"
+                      onClick={() => {
+                        handleSaveProfile();
+                        setIsEditingUsername(false);
+                      }}
+                    >
+                      Save
+                    </Button>
+                  ) : (
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => setIsEditingUsername(true)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
                 <Input 
                   value={profileData.username} 
                   onChange={(e) => setProfileData(prev => ({ ...prev, username: e.target.value }))}
-                  className={isEditing ? "bg-background" : "bg-muted"}
+                  className={isEditingUsername ? "bg-background" : "bg-muted"}
                   placeholder="Enter your username"
-                  disabled={!isEditing}
+                  disabled={!isEditingUsername}
                 />
-                {isEditing && (
-                  <Button 
-                    className="bg-green-500 hover:bg-green-600 text-white mt-2"
-                    onClick={handleSaveProfile}
-                  >
-                    Save Changes
-                  </Button>
-                )}
               </div>
 
               {/* Email Address */}
