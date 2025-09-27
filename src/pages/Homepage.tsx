@@ -599,10 +599,9 @@ const Homepage = () => {
             </DialogTrigger>
             <DialogContent className="w-[800px] max-w-none p-0 bg-background border shadow-lg">
               <Tabs defaultValue="times" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 rounded-none border-b">
+                <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
                   <TabsTrigger value="times">Times</TabsTrigger>
                   <TabsTrigger value="categories">Categories</TabsTrigger>
-                  <TabsTrigger value="location">Location</TabsTrigger>
                 </TabsList>
                 <TabsContent value="times" className="p-4">
                   <div className="space-y-4">
@@ -718,82 +717,6 @@ const Homepage = () => {
                           {category}
                         </Button>
                       ))}
-                    </div>
-                  </div>
-                </TabsContent>
-                <TabsContent value="location" className="p-4">
-                  <div className="space-y-6">
-                    
-                    {/* Location Method Status */}
-                    <div className="p-4 bg-muted/50 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Current Location Method:</span>
-                        <Badge variant={locationMethod === 'gps' ? 'default' : 'secondary'}>
-                          {locationMethod === 'gps' ? 'GPS (Precise)' : 'IP (Approximate)'}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {locationMethod === 'gps' 
-                          ? 'Using your exact GPS location for accurate distance calculations.'
-                          : 'Using your IP location. For precise distances, try GPS location below.'
-                        }
-                      </p>
-                    </div>
-
-                    {/* GPS Location Button */}
-                    <div className="space-y-4">
-                      <h5 className="font-medium">Get Precise Location</h5>
-                      <Button 
-                        onClick={getCurrentLocation}
-                        disabled={isGettingGPSLocation}
-                        className="w-full h-12 flex items-center gap-2"
-                        variant={locationMethod === 'gps' ? 'default' : 'outline'}
-                      >
-                        <MapPin className={`h-4 w-4 ${isGettingGPSLocation ? 'animate-pulse' : ''}`} />
-                        {isGettingGPSLocation ? 'Getting GPS Location...' : 'Use My GPS Location'}
-                      </Button>
-                      <p className="text-sm text-muted-foreground">
-                        Get your exact GPS coordinates for the most accurate vendor distances.
-                      </p>
-                    </div>
-
-                    {/* Zipcode Section */}
-                    <div className="space-y-4">
-                      <h5 className="font-medium">Zipcode</h5>
-                      <div className="relative">
-                        <Input 
-                          value={locationZipcode}
-                          onChange={(e) => setLocationZipcode(e.target.value)}
-                          placeholder="Zipcode will appear here..." 
-                          className="bg-background h-12 text-lg border-2 border-border rounded-xl"
-                        />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Your current zipcode (automatically detected).
-                      </p>
-                    </div>
-                    
-                    {/* Range Slider */}
-                    <div className="space-y-4">
-                      <h5 className="font-medium">Search Radius</h5>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Distance</span>
-                          <span className="text-sm font-medium">{rangeMiles[0]} miles</span>
-                        </div>
-                        <Slider
-                          value={rangeMiles}
-                          onValueChange={setRangeMiles}
-                          max={25}
-                          min={1}
-                          step={1}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>1 mile</span>
-                          <span>25 miles</span>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </TabsContent>
