@@ -80,6 +80,7 @@ const VendorDuplicate = () => {
   const [marketOpeningHours, setMarketOpeningHours] = useState<any>(null);
   const [marketReviews, setMarketReviews] = useState<{rating?: number; reviewCount?: number} | null>(null);
   const [vendorReviews, setVendorReviews] = useState<{rating?: number; reviewCount?: number} | null>(null);
+  const [vendorRatings, setVendorRatings] = useState<Record<string, {vendorId: string; averageRating: number; totalReviews: number}>>({});
   const [distance, setDistance] = useState<string>('');
   const [isLoadingDistance, setIsLoadingDistance] = useState(false);
   const [cachedMarketCoordinates, setCachedMarketCoordinates] = useState<{lat: number; lng: number} | null>(null);
@@ -99,6 +100,12 @@ const VendorDuplicate = () => {
       
       setAllVendors(allVendors);
       setLoadingData(false);
+      
+      // Fetch ratings for all vendors
+      if (allVendors.length > 0) {
+        const vendorIds = allVendors.map(vendor => vendor.id);
+        fetchVendorRatings(vendorIds);
+      }
       
       // Store cached coordinates if passed
       if (marketCoordinates) {
@@ -315,6 +322,47 @@ const VendorDuplicate = () => {
       }
     } catch (error) {
       console.error('Error fetching reviews:', error);
+    }
+  };
+
+  const fetchVendorRatings = async (vendorIds: string[]) => {
+    if (vendorIds.length === 0) return;
+
+    try {
+      const { data: reviews, error } = await supabase
+        .from('reviews')
+        .select('vendor_id, rating')
+        .in('vendor_id', vendorIds);
+
+      if (error) throw error;
+
+      // Calculate ratings for each vendor
+      const ratingsMap: Record<string, {vendorId: string; averageRating: number; totalReviews: number}> = {};
+      
+      vendorIds.forEach(vendorId => {
+        const vendorReviews = reviews?.filter(review => review.vendor_id === vendorId) || [];
+        
+        if (vendorReviews.length > 0) {
+          const totalRating = vendorReviews.reduce((sum, review) => sum + review.rating, 0);
+          const averageRating = totalRating / vendorReviews.length;
+          
+          ratingsMap[vendorId] = {
+            vendorId,
+            averageRating: Math.round(averageRating * 10) / 10,
+            totalReviews: vendorReviews.length
+          };
+        } else {
+          ratingsMap[vendorId] = {
+            vendorId,
+            averageRating: 0,
+            totalReviews: 0
+          };
+        }
+      });
+
+      setVendorRatings(ratingsMap);
+    } catch (error) {
+      console.error('Error fetching vendor ratings:', error);
     }
   };
 
@@ -803,10 +851,13 @@ const VendorDuplicate = () => {
                      <div className="flex items-center gap-1">
                        <Star className="h-3 w-3 text-yellow-500 fill-current" />
                        <span className="text-xs font-medium">
-                         No rating
+                         {vendorRatings[vendor.id]?.totalReviews > 0 
+                           ? vendorRatings[vendor.id].averageRating.toFixed(1)
+                           : '0.0'
+                         }
                        </span>
                        <span className="text-xs text-gray-600">
-                         (0)
+                         ({vendorRatings[vendor.id]?.totalReviews || 0})
                        </span>
                      </div>
                    </div>
