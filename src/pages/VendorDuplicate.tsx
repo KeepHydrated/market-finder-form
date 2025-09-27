@@ -761,9 +761,9 @@ const VendorDuplicate = () => {
                    </h3>
                    
                    {vendor.primary_specialty && (
-                     <p className="text-sm text-foreground text-left">
+                     <Badge variant="secondary" className="text-xs">
                        {vendor.primary_specialty}
-                     </p>
+                     </Badge>
                    )}
                  </div>
               </Card>
