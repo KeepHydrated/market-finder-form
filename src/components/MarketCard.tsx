@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin } from "lucide-react";
 
@@ -13,7 +13,7 @@ export const MarketCard = ({ name, address, days, hours }: MarketCardProps) => {
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader className="space-y-2">
-        <CardTitle className="text-lg text-foreground">{name}</CardTitle>
+        <h3 className="text-lg font-semibold text-foreground text-left">{name}</h3>
         <div className="flex items-start gap-2">
           <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
           <p className="text-sm text-muted-foreground">{address}</p>
