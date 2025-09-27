@@ -298,7 +298,7 @@ const Homepage = () => {
 
   useEffect(() => {
     fetchAcceptedSubmissions();
-    getLocationFromIP(); // Auto-detect location on page load
+    tryGPSLocationFirst(); // Try GPS first, fallback to IP
   }, []);
 
   // Calculate distances when vendors or user coordinates change
@@ -349,6 +349,54 @@ const Homepage = () => {
       });
       setLocationMethod('ip');
     }
+  };
+
+  // Try GPS location first, fallback to IP if denied or fails
+  const tryGPSLocationFirst = async () => {
+    if (!navigator.geolocation) {
+      console.log('Geolocation not supported, using IP fallback');
+      getLocationFromIP();
+      return;
+    }
+
+    // Try GPS first with a short timeout
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          
+          // Store user coordinates for distance calculations
+          setUserCoordinates({ lat: latitude, lng: longitude });
+          setLocationMethod('gps');
+          
+          // Get zipcode from GPS coordinates
+          const response = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            const zipcode = data.postcode || data.postalCode || '';
+            setLocationZipcode(zipcode);
+            
+            console.log('GPS location acquired automatically:', { lat: latitude, lng: longitude, zipcode });
+          }
+        } catch (error) {
+          console.error('GPS geocoding error:', error);
+          // Still keep the GPS coordinates even if zipcode lookup fails
+        }
+      },
+      (error) => {
+        // GPS failed or denied, fallback to IP
+        console.log('GPS location failed/denied, falling back to IP:', error.message);
+        getLocationFromIP();
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000, // Shorter timeout for automatic request
+        maximumAge: 300000 // 5 minutes
+      }
+    );
   };
 
   // Refresh data when component becomes visible
