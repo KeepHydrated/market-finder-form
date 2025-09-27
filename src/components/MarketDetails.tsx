@@ -25,9 +25,11 @@ export const MarketDetails = ({ market, onBack }: MarketDetailsProps) => {
   const [distance, setDistance] = useState<string>('');
   const [isLoadingDistance, setIsLoadingDistance] = useState(false);
 
-  // Get user location and calculate distance
+  // Calculate distance to market (using same logic as VendorDuplicate)
   useEffect(() => {
-    const getUserLocationAndCalculateDistance = async () => {
+    const calculateDistanceToMarket = async () => {
+      const marketAddress = `${market.address}, ${market.city}, ${market.state}`;
+      
       setIsLoadingDistance(true);
       
       try {
@@ -42,11 +44,10 @@ export const MarketDetails = ({ market, onBack }: MarketDetailsProps) => {
               setUserCoordinates(userCoords);
               
               // Get market coordinates
-              const marketAddress = `${market.address}, ${market.city}, ${market.state}`;
               const marketCoords = await getCoordinatesForAddress(marketAddress);
               
               if (marketCoords) {
-                // Try Google Maps distance first, fall back to Haversine
+                // Use Google Maps Distance Matrix API exclusively
                 const googleDistance = await getGoogleMapsDistance(
                   userCoords.lat, 
                   userCoords.lng, 
@@ -55,16 +56,12 @@ export const MarketDetails = ({ market, onBack }: MarketDetailsProps) => {
                 );
                 
                 if (googleDistance) {
-                  setDistance(googleDistance.distance);
+                  const displayText = googleDistance.duration 
+                    ? `${googleDistance.distance} (${googleDistance.duration})`
+                    : googleDistance.distance;
+                  setDistance(displayText);
                 } else {
-                  // Fallback to Haversine calculation
-                  const distanceInMiles = calculateDistance(
-                    userCoords.lat, 
-                    userCoords.lng, 
-                    marketCoords.lat, 
-                    marketCoords.lng
-                  );
-                  setDistance(`${distanceInMiles.toFixed(1)} miles`);
+                  setDistance('Distance unavailable');
                 }
               }
               
@@ -85,7 +82,7 @@ export const MarketDetails = ({ market, onBack }: MarketDetailsProps) => {
       }
     };
 
-    getUserLocationAndCalculateDistance();
+    calculateDistanceToMarket();
   }, [market]);
 
   return (
