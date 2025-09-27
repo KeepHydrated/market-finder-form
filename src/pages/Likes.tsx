@@ -466,9 +466,17 @@ const Likes = () => {
                   ${product.price ? product.price.toFixed(2) : '0.00'}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                From {product.vendorName}
-              </p>
+              <div className="flex justify-end">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/market?vendor=${product.vendorId}`);
+                  }}
+                  className="text-xs text-blue-600 hover:text-blue-800 underline"
+                >
+                  {product.vendorName}
+                </button>
+              </div>
             </CardContent>
           </Card>
         ))}
