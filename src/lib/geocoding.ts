@@ -13,7 +13,7 @@ export async function getGoogleMapsDistance(
   userLng: number, 
   targetLat: number, 
   targetLng: number
-): Promise<{ distance: string, distanceMiles: number } | null> {
+): Promise<{ distance: string, distanceMiles: number, duration?: string } | null> {
   try {
     console.log('🗺️ GOOGLE MAPS DISTANCE CALCULATION:');
     console.log('🗺️ User coordinates:', { lat: userLat, lng: userLng });
@@ -35,7 +35,8 @@ export async function getGoogleMapsDistance(
       console.log('🗺️ Google Maps distance:', data.distance, `(${data.distanceMiles} miles)`);
       return {
         distance: data.distance,
-        distanceMiles: data.distanceMiles
+        distanceMiles: data.distanceMiles,
+        duration: data.duration
       };
     }
 

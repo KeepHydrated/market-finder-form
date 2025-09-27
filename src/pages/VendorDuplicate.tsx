@@ -173,7 +173,7 @@ const VendorDuplicate = () => {
             const marketCoords = await getCoordinatesForAddress(acceptedSubmission.market_address!);
             
             if (marketCoords) {
-              // Try Google Maps distance first, fall back to Haversine
+              // Use Google Maps Distance Matrix API exclusively
               const googleDistance = await getGoogleMapsDistance(
                 userCoords.lat, 
                 userCoords.lng, 
@@ -182,16 +182,12 @@ const VendorDuplicate = () => {
               );
               
               if (googleDistance) {
-                setDistance(googleDistance.distance);
+                const displayText = googleDistance.duration 
+                  ? `${googleDistance.distance} (${googleDistance.duration})`
+                  : googleDistance.distance;
+                setDistance(displayText);
               } else {
-                // Fallback to Haversine calculation
-                const distanceInMiles = calculateDistance(
-                  userCoords.lat, 
-                  userCoords.lng, 
-                  marketCoords.lat, 
-                  marketCoords.lng
-                );
-                setDistance(`${distanceInMiles.toFixed(1)} miles`);
+                setDistance('Distance unavailable');
               }
             }
             
