@@ -79,6 +79,8 @@ const Homepage = () => {
     vendors: AcceptedSubmission[];
   } | null>(null);
   const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
+  const [locationMethod, setLocationMethod] = useState<'ip' | 'gps'>('ip');
+  const [isGettingGPSLocation, setIsGettingGPSLocation] = useState(false);
 
   const toggleDay = (day: string) => {
     setSelectedDays(prev => {
@@ -138,6 +140,7 @@ const Homepage = () => {
     }
 
     setIsLoadingLocation(true);
+    setIsGettingGPSLocation(true);
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         try {
@@ -145,6 +148,7 @@ const Homepage = () => {
           
           // Store user coordinates for distance calculations
           setUserCoordinates({ lat: latitude, lng: longitude });
+          setLocationMethod('gps');
           
           // Use a free reverse geocoding API to get actual zipcode
           const response = await fetch(
@@ -165,22 +169,24 @@ const Homepage = () => {
           setLocationZipcode(zipcode);
           
           toast({
-            title: "Location found",
-            description: `Zipcode updated to ${zipcode}`,
+            title: "GPS Location found",
+            description: `Using precise GPS location. Zipcode: ${zipcode}`,
           });
         } catch (error) {
           console.error('Geocoding error:', error);
           toast({
             title: "Error",
-            description: "Failed to get zipcode from your location. Please enter it manually.",
+            description: "Failed to get zipcode from your GPS location. Please enter it manually.",
             variant: "destructive"
           });
         } finally {
           setIsLoadingLocation(false);
+          setIsGettingGPSLocation(false);
         }
       },
       (error) => {
         setIsLoadingLocation(false);
+        setIsGettingGPSLocation(false);
         let errorMessage = "Please allow location access to get your zipcode.";
         
         switch(error.code) {
@@ -196,7 +202,7 @@ const Homepage = () => {
         }
         
         toast({
-          title: "Location Error",
+          title: "GPS Location Error",
           description: errorMessage,
           variant: "destructive"
         });
@@ -322,6 +328,7 @@ const Homepage = () => {
           lng: data.longitude 
         });
         setLocationZipcode(data.postal || '');
+        setLocationMethod('ip');
       } else {
         console.log('IP geolocation data missing coordinates, using default location');
         // Set a default location (San Antonio area) for testing
@@ -330,6 +337,7 @@ const Homepage = () => {
           lat: 29.4241, 
           lng: -98.4936 
         });
+        setLocationMethod('ip');
       }
     } catch (error) {
       console.log('IP geolocation failed:', error);
@@ -339,6 +347,7 @@ const Homepage = () => {
         lat: 29.4241, 
         lng: -98.4936 
       });
+      setLocationMethod('ip');
     }
   };
 
@@ -611,26 +620,52 @@ const Homepage = () => {
                 <TabsContent value="location" className="p-4">
                   <div className="space-y-6">
                     
+                    {/* Location Method Status */}
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Current Location Method:</span>
+                        <Badge variant={locationMethod === 'gps' ? 'default' : 'secondary'}>
+                          {locationMethod === 'gps' ? 'GPS (Precise)' : 'IP (Approximate)'}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {locationMethod === 'gps' 
+                          ? 'Using your exact GPS location for accurate distance calculations.'
+                          : 'Using your IP location. For precise distances, try GPS location below.'
+                        }
+                      </p>
+                    </div>
+
+                    {/* GPS Location Button */}
+                    <div className="space-y-4">
+                      <h5 className="font-medium">Get Precise Location</h5>
+                      <Button 
+                        onClick={getCurrentLocation}
+                        disabled={isGettingGPSLocation}
+                        className="w-full h-12 flex items-center gap-2"
+                        variant={locationMethod === 'gps' ? 'default' : 'outline'}
+                      >
+                        <MapPin className={`h-4 w-4 ${isGettingGPSLocation ? 'animate-pulse' : ''}`} />
+                        {isGettingGPSLocation ? 'Getting GPS Location...' : 'Use My GPS Location'}
+                      </Button>
+                      <p className="text-sm text-muted-foreground">
+                        Get your exact GPS coordinates for the most accurate vendor distances.
+                      </p>
+                    </div>
 
                     {/* Zipcode Section */}
                     <div className="space-y-4">
+                      <h5 className="font-medium">Zipcode</h5>
                       <div className="relative">
                         <Input 
                           value={locationZipcode}
                           onChange={(e) => setLocationZipcode(e.target.value)}
                           placeholder="Zipcode will appear here..." 
-                          className="bg-background h-12 text-lg border-2 border-border rounded-xl pr-16"
+                          className="bg-background h-12 text-lg border-2 border-border rounded-xl"
                         />
-                        <Button 
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-green-500 hover:bg-green-600 text-white h-8 w-8 p-0 rounded-lg"
-                          onClick={getCurrentLocation}
-                          disabled={isLoadingLocation}
-                        >
-                          <RotateCcw className={`h-4 w-4 ${isLoadingLocation ? 'animate-spin' : ''}`} />
-                        </Button>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Click the button to get your current zipcode.
+                        Your current zipcode (automatically detected).
                       </p>
                     </div>
                     
