@@ -95,9 +95,8 @@ export function ShoppingCart() {
                   
                   return (
                     <div key={vendorId} className="space-y-4 p-4 border rounded-lg">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center">
                         <h3 className="font-semibold">{vendorItems[0].vendor_name}</h3>
-                        <Badge variant="outline">{formatPrice(vendorTotal)}</Badge>
                       </div>
 
                       <div className="space-y-3">
