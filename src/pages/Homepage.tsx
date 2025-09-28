@@ -140,660 +140,347 @@ const Homepage = () => {
     // Apply other existing filters here if needed (days, location, etc.)
     // Note: When showing nationwide category results, we skip location-based filtering
     
-    setFilteredSubmissions(filtered);
-  }, [acceptedSubmissions, searchQuery, selectedCategories, searchParams]);
 
-  const toggleDay = (day: string) => {
-    setSelectedDays(prev => {
-      const newSelected = prev.includes(day) 
-        ? prev.filter(d => d !== day)
-        : [...prev, day];
-      
-      // Initialize time selection for newly selected day
-      if (!prev.includes(day)) {
-        setDayTimeSelections(prevTimes => ({
-          ...prevTimes,
-          [day]: {
-            startTime: '08:00',
-            startPeriod: 'AM',
-            endTime: '02:00',
-            endPeriod: 'PM'
-          }
-        }));
+    // Apply day filter
+    if (selectedDays.length > 0) {
+      filtered = filtered.filter(submission => {
+        if (!submission.market_days) return false;
+        return submission.market_days.some(day => selectedDays.includes(day));
+      });
+    }
+
+    // Apply location filter if user coordinates are available and it's not a nationwide search
+    if (userCoordinates && !isNationwideSearch) {
+      filtered = filtered.filter(submission => {
+        if (!submission.market_address) return true; // Include if no address to filter by
+        
+        try {
+          const distance = calculateDistance(
+            userCoordinates.lat,
+            userCoordinates.lng,
+            submission.market_address
+          );
+          return distance <= rangeMiles[0];
+        } catch (error) {
+          console.warn('Error calculating distance for submission:', submission.id, error);
+          return true; // Include in results if distance calculation fails
+        }
+      });
+    }
+
+    setFilteredSubmissions(filtered);
+    console.log('Filtered submissions:', filtered.length, 'out of', acceptedSubmissions.length);
+  }, [acceptedSubmissions, searchQuery, selectedCategories, selectedDays, userCoordinates, rangeMiles, searchParams]);
+
+  // Load accepted submissions
+  useEffect(() => {
+    fetchAcceptedSubmissions();
+  }, []);
+
+  // Load vendor ratings
+  useEffect(() => {
+    if (acceptedSubmissions.length > 0) {
+      fetchVendorRatings();
+    }
+  }, [acceptedSubmissions]);
+
+  const fetchAcceptedSubmissions = async () => {
+    try {
+      console.log('Fetching accepted submissions...');
+      const { data, error } = await supabase
+        .from('accepted_submissions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching accepted submissions:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load vendors. Please try again.",
+          variant: "destructive",
+        });
+        return;
       }
-      
-      return newSelected;
-    });
+
+      console.log('Fetched submissions:', data?.length || 0);
+      setAcceptedSubmissions(data || []);
+    } catch (error) {
+      console.error('Error in fetchAcceptedSubmissions:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateTimeSelection = (day: string, field: string, value: string) => {
-    setDayTimeSelections(prev => ({
-      ...prev,
-      [day]: {
-        ...prev[day],
-        [field]: value
+  const fetchVendorRatings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('vendor_reviews')
+        .select('vendor_id, rating');
+
+      if (error) {
+        console.error('Error fetching vendor ratings:', error);
+        return;
       }
-    }));
+
+      // Calculate average ratings
+      const ratingsMap: Record<string, VendorRating> = {};
+      data?.forEach(review => {
+        if (!ratingsMap[review.vendor_id]) {
+          ratingsMap[review.vendor_id] = {
+            vendorId: review.vendor_id,
+            averageRating: 0,
+            totalReviews: 0
+          };
+        }
+        ratingsMap[review.vendor_id].totalReviews += 1;
+        ratingsMap[review.vendor_id].averageRating = 
+          ((ratingsMap[review.vendor_id].averageRating * (ratingsMap[review.vendor_id].totalReviews - 1)) + review.rating) / 
+          ratingsMap[review.vendor_id].totalReviews;
+      });
+
+      setVendorRatings(ratingsMap);
+    } catch (error) {
+      console.error('Error in fetchVendorRatings:', error);
+    }
+  };
+
+  const toggleDay = (day: string) => {
+    setSelectedDays(prev => 
+      prev.includes(day) 
+        ? prev.filter(d => d !== day)
+        : [...prev, day]
+    );
   };
 
   const toggleCategory = (category: string) => {
-    setSelectedCategories(prev => {
-      return prev.includes(category) 
+    setSelectedCategories(prev => 
+      prev.includes(category) 
         ? prev.filter(c => c !== category)
-        : [...prev, category];
-    });
+        : [...prev, category]
+    );
   };
 
-  const timeOptions = Array.from({ length: 12 }, (_, i) => {
-    const hour = i + 1;
-    return [`${hour.toString().padStart(2, '0')}:00`, `${hour.toString().padStart(2, '0')}:30`];
-  }).flat();
+  const clearAllFilters = () => {
+    setSelectedDays([]);
+    setSelectedCategories([]);
+    setSearchQuery("");
+    setLocationZipcode("");
+    setUserCoordinates(null);
+    setRangeMiles([25]);
+    // Clear URL parameters
+    navigate('/homepage');
+  };
 
-  // Get current location and convert to zipcode (same as /profile page)
-  const getCurrentLocation = () => {
+  const getUserLocation = async () => {
     if (!navigator.geolocation) {
       toast({
-        title: "Geolocation not supported",
+        title: "Location not supported",
         description: "Your browser doesn't support geolocation.",
-        variant: "destructive"
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGettingGPSLocation(true);
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserCoordinates({ lat: latitude, lng: longitude });
+        setLocationMethod('gps');
+        
+        // Get address from coordinates for display
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const data = await response.json();
+          const zipcode = data.address?.postcode || '';
+          setLocationZipcode(zipcode);
+        } catch (error) {
+          console.error('Error getting address from coordinates:', error);
+        }
+        
+        setIsGettingGPSLocation(false);
+        toast({
+          title: "Location updated",
+          description: "Using your current GPS location",
+        });
+      },
+      (error) => {
+        setIsGettingGPSLocation(false);
+        console.error('Error getting location:', error);
+        toast({
+          title: "Location error",
+          description: "Could not get your location. Please enter your zip code manually.",
+          variant: "destructive",
+        });
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 600000 }
+    );
+  };
+
+  const handleLocationSubmit = async () => {
+    if (!locationZipcode.trim()) {
+      toast({
+        title: "Invalid input",
+        description: "Please enter a valid zip code",
+        variant: "destructive",
       });
       return;
     }
 
     setIsLoadingLocation(true);
-    setIsGettingGPSLocation(true);
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude } = position.coords;
-          
-          // Store user coordinates for distance calculations
-          setUserCoordinates({ lat: latitude, lng: longitude });
-          setLocationMethod('gps');
-          
-          // Use a free reverse geocoding API to get actual zipcode
-          const response = await fetch(
-            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
-          );
-          
-          if (!response.ok) {
-            throw new Error('Failed to fetch location data');
-          }
-          
-          const data = await response.json();
-          const zipcode = data.postcode || data.postalCode || 'Unknown';
-          
-          if (zipcode === 'Unknown') {
-            throw new Error('Could not determine zipcode');
-          }
-          
-          setLocationZipcode(zipcode);
-          
-          toast({
-            title: "GPS Location found",
-            description: `Using precise GPS location. Zipcode: ${zipcode}`,
-          });
-        } catch (error) {
-          console.error('Geocoding error:', error);
-          toast({
-            title: "Error",
-            description: "Failed to get zipcode from your GPS location. Please enter it manually.",
-            variant: "destructive"
-          });
-        } finally {
-          setIsLoadingLocation(false);
-          setIsGettingGPSLocation(false);
-        }
-      },
-      (error) => {
-        setIsLoadingLocation(false);
-        setIsGettingGPSLocation(false);
-        let errorMessage = "Please allow location access to get your zipcode.";
-        
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = "Location access denied. Please enable location services and try again.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information unavailable. Please enter your zipcode manually.";
-            break;
-          case error.TIMEOUT:
-            errorMessage = "Location request timed out. Please try again or enter manually.";
-            break;
-        }
-        
-        toast({
-          title: "GPS Location Error",
-          description: errorMessage,
-          variant: "destructive"
-        });
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000 // 5 minutes
-      }
-    );
-  };
+    setLocationMethod('ip');
 
-  // Calculate distances for all vendors
-  const calculateVendorDistances = async (vendors: AcceptedSubmission[], userCoords: {lat: number, lng: number}) => {
-    console.log('=== DISTANCE CALCULATION DEBUG ===');
-    console.log('User coordinates:', userCoords);
-    console.log('Starting distance calculations for', vendors.length, 'vendors');
-    
-    const distances: Record<string, string> = {};
-    
-    for (const vendor of vendors) {
-      console.log('\n--- Processing vendor:', vendor.store_name);
-      console.log('Market address:', vendor.market_address);
-      
-      if (!vendor.market_address) {
-        console.log('No market address for vendor:', vendor.store_name);
-        distances[vendor.id] = '-- miles';
-        continue;
-      }
-
-      try {
-        console.log('Getting coordinates for vendor:', vendor.id);
-        // Get coordinates for this vendor (with caching)
-        const vendorCoords = await cacheVendorCoordinates(vendor.id, vendor.market_address);
-        console.log('Vendor coordinates result:', vendorCoords);
-        
-        if (vendorCoords) {
-          console.log('=== DISTANCE CALCULATION ===');
-          console.log('User coords:', userCoords);
-          console.log('Vendor coords:', vendorCoords);
-          
-          // Try Google Maps distance first, fall back to Haversine calculation
-          const googleDistance = await getGoogleMapsDistance(
-            userCoords.lat, 
-            userCoords.lng, 
-            vendorCoords.lat, 
-            vendorCoords.lng
-          );
-          
-          let finalDistance: string;
-          
-          if (googleDistance) {
-            console.log('✅ Using Google Maps distance:', googleDistance.distance);
-            finalDistance = googleDistance.distance;
-          } else {
-            console.log('⚠️ Google Maps failed, using Haversine calculation');
-            const distanceInMiles = calculateDistance(
-              userCoords.lat, 
-              userCoords.lng, 
-              vendorCoords.lat, 
-              vendorCoords.lng
-            );
-            finalDistance = `${distanceInMiles.toFixed(1)} miles`;
-          }
-          
-          console.log('Final distance:', finalDistance);
-          console.log('Google Maps equivalent: https://maps.google.com/maps?saddr=' + userCoords.lat + ',' + userCoords.lng + '&daddr=' + vendorCoords.lat + ',' + vendorCoords.lng);
-          
-          distances[vendor.id] = finalDistance;
-        } else {
-          console.log('No coordinates returned for vendor:', vendor.id);
-          distances[vendor.id] = '-- miles';
-        }
-      } catch (error) {
-        console.error(`Error calculating distance for vendor ${vendor.id}:`, error);
-        distances[vendor.id] = '-- miles';
-      }
-    }
-    
-    console.log('Final distances:', distances);
-    console.log('=== END DISTANCE DEBUG ===');
-    setVendorDistances(distances);
-  };
-
-  // Enhanced local storage cache for distances
-  const DISTANCE_CACHE_KEY = 'market_distance_cache';
-  const CACHE_EXPIRY_HOURS = 24; // Cache expires after 24 hours
-  
-  // Load cached distances from localStorage
-  const loadCachedDistances = () => {
     try {
-      const cached = localStorage.getItem(DISTANCE_CACHE_KEY);
-      if (cached) {
-        const { data, timestamp } = JSON.parse(cached);
-        const isExpired = Date.now() - timestamp > CACHE_EXPIRY_HOURS * 60 * 60 * 1000;
-        if (!isExpired) {
-          return data;
-        }
-      }
-    } catch (error) {
-      console.warn('Error loading cached distances:', error);
-    }
-    return {};
-  };
-  
-  // Save distances to localStorage
-  const saveCachedDistances = (distances: Record<string, string>) => {
-    try {
-      const cacheData = {
-        data: distances,
-        timestamp: Date.now()
-      };
-      localStorage.setItem(DISTANCE_CACHE_KEY, JSON.stringify(cacheData));
-    } catch (error) {
-      console.warn('Error saving cached distances:', error);
-    }
-  };
-
-  // Calculate distances for all markets (super optimized with multiple caching layers)
-  const calculateMarketDistances = async (markets: Array<{name: string, address: string, vendors: AcceptedSubmission[]}>, userCoords: {lat: number, lng: number}) => {
-    console.log('=== SUPER OPTIMIZED MARKET DISTANCE CALCULATION ===');
-    console.log('User coordinates:', userCoords);
-    console.log('Starting super optimized distance calculations for', markets.length, 'markets');
-    
-    setIsLoadingMarketDistances(true);
-    
-    // Layer 1: Load cached distances from localStorage
-    const cachedDistances = loadCachedDistances();
-    
-    // Layer 2: Use vendor distances as immediate fallback
-    const quickDistances: Record<string, string> = {};
-    
-    markets.forEach(market => {
-      const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-      
-      // First try cached distance
-      if (cachedDistances[marketId]) {
-        quickDistances[marketId] = cachedDistances[marketId];
-      }
-      // Fallback to vendor distance if available
-      else {
-        const firstVendor = market.vendors[0];
-        if (firstVendor && vendorDistances[firstVendor.id]) {
-          quickDistances[marketId] = vendorDistances[firstVendor.id];
-        }
-      }
-    });
-    
-    // Set all available distances immediately for instant display
-    if (Object.keys(quickDistances).length > 0) {
-      console.log('Setting instant distances:', Object.keys(quickDistances).length, 'markets');
-      setMarketDistances(prev => ({ ...prev, ...quickDistances }));
-    }
-    
-    // Layer 3: Calculate remaining distances in optimized batches
-    const marketsNeedingCalculation = markets.filter(market => {
-      const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-      return !quickDistances[marketId]; // Only calculate if not already available
-    });
-    
-    if (marketsNeedingCalculation.length === 0) {
-      console.log('All market distances available from cache/vendors!');
-      setIsLoadingMarketDistances(false);
-      return;
-    }
-    
-    console.log(`Need to calculate distances for ${marketsNeedingCalculation.length} markets`);
-    
-    // Process in smaller batches to prevent API rate limits and improve perceived performance
-    const BATCH_SIZE = 3; // Process 3 markets at a time
-    const batches = [];
-    
-    for (let i = 0; i < marketsNeedingCalculation.length; i += BATCH_SIZE) {
-      batches.push(marketsNeedingCalculation.slice(i, i + BATCH_SIZE));
-    }
-    
-    // Process batches sequentially but markets within each batch in parallel
-    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
-      const batch = batches[batchIndex];
-      console.log(`Processing batch ${batchIndex + 1}/${batches.length} with ${batch.length} markets`);
-      
-      try {
-        const batchPromises = batch.map(async (market) => {
-          const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-          
-          try {
-            // Use market address directly for consistent coordinates
-            const marketCoords = await cacheVendorCoordinates(marketId, market.address);
-            
-            if (marketCoords) {
-              // Calculate distance using Google Maps
-              const googleDistance = await getGoogleMapsDistance(
-                userCoords.lat, 
-                userCoords.lng, 
-                marketCoords.lat, 
-                marketCoords.lng
-              );
-              
-              let finalDistance: string;
-              
-              if (googleDistance) {
-                finalDistance = googleDistance.distance;
-              } else {
-                const distanceInMiles = calculateDistance(
-                  userCoords.lat, 
-                  userCoords.lng, 
-                  marketCoords.lat, 
-                  marketCoords.lng
-                );
-                finalDistance = `${distanceInMiles.toFixed(1)} mi`;
-              }
-              
-              return { marketId, distance: finalDistance };
-            } else {
-              return { marketId, distance: '-- mi' };
-            }
-          } catch (error) {
-            console.error(`Error calculating distance for ${market.name}:`, error);
-            return { marketId, distance: '-- mi' };
-          }
-        });
-        
-        const batchResults = await Promise.all(batchPromises);
-        
-        // Update distances immediately after each batch
-        const newDistances: Record<string, string> = {};
-        batchResults.forEach(({ marketId, distance }) => {
-          newDistances[marketId] = distance;
-        });
-        
-        // Update state and cache
-        setMarketDistances(prev => {
-          const updated = { ...prev, ...newDistances };
-          // Save to cache for future use
-          saveCachedDistances({ ...cachedDistances, ...updated });
-          return updated;
-        });
-        
-        console.log(`Batch ${batchIndex + 1} completed:`, newDistances);
-        
-        // Small delay between batches to be respectful to API limits
-        if (batchIndex < batches.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-        }
-        
-      } catch (error) {
-        console.error(`Error in batch ${batchIndex + 1}:`, error);
-      }
-    }
-    
-    setIsLoadingMarketDistances(false);
-    console.log('=== END SUPER OPTIMIZED MARKET DISTANCE CALCULATION ===');
-  };
-
-  // Group vendors by market
-  const groupVendorsByMarket = () => {
-    const markets: Record<string, {
-      name: string;
-      address: string;
-      vendors: AcceptedSubmission[];
-    }> = {};
-
-    filteredSubmissions.forEach(submission => {
-      const marketKey = submission.selected_market || submission.search_term || 'Unknown Market';
-      const marketAddress = submission.market_address || 'Address not available';
-      
-      if (!markets[marketKey]) {
-        markets[marketKey] = {
-          name: marketKey,
-          address: marketAddress,
-          vendors: []
-        };
-      }
-      
-      markets[marketKey].vendors.push(submission);
-    });
-
-    return Object.values(markets);
-  };
-
-  useEffect(() => {
-    console.log('🚀 Homepage useEffect running...');
-    fetchAcceptedSubmissions();
-    
-    // Add immediate test log
-    console.log('📍 About to try GPS location detection...');
-    
-    // Try GPS with error handling
-    try {
-      tryGPSLocationFirst();
-    } catch (error) {
-      console.error('❌ Error in tryGPSLocationFirst:', error);
-      getLocationFromIP(); // Fallback to IP
-    }
-  }, []);
-
-  // Initialize cached distances on component mount for instant display
-  useEffect(() => {
-    const cachedDistances = loadCachedDistances();
-    if (Object.keys(cachedDistances).length > 0) {
-      console.log('Loading cached distances for instant display:', Object.keys(cachedDistances).length, 'markets');
-      setMarketDistances(cachedDistances);
-    }
-  }, []);
-
-  // Calculate distances when vendors or user coordinates change
-  useEffect(() => {
-    if (acceptedSubmissions.length > 0 && userCoordinates) {
-      calculateVendorDistances(acceptedSubmissions, userCoordinates);
-    }
-  }, [acceptedSubmissions, userCoordinates]);
-
-  // Calculate market distances independently and immediately
-  useEffect(() => {
-    if (acceptedSubmissions.length > 0 && userCoordinates) {
-      const markets = groupVendorsByMarket();
-      if (markets.length > 0) {
-        // Start market distance calculation immediately without waiting for vendor distances
-        calculateMarketDistances(markets, userCoordinates);
-      }
-    }
-  }, [acceptedSubmissions, userCoordinates]);
-
-  // Get location from IP address automatically
-  const getLocationFromIP = async () => {
-    try {
-      console.log('🌐 Attempting IP geolocation...');
-      const response = await fetch('https://ipapi.co/json/');
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${locationZipcode}&countrycodes=us&limit=1`);
       const data = await response.json();
-      console.log('🌐 IP geolocation response:', data);
       
-      if (data.latitude && data.longitude) {
-        console.log('📍 Setting user coordinates from IP:', { 
-          lat: data.latitude, 
-          lng: data.longitude,
-          city: data.city,
-          region: data.region 
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0];
+        setUserCoordinates({ lat: parseFloat(lat), lng: parseFloat(lon) });
+        toast({
+          title: "Location updated",
+          description: `Searching near ${locationZipcode}`,
         });
-        setUserCoordinates({ 
-          lat: data.latitude, 
-          lng: data.longitude 
-        });
-        setLocationZipcode(data.postal || '');
-        setLocationMethod('ip');
       } else {
-        console.log('❌ IP geolocation data missing coordinates, using default location');
-        // Set a default location (San Antonio area) for testing
-        console.log('🏠 Using default San Antonio coordinates for testing');
-        setUserCoordinates({ 
-          lat: 29.4241, 
-          lng: -98.4936 
+        toast({
+          title: "Location not found",
+          description: "Could not find the specified zip code",
+          variant: "destructive",
         });
-        setLocationMethod('ip');
       }
     } catch (error) {
-      console.log('❌ IP geolocation failed:', error);
-      // Set a default location (San Antonio area) for testing
-      console.log('🏠 Using default San Antonio coordinates for testing');
-      setUserCoordinates({ 
-        lat: 29.4241, 
-        lng: -98.4936 
+      console.error('Error geocoding zip code:', error);
+      toast({
+        title: "Error",
+        description: "Failed to find location. Please try again.",
+        variant: "destructive",
       });
-      setLocationMethod('ip');
+    } finally {
+      setIsLoadingLocation(false);
     }
   };
 
-  // Try GPS location first, fallback to IP if denied or fails
-  const tryGPSLocationFirst = async () => {
-    try {
-      console.log('🌍 Starting location detection...');
-      
-      if (!navigator.geolocation) {
-        console.log('❌ Geolocation not supported, using IP fallback');
-        getLocationFromIP();
-        return;
-      }
-
-      console.log('📍 Requesting GPS permission...');
-      console.log('📍 Navigator.geolocation available:', !!navigator.geolocation);
-      
-      // Try GPS first with a short timeout
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          try {
-            const { latitude, longitude, accuracy } = position.coords;
-            
-            console.log('✅ GPS Location Success!');
-            console.log('📍 GPS Coordinates:', { lat: latitude, lng: longitude, accuracy: `${accuracy}m` });
-            
-            // Store user coordinates for distance calculations
-            setUserCoordinates({ lat: latitude, lng: longitude });
-            setLocationMethod('gps');
-            
-            // Get zipcode from GPS coordinates
-            const response = await fetch(
-              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
-            );
-            
-            if (response.ok) {
-              const data = await response.json();
-              const zipcode = data.postcode || data.postalCode || '';
-              const city = data.city || data.locality || '';
-              setLocationZipcode(zipcode);
-              
-              console.log('📮 Location Details:', { city, zipcode, lat: latitude, lng: longitude });
-            }
-          } catch (error) {
-            console.error('❌ GPS geocoding error:', error);
-            // Still keep the GPS coordinates even if zipcode lookup fails
-          }
-        },
-        (error) => {
-          // GPS failed or denied, fallback to IP
-          console.log('❌ GPS location failed/denied:', error.message);
-          console.log('🔄 Falling back to IP location...');
-          
-          toast({
-            title: "Location Permission Needed",
-            description: "Using approximate IP location. Allow GPS for precise distances.",
-            variant: "destructive"
+  // Get unique markets
+  const getUniqueMarkets = () => {
+    const marketsMap = new Map();
+    
+    filteredSubmissions.forEach(submission => {
+      if (submission.market_address && submission.selected_market) {
+        const key = `${submission.selected_market}-${submission.market_address}`;
+        if (!marketsMap.has(key)) {
+          marketsMap.set(key, {
+            name: submission.selected_market,
+            address: submission.market_address,
+            vendors: []
           });
-          
-          getLocationFromIP();
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 8000, // Longer timeout for better accuracy
-          maximumAge: 60000 // 1 minute cache
         }
-      );
-    } catch (error) {
-      console.error('❌ Error in tryGPSLocationFirst function:', error);
-      console.log('🔄 Falling back to IP location due to error...');
-      getLocationFromIP();
-    }
+        marketsMap.get(key).vendors.push(submission);
+      }
+    });
+
+    return Array.from(marketsMap.values());
   };
 
-  // Refresh data when component becomes visible
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        fetchAcceptedSubmissions();
+  const handleMarketClick = (market: any) => {
+    setSelectedMarket(market);
+    setViewMode('vendors');
+  };
+
+  // Get all products from filtered vendors
+  const getAllProducts = () => {
+    const allProducts: any[] = [];
+    
+    filteredSubmissions.forEach(submission => {
+      if (submission.products && submission.products.length > 0) {
+        submission.products.forEach((product: any) => {
+          allProducts.push({
+            ...product,
+            vendorName: submission.store_name,
+            vendorId: submission.id,
+            vendorSpecialty: submission.primary_specialty
+          });
+        });
       }
+    });
+
+    return allProducts;
+  };
+
+  // Calculate and cache distances for markets
+  useEffect(() => {
+    if (!userCoordinates || viewMode !== 'markets' || isLoadingMarketDistances) return;
+    
+    const calculateMarketDistances = async () => {
+      setIsLoadingMarketDistances(true);
+      const uniqueMarkets = getUniqueMarkets();
+      const distances: Record<string, string> = {};
+      
+      for (const market of uniqueMarkets) {
+        try {
+          const distance = await getGoogleMapsDistance(userCoordinates, market.address);
+          distances[`${market.name}-${market.address}`] = distance;
+        } catch (error) {
+          console.error(`Error calculating distance to ${market.name}:`, error);
+          distances[`${market.name}-${market.address}`] = 'Distance unavailable';
+        }
+      }
+      
+      setMarketDistances(distances);
+      setIsLoadingMarketDistances(false);
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
+    calculateMarketDistances();
+  }, [userCoordinates, viewMode, filteredSubmissions]);
 
-  const fetchVendorRatings = async (vendorIds: string[]) => {
-    if (vendorIds.length === 0) return;
-
-    try {
-      const { data: reviews, error } = await supabase
-        .from('reviews')
-        .select('vendor_id, rating')
-        .in('vendor_id', vendorIds);
-
-      if (error) throw error;
-
-      // Calculate ratings for each vendor
-      const ratingsMap: Record<string, VendorRating> = {};
+  // Calculate and cache distances for vendors
+  useEffect(() => {
+    if (!userCoordinates || (viewMode !== 'vendors' && !selectedMarket)) return;
+    
+    const calculateVendorDistances = async () => {
+      const vendorsToCalculate = selectedMarket ? selectedMarket.vendors : filteredSubmissions;
+      const distances: Record<string, string> = {};
       
-      vendorIds.forEach(vendorId => {
-        const vendorReviews = reviews?.filter(review => review.vendor_id === vendorId) || [];
-        
-        if (vendorReviews.length > 0) {
-          const totalRating = vendorReviews.reduce((sum, review) => sum + review.rating, 0);
-          const averageRating = totalRating / vendorReviews.length;
-          
-          ratingsMap[vendorId] = {
-            vendorId,
-            averageRating: Math.round(averageRating * 10) / 10,
-            totalReviews: vendorReviews.length
-          };
-        } else {
-          ratingsMap[vendorId] = {
-            vendorId,
-            averageRating: 0,
-            totalReviews: 0
-          };
+      for (const vendor of vendorsToCalculate) {
+        if (vendor.market_address) {
+          try {
+            const distance = await getGoogleMapsDistance(userCoordinates, vendor.market_address);
+            distances[vendor.id] = distance;
+          } catch (error) {
+            console.error(`Error calculating distance to ${vendor.store_name}:`, error);
+            distances[vendor.id] = 'Distance unavailable';
+          }
         }
+      }
+      
+      setVendorDistances(distances);
+    };
+
+    calculateVendorDistances();
+  }, [userCoordinates, viewMode, selectedMarket, filteredSubmissions]);
+
+  const formatMarketHours = (hours: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }> | undefined) => {
+    if (!hours) return 'Hours not available';
+    
+    const daysOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const dayAbbrev: Record<string, string> = {
+      'monday': 'Mon',
+      'tuesday': 'Tue', 
+      'wednesday': 'Wed',
+      'thursday': 'Thu',
+      'friday': 'Fri',
+      'saturday': 'Sat',
+      'sunday': 'Sun'
+    };
+
+    const hoursArray = daysOrder
+      .filter(day => hours[day])
+      .map(day => {
+        const dayHours = hours[day];
+        return `${dayAbbrev[day]} ${dayHours.start}${dayHours.startPeriod}-${dayHours.end}${dayHours.endPeriod}`;
       });
 
-      setVendorRatings(ratingsMap);
-    } catch (error) {
-      console.error('Error fetching vendor ratings:', error);
-    }
-  };
-
-  const fetchAcceptedSubmissions = async () => {
-    console.log('Fetching accepted submissions...');
-    try {
-      const { data, error } = await supabase
-        .from('submissions')
-        .select('*')
-        .eq('status', 'accepted')
-        .order('created_at', { ascending: false });
-
-      console.log('Raw data from database:', data);
-      console.log('Error from database:', error);
-
-      if (error) throw error;
-      
-      const parsedSubmissions = data?.map(sub => ({
-        ...sub,
-        products: typeof sub.products === 'string' ? JSON.parse(sub.products) : sub.products,
-        market_hours: sub.market_hours && typeof sub.market_hours === 'object' && sub.market_hours !== null 
-          ? sub.market_hours as Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>
-          : undefined
-      })) || [];
-      
-      console.log('Parsed submissions:', parsedSubmissions);
-      setAcceptedSubmissions(parsedSubmissions);
-      
-      // Fetch ratings for all vendors
-      const vendorIds = parsedSubmissions.map(sub => sub.id);
-      if (vendorIds.length > 0) {
-        await fetchVendorRatings(vendorIds);
-      }
-    } catch (error) {
-      console.error('Error fetching accepted submissions:', error);
-    } finally {
-      setLoading(false);
-    }
+    return hoursArray.join(', ') || 'Hours not available';
   };
 
   if (loading) {
@@ -808,55 +495,54 @@ const Homepage = () => {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6">
         
-        {/* View Toggle and Filter Button */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex rounded-lg bg-muted p-1">
-            <button
-              onClick={() => {
-                setViewMode('vendors');
-                setSelectedMarket(null);
-              }}
-              className={cn(
-                "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                viewMode === 'vendors' && !selectedMarket
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Vendors
-            </button>
-            <button
-              onClick={() => {
-                setViewMode('markets');
-                setSelectedMarket(null);
-              }}
-              className={cn(
-                "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                viewMode === 'markets'
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Markets
-            </button>
-            <button
-              onClick={() => {
-                setViewMode('products');
-                setSelectedMarket(null);
-              }}
-              className={cn(
-                "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                viewMode === 'products'
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Products
-            </button>
-          </div>
-          
-          {/* Only show filter button for local searches, not category searches */}
-          {!searchParams.get('category') && (
+        {/* Only show view toggle and filter when no category is selected */}
+        {!searchParams.get('category') && (
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex rounded-lg bg-muted p-1">
+              <button
+                onClick={() => {
+                  setViewMode('vendors');
+                  setSelectedMarket(null);
+                }}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  viewMode === 'vendors' && !selectedMarket
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Vendors
+              </button>
+              <button
+                onClick={() => {
+                  setViewMode('markets');
+                  setSelectedMarket(null);
+                }}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  viewMode === 'markets'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Markets
+              </button>
+              <button
+                onClick={() => {
+                  setViewMode('products');
+                  setSelectedMarket(null);
+                }}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  viewMode === 'products'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Products
+              </button>
+            </div>
+            
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="outline" className="flex items-center gap-2">
@@ -864,136 +550,131 @@ const Homepage = () => {
                   Filter search results
                 </Button>
               </DialogTrigger>
-            <DialogContent className="w-[800px] max-w-none p-0 bg-background border shadow-lg">
-              <Tabs defaultValue="times" className="w-full">
-                <div className="pt-8 px-8">
-                  <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
-                    <TabsTrigger value="times">Times</TabsTrigger>
-                    <TabsTrigger value="categories">Categories</TabsTrigger>
-                  </TabsList>
-                </div>
-                <TabsContent value="times" className="px-8 pb-8 pt-8">
-                  <div className="space-y-4">
-                    <div className="flex flex-wrap gap-2">
-                      {DAYS.map((day) => (
-                        <Button
-                          key={day}
-                          type="button"
-                          variant={selectedDays.includes(day) ? "default" : "outline"}
-                          onClick={() => toggleDay(day)}
-                          className={cn(
-                            "h-12 flex-1 min-w-[70px]",
-                            selectedDays.includes(day) && "bg-primary text-primary-foreground hover:bg-primary/90"
-                          )}
-                        >
-                          {day}
-                        </Button>
-                      ))}
-                    </div>
-                    
-                    {/* Time selectors for each selected day */}
-                    <div className="grid grid-cols-2 gap-12">
-                      {selectedDays.map((day) => (
-                        <div key={day} className="space-y-3 border-t pt-4">
-                          <h5 className="font-medium capitalize">
-                            {day === 'Mon' ? 'Monday' : 
-                             day === 'Tue' ? 'Tuesday' :
-                             day === 'Wed' ? 'Wednesday' :
-                             day === 'Thu' ? 'Thursday' :
-                             day === 'Fri' ? 'Friday' :
-                             day === 'Sat' ? 'Saturday' : 'Sunday'}
-                          </h5>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-1">
-                              <Select 
-                                value={dayTimeSelections[day]?.startTime || '08:00'}
-                                onValueChange={(value) => updateTimeSelection(day, 'startTime', value)}
+              <DialogContent className="w-[800px] max-w-none p-0 bg-background border shadow-lg">
+                <Tabs defaultValue="times" className="w-full">
+                  <div className="pt-8 px-8">
+                    <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
+                      <TabsTrigger value="times">Times</TabsTrigger>
+                      <TabsTrigger value="categories">Categories</TabsTrigger>
+                    </TabsList>
+                  </div>
+                  <TabsContent value="times" className="px-8 pb-8 pt-8">
+                    <div className="space-y-4">
+                      <div className="flex flex-wrap gap-2">
+                        {DAYS.map((day) => (
+                          <Button
+                            key={day}
+                            type="button"
+                            variant={selectedDays.includes(day) ? "default" : "outline"}
+                            onClick={() => toggleDay(day)}
+                            className={cn(
+                              "h-12 flex-1 min-w-[70px]",
+                              selectedDays.includes(day) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                            )}
+                          >
+                            {day}
+                          </Button>
+                        ))}
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="text-lg font-medium mb-4">Location</h3>
+                          <div className="flex flex-col gap-3">
+                            <div className="flex gap-2">
+                              <Input
+                                placeholder="Enter zip code"
+                                value={locationZipcode}
+                                onChange={(e) => setLocationZipcode(e.target.value)}
+                                className="flex-1"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    handleLocationSubmit();
+                                  }
+                                }}
+                              />
+                              <Button 
+                                onClick={handleLocationSubmit}
+                                disabled={isLoadingLocation}
+                                className="whitespace-nowrap"
                               >
-                                <SelectTrigger className="w-20 bg-background">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="bg-background border shadow-md z-50">
-                                  {timeOptions.map((time) => (
-                                    <SelectItem key={time} value={time}>{time}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              
-                              <Select
-                                value={dayTimeSelections[day]?.startPeriod || 'AM'}
-                                onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'startPeriod', value)}
-                              >
-                                <SelectTrigger className="w-16 bg-background">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="bg-background border shadow-md z-50">
-                                  <SelectItem value="AM">AM</SelectItem>
-                                  <SelectItem value="PM">PM</SelectItem>
-                                </SelectContent>
-                              </Select>
+                                {isLoadingLocation ? "Loading..." : "Set Location"}
+                              </Button>
                             </div>
-                            
-                            <span className="text-muted-foreground text-sm">to</span>
-                            
-                            <div className="flex items-center gap-1">
-                              <Select
-                                value={dayTimeSelections[day]?.endTime || '02:00'}
-                                onValueChange={(value) => updateTimeSelection(day, 'endTime', value)}
+                            <div className="flex justify-center">
+                              <Button
+                                variant="outline"
+                                onClick={getUserLocation}
+                                disabled={isGettingGPSLocation}
+                                className="flex items-center gap-2"
                               >
-                                <SelectTrigger className="w-20 bg-background">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="bg-background border shadow-md z-50">
-                                  {timeOptions.map((time) => (
-                                    <SelectItem key={time} value={time}>{time}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              
-                              <Select
-                                value={dayTimeSelections[day]?.endPeriod || 'PM'}
-                                onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'endPeriod', value)}
-                              >
-                                <SelectTrigger className="w-16 bg-background">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="bg-background border shadow-md z-50">
-                                  <SelectItem value="AM">AM</SelectItem>
-                                  <SelectItem value="PM">PM</SelectItem>
-                                </SelectContent>
-                              </Select>
+                                <MapPin className="h-4 w-4" />
+                                {isGettingGPSLocation ? "Getting location..." : "Use Current Location"}
+                              </Button>
                             </div>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                </TabsContent>
-                <TabsContent value="categories" className="px-8 pb-8 pt-8">
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-2">
-                      {SPECIALTY_CATEGORIES.map((category) => (
-                        <Button
-                          key={category}
-                          type="button"
-                          variant={selectedCategories.includes(category) ? "default" : "outline"}
-                          onClick={() => toggleCategory(category)}
-                          className={cn(
-                            "h-12 text-sm justify-start",
-                            selectedCategories.includes(category) && "bg-primary text-primary-foreground hover:bg-primary/90"
-                          )}
-                        >
-                          {category}
+
+                        {userCoordinates && (
+                          <div>
+                            <h3 className="text-lg font-medium mb-4">Distance Range</h3>
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span>Within {rangeMiles[0]} miles</span>
+                                <span className="text-muted-foreground">
+                                  {locationMethod === 'gps' ? 'GPS Location' : locationZipcode}
+                                </span>
+                              </div>
+                              <Slider
+                                value={rangeMiles}
+                                onValueChange={setRangeMiles}
+                                max={100}
+                                min={1}
+                                step={1}
+                                className="w-full"
+                              />
+                              <div className="flex justify-between text-xs text-muted-foreground">
+                                <span>1 mile</span>
+                                <span>100 miles</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex justify-end gap-2 pt-4 border-t">
+                        <Button variant="outline" onClick={clearAllFilters}>
+                          <RotateCcw className="h-4 w-4 mr-2" />
+                          Clear All
                         </Button>
-                      ))}
+                      </div>
                     </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </DialogContent>
-          </Dialog>
-          )}
-        </div>
+                  </TabsContent>
+                  <TabsContent value="categories" className="px-8 pb-8 pt-8">
+                    <div className="space-y-4">
+                      <div className="flex flex-wrap gap-2">
+                        {SPECIALTY_CATEGORIES.map((category) => (
+                          <Button
+                            key={category}
+                            type="button"
+                            variant={selectedCategories.includes(category) ? "default" : "outline"}
+                            onClick={() => toggleCategory(category)}
+                            className={cn(
+                              "h-auto py-3 px-4 text-sm",
+                              selectedCategories.includes(category) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                            )}
+                          >
+                            {category}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
         
         {/* Content based on view mode */}
         {viewMode === 'vendors' ? (
@@ -1008,428 +689,240 @@ const Homepage = () => {
                   </div>
                   <Button 
                     variant="outline" 
-                    size="sm"
                     onClick={() => setSelectedMarket(null)}
                   >
-                    View All Vendors
+                    Back to All Vendors
                   </Button>
                 </div>
               </div>
             )}
             
-            {(selectedMarket ? selectedMarket.vendors : acceptedSubmissions).length === 0 ? (
-              <div className="text-center">
-                <p className="text-muted-foreground">
-                  {selectedMarket ? 'No vendors in this market yet.' : 'No featured vendors yet.'}
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-                {(selectedMarket ? selectedMarket.vendors : filteredSubmissions).map((submission) => (
-                   <Card 
-                     key={submission.id} 
-                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]" 
-                     onClick={async () => {
-                       // Get the same cached coordinates used for distance calculation
-                       const cachedCoords = submission.market_address 
-                         ? await cacheVendorCoordinates(submission.id, submission.market_address)
-                         : null;
-                       
-                       navigate('/market', { 
-                         state: { 
-                           type: 'vendor', 
-                           selectedVendor: submission,
-                           allVendors: selectedMarket ? selectedMarket.vendors : filteredSubmissions,
-                           marketCoordinates: cachedCoords // Pass the exact coordinates used for "2.1 mi"
-                         } 
-                       });
-                     }}
-                  >
-                    {/* Product Image */}
-                    <div className="aspect-[4/3] bg-muted relative">
-                      {submission.products && submission.products.length > 0 && submission.products[0].images && submission.products[0].images.length > 0 ? (
-                        <img 
-                          src={submission.products[0].images[0]} 
-                          alt={submission.products[0].name || 'Product'} 
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                          No Image Available
-                        </div>
-                      )}
-                      
-                      {/* Rating - Top Left */}
-                      <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                        <div className="flex items-center gap-1">
-                          <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                          <span className="text-xs font-medium">
-                            {vendorRatings[submission.id]?.totalReviews > 0 
-                              ? vendorRatings[submission.id].averageRating.toFixed(1)
-                              : '0.0'
-                            }
-                          </span>
-                          <span className="text-xs text-gray-600">
-                            ({vendorRatings[submission.id]?.totalReviews || 0})
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {/* Like Button */}
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          await toggleLike(submission.id, 'vendor');
-                        }}
-                      >
-                        <Heart 
-                          className={cn(
-                            "h-4 w-4 transition-colors",
-                            isLiked(submission.id, 'vendor') 
-                              ? "text-red-500 fill-current" 
-                              : "text-gray-600"
-                          )} 
-                        />
-                      </Button>
-
-                      {/* Distance Badge */}
-                      <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                        <span className="text-xs font-medium text-gray-700">
-                          {vendorDistances[submission.id] || '-- miles'}
-                        </span>
-                      </div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 w-full max-w-6xl">
+              {(() => {
+                const vendorsToShow = selectedMarket ? selectedMarket.vendors : filteredSubmissions;
+                
+                if (vendorsToShow.length === 0) {
+                  return (
+                    <div className="col-span-full text-center py-8">
+                      <p className="text-muted-foreground">No vendors found matching your criteria.</p>
                     </div>
-                    
-                    {/* Store Information */}
-                    <div className="p-4 space-y-3">
-                      <h3 className="text-lg font-semibold text-foreground text-left">
-                        {submission.store_name.length > 20 
-                          ? `${submission.store_name.slice(0, 20)}...`
-                          : submission.store_name
-                        }
-                      </h3>
-                      
-                      {submission.primary_specialty && (
-                        <Badge variant="secondary" className="text-xs">
-                          {submission.primary_specialty}
-                        </Badge>
-                      )}
+                  );
+                }
 
-                      {/* Market Details Section - Moved to bottom */}
-                      <div className="mt-2">
-                        <h4 className="text-sm font-semibold text-foreground mb-1">
-                          {submission.selected_market || submission.search_term || "Farmers Market"}
-                        </h4>
-                        {submission.market_address && (
-                          <div className="flex items-start gap-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-                            <p className="text-sm text-muted-foreground">
-                              {submission.market_address}
-                            </p>
+                return vendorsToShow.map((submission) => {
+                  const rating = vendorRatings[submission.id];
+                  const distance = vendorDistances[submission.id];
+                  
+                  return (
+                    <Card key={submission.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg mb-1">{submission.store_name}</h3>
+                            <Badge variant="secondary" className="mb-2">
+                              {submission.primary_specialty}
+                            </Badge>
+                          </div>
+                          {distance && (
+                            <div className="text-xs text-muted-foreground">
+                              {distance}
+                            </div>
+                          )}
+                        </div>
+
+                        {rating && (
+                          <div className="flex items-center gap-1 mb-2">
+                            <div className="flex">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={cn(
+                                    "h-4 w-4",
+                                    star <= rating.averageRating
+                                      ? "fill-yellow-400 text-yellow-400"
+                                      : "fill-muted text-muted-foreground"
+                                  )}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-sm text-muted-foreground">
+                              ({rating.totalReviews})
+                            </span>
                           </div>
                         )}
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
+
+                        <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+                          {submission.description}
+                        </p>
+
+                        <div className="space-y-2">
+                          <div>
+                            <p className="font-medium text-sm">{submission.selected_market}</p>
+                            <p className="text-xs text-muted-foreground">{submission.market_address}</p>
+                          </div>
+                          
+                          {submission.market_days && submission.market_days.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {submission.market_days.map((day, index) => (
+                                <Badge key={index} variant="outline" className="text-xs">
+                                  {day}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                          
+                          <div className="text-xs text-muted-foreground">
+                            {formatMarketHours(submission.market_hours)}
+                          </div>
+                        </div>
+
+                        <Button 
+                          className="w-full mt-4"
+                          onClick={() => navigate(`/vendor/${submission.id}`)}
+                        >
+                          View Details
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                });
+              })()}
+            </div>
           </div>
         ) : viewMode === 'markets' ? (
           <div className="flex justify-center">
-            {filteredSubmissions.length === 0 ? (
-              <div className="text-center">
-                <p className="text-muted-foreground">No markets available yet.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-                {groupVendorsByMarket().map((market, index) => (
-                   <Card 
-                      key={index}
-                      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]"
-                       onClick={() => {
-                         const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-                         const marketDistance = marketDistances[marketId];
-                         
-                         navigate('/market', { 
-                           state: { 
-                             type: 'market', 
-                             selectedMarket: market,
-                             allVendors: market.vendors,
-                             marketDistance: marketDistance // Pass the calculated distance
-                           } 
-                         });
-                       }}
-                   >
-                    {/* Vendor Images Collage */}
-                    <div className="aspect-[4/3] bg-muted relative overflow-hidden">
-                      {market.vendors.length === 1 ? (
-                        // Single vendor - show their product image or placeholder
-                        <div className="w-full h-full">
-                          {market.vendors[0].products && 
-                           market.vendors[0].products.length > 0 && 
-                           market.vendors[0].products[0].images && 
-                           market.vendors[0].products[0].images.length > 0 ? (
-                            <img 
-                              src={market.vendors[0].products[0].images[0]}
-                              alt={market.vendors[0].store_name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
-                              <div className="text-green-600 text-lg font-medium">
-                                {market.vendors[0].store_name}
-                              </div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 w-full max-w-6xl">
+              {(() => {
+                const uniqueMarkets = getUniqueMarkets();
+                
+                if (uniqueMarkets.length === 0) {
+                  return (
+                    <div className="col-span-full text-center py-8">
+                      <p className="text-muted-foreground">No markets found matching your criteria.</p>
+                    </div>
+                  );
+                }
+
+                return uniqueMarkets.map((market) => {
+                  const marketKey = `${market.name}-${market.address}`;
+                  const distance = marketDistances[marketKey];
+                  
+                  return (
+                    <Card 
+                      key={marketKey} 
+                      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                      onClick={() => handleMarketClick(market)}
+                    >
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg mb-2">{market.name}</h3>
+                            <p className="text-sm text-muted-foreground mb-3">{market.address}</p>
+                          </div>
+                          {distance && (
+                            <div className="text-xs text-muted-foreground">
+                              {distance}
                             </div>
                           )}
                         </div>
-                      ) : market.vendors.length === 2 ? (
-                        // Two vendors - split layout
-                        <div className="grid grid-cols-2 h-full gap-0.5">
-                          {market.vendors.slice(0, 2).map((vendor, vendorIndex) => (
-                            <div key={vendorIndex} className="relative overflow-hidden">
-                              {vendor.products && 
-                               vendor.products.length > 0 && 
-                               vendor.products[0].images && 
-                               vendor.products[0].images.length > 0 ? (
-                                <img 
-                                  src={vendor.products[0].images[0]}
-                                  alt={vendor.store_name}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
-                                  <div className="text-green-600 text-sm font-medium text-center">
-                                    {vendor.store_name}
-                                  </div>
-                                </div>
+
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary">
+                              {market.vendors.length} vendor{market.vendors.length !== 1 ? 's' : ''}
+                            </Badge>
+                          </div>
+                          
+                          <div className="text-sm">
+                            <p className="font-medium mb-1">Vendor Categories:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {[...new Set(market.vendors.map(v => v.primary_specialty))].slice(0, 3).map((specialty) => (
+                                <Badge key={specialty} variant="outline" className="text-xs">
+                                  {specialty}
+                                </Badge>
+                              ))}
+                              {[...new Set(market.vendors.map(v => v.primary_specialty))].length > 3 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{[...new Set(market.vendors.map(v => v.primary_specialty))].length - 3} more
+                                </Badge>
                               )}
                             </div>
-                          ))}
-                        </div>
-                      ) : market.vendors.length === 3 ? (
-                        // Three vendors - one large, two small
-                        <div className="grid grid-cols-2 h-full gap-0.5">
-                          <div className="relative overflow-hidden">
-                            {market.vendors[0].products && 
-                             market.vendors[0].products.length > 0 && 
-                             market.vendors[0].products[0].images && 
-                             market.vendors[0].products[0].images.length > 0 ? (
-                              <img 
-                                src={market.vendors[0].products[0].images[0]}
-                                alt={market.vendors[0].store_name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
-                                <div className="text-green-600 text-sm font-medium text-center">
-                                  {market.vendors[0].store_name}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          <div className="grid grid-rows-2 gap-0.5">
-                            {market.vendors.slice(1, 3).map((vendor, vendorIndex) => (
-                              <div key={vendorIndex} className="relative overflow-hidden">
-                                {vendor.products && 
-                                 vendor.products.length > 0 && 
-                                 vendor.products[0].images && 
-                                 vendor.products[0].images.length > 0 ? (
-                                  <img 
-                                    src={vendor.products[0].images[0]}
-                                    alt={vendor.store_name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
-                                    <div className="text-green-600 text-xs font-medium text-center p-1">
-                                      {vendor.store_name}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
                           </div>
                         </div>
-                      ) : (
-                        // Four or more vendors - 2x2 grid
-                        <div className="grid grid-cols-2 grid-rows-2 h-full gap-0.5">
-                          {market.vendors.slice(0, 4).map((vendor, vendorIndex) => (
-                            <div key={vendorIndex} className="relative overflow-hidden">
-                              {vendor.products && 
-                               vendor.products.length > 0 && 
-                               vendor.products[0].images && 
-                               vendor.products[0].images.length > 0 ? (
-                                <img 
-                                  src={vendor.products[0].images[0]}
-                                  alt={vendor.store_name}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
-                                  <div className="text-green-600 text-xs font-medium text-center p-1">
-                                    {vendor.store_name}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
 
-                      {/* Distance Badge */}
-                      <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                        <span className="text-xs font-medium text-gray-700">
-                          {isLoadingMarketDistances ? (
-                            <span className="animate-pulse">Loading...</span>
-                          ) : (
-                            (() => {
-                              const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-                              return marketDistances[marketId] || '-- miles';
-                            })()
-                          )}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Market Information */}
-                    <div className="p-4 space-y-3">
-                      <h3 className="text-base font-semibold text-foreground text-left">
-                        {market.name}
-                      </h3>
-                      
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        <p className="text-sm text-muted-foreground">
-                          {market.address}
-                        </p>
-                      </div>
-                      
-                      <p className="text-sm text-foreground">
-                        {market.vendors.length} vendor{market.vendors.length !== 1 ? 's' : ''}
-                      </p>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
+                        <Button className="w-full mt-4">
+                          View Market Vendors
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                });
+              })()}
+            </div>
           </div>
         ) : (
           <div className="flex justify-center">
-            {(() => {
-              // Extract all products from all vendors
-              const allProducts = filteredSubmissions.flatMap(submission => 
-                (submission.products || []).map(product => ({
-                  ...product,
-                  vendorId: submission.id,
-                  vendorName: submission.store_name,
-                  vendorSpecialty: submission.primary_specialty,
-                  vendorDistance: vendorDistances[submission.id] || '-- miles'
-                }))
-              );
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full max-w-7xl">
+              {(() => {
+                const allProducts = getAllProducts();
+                
+                if (allProducts.length === 0) {
+                  return (
+                    <div className="col-span-full text-center py-8">
+                      <p className="text-muted-foreground">No products available yet.</p>
+                    </div>
+                  );
+                }
 
-              return allProducts.length === 0 ? (
-                <div className="text-center">
-                  <p className="text-muted-foreground">No products available yet.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
-                  {allProducts.map((product, index) => (
-                    <Card 
-                      key={`${product.vendorId}-${index}`}
-                      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                      onClick={() => {
-                        const vendor = filteredSubmissions.find(v => v.id === product.vendorId);
-                        if (vendor) {
-                          navigate('/market', { 
-                            state: { 
-                              type: 'vendor', 
-                              selectedVendor: vendor,
-                              allVendors: filteredSubmissions,
-                              selectedProductIndex: vendor.products?.findIndex(p => p.name === product.name) || 0
-                            } 
-                          });
-                        }
-                      }}
-                    >
-                      {/* Product Image */}
-                      <div className="aspect-[4/3] bg-muted relative overflow-hidden group">
-                        {product.images && product.images.length > 0 ? (
-                          <img 
-                            src={product.images[0]} 
-                            alt={product.name || 'Product'} 
-                            className="w-full h-full object-cover transition-opacity duration-200"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                            No Image Available
-                          </div>
-                        )}
-                        
-                        {/* Like Button */}
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            await toggleLike(`${product.vendorId}-${product.name}`, 'product');
-                          }}
-                        >
-                          <Heart 
-                            className={cn(
-                              "h-4 w-4 transition-colors",
-                              isLiked(`${product.vendorId}-${product.name}`, 'product')
-                                ? "text-red-500 fill-current" 
-                                : "text-gray-600"
-                            )} 
-                          />
-                        </Button>
+                return allProducts.map((product, index) => (
+                  <Card key={`${product.vendorId}-${index}`} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <div className="relative">
+                      {product.image && (
+                        <img 
+                          src={product.image} 
+                          alt={product.name || 'Product'} 
+                          className="w-full h-48 object-cover"
+                        />
+                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleLike('product', `${product.vendorId}-${index}`);
+                        }}
+                        className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
+                      >
+                        <Heart 
+                          className={cn(
+                            "h-4 w-4",
+                            isLiked('product', `${product.vendorId}-${index}`)
+                              ? "fill-red-500 text-red-500" 
+                              : "text-gray-600"
+                          )}
+                        />
+                      </button>
+                    </div>
+                    <CardContent className="p-4">
+                      <h3 className="font-medium text-sm mb-1 line-clamp-2">
+                        {product.name || 'Unnamed Product'}
+                      </h3>
+                      <p className="text-muted-foreground text-xs mb-2 line-clamp-2">
+                        {product.description || 'No description available'}
+                      </p>
+                      {product.price && (
+                        <p className="text-muted text-sm font-medium mb-2">
+                          ${product.price}
+                        </p>
+                      )}
+                      <div className="border-t border-muted pt-2 mt-2">
+                        <p className="text-xs text-muted-foreground">
+                          {product.vendorName}
+                        </p>
                       </div>
-                      
-                      {/* Product Information */}
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between mb-2">
-                          <h3 className="font-normal text-sm flex-1 text-black">
-                            {product.name || 'Product'}
-                          </h3>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-muted-foreground">
-                            ${(product.price || 0).toFixed(2)}
-                          </span>
-                        </div>
-                        {product.vendorName && (
-                          <div className="mt-2 pt-2 border-t border-muted">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const vendor = filteredSubmissions.find(v => v.id === product.vendorId);
-                                if (vendor) {
-                                  navigate('/market', { 
-                                    state: { 
-                                      type: 'vendor', 
-                                      selectedVendor: vendor,
-                                      allVendors: filteredSubmissions
-                                    } 
-                                  });
-                                }
-                              }}
-                              className="text-xs text-black hover:underline cursor-pointer"
-                            >
-                              {product.vendorName}
-                            </button>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              );
-            })()}
+                    </CardContent>
+                  </Card>
+                ));
+              })()}
+            </div>
           </div>
         )}
       </div>
