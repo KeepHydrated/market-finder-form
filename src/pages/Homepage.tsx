@@ -855,14 +855,15 @@ const Homepage = () => {
             </button>
           </div>
           
-          
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                Filter search results
-              </Button>
-            </DialogTrigger>
+          {/* Only show filter button for local searches, not category searches */}
+          {!searchParams.get('category') && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <Filter className="h-4 w-4" />
+                  Filter search results
+                </Button>
+              </DialogTrigger>
             <DialogContent className="w-[800px] max-w-none p-0 bg-background border shadow-lg">
               <Tabs defaultValue="times" className="w-full">
                 <div className="pt-8 px-8">
@@ -991,6 +992,7 @@ const Homepage = () => {
               </Tabs>
             </DialogContent>
           </Dialog>
+          )}
         </div>
         
         {/* Content based on view mode */}
