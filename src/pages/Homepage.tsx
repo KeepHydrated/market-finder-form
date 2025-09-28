@@ -75,7 +75,7 @@ const Homepage = () => {
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [rangeMiles, setRangeMiles] = useState<number[]>([25]);
   const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
-  const [viewMode, setViewMode] = useState<'markets' | 'vendors'>('vendors');
+  const [viewMode, setViewMode] = useState<'markets' | 'vendors' | 'products'>('vendors');
   const [selectedMarket, setSelectedMarket] = useState<{
     name: string;
     address: string;
@@ -838,6 +838,20 @@ const Homepage = () => {
             >
               Markets
             </button>
+            <button
+              onClick={() => {
+                setViewMode('products');
+                setSelectedMarket(null);
+              }}
+              className={cn(
+                "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                viewMode === 'products'
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Products
+            </button>
           </div>
           
           
@@ -1121,7 +1135,7 @@ const Homepage = () => {
               </div>
             )}
           </div>
-        ) : (
+        ) : viewMode === 'markets' ? (
           <div className="flex justify-center">
             {filteredSubmissions.length === 0 ? (
               <div className="text-center">
@@ -1258,73 +1272,12 @@ const Homepage = () => {
                                   </div>
                                 </div>
                               )}
-                              {vendorIndex === 3 && market.vendors.length > 4 && (
-                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                                  <span className="text-white text-sm font-medium">
-                                    +{market.vendors.length - 4} more
-                                  </span>
-                                </div>
-                              )}
                             </div>
                           ))}
                         </div>
                       )}
 
-                      {/* Market Rating - Top Left */}
-                      <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                        <div className="flex items-center gap-1">
-                          <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                          <span className="text-xs font-medium">
-                            {(() => {
-                              const marketVendorRatings = market.vendors
-                                .map(vendor => vendorRatings[vendor.id])
-                                .filter(rating => rating && rating.totalReviews > 0);
-                              
-                              if (marketVendorRatings.length === 0) return '0.0';
-                              
-                              const totalRating = marketVendorRatings.reduce((sum, rating) => sum + rating.averageRating, 0);
-                              const averageRating = totalRating / marketVendorRatings.length;
-                              return averageRating.toFixed(1);
-                            })()}
-                          </span>
-                          <span className="text-xs text-gray-600">
-                            ({(() => {
-                              const totalReviews = market.vendors.reduce((sum, vendor) => {
-                                const rating = vendorRatings[vendor.id];
-                                return sum + (rating ? rating.totalReviews : 0);
-                              }, 0);
-                              return totalReviews;
-                            })()})
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Heart Button - Top Right */}
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          // Create a unique market ID by combining market name and address
-                          const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-                          await toggleLike(marketId, 'market');
-                        }}
-                      >
-                        <Heart 
-                          className={cn(
-                            "h-4 w-4 transition-colors",
-                            (() => {
-                              const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-                              return isLiked(marketId, 'market');
-                            })()
-                              ? "text-red-500 fill-current" 
-                              : "text-gray-600"
-                          )} 
-                        />
-                      </Button>
-                      
-                      {/* Distance Badge - Bottom Right */}
+                      {/* Distance Badge */}
                       <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
                         <span className="text-xs font-medium text-gray-700">
                           {isLoadingMarketDistances ? (
@@ -1332,7 +1285,7 @@ const Homepage = () => {
                           ) : (
                             (() => {
                               const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-                              return marketDistances[marketId] || '-- mi';
+                              return marketDistances[marketId] || '-- miles';
                             })()
                           )}
                         </span>
@@ -1360,6 +1313,91 @@ const Homepage = () => {
                 ))}
               </div>
             )}
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            {(() => {
+              // Extract all products from all vendors
+              const allProducts = filteredSubmissions.flatMap(submission => 
+                (submission.products || []).map(product => ({
+                  ...product,
+                  vendorId: submission.id,
+                  vendorName: submission.store_name,
+                  vendorSpecialty: submission.primary_specialty,
+                  vendorDistance: vendorDistances[submission.id] || '-- miles'
+                }))
+              );
+
+              return allProducts.length === 0 ? (
+                <div className="text-center">
+                  <p className="text-muted-foreground">No products available yet.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
+                  {allProducts.map((product, index) => (
+                    <Card 
+                      key={`${product.vendorId}-${index}`}
+                      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                      onClick={() => {
+                        const vendor = filteredSubmissions.find(v => v.id === product.vendorId);
+                        if (vendor) {
+                          navigate('/market', { 
+                            state: { 
+                              type: 'vendor', 
+                              selectedVendor: vendor,
+                              allVendors: filteredSubmissions,
+                              selectedProductIndex: vendor.products?.findIndex(p => p.name === product.name) || 0
+                            } 
+                          });
+                        }
+                      }}
+                    >
+                      {/* Product Image */}
+                      <div className="aspect-[4/3] bg-muted relative">
+                        {product.images && product.images.length > 0 ? (
+                          <img 
+                            src={product.images[0]} 
+                            alt={product.name || 'Product'} 
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                            No Image Available
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Product Information */}
+                      <div className="p-4 space-y-2">
+                        <h3 className="text-lg font-semibold text-foreground">
+                          {product.name || 'Product'}
+                        </h3>
+                        
+                        <div className="flex items-center justify-between">
+                          <span className="text-xl font-bold text-primary">
+                            ${(product.price || 0).toFixed(2)}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {product.vendorDistance}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs">
+                            {product.vendorName}
+                          </Badge>
+                          {product.vendorSpecialty && (
+                            <Badge variant="secondary" className="text-xs">
+                              {product.vendorSpecialty}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         )}
       </div>
