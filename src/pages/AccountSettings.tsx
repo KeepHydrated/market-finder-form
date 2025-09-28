@@ -56,7 +56,6 @@ export default function AccountSettings() {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
-  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [isEditingProfilePic, setIsEditingProfilePic] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [originalUsername, setOriginalUsername] = useState("");
@@ -179,89 +178,6 @@ export default function AccountSettings() {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  // Get current location and convert to zipcode
-  const getCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      toast({
-        title: "Geolocation not supported",
-        description: "Your browser doesn't support geolocation.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsLoadingLocation(true);
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude } = position.coords;
-          
-          // Use a free reverse geocoding API to get actual zipcode
-          const response = await fetch(
-            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
-          );
-          
-          if (!response.ok) {
-            throw new Error('Failed to fetch location data');
-          }
-          
-          const data = await response.json();
-          const zipcode = data.postcode || data.postalCode || 'Unknown';
-          
-          if (zipcode === 'Unknown') {
-            throw new Error('Could not determine zipcode');
-          }
-          
-          setProfileForm(prev => ({
-            ...prev,
-            zipcode: zipcode
-          }));
-          
-          toast({
-            title: "Location found",
-            description: `Zipcode updated to ${zipcode}`,
-          });
-        } catch (error) {
-          console.error('Geocoding error:', error);
-          toast({
-            title: "Error",
-            description: "Failed to get zipcode from your location. Please enter it manually.",
-            variant: "destructive"
-          });
-        } finally {
-          setIsLoadingLocation(false);
-        }
-      },
-      (error) => {
-        setIsLoadingLocation(false);
-        let errorMessage = "Please allow location access to get your zipcode.";
-        
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = "Location access denied. Please enable location services and try again.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information unavailable. Please enter your zipcode manually.";
-            break;
-          case error.TIMEOUT:
-            errorMessage = "Location request timed out. Please try again or enter manually.";
-            break;
-        }
-        
-        toast({
-          title: "Location Error",
-          description: errorMessage,
-          variant: "destructive"
-        });
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000 // 5 minutes
-      }
-    );
   };
 
   const saveAddress = async () => {
@@ -557,18 +473,7 @@ export default function AccountSettings() {
                     </div>
 
                     <div className="space-y-2 md:col-span-2">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="zipcode">Zip Code</Label>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={getCurrentLocation}
-                          disabled={isLoadingLocation}
-                        >
-                          <RotateCcw className={`h-4 w-4 mr-2 ${isLoadingLocation ? 'animate-spin' : ''}`} />
-                          {isLoadingLocation ? 'Getting Location...' : 'Auto-detect'}
-                        </Button>
-                      </div>
+                      <Label htmlFor="zipcode">Zip Code</Label>
                       <Input
                         id="zipcode"
                         value={profileForm.zipcode}
