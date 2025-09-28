@@ -849,7 +849,6 @@ export default function ShopManager() {
         <main className="flex-1">
           <header className="h-16 flex items-center border-b px-6">
             <SidebarTrigger />
-            <h1 className="text-xl font-semibold ml-4">Shop Manager</h1>
           </header>
           
           <div className="p-6">
