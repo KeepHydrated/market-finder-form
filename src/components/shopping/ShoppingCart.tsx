@@ -96,7 +96,15 @@ export function ShoppingCart() {
                   return (
                     <div key={vendorId} className="space-y-4 p-4 border rounded-lg">
                       <div className="flex items-center">
-                        <h3 className="font-semibold">{vendorItems[0].vendor_name}</h3>
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            navigate(`/market?vendor=${vendorId}`);
+                          }}
+                          className="font-semibold text-left hover:text-primary transition-colors cursor-pointer"
+                        >
+                          {vendorItems[0].vendor_name}
+                        </button>
                       </div>
 
                       <div className="space-y-3">
