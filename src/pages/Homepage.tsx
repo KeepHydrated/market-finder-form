@@ -1,4 +1,5 @@
-// Homepage component for displaying vendors and markets with distance calculations - force rebuild
+// Homepage component for displaying vendors and markets with distance calculations - rebuild cache
+// Homepage component for displaying vendors and markets with distance calculations
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -167,78 +168,6 @@ const Homepage = () => {
       calculateVendorDistances(acceptedSubmissions, userCoordinates);
     }
   }, [acceptedSubmissions, userCoordinates]);
-
-  // Fetch accepted submissions from database
-  useEffect(() => {
-    const fetchAcceptedSubmissions = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('submissions')
-          .select('*')
-          .eq('status', 'accepted');
-
-        if (error) throw error;
-        
-        // Transform the data to match our interface
-        const transformedData = (data || []).map(item => ({
-          ...item,
-          products: Array.isArray(item.products) ? item.products : 
-                   typeof item.products === 'string' ? JSON.parse(item.products) : [],
-          market_hours: (item.market_hours as any) || {},
-          market_days: Array.isArray(item.market_days) ? item.market_days : []
-        }));
-        
-        setAcceptedSubmissions(transformedData as unknown as AcceptedSubmission[]);
-        setFilteredSubmissions(transformedData as unknown as AcceptedSubmission[]);
-      } catch (error) {
-        console.error('Error fetching submissions:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load vendors",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAcceptedSubmissions();
-  }, [toast]);
-
-  // Get user location for distance calculations
-  useEffect(() => {
-    const getCurrentLocation = () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setUserCoordinates({
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            });
-          },
-          (error) => {
-            console.log('Location access denied, using IP location');
-            // Fallback to IP location or default coordinates
-            setUserCoordinates({ lat: 29.4241, lng: -98.4936 }); // San Antonio default
-          }
-        );
-      }
-    };
-
-    getCurrentLocation();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-lg font-semibold mb-2">Loading vendors...</div>
-          <div className="text-sm text-muted-foreground">Please wait while we fetch the latest information.</div>
-        </div>
-      </div>
-    );
-  }
 
   // Simplified component return focusing on vendor cards with distance badges
   return (
