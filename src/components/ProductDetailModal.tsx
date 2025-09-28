@@ -137,28 +137,6 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
           />
         </Button>
         
-        {/* Navigation arrows positioned outside the modal content */}
-        {hasPrevious && (
-          <Button
-            variant="secondary"
-            size="lg"
-            onClick={goToPrevious}
-            className="fixed left-[10px] top-1/2 transform -translate-y-1/2 z-[70] h-12 w-12 p-0 bg-black/80 hover:bg-black text-white shadow-lg rounded-full"
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </Button>
-        )}
-        
-        {hasNext && (
-          <Button
-            variant="secondary"
-            size="lg" 
-            onClick={goToNext}
-            className="fixed right-[10px] top-1/2 transform -translate-y-1/2 z-[70] h-12 w-12 p-0 bg-black/80 hover:bg-black text-white shadow-lg rounded-full"
-          >
-            <ChevronRight className="h-6 w-6" />
-          </Button>
-        )}
 
         <div className="flex flex-row w-full bg-white min-h-[400px]">
           {/* Left side - Images */}
