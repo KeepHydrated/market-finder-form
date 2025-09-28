@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,9 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Trash2, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { useShoppingCart } from '@/contexts/ShoppingCartContext';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { CustomCheckout } from './CustomCheckout';
 
 export function ShoppingCart() {
   const { 
@@ -24,10 +23,9 @@ export function ShoppingCart() {
   } = useShoppingCart();
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [guestEmail, setGuestEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showCheckout, setShowCheckout] = useState(false);
-  const [checkoutItems, setCheckoutItems] = useState<typeof items>([]);
 
   const formatPrice = (cents: number) => {
     return `$${(cents / 100).toFixed(2)}`;
@@ -44,48 +42,12 @@ export function ShoppingCart() {
     return grouped;
   };
 
-  const handleCheckout = (vendorId: string, vendorItems: typeof items) => {
-    setCheckoutItems(vendorItems);
-    setShowCheckout(true);
-  };
-
-  const handleCheckoutSuccess = () => {
-    // Remove items from cart
-    checkoutItems.forEach(item => removeItem(item.id));
-    setShowCheckout(false);
-    setCheckoutItems([]);
+  const handleCheckout = () => {
     setIsOpen(false);
-    toast({
-      title: "Payment Successful!",
-      description: "Your order has been confirmed.",
-    });
-  };
-
-  const handleCheckoutCancel = () => {
-    setShowCheckout(false);
-    setCheckoutItems([]);
+    navigate('/checkout');
   };
 
   const vendorGroups = groupItemsByVendor();
-
-  if (showCheckout) {
-    return (
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent className="w-full sm:max-w-4xl">
-          <SheetHeader>
-            <SheetTitle>Checkout</SheetTitle>
-          </SheetHeader>
-          <div className="py-6">
-            <CustomCheckout
-              items={checkoutItems}
-              onSuccess={handleCheckoutSuccess}
-              onCancel={handleCheckoutCancel}
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
-    );
-  }
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -184,8 +146,8 @@ export function ShoppingCart() {
 
                       <Button
                         className="w-full"
-                        onClick={() => handleCheckout(vendorId, vendorItems)}
-                        disabled={loading}
+                        onClick={handleCheckout}
+                        disabled={loading || (!user && !guestEmail)}
                       >
                         {loading ? 'Processing...' : 'Checkout'}
                       </Button>
