@@ -461,7 +461,7 @@ export default function ShopManager() {
         return <VendorOrders vendorId={shopData?.id} />;
       case 'account':
         return renderAccount();
-      case 'test':
+      case 'overview':
         return renderTest();
       default:
         return renderProducts();
@@ -715,7 +715,7 @@ export default function ShopManager() {
   const renderTest = () => (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Test</h2>
+        <h2 className="text-2xl font-bold mb-2">Overview</h2>
         <p className="text-muted-foreground">Your shop performance at a glance</p>
       </div>
 

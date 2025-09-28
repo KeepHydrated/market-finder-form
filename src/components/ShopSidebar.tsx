@@ -43,9 +43,9 @@ const menuItems = [
     requiresShop: true 
   },
   { 
-    title: "Test", 
+    title: "Overview", 
     icon: TestTube, 
-    section: "test",
+    section: "overview",
     requiresShop: false 
   },
 ];
