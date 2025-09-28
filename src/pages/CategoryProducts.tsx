@@ -237,58 +237,68 @@ const CategoryProducts = () => {
                 <CardContent className="p-0">
                   {/* Product Image with Heart Overlay */}
                   <div 
-                    className="relative aspect-square bg-muted overflow-hidden cursor-pointer rounded-t-lg"
+                    className="aspect-[4/3] bg-muted relative overflow-hidden group"
                     onClick={() => setSelectedProduct(product)}
                   >
                     {product.images?.[0] ? (
                       <img 
                         src={product.images[0]} 
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover transition-opacity duration-200"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-muted">
-                        No Image
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                        No Image Available
                       </div>
                     )}
                     
-                    {/* Heart Icon Overlay */}
+                    {/* Like Button */}
                     <Button
-                      variant="ghost"
+                      variant="secondary"
                       size="sm"
-                      className="absolute top-3 right-3 p-2 h-auto w-auto bg-white/90 hover:bg-white rounded-full shadow-sm"
+                      className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleLike(product.id, product.vendorId);
                       }}
                     >
                       <Heart 
-                        className={`h-4 w-4 ${
+                        className={`h-4 w-4 transition-colors ${
                           isLiked(`${product.id}`, 'product') 
-                            ? 'fill-red-500 text-red-500' 
+                            ? 'text-red-500 fill-current' 
                             : 'text-gray-600'
                         }`} 
                       />
                     </Button>
                   </div>
 
-                  {/* Product Info */}
-                  <div className="p-4 space-y-3">
-                    <h3 
-                      className="font-semibold text-lg cursor-pointer hover:text-primary transition-colors line-clamp-2"
-                      onClick={() => setSelectedProduct(product)}
-                    >
-                      {product.name}
-                    </h3>
-
-                    <div className="text-xl font-medium text-muted-foreground">
-                      ${product.price.toFixed(2)}
+                  {/* Product Information */}
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 
+                        className="font-normal text-sm flex-1 text-black cursor-pointer"
+                        onClick={() => setSelectedProduct(product)}
+                      >
+                        {product.name}
+                      </h3>
                     </div>
-
-                    <p className="text-base text-foreground font-medium">
-                      {product.vendorName}
-                    </p>
-                  </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-muted-foreground">
+                        ${product.price.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="mt-2 pt-2 border-t border-muted">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Navigate to vendor page - you can implement this later
+                        }}
+                        className="text-xs text-black hover:underline cursor-pointer"
+                      >
+                        {product.vendorName}
+                      </button>
+                    </div>
+                  </CardContent>
                 </CardContent>
               </Card>
             ))}
