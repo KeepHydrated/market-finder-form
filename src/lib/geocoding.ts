@@ -19,6 +19,12 @@ export async function getGoogleMapsDistance(
     console.log('🗺️ User coordinates:', { lat: userLat, lng: userLng });
     console.log('🗺️ Target coordinates:', { lat: targetLat, lng: targetLng });
     
+    // Generate Google Maps URL for manual verification
+    const mapsUrl = `https://maps.google.com/maps?saddr=${userLat},${userLng}&daddr=${targetLat},${targetLng}`;
+    console.log('🔗 VERIFY ROUTE: Open this Google Maps URL to check the exact same route:');
+    console.log(mapsUrl);
+    console.log('👆 This should show the EXACT route being calculated by the API');
+    
     const { data, error } = await supabase.functions.invoke('get-distance', {
       body: { 
         origin: { lat: userLat, lng: userLng },
