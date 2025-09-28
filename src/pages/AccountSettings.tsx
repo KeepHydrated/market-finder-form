@@ -276,12 +276,8 @@ export default function AccountSettings() {
         <p className="text-muted-foreground">Manage your account information and preferences</p>
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="profile" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Profile
-          </TabsTrigger>
+      <Tabs defaultValue="addresses" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="addresses" className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
             Addresses
@@ -295,63 +291,6 @@ export default function AccountSettings() {
             Security
           </TabsTrigger>
         </TabsList>
-
-        {/* Profile Tab */}
-        <TabsContent value="profile">
-          <Card>
-            <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>
-                Update your personal details and contact information
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={user?.email || ''}
-                    disabled
-                    className="bg-muted"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Email cannot be changed from here
-                  </p>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="full_name">Full Name</Label>
-                  <Input
-                    id="full_name"
-                    value={profileForm.full_name}
-                    onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
-                    placeholder="Enter your full name"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="zipcode">Zip Code</Label>
-                  <Input
-                    id="zipcode"
-                    value={profileForm.zipcode}
-                    onChange={(e) => setProfileForm(prev => ({ ...prev, zipcode: e.target.value }))}
-                    placeholder="Enter your zip code"
-                  />
-                </div>
-              </div>
-
-              <Separator />
-              
-              <div className="flex justify-end">
-                <Button onClick={saveProfile} disabled={savingProfile}>
-                  {savingProfile ? 'Saving...' : 'Save Changes'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         {/* Addresses Tab */}
         <TabsContent value="addresses">
