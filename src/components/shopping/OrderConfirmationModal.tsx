@@ -101,14 +101,6 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
                   </div>
                 ))}
               </div>
-              <div className="mt-4 pt-3 border-t">
-                <p className="text-sm text-muted-foreground">
-                  <span className="text-green-600 font-medium">Pickup available</span> - Ready for pickup at farmers market
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Standard pickup - <span className="font-medium">FREE</span>
-                </p>
-              </div>
             </div>
           ))}
 
