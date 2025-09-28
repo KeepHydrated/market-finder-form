@@ -47,8 +47,12 @@ export type Database = {
           city: string
           created_at: string
           days: string[]
+          google_place_id: string | null
+          google_rating: number | null
+          google_rating_count: number | null
           hours: string | null
           id: number
+          last_rating_update: string | null
           name: string
           state: string
           updated_at: string
@@ -59,8 +63,12 @@ export type Database = {
           city: string
           created_at?: string
           days?: string[]
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
           hours?: string | null
           id?: number
+          last_rating_update?: string | null
           name: string
           state: string
           updated_at?: string
@@ -71,8 +79,12 @@ export type Database = {
           city?: string
           created_at?: string
           days?: string[]
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
           hours?: string | null
           id?: number
+          last_rating_update?: string | null
           name?: string
           state?: string
           updated_at?: string

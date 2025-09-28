@@ -349,44 +349,78 @@ const Homepage = () => {
   const DISTANCE_CACHE_KEY = 'market_distance_cache';
   const CACHE_EXPIRY_HOURS = 24; // Cache expires after 24 hours
 
-  // Fetch Google ratings for markets using Google Places API
+  // Fetch Google ratings for markets with database persistence
   const fetchMarketGoogleRatings = async (markets: Array<{name: string, address: string, vendors: AcceptedSubmission[]}>) => {
-    console.log('=== FETCHING MARKET GOOGLE RATINGS FROM GOOGLE PLACES API ===');
+    console.log('=== FETCHING MARKET GOOGLE RATINGS WITH DATABASE PERSISTENCE ===');
     const ratings: Record<string, {rating: number; reviewCount: number}> = {};
     
     for (const market of markets) {
       const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
       
       try {
-        console.log(`Fetching Google rating for market: ${market.name}`);
-        
-        const response = await supabase.functions.invoke('farmers-market-search', {
-          body: { 
-            query: market.name,
-            location: null // Use null to get general results
-          }
-        });
+        // First, check if we have cached ratings in the database
+        const { data: existingMarket } = await supabase
+          .from('markets')
+          .select('google_rating, google_rating_count, last_rating_update')
+          .eq('name', market.name)
+          .eq('address', market.address)
+          .single();
 
-        console.log(`Google Places response for ${market.name}:`, response);
+        // Check if we have recent ratings (less than 24 hours old)
+        const isRecentRating = existingMarket?.last_rating_update && 
+          new Date(existingMarket.last_rating_update).getTime() > Date.now() - (24 * 60 * 60 * 1000);
 
-        if (response.data?.predictions && response.data.predictions.length > 0) {
-          const marketData = response.data.predictions[0];
-          console.log(`Market data for ${market.name}:`, marketData);
-          
-          if (marketData.rating && marketData.user_ratings_total) {
-            ratings[marketId] = {
-              rating: marketData.rating,
-              reviewCount: marketData.user_ratings_total
-            };
-            console.log(`✅ Found Google rating for ${market.name}:`, ratings[marketId]);
-          } else {
-            console.log(`⚠️ No rating data found for ${market.name}`);
-          }
+        if (existingMarket?.google_rating && existingMarket?.google_rating_count && isRecentRating) {
+          // Use cached ratings
+          ratings[marketId] = {
+            rating: existingMarket.google_rating,
+            reviewCount: existingMarket.google_rating_count
+          };
+          console.log(`✅ Using cached rating for ${market.name}:`, ratings[marketId]);
         } else {
-          console.log(`⚠️ No predictions found for ${market.name}`);
+          // Fetch fresh ratings from Google Places API
+          console.log(`🔄 Fetching fresh Google rating for market: ${market.name}`);
+          
+          const response = await supabase.functions.invoke('farmers-market-search', {
+            body: { 
+              query: market.name,
+              location: null
+            }
+          });
+
+          if (response.data?.predictions && response.data.predictions.length > 0) {
+            const marketData = response.data.predictions[0];
+            
+            if (marketData.rating && marketData.user_ratings_total) {
+              ratings[marketId] = {
+                rating: marketData.rating,
+                reviewCount: marketData.user_ratings_total
+              };
+              console.log(`✅ Found fresh Google rating for ${market.name}:`, ratings[marketId]);
+
+              // Store/update the rating in the database
+              await supabase
+                .from('markets')
+                .upsert({
+                  name: market.name,
+                  address: market.address,
+                  city: '', // You may want to extract this
+                  state: '', // You may want to extract this
+                  days: [], // You may want to extract this
+                  google_rating: marketData.rating,
+                  google_rating_count: marketData.user_ratings_total,
+                  google_place_id: marketData.place_id,
+                  last_rating_update: new Date().toISOString()
+                }, {
+                  onConflict: 'name,address'
+                });
+              
+              console.log(`💾 Stored rating for ${market.name} in database`);
+            }
+          }
         }
       } catch (error) {
-        console.error(`❌ Error fetching rating for market ${market.name}:`, error);
+        console.error(`❌ Error processing rating for market ${market.name}:`, error);
       }
     }
     
