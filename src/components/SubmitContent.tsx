@@ -100,10 +100,14 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
   }, []);
 
   const handleProductUpdate = useCallback((productData: any) => {
-    if (editingProduct) {
+    // Check if this is an edit operation (either by editingProduct state or ID in productData)
+    const isEditing = editingProduct || productData.id;
+    
+    if (isEditing) {
       // Update existing product
+      const productId = editingProduct?.id || productData.id;
       const updatedProduct: Product = {
-        id: editingProduct.id,
+        id: productId,
         name: productData.name,
         description: productData.description,
         price: productData.price,
@@ -111,7 +115,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
       };
       
       setProducts(prev => prev.map(product => 
-        product.id === editingProduct.id ? updatedProduct : product
+        product.id === productId ? updatedProduct : product
       ));
       
       toast({
