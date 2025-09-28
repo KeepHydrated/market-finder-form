@@ -104,6 +104,10 @@ const Homepage = () => {
   // Filter submissions based on search query and other filters
   useEffect(() => {
     let filtered = acceptedSubmissions;
+    
+    // When filtering by category (from header dropdown), show ALL nationwide vendors
+    const categoryParam = searchParams.get('category');
+    const isNationwideSearch = !!categoryParam;
 
     // Apply search filter
     if (searchQuery.trim()) {
@@ -119,17 +123,24 @@ const Homepage = () => {
       );
     }
 
-    // Apply category filter
+    // Apply category filter - show ALL nationwide vendors for selected category
     if (selectedCategories.length > 0) {
       filtered = filtered.filter(submission =>
         selectedCategories.includes(submission.primary_specialty)
       );
+      
+      // If this is from the header dropdown, ensure we're showing nationwide results
+      if (isNationwideSearch) {
+        console.log(`🌍 Showing nationwide results for category: ${selectedCategories.join(', ')}`);
+        console.log(`Found ${filtered.length} vendors nationwide in this category`);
+      }
     }
 
     // Apply other existing filters here if needed (days, location, etc.)
+    // Note: When showing nationwide category results, we skip location-based filtering
     
     setFilteredSubmissions(filtered);
-  }, [acceptedSubmissions, searchQuery, selectedCategories]);
+  }, [acceptedSubmissions, searchQuery, selectedCategories, searchParams]);
 
   const toggleDay = (day: string) => {
     setSelectedDays(prev => {
@@ -828,6 +839,16 @@ const Homepage = () => {
               Markets
             </button>
           </div>
+          
+          {/* Show nationwide indicator when category is selected from header */}
+          {searchParams.get('category') && selectedCategories.length > 0 && (
+            <div className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-3 py-2 rounded-lg">
+              <span className="font-medium">🌍 Showing nationwide results for:</span>
+              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                {selectedCategories[0]}
+              </Badge>
+            </div>
+          )}
           
           <Dialog>
             <DialogTrigger asChild>
