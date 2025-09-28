@@ -103,6 +103,13 @@ export function ShoppingCart() {
                       <div className="space-y-3">
                         {vendorItems.map((item) => (
                           <div key={item.id} className="flex items-center gap-3">
+                            {item.product_image && (
+                              <img
+                                src={item.product_image}
+                                alt={item.product_name}
+                                className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                              />
+                            )}
                             <div className="flex-1 min-w-0">
                               <p className="font-medium truncate">{item.product_name}</p>
                               {item.product_description && (

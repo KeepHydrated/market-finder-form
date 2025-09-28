@@ -8,6 +8,7 @@ export interface CartItem {
   quantity: number;
   vendor_id: string;
   vendor_name: string;
+  product_image?: string;
 }
 
 interface ShoppingCartContextType {
