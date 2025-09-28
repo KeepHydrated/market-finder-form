@@ -330,25 +330,33 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
           setShowAddProductForm(false);
           setEditingProduct(null);
         }}
-        onProductAdded={editingProduct ? async (productData: any) => {
-          if (!editingProduct) return;
-          
-          // Update the existing product in the products array
-          const updatedProduct: Product = {
-            id: editingProduct.id, // Keep the same ID
-            name: productData.name,
-            description: productData.description,
-            price: productData.price,
-            images: productData.images
-          };
-          
-          setProducts(prev => prev.map(product => 
-            product.id === editingProduct.id ? updatedProduct : product
-          ));
-          
-          setShowAddProductForm(false);
-          setEditingProduct(null);
-        } : handleProductAdded}
+        onProductAdded={(productData: any) => {
+          if (editingProduct) {
+            // Update existing product
+            const updatedProduct: Product = {
+              id: editingProduct.id, // Keep the same ID
+              name: productData.name,
+              description: productData.description,
+              price: productData.price,
+              images: productData.images
+            };
+            
+            setProducts(prev => prev.map(product => 
+              product.id === editingProduct.id ? updatedProduct : product
+            ));
+            
+            setShowAddProductForm(false);
+            setEditingProduct(null);
+            
+            toast({
+              title: "Product Updated",
+              description: "Your product has been successfully updated.",
+            });
+          } else {
+            // Add new product
+            handleProductAdded(productData);
+          }
+        }}
         editingProduct={editingProduct}
       />
     </>
