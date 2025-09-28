@@ -12,7 +12,7 @@ import { Heart, Star, Filter, RotateCcw, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { useLikes } from "@/hooks/useLikes";
+import { useLikes, LikeType } from "@/hooks/useLikes";
 import { calculateDistance, getGoogleMapsDistance, cacheVendorCoordinates } from "@/lib/geocoding";
 
 interface AcceptedSubmission {
@@ -21,13 +21,15 @@ interface AcceptedSubmission {
   primary_specialty: string;
   website: string;
   description: string;
-  products: any[];
+  products: any;
   selected_market: string;
   search_term: string;
   market_address?: string;
   market_days?: string[];
-  market_hours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
+  market_hours?: any;
   created_at: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface VendorRating {
@@ -116,7 +118,9 @@ const Homepage = () => {
         submission.store_name.toLowerCase().includes(query) ||
         submission.primary_specialty.toLowerCase().includes(query) ||
         submission.description.toLowerCase().includes(query) ||
-        submission.products.some((product: any) => 
+        (Array.isArray(submission.products) ? submission.products : 
+          (typeof submission.products === 'string' ? JSON.parse(submission.products) : [])
+        ).some((product: any) => 
           product.name?.toLowerCase().includes(query) ||
           product.description?.toLowerCase().includes(query)
         )
@@ -158,7 +162,8 @@ const Homepage = () => {
           const distance = calculateDistance(
             userCoordinates.lat,
             userCoordinates.lng,
-            submission.market_address
+            submission.latitude || 0,
+            submission.longitude || 0
           );
           return distance <= rangeMiles[0];
         } catch (error) {
@@ -188,8 +193,9 @@ const Homepage = () => {
     try {
       console.log('Fetching accepted submissions...');
       const { data, error } = await supabase
-        .from('accepted_submissions')
+        .from('submissions')
         .select('*')
+        .eq('status', 'accepted')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -214,7 +220,7 @@ const Homepage = () => {
   const fetchVendorRatings = async () => {
     try {
       const { data, error } = await supabase
-        .from('vendor_reviews')
+        .from('reviews')
         .select('vendor_id, rating');
 
       if (error) {
@@ -392,8 +398,12 @@ const Homepage = () => {
     const allProducts: any[] = [];
     
     filteredSubmissions.forEach(submission => {
-      if (submission.products && submission.products.length > 0) {
-        submission.products.forEach((product: any) => {
+      const products = Array.isArray(submission.products) ? 
+        submission.products : 
+        (typeof submission.products === 'string' ? JSON.parse(submission.products) : []);
+      
+      if (products && products.length > 0) {
+        products.forEach((product: any) => {
           allProducts.push({
             ...product,
             vendorName: submission.store_name,
@@ -418,8 +428,13 @@ const Homepage = () => {
       
       for (const market of uniqueMarkets) {
         try {
-          const distance = await getGoogleMapsDistance(userCoordinates, market.address);
-          distances[`${market.name}-${market.address}`] = distance;
+          const distance = await getGoogleMapsDistance(
+            userCoordinates.lat,
+            userCoordinates.lng,
+            market.vendors[0]?.latitude || 0,
+            market.vendors[0]?.longitude || 0
+          );
+          distances[`${market.name}-${market.address}`] = distance?.distance || 'Distance unavailable';
         } catch (error) {
           console.error(`Error calculating distance to ${market.name}:`, error);
           distances[`${market.name}-${market.address}`] = 'Distance unavailable';
@@ -444,8 +459,13 @@ const Homepage = () => {
       for (const vendor of vendorsToCalculate) {
         if (vendor.market_address) {
           try {
-            const distance = await getGoogleMapsDistance(userCoordinates, vendor.market_address);
-            distances[vendor.id] = distance;
+            const distance = await getGoogleMapsDistance(
+              userCoordinates.lat,
+              userCoordinates.lng,
+              vendor.latitude || 0,
+              vendor.longitude || 0
+            );
+            distances[vendor.id] = distance?.distance || 'Distance unavailable';
           } catch (error) {
             console.error(`Error calculating distance to ${vendor.store_name}:`, error);
             distances[vendor.id] = 'Distance unavailable';
@@ -459,7 +479,7 @@ const Homepage = () => {
     calculateVendorDistances();
   }, [userCoordinates, viewMode, selectedMarket, filteredSubmissions]);
 
-  const formatMarketHours = (hours: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }> | undefined) => {
+  const formatMarketHours = (hours: any) => {
     if (!hours) return 'Hours not available';
     
     const daysOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -836,7 +856,7 @@ const Homepage = () => {
                           <div className="text-sm">
                             <p className="font-medium mb-1">Vendor Categories:</p>
                             <div className="flex flex-wrap gap-1">
-                              {[...new Set(market.vendors.map(v => v.primary_specialty))].slice(0, 3).map((specialty) => (
+                              {[...new Set(market.vendors.map((v: any) => v.primary_specialty))].slice(0, 3).map((specialty: string) => (
                                 <Badge key={specialty} variant="outline" className="text-xs">
                                   {specialty}
                                 </Badge>
@@ -887,14 +907,14 @@ const Homepage = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          toggleLike('product', `${product.vendorId}-${index}`);
+                          toggleLike(`${product.vendorId}-${index}`, 'product' as LikeType);
                         }}
                         className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
                       >
                         <Heart 
                           className={cn(
                             "h-4 w-4",
-                            isLiked('product', `${product.vendorId}-${index}`)
+                            isLiked(`${product.vendorId}-${index}`, 'product' as LikeType)
                               ? "fill-red-500 text-red-500" 
                               : "text-gray-600"
                           )}
