@@ -87,6 +87,8 @@ const Homepage = () => {
   const [locationMethod, setLocationMethod] = useState<'ip' | 'gps'>('ip');
   const [isGettingGPSLocation, setIsGettingGPSLocation] = useState(false);
   const [marketGoogleRatings, setMarketGoogleRatings] = useState<Record<string, {rating: number; reviewCount: number}>>({});
+  const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
+  const [isLoadingVendorDistances, setIsLoadingVendorDistances] = useState(false);
 
   // Handle category selection from URL and navigate to new page
   useEffect(() => {
@@ -568,6 +570,69 @@ const Homepage = () => {
     console.log('=== END SUPER OPTIMIZED MARKET DISTANCE CALCULATION ===');
   };
 
+  // Calculate distances for all vendors
+  const calculateVendorDistances = async (vendors: AcceptedSubmission[], userCoords: {lat: number, lng: number}) => {
+    console.log('=== CALCULATING VENDOR DISTANCES ===');
+    console.log('User coordinates:', userCoords);
+    console.log('Calculating distances for', vendors.length, 'vendors');
+    
+    setIsLoadingVendorDistances(true);
+    
+    const newDistances: Record<string, string> = {};
+    
+    for (const vendor of vendors) {
+      try {
+        if (vendor.market_address) {
+          // Get coordinates for vendor's market
+          const marketCoords = await getCoordinatesForAddress(vendor.market_address);
+          
+          if (marketCoords) {
+            // Try Google Maps distance first
+            const googleDistance = await getGoogleMapsDistance(
+              userCoords.lat, 
+              userCoords.lng, 
+              marketCoords.lat, 
+              marketCoords.lng
+            );
+            
+            let finalDistance = '-- mi';
+            
+            if (googleDistance && googleDistance.distanceMiles) {
+              finalDistance = `${googleDistance.distanceMiles.toFixed(1)} mi`;
+              console.log(`✅ Google Maps distance for ${vendor.store_name}: ${finalDistance}`);
+            } else {
+              // Fallback to straight-line distance
+              const distanceInMiles = calculateDistance(
+                userCoords.lat, 
+                userCoords.lng, 
+                marketCoords.lat, 
+                marketCoords.lng
+              );
+              finalDistance = `${distanceInMiles.toFixed(1)} mi`;
+              console.log(`⚠️ Fallback distance for ${vendor.store_name}: ${finalDistance}`);
+            }
+            
+            newDistances[vendor.id] = finalDistance;
+          } else {
+            console.log(`⚠️ Could not get coordinates for ${vendor.store_name}`);
+            newDistances[vendor.id] = '-- mi';
+          }
+        } else {
+          console.log(`⚠️ No market address for ${vendor.store_name}`);
+          newDistances[vendor.id] = '-- mi';
+        }
+      } catch (error) {
+        console.error(`Error calculating distance for ${vendor.store_name}:`, error);
+        newDistances[vendor.id] = '-- mi';
+      }
+    }
+    
+    console.log('🎯 Final vendor distances:', newDistances);
+    setVendorDistances(newDistances);
+    setIsLoadingVendorDistances(false);
+    console.log('=== END VENDOR DISTANCE CALCULATION ===');
+  };
+
   // Group vendors by market
   const groupVendorsByMarket = () => {
     const markets: Record<string, {
@@ -647,6 +712,14 @@ const Homepage = () => {
         filteredSubmissionsCount: filteredSubmissions.length,
         hasUserCoordinates: !!userCoordinates
       });
+    }
+  }, [filteredSubmissions, userCoordinates]);
+
+  // Calculate vendor distances when vendors and user coordinates are available
+  useEffect(() => {
+    if (filteredSubmissions.length > 0 && userCoordinates) {
+      console.log('🚚 Starting vendor distance calculation for', filteredSubmissions.length, 'vendors');
+      calculateVendorDistances(filteredSubmissions, userCoordinates);
     }
   }, [filteredSubmissions, userCoordinates]);
 
@@ -1155,6 +1228,17 @@ const Homepage = () => {
                           )} 
                         />
                       </Button>
+
+                      {/* Distance Badge */}
+                      <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                        <span className="text-xs font-medium text-gray-700">
+                          {isLoadingVendorDistances ? (
+                            <span className="animate-pulse">Loading...</span>
+                          ) : (
+                            vendorDistances[submission.id] || '-- miles'
+                          )}
+                        </span>
+                      </div>
 
                     </div>
                     
