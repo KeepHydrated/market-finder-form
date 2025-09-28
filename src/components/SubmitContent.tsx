@@ -100,12 +100,18 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
   }, []);
 
   const handleProductUpdate = useCallback((productData: any) => {
+    console.log('handleProductUpdate called with:', { productData, editingProduct });
+    
     // Check if this is an edit operation (either by editingProduct state or ID in productData)
     const isEditing = editingProduct || productData.id;
+    console.log('isEditing:', isEditing);
     
     if (isEditing) {
+      console.log('Updating existing product');
       // Update existing product
       const productId = editingProduct?.id || productData.id;
+      console.log('Product ID to update:', productId);
+      
       const updatedProduct: Product = {
         id: productId,
         name: productData.name,
@@ -114,15 +120,21 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
         images: productData.images
       };
       
-      setProducts(prev => prev.map(product => 
-        product.id === productId ? updatedProduct : product
-      ));
+      setProducts(prev => {
+        console.log('Current products before update:', prev);
+        const updated = prev.map(product => 
+          product.id === productId ? updatedProduct : product
+        );
+        console.log('Products after update:', updated);
+        return updated;
+      });
       
       toast({
         title: "Product Updated",
         description: "Your product has been successfully updated.",
       });
     } else {
+      console.log('Adding new product');
       // Add new product
       const newProduct: Product = {
         id: Date.now(),
