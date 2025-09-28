@@ -17,7 +17,10 @@ import {
   Plus,
   Edit2,
   Trash2,
-  Check 
+  Check,
+  Upload,
+  Edit,
+  RotateCcw
 } from 'lucide-react';
 
 interface Profile {
@@ -44,20 +47,26 @@ interface Address {
 }
 
 export default function AccountSettings() {
-  const { user, loading } = useAuth();
+  const { user, profile, loading, refreshProfile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [isEditingProfilePic, setIsEditingProfilePic] = useState(false);
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [originalUsername, setOriginalUsername] = useState("");
+  const [originalZipcode, setOriginalZipcode] = useState("");
+  const [originalAvatarUrl, setOriginalAvatarUrl] = useState("");
 
   const [profileForm, setProfileForm] = useState({
     full_name: '',
-    zipcode: ''
+    zipcode: '',
+    avatar_url: ''
   });
 
   const [addressForm, setAddressForm] = useState({
@@ -79,35 +88,19 @@ export default function AccountSettings() {
       return;
     }
 
-    if (user) {
-      fetchProfile();
-      fetchAddresses();
-    }
-  }, [user, loading, navigate]);
-
-  const fetchProfile = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user?.id)
-        .maybeSingle();
-
-      if (error) throw error;
-
-      if (data) {
-        setProfile(data);
-        setProfileForm({
-          full_name: data.full_name || '',
-          zipcode: data.zipcode || ''
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    } finally {
+    if (user && profile) {
+      setProfileForm({
+        full_name: profile.full_name || '',
+        zipcode: profile.zipcode || '',
+        avatar_url: profile.avatar_url || ''
+      });
       setLoadingProfile(false);
     }
-  };
+    
+    if (user) {
+      fetchAddresses();
+    }
+  }, [user, profile, loading, navigate]);
 
   const fetchAddresses = async () => {
     try {
@@ -134,17 +127,24 @@ export default function AccountSettings() {
         .upsert({
           user_id: user.id,
           full_name: profileForm.full_name,
-          zipcode: profileForm.zipcode
+          zipcode: profileForm.zipcode,
+          avatar_url: profileForm.avatar_url
         });
 
       if (error) throw error;
+
+      // Refresh profile data in the auth context
+      await refreshProfile();
 
       toast({
         title: "Profile updated",
         description: "Your profile has been saved successfully.",
       });
       
-      fetchProfile();
+      // Exit all edit modes
+      setIsEditingProfilePic(false);
+      setIsEditingUsername(false);
+      
     } catch (error) {
       console.error('Error saving profile:', error);
       toast({
@@ -155,6 +155,113 @@ export default function AccountSettings() {
     } finally {
       setSavingProfile(false);
     }
+  };
+
+  // Handle profile picture upload
+  const handleProfilePictureUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 5MB.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        setProfileForm(prev => ({
+          ...prev,
+          avatar_url: reader.result as string
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Get current location and convert to zipcode
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: "Geolocation not supported",
+        description: "Your browser doesn't support geolocation.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoadingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          
+          // Use a free reverse geocoding API to get actual zipcode
+          const response = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          );
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch location data');
+          }
+          
+          const data = await response.json();
+          const zipcode = data.postcode || data.postalCode || 'Unknown';
+          
+          if (zipcode === 'Unknown') {
+            throw new Error('Could not determine zipcode');
+          }
+          
+          setProfileForm(prev => ({
+            ...prev,
+            zipcode: zipcode
+          }));
+          
+          toast({
+            title: "Location found",
+            description: `Zipcode updated to ${zipcode}`,
+          });
+        } catch (error) {
+          console.error('Geocoding error:', error);
+          toast({
+            title: "Error",
+            description: "Failed to get zipcode from your location. Please enter it manually.",
+            variant: "destructive"
+          });
+        } finally {
+          setIsLoadingLocation(false);
+        }
+      },
+      (error) => {
+        setIsLoadingLocation(false);
+        let errorMessage = "Please allow location access to get your zipcode.";
+        
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location access denied. Please enable location services and try again.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information unavailable. Please enter your zipcode manually.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out. Please try again or enter manually.";
+            break;
+        }
+        
+        toast({
+          title: "Location Error",
+          description: errorMessage,
+          variant: "destructive"
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutes
+      }
+    );
   };
 
   const saveAddress = async () => {
@@ -302,59 +409,211 @@ export default function AccountSettings() {
         <div className="flex-1">
           {/* Account Tab */}
           <TabsContent value="account" className="mt-0">
-            <Card>
-              <CardHeader>
-                <CardTitle>Personal Information</CardTitle>
-                <CardDescription>
-                  Update your personal details and contact information
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={user?.email || ''}
-                      disabled
-                      className="bg-muted"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Email cannot be changed from here
-                    </p>
+            <div className="space-y-8">
+              {/* Profile Picture */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Profile Picture</CardTitle>
+                  <CardDescription>Upload and manage your profile picture</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between mb-4">
+                    {isEditingProfilePic ? (
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            setProfileForm(prev => ({ ...prev, avatar_url: originalAvatarUrl }));
+                            setIsEditingProfilePic(false);
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                         <Button 
+                           size="sm" 
+                           onClick={async () => {
+                             await saveProfile();
+                             setIsEditingProfilePic(false);
+                           }}
+                           disabled={savingProfile}
+                         >
+                          {savingProfile ? 'Saving...' : 'Save'}
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          setOriginalAvatarUrl(profileForm.avatar_url);
+                          setIsEditingProfilePic(true);
+                        }}
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Picture
+                      </Button>
+                    )}
                   </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="full_name">Full Name</Label>
-                    <Input
-                      id="full_name"
-                      value={profileForm.full_name}
-                      onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
-                      placeholder="Enter your full name"
-                    />
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProfilePictureUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        disabled={!isEditingProfilePic}
+                      />
+                      <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center border-2 border-dashed border-muted-foreground/30 overflow-hidden">
+                        {profileForm.avatar_url ? (
+                          <img 
+                            src={profileForm.avatar_url} 
+                            alt="Profile" 
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Upload className="h-8 w-8 text-muted-foreground" />
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-muted-foreground">
+                      JPG, PNG or GIF (max 5MB)
+                    </div>
                   </div>
+                </CardContent>
+              </Card>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="zipcode">Zip Code</Label>
-                    <Input
-                      id="zipcode"
-                      value={profileForm.zipcode}
-                      onChange={(e) => setProfileForm(prev => ({ ...prev, zipcode: e.target.value }))}
-                      placeholder="Enter your zip code"
-                    />
-                  </div>
-                </div>
+              {/* Personal Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Personal Information</CardTitle>
+                  <CardDescription>
+                    Update your personal details and contact information
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={user?.email || ''}
+                        disabled
+                        className="bg-muted"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Email cannot be changed from here
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="full_name">Full Name</Label>
+                        {isEditingUsername ? (
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {
+                                setProfileForm(prev => ({ ...prev, full_name: originalUsername }));
+                                setIsEditingUsername(false);
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                             <Button 
+                               size="sm" 
+                               onClick={async () => {
+                                 await saveProfile();
+                                 setIsEditingUsername(false);
+                               }}
+                               disabled={savingProfile}
+                             >
+                              {savingProfile ? 'Saving...' : 'Save'}
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              setOriginalUsername(profileForm.full_name);
+                              setIsEditingUsername(true);
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                      <Input
+                        id="full_name"
+                        value={profileForm.full_name}
+                        onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
+                        placeholder="Enter your full name"
+                        disabled={!isEditingUsername}
+                        className={isEditingUsername ? "bg-background" : "bg-muted"}
+                      />
+                    </div>
 
-                <Separator />
-                
-                <div className="flex justify-end">
-                  <Button onClick={saveProfile} disabled={savingProfile}>
-                    {savingProfile ? 'Saving...' : 'Save Changes'}
+                    <div className="space-y-2 md:col-span-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="zipcode">Zip Code</Label>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={getCurrentLocation}
+                          disabled={isLoadingLocation}
+                        >
+                          <RotateCcw className={`h-4 w-4 mr-2 ${isLoadingLocation ? 'animate-spin' : ''}`} />
+                          {isLoadingLocation ? 'Getting Location...' : 'Auto-detect'}
+                        </Button>
+                      </div>
+                      <Input
+                        id="zipcode"
+                        value={profileForm.zipcode}
+                        onChange={(e) => setProfileForm(prev => ({ ...prev, zipcode: e.target.value }))}
+                        placeholder="Enter your zip code"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Password */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Password</CardTitle>
+                  <CardDescription>Change your account password</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-4 items-center mb-2">
+                    <div className="bg-muted p-4 rounded-md flex-1 text-muted-foreground tracking-widest">
+                      ••••••••••••
+                    </div>
+                    <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+                      Change Password
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Click to receive a password reset link via email</p>
+                </CardContent>
+              </Card>
+
+              {/* Danger Zone */}
+              <Card className="border-red-200">
+                <CardHeader>
+                  <CardTitle className="text-red-600">Danger Zone</CardTitle>
+                  <CardDescription>
+                    Once you delete your account, there is no going back. Please be certain.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button className="bg-red-600 hover:bg-red-700 text-white">
+                    Delete Account
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* Addresses Tab */}
