@@ -99,22 +99,45 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
     setShowAddProductForm(true);
   }, []);
 
-  const handleProductAdded = useCallback((product: { name: string; description: string; price: number; images: string[] }) => {
-    const newProduct: Product = {
-      id: Date.now(),
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      images: product.images // Now already URLs from storage
-    };
+  const handleProductUpdate = useCallback((productData: any) => {
+    if (editingProduct) {
+      // Update existing product
+      const updatedProduct: Product = {
+        id: editingProduct.id,
+        name: productData.name,
+        description: productData.description,
+        price: productData.price,
+        images: productData.images
+      };
+      
+      setProducts(prev => prev.map(product => 
+        product.id === editingProduct.id ? updatedProduct : product
+      ));
+      
+      toast({
+        title: "Product Updated",
+        description: "Your product has been successfully updated.",
+      });
+    } else {
+      // Add new product
+      const newProduct: Product = {
+        id: Date.now(),
+        name: productData.name,
+        description: productData.description,
+        price: productData.price,
+        images: productData.images
+      };
+      
+      setProducts(prev => [...prev, newProduct]);
+      toast({
+        title: "Product Added",
+        description: "Your product has been successfully added.",
+      });
+    }
     
-    setProducts(prev => [...prev, newProduct]);
     setShowAddProductForm(false);
-    toast({
-      title: "Product Added",
-      description: "Your product has been successfully added.",
-    });
-  }, [toast]);
+    setEditingProduct(null);
+  }, [editingProduct, toast]);
 
   const handleDeleteProduct = useCallback((productId: number) => {
     setProducts(prev => prev.filter(product => product.id !== productId));
@@ -138,7 +161,6 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
   }, [toast]);
 
   const handleEditProduct = useCallback((product: Product) => {
-    console.log('handleEditProduct called with:', product);
     setEditingProduct(product);
     setShowAddProductForm(true);
   }, []);
@@ -331,36 +353,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
           setShowAddProductForm(false);
           setEditingProduct(null);
         }}
-        onProductAdded={(productData: any) => {
-          console.log('onProductAdded called', { editingProduct, productData });
-          if (editingProduct) {
-            console.log('Updating existing product:', editingProduct.id);
-            // Update existing product
-            const updatedProduct: Product = {
-              id: editingProduct.id, // Keep the same ID
-              name: productData.name,
-              description: productData.description,
-              price: productData.price,
-              images: productData.images
-            };
-            
-            setProducts(prev => prev.map(product => 
-              product.id === editingProduct.id ? updatedProduct : product
-            ));
-            
-            setShowAddProductForm(false);
-            setEditingProduct(null);
-            
-            toast({
-              title: "Product Updated",
-              description: "Your product has been successfully updated.",
-            });
-          } else {
-            console.log('Adding new product');
-            // Add new product
-            handleProductAdded(productData);
-          }
-        }}
+        onProductAdded={handleProductUpdate}
         editingProduct={editingProduct}
       />
     </>
