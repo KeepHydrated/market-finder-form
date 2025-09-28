@@ -98,6 +98,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
       unit_price: Math.round(product.price * 100), // Convert to cents
       vendor_id: vendorId,
       vendor_name: vendorName,
+      product_image: product.images?.[0], // Use first image if available
     };
 
     addItem({ ...cartItem, quantity: 1 });

@@ -147,7 +147,8 @@ const CategoryProducts = () => {
       product_description: product.description,
       unit_price: product.price * 100, // Convert to cents
       vendor_id: product.vendorId,
-      vendor_name: product.vendorName
+      vendor_name: product.vendorName,
+      product_image: product.images?.[0] // Use first image if available
     });
     
     toast({
