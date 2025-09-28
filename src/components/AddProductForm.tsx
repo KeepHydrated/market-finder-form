@@ -161,12 +161,15 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
       setImages([]);
       setExistingImages([]);
       setWebsiteSaleEnabled(true);
-      onClose();
       
-      toast({
-        title: editingProduct ? "Product updated" : "Product added",
-        description: editingProduct ? "Product has been updated successfully." : "Product has been added successfully.",
-      });
+      // Only close and show toast if not editing (let parent handle edit case)
+      if (!editingProduct) {
+        onClose();
+        toast({
+          title: "Product added",
+          description: "Product has been added successfully.",
+        });
+      }
       
     } catch (error: any) {
       console.error('Error uploading images:', error);
