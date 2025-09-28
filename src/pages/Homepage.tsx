@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLikes } from "@/hooks/useLikes";
-import { calculateDistance, getGoogleMapsDistance, cacheVendorCoordinates } from "@/lib/geocoding";
+import { calculateDistance, getGoogleMapsDistance, cacheVendorCoordinates, getCoordinatesForAddress } from "@/lib/geocoding";
 
 interface AcceptedSubmission {
   id: string;
@@ -273,11 +273,11 @@ const Homepage = () => {
     );
   };
 
-  // Calculate distances for all vendors
+  // Calculate distances for all vendors (synchronized with market calculation)
   const calculateVendorDistances = async (vendors: AcceptedSubmission[], userCoords: {lat: number, lng: number}) => {
-    console.log('=== DISTANCE CALCULATION DEBUG ===');
+    console.log('=== VENDOR DISTANCE CALCULATION (SYNCHRONIZED WITH MARKETS) ===');
     console.log('User coordinates:', userCoords);
-    console.log('Starting distance calculations for', vendors.length, 'vendors');
+    console.log('Starting synchronized distance calculations for', vendors.length, 'vendors');
     
     const distances: Record<string, string> = {};
     
@@ -292,10 +292,10 @@ const Homepage = () => {
       }
 
       try {
-        console.log('Getting coordinates for vendor:', vendor.id);
-        // Get coordinates for this vendor (with caching)
-        const vendorCoords = await cacheVendorCoordinates(vendor.id, vendor.market_address);
-        console.log('Vendor coordinates result:', vendorCoords);
+        // USE THE SAME COORDINATE SOURCE AS MARKET DISTANCE CALCULATION
+        // This ensures vendor and market cards show identical distances
+        const vendorCoords = await getCoordinatesForAddress(vendor.market_address);
+        console.log('🔄 Using geocoded coordinates (same as market calculation):', vendorCoords);
         
         if (vendorCoords) {
           console.log('=== DISTANCE CALCULATION ===');
@@ -326,7 +326,7 @@ const Homepage = () => {
             finalDistance = `${distanceInMiles.toFixed(1)} miles`;
           }
           
-          console.log('Final distance:', finalDistance);
+          console.log('Final synchronized distance:', finalDistance);
           console.log('Google Maps equivalent: https://maps.google.com/maps?saddr=' + userCoords.lat + ',' + userCoords.lng + '&daddr=' + vendorCoords.lat + ',' + vendorCoords.lng);
           
           distances[vendor.id] = finalDistance;
@@ -340,8 +340,8 @@ const Homepage = () => {
       }
     }
     
-    console.log('Final distances:', distances);
-    console.log('=== END DISTANCE DEBUG ===');
+    console.log('Final synchronized distances:', distances);
+    console.log('=== END VENDOR DISTANCE CALCULATION ===');
     setVendorDistances(distances);
   };
 
