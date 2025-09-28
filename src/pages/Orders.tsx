@@ -203,16 +203,21 @@ const Orders = () => {
                   
                   {order.order_items.map((item) => (
                     <div key={item.id} className="flex justify-between items-start py-2">
-                      <div className="flex-1">
-                        <h5 className="font-medium">{item.product_name}</h5>
-                        {item.product_description && (
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Package className="h-6 w-6 text-green-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h5 className="font-medium">{item.product_name}</h5>
+                          {item.product_description && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {item.product_description}
+                            </p>
+                          )}
                           <p className="text-sm text-muted-foreground mt-1">
-                            {item.product_description}
+                            Quantity: {item.quantity} × {formatPrice(item.unit_price)}
                           </p>
-                        )}
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Quantity: {item.quantity} × {formatPrice(item.unit_price)}
-                        </p>
+                        </div>
                       </div>
                       <div className="text-right ml-4">
                         <p className="font-medium">{formatPrice(item.total_price)}</p>
