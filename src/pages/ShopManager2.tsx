@@ -15,7 +15,7 @@ import { AddProductForm } from '@/components/AddProductForm';
 import { FarmersMarketSearch } from '@/components/FarmersMarketSearch';
 import { ShopSidebar } from '@/components/ShopSidebar';
 import { VendorOrders } from '@/components/VendorOrders';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -848,7 +848,6 @@ export default function ShopManager() {
         
         <main className="flex-1">
           <header className="h-16 flex items-center border-b px-6">
-            <SidebarTrigger />
           </header>
           
           <div className="p-6">
