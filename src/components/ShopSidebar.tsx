@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { 
-  BarChart3, 
   Package, 
   Store, 
   Settings, 
@@ -25,12 +24,6 @@ interface ShopSidebarProps {
 }
 
 const menuItems = [
-  { 
-    title: "Overview", 
-    icon: BarChart3, 
-    section: "overview",
-    requiresShop: true 
-  },
   { 
     title: "Shop", 
     icon: Store, 
@@ -64,7 +57,7 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
   
   // Get current section from URL params or default
   const urlParams = new URLSearchParams(location.search);
-  const currentSection = urlParams.get('section') || (hasShopData ? 'overview' : 'shop');
+  const currentSection = urlParams.get('section') || 'shop';
 
   // Filter items based on whether shop data exists
   const availableItems = menuItems.filter(item => 
