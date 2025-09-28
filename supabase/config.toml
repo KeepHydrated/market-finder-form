@@ -2,3 +2,6 @@ project_id = "cxkvyrtdgbqxtcelytwl"
 
 [functions.farmers-market-search]
 verify_jwt = false
+
+[functions.get-distance]
+verify_jwt = false
