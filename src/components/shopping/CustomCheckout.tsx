@@ -172,11 +172,30 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
                   {group.vendor_name}
                 </h4>
                 {group.items.map((item, itemIndex) => (
-                  <div key={itemIndex} className="flex justify-between text-sm">
-                    <span>
-                      {item.product_name} × {item.quantity}
-                    </span>
-                    <span>{formatPrice(item.unit_price * item.quantity)}</span>
+                  <div key={itemIndex} className="flex items-center gap-3 py-2">
+                    {item.product_image && (
+                      <img
+                        src={item.product_image}
+                        alt={item.product_name}
+                        className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-sm">{item.product_name}</p>
+                          {item.product_description && (
+                            <p className="text-xs text-muted-foreground truncate">
+                              {item.product_description}
+                            </p>
+                          )}
+                          <p className="text-xs text-muted-foreground">
+                            Qty: {item.quantity} × {formatPrice(item.unit_price)}
+                          </p>
+                        </div>
+                        <span className="text-sm font-medium">{formatPrice(item.unit_price * item.quantity)}</span>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
