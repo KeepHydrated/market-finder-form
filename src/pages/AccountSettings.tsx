@@ -14,7 +14,6 @@ import {
   User, 
   MapPin, 
   CreditCard, 
-  Shield, 
   Plus,
   Edit2,
   Trash2,
@@ -277,7 +276,7 @@ export default function AccountSettings() {
       </div>
 
       <Tabs defaultValue="addresses" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="addresses" className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
             Addresses
@@ -285,10 +284,6 @@ export default function AccountSettings() {
           <TabsTrigger value="payment" className="flex items-center gap-2">
             <CreditCard className="h-4 w-4" />
             Payment
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            Security
           </TabsTrigger>
         </TabsList>
 
@@ -499,37 +494,6 @@ export default function AccountSettings() {
               <p className="text-sm text-muted-foreground">
                 You can add and manage payment methods during your next purchase
               </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Security Tab */}
-        <TabsContent value="security">
-          <Card>
-            <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
-              <CardDescription>
-                Manage your account security and authentication
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 border rounded-lg">
-                <h4 className="font-medium mb-2">Password</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Last changed: Never
-                </p>
-                <Button variant="outline">Change Password</Button>
-              </div>
-
-              <div className="p-4 border rounded-lg">
-                <h4 className="font-medium mb-2">Two-Factor Authentication</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Add an extra layer of security to your account
-                </p>
-                <Button variant="outline" disabled>
-                  Enable 2FA (Coming Soon)
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
