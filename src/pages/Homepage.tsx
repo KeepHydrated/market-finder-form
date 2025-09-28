@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLikes } from "@/hooks/useLikes";
 import { calculateDistance, getGoogleMapsDistance, getCoordinatesForAddress } from "@/lib/geocoding";
+import { ProductDetailModal } from "@/components/ProductDetailModal";
 
 interface AcceptedSubmission {
   id: string;
@@ -89,6 +90,9 @@ const Homepage = () => {
   const [marketGoogleRatings, setMarketGoogleRatings] = useState<Record<string, {rating: number; reviewCount: number}>>({});
   const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
   const [isLoadingVendorDistances, setIsLoadingVendorDistances] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [currentVendorProducts, setCurrentVendorProducts] = useState<any[]>([]);
 
   // Handle category selection from URL and navigate to new page
   useEffect(() => {
@@ -1532,14 +1536,14 @@ const Homepage = () => {
                       onClick={() => {
                         const vendor = filteredSubmissions.find(v => v.id === product.vendorId);
                         if (vendor) {
-                          navigate('/market', { 
-                            state: { 
-                              type: 'vendor', 
-                              selectedVendor: vendor,
-                              allVendors: filteredSubmissions,
-                              selectedProductIndex: vendor.products?.findIndex(p => p.name === product.name) || 0
-                            } 
-                          });
+                          // Set up the product modal
+                          const productWithId = {
+                            ...product,
+                            id: product.id || index
+                          };
+                          setSelectedProduct(productWithId);
+                          setCurrentVendorProducts(vendor.products || []);
+                          setIsProductModalOpen(true);
                         }
                       }}
                     >
@@ -1616,13 +1620,29 @@ const Homepage = () => {
                       </CardContent>
                     </Card>
                   ))}
-                </div>
-              );
-            })()}
-          </div>
-        )}
-      </div>
-    </div>
+                 </div>
+               );
+             })()}
+           </div>
+         )}
+       </div>
+       
+       {/* Product Detail Modal */}
+       <ProductDetailModal
+         product={selectedProduct}
+         products={currentVendorProducts}
+         open={isProductModalOpen}
+         onClose={() => {
+           setIsProductModalOpen(false);
+           setSelectedProduct(null);
+           setCurrentVendorProducts([]);
+         }}
+         onProductChange={setSelectedProduct}
+         vendorId={selectedProduct?.vendorId}
+         vendorName={selectedProduct?.vendorName}
+       />
+     </div>
+   </div>
   );
 };
 
