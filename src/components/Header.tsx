@@ -88,62 +88,62 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=Fresh Flowers & Plants" className="w-full">
+                  <Link to="/category?category=Fresh Flowers & Plants" className="w-full">
                     Fresh Flowers & Plants
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=Bakery" className="w-full">
+                  <Link to="/category?category=Bakery" className="w-full">
                     Bakery
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=Dairy" className="w-full">
+                  <Link to="/category?category=Dairy" className="w-full">
                     Dairy
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=Rancher" className="w-full">
+                  <Link to="/category?category=Rancher" className="w-full">
                     Rancher
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=Beverages" className="w-full">
+                  <Link to="/category?category=Beverages" className="w-full">
                     Beverages
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=Seasonings & Spices" className="w-full">
+                  <Link to="/category?category=Seasonings & Spices" className="w-full">
                     Seasonings & Spices
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=Pets" className="w-full">
+                  <Link to="/category?category=Pets" className="w-full">
                     Pets
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=Home Goods" className="w-full">
+                  <Link to="/category?category=Home Goods" className="w-full">
                     Home Goods
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=Farmers" className="w-full">
+                  <Link to="/category?category=Farmers" className="w-full">
                     Farmers
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=Ready to Eat" className="w-full">
+                  <Link to="/category?category=Ready to Eat" className="w-full">
                     Ready to Eat
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=Packaged Goods & Snacks" className="w-full">
+                  <Link to="/category?category=Packaged Goods & Snacks" className="w-full">
                     Packaged Goods & Snacks
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/homepage?category=Artisan" className="w-full">
+                  <Link to="/category?category=Artisan" className="w-full">
                     Artisan
                   </Link>
                 </DropdownMenuItem>

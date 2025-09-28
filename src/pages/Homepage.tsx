@@ -87,19 +87,15 @@ const Homepage = () => {
   const [locationMethod, setLocationMethod] = useState<'ip' | 'gps'>('ip');
   const [isGettingGPSLocation, setIsGettingGPSLocation] = useState(false);
 
-  // Handle URL parameters
+  // Handle category selection from URL and navigate to new page
   useEffect(() => {
     const categoryParam = searchParams.get('category');
-    const searchParam = searchParams.get('search');
     
-    if (categoryParam && !selectedCategories.includes(categoryParam)) {
-      setSelectedCategories([categoryParam]);
+    if (categoryParam) {
+      // Navigate to the new CategoryProducts page
+      navigate(`/category?category=${encodeURIComponent(categoryParam)}`);
     }
-    
-    if (searchParam) {
-      setSearchQuery(searchParam);
-    }
-  }, [searchParams]);
+  }, [searchParams, navigate]);
 
   // Filter submissions based on search query and other filters
   useEffect(() => {

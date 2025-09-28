@@ -1,0 +1,287 @@
+import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Heart, Star, ArrowLeft, ShoppingCart } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useLikes } from "@/hooks/useLikes";
+import { useShoppingCart } from "@/contexts/ShoppingCartContext";
+import { ProductDetailModal } from "@/components/ProductDetailModal";
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  images: string[];
+  description: string;
+  websiteSaleEnabled: boolean;
+}
+
+interface Vendor {
+  id: string;
+  store_name: string;
+  primary_specialty: string;
+  website: string;
+  description: string;
+  products: any; // Can be JSON string or array
+  created_at: string;
+  updated_at: string;
+  market_address?: string;
+  market_days?: string[];
+  market_hours?: any;
+  selected_market?: string;
+  search_term?: string;
+  status: string;
+  selected_markets?: any; // Can be JSON string or array
+  google_rating?: number;
+  google_rating_count?: number;
+  latitude?: number;
+  longitude?: number;
+  vacation_mode?: boolean;
+  user_id: string;
+}
+
+const CategoryProducts = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { toggleLike, isLiked } = useLikes();
+  const { addItem } = useShoppingCart();
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState<Product & { vendorName: string; vendorId: string } | null>(null);
+  
+  const category = searchParams.get('category');
+
+  // Fetch all vendors nationwide for the selected category
+  useEffect(() => {
+    const fetchNationwideVendors = async () => {
+      if (!category) return;
+      
+      setLoading(true);
+      
+      try {
+        const { data, error } = await supabase
+          .from('submissions')
+          .select('*')
+          .eq('status', 'accepted')
+          .eq('primary_specialty', category);
+
+        if (error) throw error;
+
+        console.log(`Found ${data?.length || 0} vendors nationwide for category: ${category}`);
+        setVendors(data || []);
+      } catch (error) {
+        console.error('Error fetching vendors:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load products",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNationwideVendors();
+  }, [category, toast]);
+
+  // Get all products from all vendors
+  const allProducts = vendors.flatMap(vendor => {
+    let products: Product[] = [];
+    
+    // Handle products data (could be JSON string or array)
+    if (vendor.products) {
+      try {
+        products = Array.isArray(vendor.products) 
+          ? vendor.products 
+          : JSON.parse(vendor.products as string);
+      } catch (e) {
+        products = vendor.products as Product[];
+      }
+    }
+    
+    return products
+      .filter(product => product.websiteSaleEnabled)
+      .map(product => ({
+        ...product,
+        vendorName: vendor.store_name,
+        vendorId: vendor.id
+      }));
+  });
+
+  console.log(`Total products available for purchase: ${allProducts.length}`);
+
+  const handleAddToCart = (product: Product & { vendorName: string; vendorId: string }) => {
+    addItem({
+      id: product.id.toString(),
+      product_name: product.name,
+      product_description: product.description,
+      unit_price: product.price * 100, // Convert to cents
+      vendor_id: product.vendorId,
+      vendor_name: product.vendorName
+    });
+    
+    toast({
+      title: "Added to cart",
+      description: `${product.name} has been added to your cart`
+    });
+  };
+
+  const handleLike = (productId: number, vendorId: string) => {
+    toggleLike(`${productId}`, 'product');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center gap-4 mb-8">
+            <Button variant="ghost" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+            <h1 className="text-3xl font-bold">Loading...</h1>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Card key={i} className="animate-pulse">
+                <CardContent className="p-4">
+                  <div className="aspect-square bg-muted rounded-lg mb-4"></div>
+                  <div className="h-4 bg-muted rounded mb-2"></div>
+                  <div className="h-4 bg-muted rounded w-2/3"></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold">{category}</h1>
+              <p className="text-muted-foreground">
+                {allProducts.length} products from {vendors.length} vendors nationwide
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        {allProducts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-lg text-muted-foreground mb-4">
+              No products available for purchase in this category yet.
+            </p>
+            <Button onClick={() => navigate('/')}>
+              Browse Other Categories
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {allProducts.map((product) => (
+              <Card key={`${product.vendorId}-${product.id}`} className="group hover:shadow-lg transition-shadow">
+                <CardContent className="p-4">
+                  {/* Product Image */}
+                  <div 
+                    className="aspect-square bg-muted rounded-lg mb-4 overflow-hidden cursor-pointer"
+                    onClick={() => setSelectedProduct(product)}
+                  >
+                    {product.images?.[0] ? (
+                      <img 
+                        src={product.images[0]} 
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                        No Image
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Product Info */}
+                  <div className="space-y-2">
+                    <div className="flex items-start justify-between">
+                      <h3 
+                        className="font-semibold text-sm line-clamp-2 cursor-pointer hover:text-primary"
+                        onClick={() => setSelectedProduct(product)}
+                      >
+                        {product.name}
+                      </h3>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="p-1 h-auto"
+                        onClick={() => handleLike(product.id, product.vendorId)}
+                      >
+                        <Heart 
+                          className={`h-4 w-4 ${
+                            isLiked(`${product.id}`, 'product') 
+                              ? 'fill-red-500 text-red-500' 
+                              : 'text-muted-foreground'
+                          }`} 
+                        />
+                      </Button>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground">
+                      by {product.vendorName}
+                    </p>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold text-primary">
+                        ${product.price}
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => handleAddToCart(product)}
+                        className="flex items-center gap-1"
+                      >
+                        <ShoppingCart className="h-3 w-3" />
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Product Detail Modal */}
+      {selectedProduct && (
+        <ProductDetailModal
+          product={{
+            id: selectedProduct.id,
+            name: selectedProduct.name,
+            price: selectedProduct.price,
+            images: selectedProduct.images,
+            description: selectedProduct.description
+          }}
+          products={[selectedProduct]} // Pass as array for the modal
+          open={true}
+          onClose={() => setSelectedProduct(null)}
+          vendorId={selectedProduct.vendorId}
+          vendorName={selectedProduct.vendorName}
+        />
+      )}
+    </div>
+  );
+};
+
+export default CategoryProducts;
