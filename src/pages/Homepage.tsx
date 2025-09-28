@@ -1625,24 +1625,23 @@ const Homepage = () => {
              })()}
            </div>
          )}
-       </div>
-       
-       {/* Product Detail Modal */}
-       <ProductDetailModal
-         product={selectedProduct}
-         products={currentVendorProducts}
-         open={isProductModalOpen}
-         onClose={() => {
-           setIsProductModalOpen(false);
-           setSelectedProduct(null);
-           setCurrentVendorProducts([]);
-         }}
-         onProductChange={setSelectedProduct}
-         vendorId={selectedProduct?.vendorId}
-         vendorName={selectedProduct?.vendorName}
-       />
-     </div>
-   </div>
+        
+        {/* Product Detail Modal */}
+        <ProductDetailModal
+          product={selectedProduct}
+          products={currentVendorProducts}
+          open={isProductModalOpen}
+          onClose={() => {
+            setIsProductModalOpen(false);
+            setSelectedProduct(null);
+            setCurrentVendorProducts([]);
+          }}
+          onProductChange={setSelectedProduct}
+          vendorId={selectedProduct?.vendorId}
+          vendorName={selectedProduct?.vendorName}
+        />
+      </div>
+    </div>
   );
 };
 
