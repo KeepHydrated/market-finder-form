@@ -393,8 +393,7 @@ export default function ShopManager() {
   const handleDuplicateProduct = async (product: any) => {
     const duplicatedProduct = {
       ...product,
-      id: Date.now(),
-      name: `${product.name} (Copy)`
+      id: Date.now()
     };
     
     const updatedProducts = [duplicatedProduct, ...products];

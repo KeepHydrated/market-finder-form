@@ -305,6 +305,23 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, ven
       return;
     }
 
+    // Check if any changes have been made
+    if (duplicateProduct) {
+      const hasNameChanged = productName !== duplicateProduct.name;
+      const hasDescriptionChanged = description !== duplicateProduct.description;
+      const hasPriceChanged = parseFloat(price) !== duplicateProduct.price;
+      const hasImagesChanged = images.length > 0 || existingImages.length !== duplicateProduct.images.length;
+      
+      if (!hasNameChanged && !hasDescriptionChanged && !hasPriceChanged && !hasImagesChanged) {
+        toast({
+          title: "No changes made",
+          description: "Please make some changes before saving the duplicate.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setIsUploading(true);
     
     try {
