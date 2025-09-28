@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut } from 'lucide-react';
+import { LogOut, Package } from 'lucide-react';
 
 interface UserMenuProps {
   user: any;
@@ -27,6 +27,10 @@ export function UserMenu({ user, profile }: UserMenuProps) {
 
   const handleProfileClick = () => {
     navigate('/profile');
+  };
+
+  const handleOrdersClick = () => {
+    navigate('/orders');
   };
 
   const getInitials = (name?: string) => {
@@ -77,6 +81,10 @@ export function UserMenu({ user, profile }: UserMenuProps) {
           </button>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleOrdersClick}>
+          <Package className="mr-2 h-4 w-4" />
+          <span>My Orders</span>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
