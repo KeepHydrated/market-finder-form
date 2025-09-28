@@ -1160,39 +1160,6 @@ const Homepage = () => {
                    >
                      {/* Vendor Images Collage */}
                      <div className="aspect-[4/3] bg-muted relative overflow-hidden">
-                       {/* Google Rating Badge - Top Left */}
-                       <div className="absolute top-2 left-2 z-10 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                         <div className="flex items-center gap-1">
-                           <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                           <span className="text-xs font-medium">
-                             {(() => {
-                               // Calculate average rating from all vendors in the market
-                               const marketVendors = market.vendors.filter(vendor => 
-                                 vendorRatings[vendor.id]?.totalReviews > 0
-                               );
-                               
-                               if (marketVendors.length === 0) return '0.0';
-                               
-                               const totalRating = marketVendors.reduce((sum, vendor) => 
-                                 sum + vendorRatings[vendor.id].averageRating, 0
-                               );
-                               const avgRating = totalRating / marketVendors.length;
-                               
-                               return avgRating.toFixed(1);
-                             })()}
-                           </span>
-                           <span className="text-xs text-gray-600">
-                             ({(() => {
-                               // Sum total reviews from all vendors in the market
-                               return market.vendors.reduce((sum, vendor) => 
-                                 sum + (vendorRatings[vendor.id]?.totalReviews || 0), 0
-                               );
-                             })()})
-                           </span>
-                           <span className="text-xs text-gray-500">Google reviews</span>
-                         </div>
-                       </div>
-
                        {/* Like Button - Top Right */}
                        <Button
                          variant="secondary"
