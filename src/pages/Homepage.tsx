@@ -502,7 +502,11 @@ const Homepage = () => {
     
     setIsLoadingMarketDistances(true);
     
-    // Layer 1: Load cached distances from localStorage
+    // TEMPORARILY CLEAR CACHE to ensure fresh Google Maps calculations
+    console.log('🔄 Clearing distance cache to force fresh Google Maps calculations');
+    localStorage.removeItem(DISTANCE_CACHE_KEY);
+    
+    // Layer 1: Load cached distances from localStorage (will be empty now)
     const cachedDistances = loadCachedDistances();
     
     // Layer 2: Use ONLY cached market distances (no vendor fallbacks for consistency)
@@ -516,7 +520,7 @@ const Homepage = () => {
         quickDistances[marketId] = cachedDistances[marketId];
         console.log(`📍 Using cached market distance for ${market.name}: ${cachedDistances[marketId]}`);
       } else {
-        console.log(`⚠️ No cached distance for ${market.name}, will calculate fresh`);
+        console.log(`⚠️ No cached distance for ${market.name}, will calculate fresh from Google Maps`);
       }
     });
     
