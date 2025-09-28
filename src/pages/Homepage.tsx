@@ -690,8 +690,14 @@ const Homepage = () => {
 
   // Calculate market distances independently and immediately
   useEffect(() => {
-    if (acceptedSubmissions.length > 0 && userCoordinates) {
-      console.log('🔄 Processing accepted submissions with user coordinates');
+    console.log('🔄 useEffect triggered with:', {
+      acceptedSubmissionsLength: acceptedSubmissions.length,
+      filteredSubmissionsLength: filteredSubmissions.length,
+      hasUserCoordinates: !!userCoordinates
+    });
+    
+    if (filteredSubmissions.length > 0 && userCoordinates) {
+      console.log('🔄 Processing filtered submissions with user coordinates');
       const markets = groupVendorsByMarket();
       console.log('📍 Grouped markets:', markets);
       if (markets.length > 0) {
@@ -706,11 +712,11 @@ const Homepage = () => {
       }
     } else {
       console.log('⚠️ Missing data for market processing:', {
-        submissionsCount: acceptedSubmissions.length,
+        filteredSubmissionsCount: filteredSubmissions.length,
         hasUserCoordinates: !!userCoordinates
       });
     }
-  }, [acceptedSubmissions, userCoordinates]);
+  }, [filteredSubmissions, userCoordinates]);
 
   // Get location from IP address automatically
   const getLocationFromIP = async () => {
