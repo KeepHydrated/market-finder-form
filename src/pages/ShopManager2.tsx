@@ -823,43 +823,99 @@ export default function ShopManager() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-2">Test</h2>
-        <p className="text-muted-foreground">This is a test tab for development and experimentation</p>
+        <p className="text-muted-foreground">Your shop performance at a glance</p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{analytics.totalOrders}</div>
+            <p className="text-xs text-muted-foreground">Total orders received</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${analytics.revenue.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">Total revenue earned</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Products</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{products.length}</div>
+            <p className="text-xs text-muted-foreground">Products available</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {analytics.reviewCount > 0 ? analytics.averageRating.toFixed(1) : '--'}
+            </div>
+            <p className="text-xs text-muted-foreground">Based on {analytics.reviewCount} reviews</p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Sample Component</CardTitle>
+            <CardTitle>Recent Orders</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              This is a sample component in the test tab. You can use this space to test new features, layouts, or components.
-            </p>
-            <Button variant="outline" className="w-full">
-              Test Button
-            </Button>
+          <CardContent className="space-y-4">
+            {analytics.recentOrders.length > 0 ? (
+              analytics.recentOrders.map((order: any) => (
+                <div key={order.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div>
+                    <p className="font-medium">Order #{order.id.slice(-8)}</p>
+                    <p className="text-sm text-muted-foreground">{order.email}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium">${(order.total_amount / 100).toFixed(2)}</p>
+                    <p className="text-sm capitalize">{order.status}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-4 text-muted-foreground">No orders yet</div>
+            )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Another Sample</CardTitle>
+            <CardTitle>Top Selling Products</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Test Item 1</span>
-                <Badge>Active</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Test Item 2</span>
-                <Badge variant="secondary">Inactive</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Test Item 3</span>
-                <Badge variant="outline">Pending</Badge>
-              </div>
-            </div>
+          <CardContent className="space-y-4">
+            {analytics.topProducts.length > 0 ? (
+              analytics.topProducts.map((product: any, index: number) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{product.name}</p>
+                    <p className="text-sm text-muted-foreground">Product</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium">{product.count} sold</p>
+                    <p className="text-sm text-muted-foreground">${(product.price / 100).toFixed(2)} each</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-4 text-muted-foreground">No sales data yet</div>
+            )}
           </CardContent>
         </Card>
       </div>
