@@ -233,11 +233,11 @@ const CategoryProducts = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {sortedProducts.map((product) => (
-              <Card key={`${product.vendorId}-${product.id}`} className="group hover:shadow-lg transition-shadow">
-                <CardContent className="p-4">
-                  {/* Product Image */}
+              <Card key={`${product.vendorId}-${product.id}`} className="group hover:shadow-lg transition-shadow overflow-hidden">
+                <CardContent className="p-0">
+                  {/* Product Image with Heart Overlay */}
                   <div 
-                    className="aspect-square bg-muted rounded-lg mb-4 overflow-hidden cursor-pointer"
+                    className="relative aspect-[4/5] bg-muted overflow-hidden cursor-pointer"
                     onClick={() => setSelectedProduct(product)}
                   >
                     {product.images?.[0] ? (
@@ -251,50 +251,43 @@ const CategoryProducts = () => {
                         No Image
                       </div>
                     )}
+                    
+                    {/* Heart Icon Overlay */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute top-3 right-3 p-2 h-auto bg-white/90 hover:bg-white rounded-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLike(product.id, product.vendorId);
+                      }}
+                    >
+                      <Heart 
+                        className={`h-5 w-5 ${
+                          isLiked(`${product.id}`, 'product') 
+                            ? 'fill-red-500 text-red-500' 
+                            : 'text-gray-600'
+                        }`} 
+                      />
+                    </Button>
                   </div>
 
                   {/* Product Info */}
-                  <div className="space-y-2">
-                    <div className="flex items-start justify-between">
-                      <h3 
-                        className="font-semibold text-sm line-clamp-2 cursor-pointer hover:text-primary"
-                        onClick={() => setSelectedProduct(product)}
-                      >
-                        {product.name}
-                      </h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="p-1 h-auto"
-                        onClick={() => handleLike(product.id, product.vendorId)}
-                      >
-                        <Heart 
-                          className={`h-4 w-4 ${
-                            isLiked(`${product.id}`, 'product') 
-                              ? 'fill-red-500 text-red-500' 
-                              : 'text-muted-foreground'
-                          }`} 
-                        />
-                      </Button>
+                  <div className="p-4 space-y-2">
+                    <h3 
+                      className="font-semibold text-base cursor-pointer hover:text-primary line-clamp-2"
+                      onClick={() => setSelectedProduct(product)}
+                    >
+                      {product.name}
+                    </h3>
+
+                    <div className="text-lg font-bold text-primary">
+                      ${product.price.toFixed(2)}
                     </div>
 
-                    <p className="text-xs text-muted-foreground">
-                      by {product.vendorName}
+                    <p className="text-sm text-muted-foreground">
+                      {product.vendorName}
                     </p>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-primary">
-                        ${product.price}
-                      </span>
-                      <Button
-                        size="sm"
-                        onClick={() => handleAddToCart(product)}
-                        className="flex items-center gap-1"
-                      >
-                        <ShoppingCart className="h-3 w-3" />
-                        Add
-                      </Button>
-                    </div>
                   </div>
                 </CardContent>
               </Card>
