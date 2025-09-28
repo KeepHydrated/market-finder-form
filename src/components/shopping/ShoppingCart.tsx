@@ -11,6 +11,7 @@ import { useShoppingCart } from '@/contexts/ShoppingCartContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { ProductDetailModal } from '@/components/ProductDetailModal';
+import { OrderConfirmationModal } from './OrderConfirmationModal';
 
 export function ShoppingCart() {
   const { 
@@ -29,6 +30,7 @@ export function ShoppingCart() {
   const [loading, setLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showProductModal, setShowProductModal] = useState(false);
+  const [showOrderConfirm, setShowOrderConfirm] = useState(false);
 
   const formatPrice = (cents: number) => {
     return `$${(cents / 100).toFixed(2)}`;
@@ -46,6 +48,11 @@ export function ShoppingCart() {
   };
 
   const handleCheckout = () => {
+    setShowOrderConfirm(true);
+  };
+
+  const handleOrderConfirm = () => {
+    setShowOrderConfirm(false);
     setIsOpen(false);
     navigate('/checkout');
   };
@@ -213,6 +220,13 @@ export function ShoppingCart() {
           open={showProductModal}
           onClose={() => setShowProductModal(false)}
           hideVendorName={true}
+        />
+        <OrderConfirmationModal
+          items={items}
+          open={showOrderConfirm}
+          onClose={() => setShowOrderConfirm(false)}
+          onConfirm={handleOrderConfirm}
+          customerEmail={user?.email || guestEmail}
         />
       </SheetContent>
     </Sheet>
