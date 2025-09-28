@@ -25,6 +25,12 @@ interface ShopSidebarProps {
 
 const menuItems = [
   { 
+    title: "Overview", 
+    icon: TestTube, 
+    section: "overview",
+    requiresShop: false 
+  },
+  { 
     title: "Products", 
     icon: Package, 
     section: "products",
@@ -42,12 +48,6 @@ const menuItems = [
     section: "account",
     requiresShop: true 
   },
-  { 
-    title: "Overview", 
-    icon: TestTube, 
-    section: "overview",
-    requiresShop: false 
-  },
 ];
 
 export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
@@ -57,7 +57,7 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
   
   // Get current section from URL params or default
   const urlParams = new URLSearchParams(location.search);
-  const currentSection = urlParams.get('section') || 'products';
+  const currentSection = urlParams.get('section') || 'overview';
 
   // Filter items based on whether shop data exists
   const availableItems = menuItems.filter(item => 

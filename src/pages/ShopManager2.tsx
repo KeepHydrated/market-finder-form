@@ -110,7 +110,7 @@ export default function ShopManager() {
   useEffect(() => {
     // Auto-navigate based on shop data existence
     if (!isSavingRef.current) {
-      const newSection = shopData ? currentSection : 'products';
+      const newSection = shopData ? currentSection : 'overview';
       if (newSection !== currentSection) {
         navigate(`/submit?section=${newSection}`, { replace: true });
       }
@@ -455,16 +455,16 @@ export default function ShopManager() {
   const renderContent = () => {
     console.log("Rendering content for section:", currentSection);
     switch (currentSection) {
+      case 'overview':
+        return renderTest();
       case 'products':
         return renderProducts();
       case 'orders':
         return <VendorOrders vendorId={shopData?.id} />;
       case 'account':
         return renderAccount();
-      case 'overview':
-        return renderTest();
       default:
-        return renderProducts();
+        return renderTest();
     }
   };
 
