@@ -566,29 +566,38 @@ const Homepage = () => {
             const marketCoords = await cacheVendorCoordinates(marketId, market.address);
             
             if (marketCoords) {
-              // Calculate distance using Google Maps
-              const googleDistance = await getGoogleMapsDistance(
-                userCoords.lat, 
-                userCoords.lng, 
-                marketCoords.lat, 
-                marketCoords.lng
-              );
-              
-              let finalDistance: string;
-              
-              if (googleDistance) {
-                finalDistance = googleDistance.distance;
-              } else {
-                const distanceInMiles = calculateDistance(
-                  userCoords.lat, 
-                  userCoords.lng, 
-                  marketCoords.lat, 
-                  marketCoords.lng
-                );
-                finalDistance = `${distanceInMiles.toFixed(1)} mi`;
-              }
-              
-              return { marketId, distance: finalDistance };
+               // Calculate distance using Google Maps
+               const googleDistance = await getGoogleMapsDistance(
+                 userCoords.lat, 
+                 userCoords.lng, 
+                 marketCoords.lat, 
+                 marketCoords.lng
+               );
+               
+               console.log(`🗺️ Google Maps API result for ${market.name}:`, {
+                 googleDistance,
+                 coordinates: { user: userCoords, market: marketCoords }
+               });
+               
+               let finalDistance: string;
+               
+               if (googleDistance) {
+                 finalDistance = googleDistance.distance;
+                 console.log(`✅ Using Google Maps distance for ${market.name}: ${finalDistance}`);
+               } else {
+                 const distanceInMiles = calculateDistance(
+                   userCoords.lat, 
+                   userCoords.lng, 
+                   marketCoords.lat, 
+                   marketCoords.lng
+                 );
+                 finalDistance = `${distanceInMiles.toFixed(1)} mi`;
+                 console.log(`⚠️ Fallback to straight-line distance for ${market.name}: ${finalDistance}`);
+               }
+               
+               console.log(`🎯 Final distance set for ${market.name} (${marketId}): ${finalDistance}`);
+               
+               return { marketId, distance: finalDistance };
             } else {
               return { marketId, distance: '-- mi' };
             }
@@ -1454,14 +1463,21 @@ const Homepage = () => {
                       {/* Distance Badge */}
                       <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
                         <span className="text-xs font-medium text-gray-700">
-                          {isLoadingMarketDistances ? (
-                            <span className="animate-pulse">Loading...</span>
-                          ) : (
-                            (() => {
-                              const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
-                              return marketDistances[marketId] || '-- miles';
-                            })()
-                          )}
+                           {isLoadingMarketDistances ? (
+                             <span className="animate-pulse">Loading...</span>
+                           ) : (
+                             (() => {
+                               const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+                               const distance = marketDistances[marketId];
+                               console.log(`🎯 DISPLAYING DISTANCE for ${market.name}:`, {
+                                 marketId,
+                                 distance,
+                                 allMarketDistances: marketDistances,
+                                 source: distance ? 'market-distances' : 'none-found'
+                               });
+                               return distance || '-- miles';
+                             })()
+                           )}
                         </span>
                       </div>
                     </div>
