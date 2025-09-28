@@ -192,7 +192,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProd
           </span>
         </div>
         {vendorName && !onDeleteProduct && (
-          <div className="mt-2 pt-2 border-t border-border">
+          <div className="mt-2 pt-2 border-t border-muted">
             <button 
               onClick={(e) => e.stopPropagation()}
               className="text-xs text-primary hover:underline cursor-pointer"
