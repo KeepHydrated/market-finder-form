@@ -2,11 +2,19 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Upload, X, ImageIcon } from "lucide-react";
 import { ChevronLeft, ChevronRight, MoreVertical, Copy, Trash2, Heart } from "lucide-react";
 import { ProductDetailModal } from "./ProductDetailModal";
 import { useLikes } from "@/hooks/useLikes";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Product {
   id: number;
@@ -195,10 +203,26 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClic
 };
 
 export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, vendorId, vendorName, hideVendorName = false }: ProductGridProps) => {
+  // Character limits
+  const NAME_LIMIT = 20;
+  const DESCRIPTION_LIMIT = 200;
+  
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [duplicateProduct, setDuplicateProduct] = useState<Product | null>(null);
   const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
+  
+  // Duplicate form states
+  const [productName, setProductName] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [images, setImages] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [websiteSaleEnabled, setWebsiteSaleEnabled] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+  
+  const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
@@ -212,20 +236,120 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, ven
 
   const handleDuplicateClick = (product: Product) => {
     setDuplicateProduct(product);
+    // Pre-fill the form with product data
+    setProductName(product.name);
+    setDescription(product.description);
+    setPrice(product.price.toString());
+    setExistingImages(product.images);
+    setImages([]);
+    setWebsiteSaleEnabled(true);
     setIsDuplicateModalOpen(true);
   };
 
-  const handleConfirmDuplicate = () => {
-    if (duplicateProduct && onDuplicateProduct) {
-      onDuplicateProduct(duplicateProduct);
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const totalImages = images.length + existingImages.length;
+    const remainingSlots = 5 - totalImages;
+    
+    const filesToAdd = files.slice(0, remainingSlots);
+    setImages(prev => [...prev, ...filesToAdd]);
+  };
+
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (index: number) => {
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const uploadImages = async (imageFiles: File[]): Promise<string[]> => {
+    if (!user) return [];
+    
+    const uploadPromises = imageFiles.map(async (image, index) => {
+      const fileExt = image.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}-${index}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('product-images')
+        .upload(fileName, image);
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    });
+
+    return Promise.all(uploadPromises);
+  };
+
+  const handleDuplicateSubmit = async () => {
+    if (!productName || !description || !price) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
     }
-    setIsDuplicateModalOpen(false);
-    setDuplicateProduct(null);
+
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to duplicate products.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    
+    try {
+      const uploadedImageUrls = images.length > 0 ? await uploadImages(images) : [];
+      const allImageUrls = [...existingImages, ...uploadedImageUrls];
+      
+      const productData = {
+        name: productName,
+        description,
+        price: parseFloat(price),
+        images: allImageUrls,
+        websiteSaleEnabled
+      };
+      
+      if (onDuplicateProduct) {
+        onDuplicateProduct(productData as any);
+      }
+      
+      handleCancelDuplicate();
+      toast({
+        title: "Product duplicated",
+        description: "Product has been duplicated successfully.",
+      });
+      
+    } catch (error: any) {
+      console.error('Error duplicating product:', error);
+      toast({
+        title: "Duplication failed",
+        description: error.message || "Failed to duplicate product. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleCancelDuplicate = () => {
     setIsDuplicateModalOpen(false);
     setDuplicateProduct(null);
+    setProductName('');
+    setDescription('');
+    setPrice('');
+    setImages([]);
+    setExistingImages([]);
+    setWebsiteSaleEnabled(true);
   };
 
   if (products.length === 0) {
@@ -264,21 +388,182 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, ven
       />
 
       <Dialog open={isDuplicateModalOpen} onOpenChange={setIsDuplicateModalOpen}>
-        <DialogContent>
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-6">
+          <DialogHeader className="pb-4">
             <DialogTitle>Duplicate Product</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to duplicate "{duplicateProduct?.name}"? This will create a copy of the product.
-            </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleCancelDuplicate}>
+          
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Product Images (Up to 5)</Label>
+              
+              {/* Image Upload Area */}
+              <div className="border-2 border-dashed border-border rounded-lg p-6">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <ImageIcon className="h-10 w-10 text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Drag and drop images here, or click to select
+                  </p>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="duplicate-image-upload"
+                    disabled={images.length + existingImages.length >= 5}
+                  />
+                  <Label
+                    htmlFor="duplicate-image-upload"
+                    className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium border border-border hover:bg-muted ${
+                      images.length + existingImages.length >= 5 ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <Upload className="h-4 w-4" />
+                    Choose Images
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {images.length + existingImages.length}/5 images uploaded
+                  </p>
+                </div>
+              </div>
+
+              {/* Image Previews */}
+              {(existingImages.length > 0 || images.length > 0) && (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                  {/* Existing images */}
+                  {existingImages.map((image, index) => (
+                    <div key={`existing-${index}`} className="relative group">
+                      <div className="aspect-square rounded-lg border border-border overflow-hidden bg-muted">
+                        <img
+                          src={image}
+                          alt={`Existing product image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                        onClick={() => removeExistingImage(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                  {/* New images */}
+                  {images.map((image, index) => (
+                    <div key={`new-${index}`} className="relative group">
+                      <div className="aspect-square rounded-lg border border-border overflow-hidden bg-muted">
+                        <img
+                          src={URL.createObjectURL(image)}
+                          alt={`Product image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                        onClick={() => removeImage(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label htmlFor="duplicate-product-name">Product Name *</Label>
+                <span className="text-xs text-muted-foreground">
+                  {productName.length}/{NAME_LIMIT}
+                </span>
+              </div>
+              <Input
+                id="duplicate-product-name"
+                value={productName}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= NAME_LIMIT) {
+                    setProductName(value);
+                  }
+                }}
+                placeholder="Enter product name"
+                maxLength={NAME_LIMIT}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label htmlFor="duplicate-description">Description *</Label>
+                <span className="text-xs text-muted-foreground">
+                  {description.length}/{DESCRIPTION_LIMIT}
+                </span>
+              </div>
+              <Textarea
+                id="duplicate-description"
+                value={description}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= DESCRIPTION_LIMIT) {
+                    setDescription(value);
+                  }
+                }}
+                placeholder="Describe your product..."
+                className="min-h-[100px] resize-none"
+                maxLength={DESCRIPTION_LIMIT}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="duplicate-price">Price *</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                  $
+                </span>
+                <Input
+                  id="duplicate-price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="0.00"
+                  className="pl-8"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/50">
+              <div className="space-y-1">
+                <Label htmlFor="duplicate-website-sale" className="text-sm font-medium">
+                  Available for Online Purchase
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Allow customers to buy this product directly from your online store
+                </p>
+              </div>
+              <Switch
+                id="duplicate-website-sale"
+                checked={websiteSaleEnabled}
+                onCheckedChange={setWebsiteSaleEnabled}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-6 border-t mt-6">
+            <Button variant="outline" onClick={handleCancelDuplicate} disabled={isUploading}>
               Cancel
             </Button>
-            <Button onClick={handleConfirmDuplicate}>
-              Duplicate Product
+            <Button onClick={handleDuplicateSubmit} disabled={isUploading}>
+              {isUploading ? 'Uploading...' : 'Duplicate Product'}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </>
