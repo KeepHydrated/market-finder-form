@@ -233,21 +233,21 @@ const CategoryProducts = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {sortedProducts.map((product) => (
-              <Card key={`${product.vendorId}-${product.id}`} className="group hover:shadow-lg transition-shadow overflow-hidden">
+              <Card key={`${product.vendorId}-${product.id}`} className="group hover:shadow-lg transition-all duration-300 overflow-hidden bg-card border-0 shadow-sm rounded-lg">
                 <CardContent className="p-0">
                   {/* Product Image with Heart Overlay */}
                   <div 
-                    className="relative aspect-[4/5] bg-muted overflow-hidden cursor-pointer"
+                    className="relative aspect-square bg-muted overflow-hidden cursor-pointer rounded-t-lg"
                     onClick={() => setSelectedProduct(product)}
                   >
                     {product.images?.[0] ? (
                       <img 
                         src={product.images[0]} 
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-muted">
                         No Image
                       </div>
                     )}
@@ -256,14 +256,14 @@ const CategoryProducts = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="absolute top-3 right-3 p-2 h-auto bg-white/90 hover:bg-white rounded-full"
+                      className="absolute top-3 right-3 p-2 h-auto w-auto bg-white/90 hover:bg-white rounded-full shadow-sm"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleLike(product.id, product.vendorId);
                       }}
                     >
                       <Heart 
-                        className={`h-5 w-5 ${
+                        className={`h-4 w-4 ${
                           isLiked(`${product.id}`, 'product') 
                             ? 'fill-red-500 text-red-500' 
                             : 'text-gray-600'
@@ -273,19 +273,19 @@ const CategoryProducts = () => {
                   </div>
 
                   {/* Product Info */}
-                  <div className="p-4 space-y-2">
+                  <div className="p-4 space-y-3">
                     <h3 
-                      className="font-semibold text-base cursor-pointer hover:text-primary line-clamp-2"
+                      className="font-semibold text-lg cursor-pointer hover:text-primary transition-colors line-clamp-2"
                       onClick={() => setSelectedProduct(product)}
                     >
                       {product.name}
                     </h3>
 
-                    <div className="text-lg font-bold text-primary">
+                    <div className="text-xl font-medium text-muted-foreground">
                       ${product.price.toFixed(2)}
                     </div>
 
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-base text-foreground font-medium">
                       {product.vendorName}
                     </p>
                   </div>
