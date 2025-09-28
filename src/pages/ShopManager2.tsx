@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Save, Plus, Trash2, ArrowRight, Package } from 'lucide-react';
+import { Edit, Save, Plus, Trash2, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { ProductGrid } from '@/components/ProductGrid';
@@ -111,7 +111,7 @@ export default function ShopManager() {
       console.log("Fetching shop data for user:", user.id);
       
       const { data, error } = await supabase
-        .from('accepted_submissions')
+        .from('accepted_submissions' as any)
         .select('*')
         .eq('user_id', user.id)
         .single();
@@ -126,7 +126,7 @@ export default function ShopManager() {
         }
       } else {
         console.log("Shop data found:", data);
-        setShopData(data as ShopData);
+        setShopData(data as any);
         
         // Populate form fields
         const shopDataTyped = data as any;
@@ -233,7 +233,7 @@ export default function ShopManager() {
       if (shopData) {
         // Update existing
         result = await supabase
-          .from('accepted_submissions')
+          .from('accepted_submissions' as any)
           .update(shopDataToSave)
           .eq('id', shopData.id)
           .select()
@@ -241,7 +241,7 @@ export default function ShopManager() {
       } else {
         // Create new
         result = await supabase
-          .from('accepted_submissions')
+          .from('accepted_submissions' as any)
           .insert(shopDataToSave)
           .select()
           .single();
@@ -301,7 +301,7 @@ export default function ShopManager() {
     if (shopData) {
       try {
         await supabase
-          .from('accepted_submissions')
+          .from('accepted_submissions' as any)
           .update({ products: updatedProducts as any })
           .eq('id', shopData.id);
       } catch (error) {
@@ -365,7 +365,7 @@ export default function ShopManager() {
           ) : (
             <div className="text-center py-8 text-muted-foreground">
               <div className="mb-4">
-                <Package className="h-12 w-12 mx-auto text-muted-foreground/50" />
+                <Plus className="h-12 w-12 mx-auto text-muted-foreground/50" />
               </div>
               <p className="mb-2">No products yet</p>
               <p className="text-sm">Add your first product to get started</p>
@@ -405,7 +405,7 @@ export default function ShopManager() {
                 
                 try {
                   await supabase
-                    .from('accepted_submissions')
+                    .from('accepted_submissions' as any)
                     .update({ vacation_mode: checked })
                     .eq('id', shopData.id);
                   
