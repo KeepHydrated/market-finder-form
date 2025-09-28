@@ -396,9 +396,28 @@ const Homepage = () => {
     const allProducts: any[] = [];
     
     filteredSubmissions.forEach(submission => {
-      const products = Array.isArray(submission.products) ? submission.products : [];
+      console.log('Processing submission:', submission.store_name, 'Products:', submission.products);
+      
+      // Handle products that might be stored as JSON string or array
+      let products: any[] = [];
+      if (submission.products) {
+        if (typeof submission.products === 'string') {
+          try {
+            products = JSON.parse(submission.products);
+          } catch (e) {
+            console.warn('Could not parse products JSON for', submission.store_name, e);
+            products = [];
+          }
+        } else if (Array.isArray(submission.products)) {
+          products = submission.products;
+        } else if (typeof submission.products === 'object') {
+          products = Object.values(submission.products);
+        }
+      }
+      
       if (products && products.length > 0) {
         products.forEach((product: any) => {
+          console.log('Adding product:', product.name, 'Image:', product.image);
           allProducts.push({
             ...product,
             vendorName: submission.store_name,
@@ -409,6 +428,7 @@ const Homepage = () => {
       }
     });
 
+    console.log('Total products found:', allProducts.length);
     return allProducts;
   };
 
@@ -882,9 +902,9 @@ const Homepage = () => {
                 return allProducts.map((product, index) => (
                   <Card key={`${product.vendorId}-${index}`} className="overflow-hidden hover:shadow-lg transition-shadow">
                     <div className="relative">
-                      {product.image && (
+                      {product.images && product.images.length > 0 && (
                         <img 
-                          src={product.image} 
+                          src={product.images[0]} 
                           alt={product.name || 'Product'} 
                           className="w-full h-48 object-cover"
                         />
