@@ -24,6 +24,12 @@ interface ShopSidebarProps {
 
 const menuItems = [
   { 
+    title: "Overview", 
+    icon: Store, 
+    section: "overview",
+    requiresShop: true 
+  },
+  { 
     title: "Shop", 
     icon: Store, 
     section: "shop",
@@ -67,7 +73,7 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
 
   const getNavClasses = (active: boolean, section: string) =>
     active 
-      ? section === 'shop' 
+      ? (section === 'shop' || section === 'overview')
         ? "bg-green-500 text-white font-medium hover:bg-green-600" 
         : "bg-primary text-primary-foreground font-medium"
       : "hover:bg-muted/50 text-muted-foreground hover:text-foreground";
