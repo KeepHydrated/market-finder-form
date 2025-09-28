@@ -145,6 +145,7 @@ export type Database = {
           id: string
           order_id: string
           product_description: string | null
+          product_image: string | null
           product_name: string
           quantity: number
           total_price: number
@@ -155,6 +156,7 @@ export type Database = {
           id?: string
           order_id: string
           product_description?: string | null
+          product_image?: string | null
           product_name: string
           quantity?: number
           total_price: number
@@ -165,6 +167,7 @@ export type Database = {
           id?: string
           order_id?: string
           product_description?: string | null
+          product_image?: string | null
           product_name?: string
           quantity?: number
           total_price?: number
