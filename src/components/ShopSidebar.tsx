@@ -65,9 +65,11 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
 
   const isActive = (section: string) => currentSection === section;
 
-  const getNavClasses = (active: boolean) =>
+  const getNavClasses = (active: boolean, section: string) =>
     active 
-      ? "bg-primary text-primary-foreground font-medium" 
+      ? section === 'shop' 
+        ? "bg-green-500 text-white font-medium hover:bg-green-600" 
+        : "bg-primary text-primary-foreground font-medium"
       : "hover:bg-muted/50 text-muted-foreground hover:text-foreground";
 
   return (
@@ -84,7 +86,7 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
             <SidebarMenu>
               {availableItems.map((item) => (
                 <SidebarMenuItem key={item.section}>
-                  <SidebarMenuButton asChild className={getNavClasses(isActive(item.section))}>
+                  <SidebarMenuButton asChild className={getNavClasses(isActive(item.section), item.section)}>
                     <NavLink 
                       to={`/submit?section=${item.section}`}
                     >
