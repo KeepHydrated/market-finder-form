@@ -505,22 +505,18 @@ const Homepage = () => {
     // Layer 1: Load cached distances from localStorage
     const cachedDistances = loadCachedDistances();
     
-    // Layer 2: Use vendor distances as immediate fallback
+    // Layer 2: Use ONLY cached market distances (no vendor fallbacks for consistency)
     const quickDistances: Record<string, string> = {};
     
     markets.forEach(market => {
       const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
       
-      // First try cached distance
+      // Only use cached market distances - no vendor fallbacks to ensure consistency
       if (cachedDistances[marketId]) {
         quickDistances[marketId] = cachedDistances[marketId];
-      }
-      // Fallback to vendor distance if available
-      else {
-        const firstVendor = market.vendors[0];
-        if (firstVendor && vendorDistances[firstVendor.id]) {
-          quickDistances[marketId] = vendorDistances[firstVendor.id];
-        }
+        console.log(`📍 Using cached market distance for ${market.name}: ${cachedDistances[marketId]}`);
+      } else {
+        console.log(`⚠️ No cached distance for ${market.name}, will calculate fresh`);
       }
     });
     
