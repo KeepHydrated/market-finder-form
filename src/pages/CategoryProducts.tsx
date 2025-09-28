@@ -3,12 +3,18 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Star, ArrowLeft, ShoppingCart } from "lucide-react";
+import { Heart, Star, ArrowLeft, ShoppingCart, ChevronDown, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLikes } from "@/hooks/useLikes";
 import { useShoppingCart } from "@/contexts/ShoppingCartContext";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Product {
   id: number;
@@ -52,6 +58,7 @@ const CategoryProducts = () => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product & { vendorName: string; vendorId: string } | null>(null);
+  const [sortBy, setSortBy] = useState<'relevancy' | 'lowest-price' | 'highest-price' | 'top-rated' | 'most-recent'>('relevancy');
   
   const category = searchParams.get('category');
 
@@ -88,7 +95,7 @@ const CategoryProducts = () => {
     fetchNationwideVendors();
   }, [category, toast]);
 
-  // Get all products from all vendors
+  // Get all products from all vendors with sorting
   const allProducts = vendors.flatMap(vendor => {
     let products: Product[] = [];
     
@@ -108,11 +115,30 @@ const CategoryProducts = () => {
       .map(product => ({
         ...product,
         vendorName: vendor.store_name,
-        vendorId: vendor.id
+        vendorId: vendor.id,
+        vendorRating: vendor.google_rating || 0,
+        vendorCreatedAt: vendor.created_at
       }));
   });
 
-  console.log(`Total products available for purchase: ${allProducts.length}`);
+  // Sort products based on selected option
+  const sortedProducts = [...allProducts].sort((a, b) => {
+    switch (sortBy) {
+      case 'lowest-price':
+        return a.price - b.price;
+      case 'highest-price':
+        return b.price - a.price;
+      case 'top-rated':
+        return b.vendorRating - a.vendorRating;
+      case 'most-recent':
+        return new Date(b.vendorCreatedAt).getTime() - new Date(a.vendorCreatedAt).getTime();
+      case 'relevancy':
+      default:
+        return 0; // Keep original order for relevancy
+    }
+  });
+
+  console.log(`Total products available for purchase: ${sortedProducts.length}`);
 
   const handleAddToCart = (product: Product & { vendorName: string; vendorId: string }) => {
     addItem({
@@ -133,6 +159,14 @@ const CategoryProducts = () => {
   const handleLike = (productId: number, vendorId: string) => {
     toggleLike(`${productId}`, 'product');
   };
+
+  const sortOptions = [
+    { value: 'relevancy' as const, label: 'Relevancy' },
+    { value: 'lowest-price' as const, label: 'Lowest Price' },
+    { value: 'highest-price' as const, label: 'Highest Price' },
+    { value: 'top-rated' as const, label: 'Top Rated Store' },
+    { value: 'most-recent' as const, label: 'Most Recent' },
+  ];
 
   if (loading) {
     return (
@@ -174,14 +208,36 @@ const CategoryProducts = () => {
             <div>
               <h1 className="text-3xl font-bold">{category}</h1>
               <p className="text-muted-foreground">
-                {allProducts.length} products from {vendors.length} vendors nationwide
+                {sortedProducts.length} products from {vendors.length} vendors nationwide
               </p>
             </div>
           </div>
+          
+          {/* Sort Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="min-w-[180px] justify-between">
+                Sort by: {sortOptions.find(opt => opt.value === sortBy)?.label}
+                <ChevronDown className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[180px] bg-background border shadow-lg z-50">
+              {sortOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => setSortBy(option.value)}
+                  className="cursor-pointer flex items-center justify-between"
+                >
+                  {option.label}
+                  {sortBy === option.value && <Check className="h-4 w-4" />}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Products Grid */}
-        {allProducts.length === 0 ? (
+        {sortedProducts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-lg text-muted-foreground mb-4">
               No products available for purchase in this category yet.
@@ -192,7 +248,7 @@ const CategoryProducts = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {allProducts.map((product) => (
+            {sortedProducts.map((product) => (
               <Card key={`${product.vendorId}-${product.id}`} className="group hover:shadow-lg transition-shadow">
                 <CardContent className="p-4">
                   {/* Product Image */}
