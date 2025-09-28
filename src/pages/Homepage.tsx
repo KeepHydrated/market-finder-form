@@ -656,13 +656,24 @@ const Homepage = () => {
   // Calculate market distances independently and immediately
   useEffect(() => {
     if (acceptedSubmissions.length > 0 && userCoordinates) {
+      console.log('🔄 Processing accepted submissions with user coordinates');
       const markets = groupVendorsByMarket();
+      console.log('📍 Grouped markets:', markets);
       if (markets.length > 0) {
+        console.log('🏪 Starting market processing...');
         // Start market distance calculation immediately without waiting for vendor distances
         calculateMarketDistances(markets, userCoordinates);
         // Also fetch Google ratings for markets
+        console.log('⭐ Starting Google ratings fetch...');
         fetchMarketGoogleRatings(markets);
+      } else {
+        console.log('⚠️ No markets found to process');
       }
+    } else {
+      console.log('⚠️ Missing data for market processing:', {
+        submissionsCount: acceptedSubmissions.length,
+        hasUserCoordinates: !!userCoordinates
+      });
     }
   }, [acceptedSubmissions, userCoordinates]);
 
