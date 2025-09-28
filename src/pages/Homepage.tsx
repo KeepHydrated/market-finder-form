@@ -840,15 +840,6 @@ const Homepage = () => {
             </button>
           </div>
           
-          {/* Show nationwide indicator when category is selected from header */}
-          {searchParams.get('category') && selectedCategories.length > 0 && (
-            <div className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-3 py-2 rounded-lg">
-              <span className="font-medium">🌍 Showing nationwide results for:</span>
-              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                {selectedCategories[0]}
-              </Badge>
-            </div>
-          )}
           
           <Dialog>
             <DialogTrigger asChild>
