@@ -1,3 +1,4 @@
+// Homepage component for displaying vendors and markets
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -1430,8 +1431,7 @@ const Homepage = () => {
                   ...product,
                   vendorId: submission.id,
                   vendorName: submission.store_name,
-                  vendorSpecialty: submission.primary_specialty,
-                  vendorDistance: undefined
+                  vendorSpecialty: submission.primary_specialty
                 }))
               );
 
@@ -1472,17 +1472,6 @@ const Homepage = () => {
                             No Image Available
                           </div>
                         )}
-                        
-                        {/* Distance Badge */}
-                        <div className="absolute bottom-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                          <span className="text-xs font-medium text-gray-700">
-                            {product.vendorDistance === '-- miles' ? (
-                              <span className="animate-pulse">Loading...</span>
-                            ) : (
-                              product.vendorDistance
-                            )}
-                          </span>
-                        </div>
                         
                         {/* Like Button */}
                         <Button
