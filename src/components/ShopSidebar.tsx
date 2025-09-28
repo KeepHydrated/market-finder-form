@@ -12,7 +12,6 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -81,7 +80,6 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
       </div>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Shop Management</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {availableItems.map((item) => (
