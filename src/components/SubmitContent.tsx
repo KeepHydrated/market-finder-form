@@ -138,6 +138,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
   }, [toast]);
 
   const handleEditProduct = useCallback((product: Product) => {
+    console.log('handleEditProduct called with:', product);
     setEditingProduct(product);
     setShowAddProductForm(true);
   }, []);
