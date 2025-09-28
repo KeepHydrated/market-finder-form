@@ -152,14 +152,6 @@ export function ShoppingCart() {
                           </div>
                         ))}
                       </div>
-
-                      <Button
-                        className="w-full"
-                        onClick={handleCheckout}
-                        disabled={loading || (!user && !guestEmail)}
-                      >
-                        {loading ? 'Processing...' : 'Checkout'}
-                      </Button>
                     </div>
                   );
                 })}
@@ -170,6 +162,14 @@ export function ShoppingCart() {
                   <span>Total</span>
                   <span>{formatPrice(getTotalPrice())}</span>
                 </div>
+                
+                <Button
+                  className="w-full"
+                  onClick={handleCheckout}
+                  disabled={loading || (!user && !guestEmail)}
+                >
+                  {loading ? 'Processing...' : 'Checkout'}
+                </Button>
                 
                 <Button
                   variant="outline"
