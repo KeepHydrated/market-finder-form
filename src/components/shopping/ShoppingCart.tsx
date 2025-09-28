@@ -10,6 +10,7 @@ import { Trash2, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { useShoppingCart } from '@/contexts/ShoppingCartContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { ProductDetailModal } from '@/components/ProductDetailModal';
 
 export function ShoppingCart() {
   const { 
@@ -26,6 +27,8 @@ export function ShoppingCart() {
   const navigate = useNavigate();
   const [guestEmail, setGuestEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [showProductModal, setShowProductModal] = useState(false);
 
   const formatPrice = (cents: number) => {
     return `$${(cents / 100).toFixed(2)}`;
@@ -45,6 +48,18 @@ export function ShoppingCart() {
   const handleCheckout = () => {
     setIsOpen(false);
     navigate('/checkout');
+  };
+
+  const handleProductClick = (item: any) => {
+    const product = {
+      id: parseInt(item.id.split('-')[1]) || 1,
+      name: item.product_name,
+      description: item.product_description || '',
+      price: item.unit_price / 100,
+      images: item.product_image ? [item.product_image] : []
+    };
+    setSelectedProduct(product);
+    setShowProductModal(true);
   };
 
   const vendorGroups = groupItemsByVendor();
@@ -111,14 +126,24 @@ export function ShoppingCart() {
                         {vendorItems.map((item) => (
                           <div key={item.id} className="flex items-center gap-3">
                             {item.product_image && (
-                              <img
-                                src={item.product_image}
-                                alt={item.product_name}
-                                className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                              />
+                              <button
+                                onClick={() => handleProductClick(item)}
+                                className="flex-shrink-0 hover:opacity-80 transition-opacity"
+                              >
+                                <img
+                                  src={item.product_image}
+                                  alt={item.product_name}
+                                  className="w-16 h-16 rounded-lg object-cover cursor-pointer"
+                                />
+                              </button>
                             )}
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium truncate">{item.product_name}</p>
+                              <button
+                                onClick={() => handleProductClick(item)}
+                                className="text-left w-full hover:text-primary transition-colors"
+                              >
+                                <p className="font-medium truncate">{item.product_name}</p>
+                              </button>
                               <p className="text-sm font-medium">
                                 {formatPrice(item.unit_price)}
                               </p>
@@ -182,6 +207,13 @@ export function ShoppingCart() {
             </>
           )}
         </div>
+        <ProductDetailModal
+          product={selectedProduct}
+          products={selectedProduct ? [selectedProduct] : []}
+          open={showProductModal}
+          onClose={() => setShowProductModal(false)}
+          hideVendorName={true}
+        />
       </SheetContent>
     </Sheet>
   );
