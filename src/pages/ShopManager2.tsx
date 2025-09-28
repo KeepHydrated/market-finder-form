@@ -847,9 +847,6 @@ export default function ShopManager() {
         <ShopSidebar hasShopData={!!shopData} />
         
         <main className="flex-1">
-          <header className="h-16 flex items-center border-b px-6">
-          </header>
-          
           <div className="p-6">
             {renderContent()}
           </div>
