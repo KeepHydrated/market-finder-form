@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import { Edit, Save, Plus, Trash2, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/auth/AuthForm';
@@ -465,6 +466,8 @@ export default function ShopManager() {
         return <VendorOrders vendorId={shopData?.id} />;
       case 'account':
         return renderAccount();
+      case 'test':
+        return renderTest();
       default:
         return renderShop();
     }
@@ -813,6 +816,53 @@ export default function ShopManager() {
           </div>
         </CardContent>
       </Card>
+    </div>
+  );
+
+  const renderTest = () => (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Test</h2>
+        <p className="text-muted-foreground">This is a test tab for development and experimentation</p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Sample Component</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              This is a sample component in the test tab. You can use this space to test new features, layouts, or components.
+            </p>
+            <Button variant="outline" className="w-full">
+              Test Button
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Another Sample</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Test Item 1</span>
+                <Badge>Active</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Test Item 2</span>
+                <Badge variant="secondary">Inactive</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Test Item 3</span>
+                <Badge variant="outline">Pending</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 

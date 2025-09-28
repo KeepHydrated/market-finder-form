@@ -3,7 +3,8 @@ import {
   Package, 
   Store, 
   Settings, 
-  ShoppingBag 
+  ShoppingBag,
+  TestTube
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -52,6 +53,12 @@ const menuItems = [
     icon: Settings, 
     section: "account",
     requiresShop: true 
+  },
+  { 
+    title: "Test", 
+    icon: TestTube, 
+    section: "test",
+    requiresShop: false 
   },
 ];
 
