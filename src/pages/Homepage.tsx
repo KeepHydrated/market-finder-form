@@ -86,6 +86,7 @@ const Homepage = () => {
   const [isLoadingMarketDistances, setIsLoadingMarketDistances] = useState(false);
   const [locationMethod, setLocationMethod] = useState<'ip' | 'gps'>('ip');
   const [isGettingGPSLocation, setIsGettingGPSLocation] = useState(false);
+  const [marketGoogleRatings, setMarketGoogleRatings] = useState<Record<string, {rating: number; reviewCount: number}>>({});
 
   // Handle category selection from URL and navigate to new page
   useEffect(() => {
@@ -347,6 +348,48 @@ const Homepage = () => {
   // Enhanced local storage cache for distances
   const DISTANCE_CACHE_KEY = 'market_distance_cache';
   const CACHE_EXPIRY_HOURS = 24; // Cache expires after 24 hours
+
+  // Fetch Google ratings for markets
+  const fetchMarketGoogleRatings = async (markets: Array<{name: string, address: string, vendors: AcceptedSubmission[]}>) => {
+    console.log('=== FETCHING MARKET GOOGLE RATINGS ===');
+    const ratings: Record<string, {rating: number; reviewCount: number}> = {};
+    
+    for (const market of markets) {
+      const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+      
+      try {
+        console.log(`Fetching Google rating for market: ${market.name}`);
+        
+        const response = await supabase.functions.invoke('farmers-market-search', {
+          body: { 
+            query: market.name,
+            location: market.address
+          }
+        });
+
+        console.log(`Google Places response for ${market.name}:`, response);
+
+        if (response.data?.predictions && response.data.predictions.length > 0) {
+          const marketData = response.data.predictions[0];
+          console.log(`Market data for ${market.name}:`, marketData);
+          
+          if (marketData.rating && marketData.user_ratings_total) {
+            ratings[marketId] = {
+              rating: marketData.rating,
+              reviewCount: marketData.user_ratings_total
+            };
+            console.log(`✅ Found rating for ${market.name}:`, ratings[marketId]);
+          }
+        }
+      } catch (error) {
+        console.error(`Error fetching rating for market ${market.name}:`, error);
+      }
+    }
+    
+    console.log('Final market ratings:', ratings);
+    setMarketGoogleRatings(ratings);
+    console.log('=== END MARKET GOOGLE RATINGS FETCH ===');
+  };
   
   // Load cached distances from localStorage
   const loadCachedDistances = () => {
@@ -579,6 +622,8 @@ const Homepage = () => {
       if (markets.length > 0) {
         // Start market distance calculation immediately without waiting for vendor distances
         calculateMarketDistances(markets, userCoordinates);
+        // Also fetch Google ratings for markets
+        fetchMarketGoogleRatings(markets);
       }
     }
   }, [acceptedSubmissions, userCoordinates]);
@@ -1160,6 +1205,25 @@ const Homepage = () => {
                    >
                      {/* Vendor Images Collage */}
                      <div className="aspect-[4/3] bg-muted relative overflow-hidden">
+                       {/* Google Rating Badge - Top Left */}
+                       <div className="absolute top-2 left-2 z-10 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                         <div className="flex items-center gap-1">
+                           <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                           <span className="text-xs font-medium">
+                             {(() => {
+                               const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+                               return marketGoogleRatings[marketId]?.rating?.toFixed(1) || '0.0';
+                             })()}
+                           </span>
+                           <span className="text-xs text-gray-600">
+                             ({(() => {
+                               const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+                               return marketGoogleRatings[marketId]?.reviewCount || 0;
+                             })()}) Google reviews
+                           </span>
+                         </div>
+                       </div>
+
                        {/* Like Button - Top Right */}
                        <Button
                          variant="secondary"
