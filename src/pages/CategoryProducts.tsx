@@ -291,7 +291,7 @@ const CategoryProducts = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Navigate to vendor page - you can implement this later
+                          navigate(`/market?vendor=${product.vendorId}`);
                         }}
                         className="text-xs text-black hover:underline cursor-pointer"
                       >
