@@ -358,13 +358,21 @@ const Homepage = () => {
       const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
       
       try {
-        // First, check if we have cached ratings in the database
-        const { data: existingMarket } = await supabase
+        console.log(`🔍 Checking database for cached rating: ${market.name}`);
+        
+        // First, check if we have cached ratings in the database (using maybeSingle to avoid errors)
+        const { data: existingMarket, error: dbError } = await supabase
           .from('markets')
           .select('google_rating, google_rating_count, last_rating_update')
           .eq('name', market.name)
           .eq('address', market.address)
-          .single();
+          .maybeSingle();
+
+        if (dbError) {
+          console.error(`❌ Database error for ${market.name}:`, dbError);
+        } else {
+          console.log(`📊 Database result for ${market.name}:`, existingMarket);
+        }
 
         // Check if we have recent ratings (less than 24 hours old)
         const isRecentRating = existingMarket?.last_rating_update && 
@@ -388,8 +396,11 @@ const Homepage = () => {
             }
           });
 
+          console.log(`📡 API response for ${market.name}:`, response);
+
           if (response.data?.predictions && response.data.predictions.length > 0) {
             const marketData = response.data.predictions[0];
+            console.log(`📍 Market data for ${market.name}:`, marketData);
             
             if (marketData.rating && marketData.user_ratings_total) {
               ratings[marketId] = {
@@ -398,25 +409,49 @@ const Homepage = () => {
               };
               console.log(`✅ Found fresh Google rating for ${market.name}:`, ratings[marketId]);
 
-              // Store/update the rating in the database
-              await supabase
+              // Store/update the rating in the database using insert with ON CONFLICT
+              const { error: insertError } = await supabase
                 .from('markets')
-                .upsert({
+                .insert({
                   name: market.name,
                   address: market.address,
-                  city: '', // You may want to extract this
-                  state: '', // You may want to extract this
-                  days: [], // You may want to extract this
+                  city: 'San Antonio', // Default city
+                  state: 'TX', // Default state
+                  days: ['Sunday'], // Default days
                   google_rating: marketData.rating,
                   google_rating_count: marketData.user_ratings_total,
                   google_place_id: marketData.place_id,
                   last_rating_update: new Date().toISOString()
-                }, {
-                  onConflict: 'name,address'
                 });
-              
-              console.log(`💾 Stored rating for ${market.name} in database`);
+
+              if (insertError) {
+                console.error(`❌ Error storing rating for ${market.name}:`, insertError);
+                
+                // Try updating existing record if insert failed
+                const { error: updateError } = await supabase
+                  .from('markets')
+                  .update({
+                    google_rating: marketData.rating,
+                    google_rating_count: marketData.user_ratings_total,
+                    google_place_id: marketData.place_id,
+                    last_rating_update: new Date().toISOString()
+                  })
+                  .eq('name', market.name)
+                  .eq('address', market.address);
+
+                if (updateError) {
+                  console.error(`❌ Error updating rating for ${market.name}:`, updateError);
+                } else {
+                  console.log(`💾 Updated rating for ${market.name} in database`);
+                }
+              } else {
+                console.log(`💾 Stored rating for ${market.name} in database`);
+              }
+            } else {
+              console.log(`⚠️ No rating data in API response for ${market.name}`);
             }
+          } else {
+            console.log(`⚠️ No predictions in API response for ${market.name}`);
           }
         }
       } catch (error) {
@@ -424,7 +459,7 @@ const Homepage = () => {
       }
     }
     
-    console.log('Final market ratings:', ratings);
+    console.log('🎯 Final market ratings:', ratings);
     setMarketGoogleRatings(ratings);
     console.log('=== END MARKET GOOGLE RATINGS FETCH ===');
   };
