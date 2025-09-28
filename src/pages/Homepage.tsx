@@ -1257,7 +1257,7 @@ const Homepage = () => {
                              ({(() => {
                                const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
                                return marketGoogleRatings[marketId]?.reviewCount || 0;
-                             })()}) Google reviews
+                             })()})
                            </span>
                          </div>
                        </div>
