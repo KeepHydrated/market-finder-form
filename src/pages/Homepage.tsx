@@ -1473,16 +1473,6 @@ const Homepage = () => {
                           </div>
                         )}
                         
-                        {/* Distance Badge */}
-                        <div className="absolute bottom-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                          <span className="text-xs font-medium text-gray-700">
-                            {product.vendorDistance === '-- miles' ? (
-                              <span className="animate-pulse">Loading...</span>
-                            ) : (
-                              product.vendorDistance
-                            )}
-                          </span>
-                        </div>
                         
                         {/* Like Button */}
                         <Button
