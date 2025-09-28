@@ -275,304 +275,300 @@ export default function AccountSettings() {
         <p className="text-muted-foreground">Manage your account information and preferences</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
+      <Tabs defaultValue="account" orientation="vertical" className="flex flex-col lg:flex-row gap-6">
         {/* Vertical Tab Navigation */}
         <div className="lg:w-64 lg:flex-shrink-0">
           <Card>
             <CardContent className="p-4">
-              <Tabs defaultValue="account" orientation="vertical" className="w-full">
-                <TabsList className="grid w-full grid-rows-3 h-auto p-1 bg-muted">
-                  <TabsTrigger value="account" className="flex items-center justify-start gap-2 w-full px-4 py-3 text-left">
-                    <User className="h-4 w-4" />
-                    Account
-                  </TabsTrigger>
-                  <TabsTrigger value="addresses" className="flex items-center justify-start gap-2 w-full px-4 py-3 text-left">
-                    <MapPin className="h-4 w-4" />
-                    Addresses
-                  </TabsTrigger>
-                  <TabsTrigger value="payment" className="flex items-center justify-start gap-2 w-full px-4 py-3 text-left">
-                    <CreditCard className="h-4 w-4" />
-                    Payment
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
+              <TabsList className="grid w-full grid-rows-3 h-auto p-1 bg-muted">
+                <TabsTrigger value="account" className="flex items-center justify-start gap-2 w-full px-4 py-3 text-left">
+                  <User className="h-4 w-4" />
+                  Account
+                </TabsTrigger>
+                <TabsTrigger value="addresses" className="flex items-center justify-start gap-2 w-full px-4 py-3 text-left">
+                  <MapPin className="h-4 w-4" />
+                  Addresses
+                </TabsTrigger>
+                <TabsTrigger value="payment" className="flex items-center justify-start gap-2 w-full px-4 py-3 text-left">
+                  <CreditCard className="h-4 w-4" />
+                  Payment
+                </TabsTrigger>
+              </TabsList>
             </CardContent>
           </Card>
         </div>
 
         {/* Content Area */}
         <div className="flex-1">
-          <Tabs defaultValue="account" orientation="vertical">
-            {/* Account Tab */}
-            <TabsContent value="account" className="mt-0">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Personal Information</CardTitle>
-                  <CardDescription>
-                    Update your personal details and contact information
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={user?.email || ''}
-                        disabled
-                        className="bg-muted"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Email cannot be changed from here
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="full_name">Full Name</Label>
-                      <Input
-                        id="full_name"
-                        value={profileForm.full_name}
-                        onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
-                        placeholder="Enter your full name"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="zipcode">Zip Code</Label>
-                      <Input
-                        id="zipcode"
-                        value={profileForm.zipcode}
-                        onChange={(e) => setProfileForm(prev => ({ ...prev, zipcode: e.target.value }))}
-                        placeholder="Enter your zip code"
-                      />
-                    </div>
+          {/* Account Tab */}
+          <TabsContent value="account" className="mt-0">
+            <Card>
+              <CardHeader>
+                <CardTitle>Personal Information</CardTitle>
+                <CardDescription>
+                  Update your personal details and contact information
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={user?.email || ''}
+                      disabled
+                      className="bg-muted"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Email cannot be changed from here
+                    </p>
                   </div>
-
-                  <Separator />
                   
-                  <div className="flex justify-end">
-                    <Button onClick={saveProfile} disabled={savingProfile}>
-                      {savingProfile ? 'Saving...' : 'Save Changes'}
-                    </Button>
+                  <div className="space-y-2">
+                    <Label htmlFor="full_name">Full Name</Label>
+                    <Input
+                      id="full_name"
+                      value={profileForm.full_name}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
+                      placeholder="Enter your full name"
+                    />
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
 
-            {/* Addresses Tab */}
-            <TabsContent value="addresses" className="mt-0">
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="text-lg font-semibold">Saved Addresses</h3>
-                    <p className="text-muted-foreground">Manage your shipping and billing addresses</p>
+                  <div className="space-y-2">
+                    <Label htmlFor="zipcode">Zip Code</Label>
+                    <Input
+                      id="zipcode"
+                      value={profileForm.zipcode}
+                      onChange={(e) => setProfileForm(prev => ({ ...prev, zipcode: e.target.value }))}
+                      placeholder="Enter your zip code"
+                    />
                   </div>
-                  <Button 
-                    onClick={() => {
-                      resetAddressForm();
-                      setEditingAddress(null);
-                      setShowAddressForm(true);
-                    }}
-                    className="flex items-center gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add Address
-                  </Button>
                 </div>
 
-                {/* Address Form */}
-                {showAddressForm && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>{editingAddress ? 'Edit Address' : 'Add New Address'}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="address_full_name">Full Name</Label>
-                          <Input
-                            id="address_full_name"
-                            value={addressForm.full_name}
-                            onChange={(e) => setAddressForm(prev => ({ ...prev, full_name: e.target.value }))}
-                          />
-                        </div>
+                <Separator />
+                
+                <div className="flex justify-end">
+                  <Button onClick={saveProfile} disabled={savingProfile}>
+                    {savingProfile ? 'Saving...' : 'Save Changes'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-                        <div className="space-y-2">
-                          <Label htmlFor="phone">Phone Number</Label>
-                          <Input
-                            id="phone"
-                            value={addressForm.phone}
-                            onChange={(e) => setAddressForm(prev => ({ ...prev, phone: e.target.value }))}
-                          />
-                        </div>
+          {/* Addresses Tab */}
+          <TabsContent value="addresses" className="mt-0">
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-semibold">Saved Addresses</h3>
+                  <p className="text-muted-foreground">Manage your shipping and billing addresses</p>
+                </div>
+                <Button 
+                  onClick={() => {
+                    resetAddressForm();
+                    setEditingAddress(null);
+                    setShowAddressForm(true);
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Address
+                </Button>
+              </div>
 
-                        <div className="space-y-2 md:col-span-2">
-                          <Label htmlFor="address_line_1">Address Line 1</Label>
-                          <Input
-                            id="address_line_1"
-                            value={addressForm.address_line_1}
-                            onChange={(e) => setAddressForm(prev => ({ ...prev, address_line_1: e.target.value }))}
-                            placeholder="Street address"
-                          />
-                        </div>
-
-                        <div className="space-y-2 md:col-span-2">
-                          <Label htmlFor="address_line_2">Address Line 2 (Optional)</Label>
-                          <Input
-                            id="address_line_2"
-                            value={addressForm.address_line_2}
-                            onChange={(e) => setAddressForm(prev => ({ ...prev, address_line_2: e.target.value }))}
-                            placeholder="Apartment, suite, etc."
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="city">City</Label>
-                          <Input
-                            id="city"
-                            value={addressForm.city}
-                            onChange={(e) => setAddressForm(prev => ({ ...prev, city: e.target.value }))}
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="state">State</Label>
-                          <Input
-                            id="state"
-                            value={addressForm.state}
-                            onChange={(e) => setAddressForm(prev => ({ ...prev, state: e.target.value }))}
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="postal_code">Postal Code</Label>
-                          <Input
-                            id="postal_code"
-                            value={addressForm.postal_code}
-                            onChange={(e) => setAddressForm(prev => ({ ...prev, postal_code: e.target.value }))}
-                          />
-                        </div>
+              {/* Address Form */}
+              {showAddressForm && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{editingAddress ? 'Edit Address' : 'Add New Address'}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="address_full_name">Full Name</Label>
+                        <Input
+                          id="address_full_name"
+                          value={addressForm.full_name}
+                          onChange={(e) => setAddressForm(prev => ({ ...prev, full_name: e.target.value }))}
+                        />
                       </div>
 
-                      <div className="flex justify-end gap-3">
-                        <Button 
-                          variant="outline" 
-                          onClick={() => {
-                            setShowAddressForm(false);
-                            setEditingAddress(null);
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                        <Button onClick={saveAddress}>
-                          {editingAddress ? 'Update Address' : 'Save Address'}
-                        </Button>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input
+                          id="phone"
+                          value={addressForm.phone}
+                          onChange={(e) => setAddressForm(prev => ({ ...prev, phone: e.target.value }))}
+                        />
+                      </div>
+
+                      <div className="space-y-2 md:col-span-2">
+                        <Label htmlFor="address_line_1">Address Line 1</Label>
+                        <Input
+                          id="address_line_1"
+                          value={addressForm.address_line_1}
+                          onChange={(e) => setAddressForm(prev => ({ ...prev, address_line_1: e.target.value }))}
+                          placeholder="Street address"
+                        />
+                      </div>
+
+                      <div className="space-y-2 md:col-span-2">
+                        <Label htmlFor="address_line_2">Address Line 2 (Optional)</Label>
+                        <Input
+                          id="address_line_2"
+                          value={addressForm.address_line_2}
+                          onChange={(e) => setAddressForm(prev => ({ ...prev, address_line_2: e.target.value }))}
+                          placeholder="Apartment, suite, etc."
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="city">City</Label>
+                        <Input
+                          id="city"
+                          value={addressForm.city}
+                          onChange={(e) => setAddressForm(prev => ({ ...prev, city: e.target.value }))}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="state">State</Label>
+                        <Input
+                          id="state"
+                          value={addressForm.state}
+                          onChange={(e) => setAddressForm(prev => ({ ...prev, state: e.target.value }))}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="postal_code">Postal Code</Label>
+                        <Input
+                          id="postal_code"
+                          value={addressForm.postal_code}
+                          onChange={(e) => setAddressForm(prev => ({ ...prev, postal_code: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end gap-3">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setShowAddressForm(false);
+                          setEditingAddress(null);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button onClick={saveAddress}>
+                        {editingAddress ? 'Update Address' : 'Save Address'}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Address List */}
+              <div className="grid gap-4">
+                {addresses.map((address) => (
+                  <Card key={address.id} className="relative">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-medium">{address.full_name}</h4>
+                            {address.is_default && (
+                              <Badge variant="secondary" className="text-xs">
+                                <Check className="h-3 w-3 mr-1" />
+                                Default
+                              </Badge>
+                            )}
+                            <Badge variant="outline" className="text-xs capitalize">
+                              {address.type}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {address.address_line_1}
+                            {address.address_line_2 && `, ${address.address_line_2}`}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {address.city}, {address.state} {address.postal_code}
+                          </p>
+                          {address.phone && (
+                            <p className="text-sm text-muted-foreground">
+                              {address.phone}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => startEditAddress(address)}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteAddress(address.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
+                ))}
+
+                {addresses.length === 0 && !showAddressForm && (
+                  <Card>
+                    <CardContent className="text-center py-8">
+                      <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No addresses saved</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Add your shipping and billing addresses for faster checkout
+                      </p>
+                      <Button 
+                        onClick={() => {
+                          resetAddressForm();
+                          setShowAddressForm(true);
+                        }}
+                      >
+                        Add Your First Address
+                      </Button>
+                    </CardContent>
+                  </Card>
                 )}
-
-                {/* Address List */}
-                <div className="grid gap-4">
-                  {addresses.map((address) => (
-                    <Card key={address.id} className="relative">
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-medium">{address.full_name}</h4>
-                              {address.is_default && (
-                                <Badge variant="secondary" className="text-xs">
-                                  <Check className="h-3 w-3 mr-1" />
-                                  Default
-                                </Badge>
-                              )}
-                              <Badge variant="outline" className="text-xs capitalize">
-                                {address.type}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground">
-                              {address.address_line_1}
-                              {address.address_line_2 && `, ${address.address_line_2}`}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {address.city}, {address.state} {address.postal_code}
-                            </p>
-                            {address.phone && (
-                              <p className="text-sm text-muted-foreground">
-                                {address.phone}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => startEditAddress(address)}
-                            >
-                              <Edit2 className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => deleteAddress(address.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-
-                  {addresses.length === 0 && !showAddressForm && (
-                    <Card>
-                      <CardContent className="text-center py-8">
-                        <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-medium mb-2">No addresses saved</h3>
-                        <p className="text-muted-foreground mb-4">
-                          Add your shipping and billing addresses for faster checkout
-                        </p>
-                        <Button 
-                          onClick={() => {
-                            resetAddressForm();
-                            setShowAddressForm(true);
-                          }}
-                        >
-                          Add Your First Address
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
               </div>
-            </TabsContent>
+            </div>
+          </TabsContent>
 
-            {/* Payment Tab */}
-            <TabsContent value="payment" className="mt-0">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Payment Methods</CardTitle>
-                  <CardDescription>
-                    Manage your saved payment methods
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="text-center py-8">
-                  <CreditCard className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Payment methods</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Payment methods are securely managed by Stripe during checkout
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    You can add and manage payment methods during your next purchase
-                  </p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+          {/* Payment Tab */}
+          <TabsContent value="payment" className="mt-0">
+            <Card>
+              <CardHeader>
+                <CardTitle>Payment Methods</CardTitle>
+                <CardDescription>
+                  Manage your saved payment methods
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center py-8">
+                <CreditCard className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Payment methods</h3>
+                <p className="text-muted-foreground mb-4">
+                  Payment methods are securely managed by Stripe during checkout
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  You can add and manage payment methods during your next purchase
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </div>
-      </div>
+      </Tabs>
     </div>
   );
 }
