@@ -26,9 +26,10 @@ interface ProductDetailModalProps {
   onProductChange?: (product: Product) => void;
   vendorId?: string;
   vendorName?: string;
+  hideVendorName?: boolean;
 }
 
-export const ProductDetailModal = ({ product, products = [], open, onClose, onProductChange, vendorId, vendorName }: ProductDetailModalProps) => {
+export const ProductDetailModal = ({ product, products = [], open, onClose, onProductChange, vendorId, vendorName, hideVendorName = false }: ProductDetailModalProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { addItem } = useShoppingCart();
   const { toast } = useToast();
@@ -226,7 +227,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
               </div>
               
               {/* Store name at the very bottom of right column */}
-              {vendorId && vendorName && (
+              {vendorId && vendorName && !hideVendorName && (
                 <div className="mt-auto pt-3 border-t border-gray-200">
                   <div className="flex justify-start">
                     <button

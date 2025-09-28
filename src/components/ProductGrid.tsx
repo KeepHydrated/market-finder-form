@@ -22,6 +22,7 @@ interface ProductGridProps {
   onEditProduct?: (product: Product) => void;
   vendorId?: string;
   vendorName?: string;
+  hideVendorName?: boolean;
 }
 
 interface ProductCardProps {
@@ -206,7 +207,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProd
   );
 };
 
-export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId, vendorName }: ProductGridProps) => {
+export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId, vendorName, hideVendorName = false }: ProductGridProps) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -253,6 +254,7 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
         onProductChange={setSelectedProduct}
         vendorId={vendorId}
         vendorName={vendorName}
+        hideVendorName={hideVendorName}
       />
     </>
   );
