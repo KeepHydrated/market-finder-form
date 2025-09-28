@@ -191,7 +191,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProd
             ${product.price.toFixed(2)}
           </span>
         </div>
-        {vendorName && (
+        {vendorName && !onDeleteProduct && (
           <div className="mt-2 pt-2 border-t border-border">
             <button 
               onClick={(e) => e.stopPropagation()}
