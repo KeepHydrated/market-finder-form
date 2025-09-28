@@ -84,10 +84,9 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
             <SidebarMenu>
               {availableItems.map((item) => (
                 <SidebarMenuItem key={item.section}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className={getNavClasses(isActive(item.section))}>
                     <NavLink 
-                      to={`/submit?section=${item.section}`} 
-                      className={getNavClasses(isActive(item.section))}
+                      to={`/submit?section=${item.section}`}
                     >
                       <item.icon className="h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
