@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLikes } from "@/hooks/useLikes";
-import { calculateDistance, getGoogleMapsDistance, cacheVendorCoordinates, getCoordinatesForAddress } from "@/lib/geocoding";
+import { calculateDistance, getGoogleMapsDistance, getCoordinatesForAddress } from "@/lib/geocoding";
 
 interface AcceptedSubmission {
   id: string;
@@ -81,7 +81,7 @@ const Homepage = () => {
     address: string;
     vendors: AcceptedSubmission[];
   } | null>(null);
-  const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
+  
   const [marketDistances, setMarketDistances] = useState<Record<string, string>>({});
   const [isLoadingMarketDistances, setIsLoadingMarketDistances] = useState(false);
   const [locationMethod, setLocationMethod] = useState<'ip' | 'gps'>('ip');
@@ -273,77 +273,6 @@ const Homepage = () => {
     );
   };
 
-  // Calculate distances for all vendors (synchronized with market calculation)
-  const calculateVendorDistances = async (vendors: AcceptedSubmission[], userCoords: {lat: number, lng: number}) => {
-    console.log('=== VENDOR DISTANCE CALCULATION (SYNCHRONIZED WITH MARKETS) ===');
-    console.log('User coordinates:', userCoords);
-    console.log('Starting synchronized distance calculations for', vendors.length, 'vendors');
-    
-    const distances: Record<string, string> = {};
-    
-    for (const vendor of vendors) {
-      console.log('\n--- Processing vendor:', vendor.store_name);
-      console.log('Market address:', vendor.market_address);
-      
-      if (!vendor.market_address) {
-        console.log('No market address for vendor:', vendor.store_name);
-        distances[vendor.id] = '-- miles';
-        continue;
-      }
-
-      try {
-        // USE THE SAME COORDINATE SOURCE AS MARKET DISTANCE CALCULATION
-        // This ensures vendor and market cards show identical distances
-        const vendorCoords = await getCoordinatesForAddress(vendor.market_address);
-        console.log('🔄 Using geocoded coordinates (same as market calculation):', vendorCoords);
-        
-        if (vendorCoords) {
-          console.log('=== DISTANCE CALCULATION ===');
-          console.log('User coords:', userCoords);
-          console.log('Vendor coords:', vendorCoords);
-          
-          // Try Google Maps distance first, fall back to Haversine calculation
-          const googleDistance = await getGoogleMapsDistance(
-            userCoords.lat, 
-            userCoords.lng, 
-            vendorCoords.lat, 
-            vendorCoords.lng
-          );
-          
-          let finalDistance: string;
-          
-          if (googleDistance) {
-            console.log('✅ Using Google Maps distance:', googleDistance.distance);
-            finalDistance = googleDistance.distance;
-          } else {
-            console.log('⚠️ Google Maps failed, using Haversine calculation');
-            const distanceInMiles = calculateDistance(
-              userCoords.lat, 
-              userCoords.lng, 
-              vendorCoords.lat, 
-              vendorCoords.lng
-            );
-            finalDistance = `${distanceInMiles.toFixed(1)} miles`;
-          }
-          
-          console.log('Final synchronized distance:', finalDistance);
-          console.log('Google Maps equivalent: https://maps.google.com/maps?saddr=' + userCoords.lat + ',' + userCoords.lng + '&daddr=' + vendorCoords.lat + ',' + vendorCoords.lng);
-          
-          distances[vendor.id] = finalDistance;
-        } else {
-          console.log('No coordinates returned for vendor:', vendor.id);
-          distances[vendor.id] = '-- miles';
-        }
-      } catch (error) {
-        console.error(`Error calculating distance for vendor ${vendor.id}:`, error);
-        distances[vendor.id] = '-- miles';
-      }
-    }
-    
-    console.log('Final synchronized distances:', distances);
-    console.log('=== END VENDOR DISTANCE CALCULATION ===');
-    setVendorDistances(distances);
-  };
 
   // Enhanced local storage cache for distances
   const DISTANCE_CACHE_KEY = 'market_distance_cache';
@@ -563,7 +492,7 @@ const Homepage = () => {
           
           try {
             // Use market address directly for consistent coordinates
-            const marketCoords = await cacheVendorCoordinates(marketId, market.address);
+            const marketCoords = await getCoordinatesForAddress(market.address);
             
             if (marketCoords) {
                // Calculate distance using Google Maps
@@ -690,12 +619,6 @@ const Homepage = () => {
     }
   }, []);
 
-  // Calculate distances when vendors or user coordinates change
-  useEffect(() => {
-    if (acceptedSubmissions.length > 0 && userCoordinates) {
-      calculateVendorDistances(acceptedSubmissions, userCoordinates);
-    }
-  }, [acceptedSubmissions, userCoordinates]);
 
   // Calculate market distances independently and immediately
   useEffect(() => {
@@ -1169,9 +1092,9 @@ const Homepage = () => {
                      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]" 
                      onClick={async () => {
                        // Get the same cached coordinates used for distance calculation
-                       const cachedCoords = submission.market_address 
-                         ? await cacheVendorCoordinates(submission.id, submission.market_address)
-                         : null;
+                        const cachedCoords = submission.market_address 
+                          ? await getCoordinatesForAddress(submission.market_address)
+                          : null;
                        
                        navigate('/market', { 
                          state: { 
@@ -1233,12 +1156,6 @@ const Homepage = () => {
                         />
                       </Button>
 
-                      {/* Distance Badge */}
-                      <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                        <span className="text-xs font-medium text-gray-700">
-                          {vendorDistances[submission.id] || '-- miles'}
-                        </span>
-                      </div>
                     </div>
                     
                     {/* Store Information */}
@@ -1514,7 +1431,7 @@ const Homepage = () => {
                   vendorId: submission.id,
                   vendorName: submission.store_name,
                   vendorSpecialty: submission.primary_specialty,
-                  vendorDistance: vendorDistances[submission.id] || '-- miles'
+                  vendorDistance: undefined
                 }))
               );
 
