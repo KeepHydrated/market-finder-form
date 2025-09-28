@@ -397,7 +397,7 @@ export default function ShopManager() {
       name: `${product.name} (Copy)`
     };
     
-    const updatedProducts = [...products, duplicatedProduct];
+    const updatedProducts = [duplicatedProduct, ...products];
     setProducts(updatedProducts);
 
     if (shopData) {
