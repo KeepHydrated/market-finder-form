@@ -129,10 +129,11 @@ const Homepage = () => {
         selectedCategories.includes(submission.primary_specialty)
       );
       
-      // If this is from the header dropdown, ensure we're showing nationwide results
+      // If this is from the header dropdown, switch to products view and show nationwide results
       if (isNationwideSearch) {
         console.log(`🌍 Showing nationwide results for category: ${selectedCategories.join(', ')}`);
         console.log(`Found ${filtered.length} vendors nationwide in this category`);
+        setViewMode('products'); // Automatically switch to products view for category searches
       }
     }
 
