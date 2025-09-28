@@ -207,9 +207,6 @@ const CategoryProducts = () => {
             </Button>
             <div>
               <h1 className="text-3xl font-bold">{category}</h1>
-              <p className="text-muted-foreground">
-                {sortedProducts.length} products from {vendors.length} vendors nationwide
-              </p>
             </div>
           </div>
           
