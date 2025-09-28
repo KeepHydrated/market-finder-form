@@ -202,7 +202,7 @@ export function ShoppingCart() {
                         onClick={() => handleCheckout(vendorId, vendorItems)}
                         disabled={loading}
                       >
-                        {loading ? 'Processing...' : `Checkout ${vendorItems[0].vendor_name}`}
+                        {loading ? 'Processing...' : 'Checkout'}
                       </Button>
                     </div>
                   );
