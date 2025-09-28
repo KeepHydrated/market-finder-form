@@ -82,7 +82,11 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
     <Sidebar
       collapsible="icon"
     >
-      <SidebarContent className="pt-4">
+      {/* Header spacer to align with main content header */}
+      <div className="h-16 border-b flex items-center px-4">
+        <span className="font-semibold text-sm text-muted-foreground">Navigation</span>
+      </div>
+      <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Shop Management</SidebarGroupLabel>
           <SidebarGroupContent>
