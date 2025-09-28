@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      commissions: {
+        Row: {
+          commission_amount: number
+          commission_email: string
+          commission_rate: number
+          created_at: string
+          id: string
+          order_id: string
+          order_total: number
+          updated_at: string
+          vendor_id: string
+          vendor_name: string
+        }
+        Insert: {
+          commission_amount: number
+          commission_email: string
+          commission_rate?: number
+          created_at?: string
+          id?: string
+          order_id: string
+          order_total: number
+          updated_at?: string
+          vendor_id: string
+          vendor_name: string
+        }
+        Update: {
+          commission_amount?: number
+          commission_email?: string
+          commission_rate?: number
+          created_at?: string
+          id?: string
+          order_id?: string
+          order_total?: number
+          updated_at?: string
+          vendor_id?: string
+          vendor_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commissions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       likes: {
         Row: {
           created_at: string

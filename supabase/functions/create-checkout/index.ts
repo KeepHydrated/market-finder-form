@@ -113,6 +113,30 @@ serve(async (req) => {
     if (itemsError) throw new Error(`Failed to create order items: ${itemsError.message}`);
     logStep("Created order items", { count: orderItems.length });
 
+    // Create commission record for nadiachibri@gmail.com (3% commission)
+    const commissionEmail = "nadiachibri@gmail.com";
+    const commissionRate = 0.03; // 3%
+    const commissionAmount = Math.round(totalAmount * commissionRate);
+    
+    const { error: commissionError } = await supabaseClient
+      .from('commissions')
+      .insert({
+        order_id: order.id,
+        commission_email: commissionEmail,
+        commission_rate: commissionRate,
+        commission_amount: commissionAmount,
+        order_total: totalAmount,
+        vendor_id,
+        vendor_name
+      });
+
+    if (commissionError) {
+      logStep("Failed to create commission record", { error: commissionError.message });
+      // Don't fail the checkout if commission tracking fails
+    } else {
+      logStep("Created commission record", { commissionAmount, commissionEmail });
+    }
+
     // Create Stripe line items
     const lineItems = items.map(item => ({
       price_data: {

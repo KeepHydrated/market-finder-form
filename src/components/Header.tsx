@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { CartButton } from "@/components/shopping/CartButton";
-import { ArrowLeft, Heart, Store, ChevronDown, Search } from "lucide-react";
+import { ArrowLeft, Heart, Store, ChevronDown, Search, DollarSign } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -175,6 +175,13 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
               <Link to="/submit">
                 <Button variant="ghost" size="sm">
                   <Store className="h-5 w-5" />
+                </Button>
+              </Link>
+            )}
+            {user?.email === 'nadiachibri@gmail.com' && (
+              <Link to="/commissions">
+                <Button variant="ghost" size="sm" title="Commission Dashboard">
+                  <DollarSign className="h-5 w-5" />
                 </Button>
               </Link>
             )}
