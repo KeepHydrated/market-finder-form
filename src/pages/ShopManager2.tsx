@@ -51,6 +51,7 @@ const SPECIALTY_CATEGORIES = [
 ];
 
 export default function ShopManager() {
+  console.log("ShopManager component rendering...");
   const { user, loading } = useAuth();
   const { toast } = useToast();
   const location = useLocation();
@@ -451,6 +452,7 @@ export default function ShopManager() {
   };
 
   const renderContent = () => {
+    console.log("Rendering content for section:", currentSection);
     switch (currentSection) {
       case 'overview':
         if (!shopData) return renderShop();
@@ -842,7 +844,7 @@ export default function ShopManager() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+      <div className="min-h-screen flex w-full bg-background">
         <ShopSidebar hasShopData={!!shopData} />
         
         <main className="flex-1">
