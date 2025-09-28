@@ -91,7 +91,7 @@ export function UserMenu({ user, profile }: UserMenuProps) {
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleAccountClick}>
           <Settings className="mr-2 h-4 w-4" />
-          <span>Account Settings</span>
+          <span>Shopping Settings</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
