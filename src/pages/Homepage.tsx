@@ -349,31 +349,50 @@ const Homepage = () => {
   const DISTANCE_CACHE_KEY = 'market_distance_cache';
   const CACHE_EXPIRY_HOURS = 24; // Cache expires after 24 hours
 
-  // Fetch Google ratings for markets - using existing vendor data that already has Google ratings
+  // Fetch Google ratings for markets using Google Places API
   const fetchMarketGoogleRatings = async (markets: Array<{name: string, address: string, vendors: AcceptedSubmission[]}>) => {
-    console.log('=== SETTING MARKET GOOGLE RATINGS FROM EXISTING DATA ===');
+    console.log('=== FETCHING MARKET GOOGLE RATINGS FROM GOOGLE PLACES API ===');
     const ratings: Record<string, {rating: number; reviewCount: number}> = {};
     
     for (const market of markets) {
       const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
       
-      // Check if any vendor in this market has Google rating data
-      const vendorWithRating = market.vendors.find(vendor => 
-        (vendor as any).google_rating && (vendor as any).google_rating_count
-      );
-      
-      if (vendorWithRating && (vendorWithRating as any).google_rating && (vendorWithRating as any).google_rating_count) {
-        ratings[marketId] = {
-          rating: (vendorWithRating as any).google_rating,
-          reviewCount: (vendorWithRating as any).google_rating_count
-        };
-        console.log(`✅ Using existing rating for ${market.name}:`, ratings[marketId]);
+      try {
+        console.log(`Fetching Google rating for market: ${market.name}`);
+        
+        const response = await supabase.functions.invoke('farmers-market-search', {
+          body: { 
+            query: market.name,
+            location: null // Use null to get general results
+          }
+        });
+
+        console.log(`Google Places response for ${market.name}:`, response);
+
+        if (response.data?.predictions && response.data.predictions.length > 0) {
+          const marketData = response.data.predictions[0];
+          console.log(`Market data for ${market.name}:`, marketData);
+          
+          if (marketData.rating && marketData.user_ratings_total) {
+            ratings[marketId] = {
+              rating: marketData.rating,
+              reviewCount: marketData.user_ratings_total
+            };
+            console.log(`✅ Found Google rating for ${market.name}:`, ratings[marketId]);
+          } else {
+            console.log(`⚠️ No rating data found for ${market.name}`);
+          }
+        } else {
+          console.log(`⚠️ No predictions found for ${market.name}`);
+        }
+      } catch (error) {
+        console.error(`❌ Error fetching rating for market ${market.name}:`, error);
       }
     }
     
     console.log('Final market ratings:', ratings);
     setMarketGoogleRatings(ratings);
-    console.log('=== END MARKET GOOGLE RATINGS SETUP ===');
+    console.log('=== END MARKET GOOGLE RATINGS FETCH ===');
   };
   
   // Load cached distances from localStorage
