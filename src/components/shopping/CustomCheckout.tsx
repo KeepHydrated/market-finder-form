@@ -154,110 +154,95 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
     }
   };
 
-  // Auto-initialize payment intent when user is logged in or email is provided
-  useEffect(() => {
-    if ((user || guestEmail) && !clientSecret && !loading) {
-      handleCreatePaymentIntent();
-    }
-  }, [user, guestEmail, clientSecret, loading]);
-
   const customerEmail = user?.email || guestEmail;
 
-  const options = clientSecret ? {
-    clientSecret,
-    appearance: {
-      theme: 'stripe' as const,
-    },
-  } : undefined;
-
-  return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle>Checkout</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Order Summary - Left Side */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold">Order Summary</h3>
-            <div className="space-y-4">
-              {Object.values(groupedItems).map((group, index) => (
-                <div key={index} className="space-y-2">
-                  <h4 className="font-medium text-sm text-muted-foreground">
-                    {group.vendor_name}
-                  </h4>
-                  {group.items.map((item, itemIndex) => (
-                    <div key={itemIndex} className="flex justify-between text-sm">
-                      <span>
-                        {item.product_name} × {item.quantity}
-                      </span>
-                      <span>{formatPrice(item.unit_price * item.quantity)}</span>
-                    </div>
-                  ))}
-                </div>
-              ))}
-              <div className="border-t pt-4">
-                <div className="flex justify-between font-semibold text-lg">
-                  <span>Total</span>
-                  <span>{formatPrice(totalAmount)}</span>
-                </div>
+  if (!clientSecret) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle>Checkout</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Order Summary */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">Order Summary</h3>
+            {Object.values(groupedItems).map((group, index) => (
+              <div key={index} className="space-y-2">
+                <h4 className="font-medium text-sm text-muted-foreground">
+                  {group.vendor_name}
+                </h4>
+                {group.items.map((item, itemIndex) => (
+                  <div key={itemIndex} className="flex justify-between text-sm">
+                    <span>
+                      {item.product_name} × {item.quantity}
+                    </span>
+                    <span>{formatPrice(item.unit_price * item.quantity)}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+            <div className="border-t pt-2">
+              <div className="flex justify-between font-semibold">
+                <span>Total</span>
+                <span>{formatPrice(totalAmount)}</span>
               </div>
             </div>
           </div>
 
-          {/* Payment Form - Right Side */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold">Payment Information</h3>
-            
-            {/* Guest Email Input */}
-            {!user && (
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={guestEmail}
-                  onChange={(e) => setGuestEmail(e.target.value)}
-                  required
-                />
-              </div>
-            )}
+          {/* Guest Email Input */}
+          {!user && (
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+                required
+              />
+            </div>
+          )}
 
-            {/* Payment Elements */}
-            {clientSecret && options ? (
-              <Elements options={options} stripe={stripePromise}>
-                <CheckoutForm
-                  clientSecret={clientSecret}
-                  customerEmail={customerEmail}
-                  onSuccess={onSuccess}
-                  onCancel={onCancel}
-                />
-              </Elements>
-            ) : (
-              <div className="space-y-4">
-                {loading ? (
-                  <div className="text-center py-8">
-                    <div className="text-muted-foreground">Initializing payment...</div>
-                  </div>
-                ) : (
-                  <div className="flex gap-3">
-                    <Button variant="outline" onClick={onCancel} className="flex-1">
-                      Back to Cart
-                    </Button>
-                    <Button
-                      onClick={handleCreatePaymentIntent}
-                      disabled={!user && !guestEmail}
-                      className="flex-1"
-                    >
-                      Continue to Payment
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
+          {/* Action Buttons */}
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={onCancel} className="flex-1">
+              Back to Cart
+            </Button>
+            <Button
+              onClick={handleCreatePaymentIntent}
+              disabled={loading || (!user && !guestEmail)}
+              className="flex-1"
+            >
+              {loading ? 'Loading...' : 'Continue to Payment'}
+            </Button>
           </div>
-        </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const options = {
+    clientSecret,
+    appearance: {
+      theme: 'stripe' as const,
+    },
+  };
+
+  return (
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle>Complete Payment</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Elements options={options} stripe={stripePromise}>
+          <CheckoutForm
+            clientSecret={clientSecret}
+            customerEmail={customerEmail}
+            onSuccess={onSuccess}
+            onCancel={onCancel}
+          />
+        </Elements>
       </CardContent>
     </Card>
   );
