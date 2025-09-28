@@ -21,15 +21,13 @@ interface AcceptedSubmission {
   primary_specialty: string;
   website: string;
   description: string;
-  products: any;
+  products: any[];
   selected_market: string;
   search_term: string;
   market_address?: string;
   market_days?: string[];
-  market_hours?: any;
+  market_hours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
   created_at: string;
-  latitude?: number;
-  longitude?: number;
 }
 
 interface VendorRating {
@@ -151,25 +149,24 @@ const Homepage = () => {
       });
     }
 
-        // Apply location filter if user coordinates are available and it's not a nationwide search
-        if (userCoordinates && !isNationwideSearch) {
-          filtered = filtered.filter(submission => {
-            if (!submission.latitude || !submission.longitude) return true; // Include if no coordinates to filter by
-            
-            try {
-              const distance = calculateDistance(
-                userCoordinates.lat,
-                userCoordinates.lng,
-                submission.latitude,
-                submission.longitude
-              );
-              return distance <= rangeMiles[0];
-            } catch (error) {
-              console.warn('Error calculating distance for submission:', submission.id, error);
-              return true; // Include in results if distance calculation fails
-            }
-          });
+    // Apply location filter if user coordinates are available and it's not a nationwide search
+    if (userCoordinates && !isNationwideSearch) {
+      filtered = filtered.filter(submission => {
+        if (!submission.market_address) return true; // Include if no address to filter by
+        
+        try {
+          const distance = calculateDistance(
+            userCoordinates.lat,
+            userCoordinates.lng,
+            submission.market_address
+          );
+          return distance <= rangeMiles[0];
+        } catch (error) {
+          console.warn('Error calculating distance for submission:', submission.id, error);
+          return true; // Include in results if distance calculation fails
         }
+      });
+    }
 
     setFilteredSubmissions(filtered);
     console.log('Filtered submissions:', filtered.length, 'out of', acceptedSubmissions.length);
@@ -191,9 +188,8 @@ const Homepage = () => {
     try {
       console.log('Fetching accepted submissions...');
       const { data, error } = await supabase
-        .from('submissions')
+        .from('accepted_submissions')
         .select('*')
-        .eq('status', 'accepted')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -218,7 +214,7 @@ const Homepage = () => {
   const fetchVendorRatings = async () => {
     try {
       const { data, error } = await supabase
-        .from('reviews')
+        .from('vendor_reviews')
         .select('vendor_id, rating');
 
       if (error) {
@@ -396,28 +392,8 @@ const Homepage = () => {
     const allProducts: any[] = [];
     
     filteredSubmissions.forEach(submission => {
-      console.log('Processing submission:', submission.store_name, 'Products:', submission.products);
-      
-      // Handle products that might be stored as JSON string or array
-      let products: any[] = [];
-      if (submission.products) {
-        if (typeof submission.products === 'string') {
-          try {
-            products = JSON.parse(submission.products);
-          } catch (e) {
-            console.warn('Could not parse products JSON for', submission.store_name, e);
-            products = [];
-          }
-        } else if (Array.isArray(submission.products)) {
-          products = submission.products;
-        } else if (typeof submission.products === 'object') {
-          products = Object.values(submission.products);
-        }
-      }
-      
-      if (products && products.length > 0) {
-        products.forEach((product: any) => {
-          console.log('Adding product:', product.name, 'Image:', product.image);
+      if (submission.products && submission.products.length > 0) {
+        submission.products.forEach((product: any) => {
           allProducts.push({
             ...product,
             vendorName: submission.store_name,
@@ -428,7 +404,6 @@ const Homepage = () => {
       }
     });
 
-    console.log('Total products found:', allProducts.length);
     return allProducts;
   };
 
@@ -441,10 +416,15 @@ const Homepage = () => {
       const uniqueMarkets = getUniqueMarkets();
       const distances: Record<string, string> = {};
       
-        for (const market of uniqueMarkets) {
-          // For now, skip market distance calculations since we need coordinates
+      for (const market of uniqueMarkets) {
+        try {
+          const distance = await getGoogleMapsDistance(userCoordinates, market.address);
+          distances[`${market.name}-${market.address}`] = distance;
+        } catch (error) {
+          console.error(`Error calculating distance to ${market.name}:`, error);
           distances[`${market.name}-${market.address}`] = 'Distance unavailable';
         }
+      }
       
       setMarketDistances(distances);
       setIsLoadingMarketDistances(false);
@@ -461,22 +441,17 @@ const Homepage = () => {
       const vendorsToCalculate = selectedMarket ? selectedMarket.vendors : filteredSubmissions;
       const distances: Record<string, string> = {};
       
-        for (const vendor of vendorsToCalculate) {
-          if (vendor.latitude && vendor.longitude) {
-            try {
-              const distance = calculateDistance(
-                userCoordinates.lat,
-                userCoordinates.lng,
-                vendor.latitude,
-                vendor.longitude
-              );
-              distances[vendor.id] = `${distance.toFixed(1)} miles`;
-            } catch (error) {
-              console.error(`Error calculating distance to ${vendor.store_name}:`, error);
-              distances[vendor.id] = 'Distance unavailable';
-            }
+      for (const vendor of vendorsToCalculate) {
+        if (vendor.market_address) {
+          try {
+            const distance = await getGoogleMapsDistance(userCoordinates, vendor.market_address);
+            distances[vendor.id] = distance;
+          } catch (error) {
+            console.error(`Error calculating distance to ${vendor.store_name}:`, error);
+            distances[vendor.id] = 'Distance unavailable';
           }
         }
+      }
       
       setVendorDistances(distances);
     };
@@ -861,14 +836,14 @@ const Homepage = () => {
                           <div className="text-sm">
                             <p className="font-medium mb-1">Vendor Categories:</p>
                             <div className="flex flex-wrap gap-1">
-                              {[...new Set(market.vendors.map((v: any) => v.primary_specialty))].slice(0, 3).map((specialty: any) => (
-                                <Badge key={specialty as string} variant="outline" className="text-xs">
-                                  {specialty as string}
+                              {[...new Set(market.vendors.map(v => v.primary_specialty))].slice(0, 3).map((specialty) => (
+                                <Badge key={specialty} variant="outline" className="text-xs">
+                                  {specialty}
                                 </Badge>
                               ))}
-                              {[...new Set(market.vendors.map((v: any) => v.primary_specialty))].length > 3 && (
+                              {[...new Set(market.vendors.map(v => v.primary_specialty))].length > 3 && (
                                 <Badge variant="outline" className="text-xs">
-                                  +{[...new Set(market.vendors.map((v: any) => v.primary_specialty))].length - 3} more
+                                  +{[...new Set(market.vendors.map(v => v.primary_specialty))].length - 3} more
                                 </Badge>
                               )}
                             </div>
@@ -902,9 +877,9 @@ const Homepage = () => {
                 return allProducts.map((product, index) => (
                   <Card key={`${product.vendorId}-${index}`} className="overflow-hidden hover:shadow-lg transition-shadow">
                     <div className="relative">
-                      {product.images && product.images.length > 0 && (
+                      {product.image && (
                         <img 
-                          src={product.images[0]} 
+                          src={product.image} 
                           alt={product.name || 'Product'} 
                           className="w-full h-48 object-cover"
                         />
@@ -912,14 +887,14 @@ const Homepage = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          toggleLike('product', `${product.vendorId}-${index}` as any);
+                          toggleLike('product', `${product.vendorId}-${index}`);
                         }}
                         className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
                       >
                         <Heart 
                           className={cn(
                             "h-4 w-4",
-                            isLiked('product', `${product.vendorId}-${index}` as any)
+                            isLiked('product', `${product.vendorId}-${index}`)
                               ? "fill-red-500 text-red-500" 
                               : "text-gray-600"
                           )}
