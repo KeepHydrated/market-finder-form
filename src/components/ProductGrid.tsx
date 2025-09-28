@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, MoreVertical, Copy, Trash2, Heart } from "lucide-react";
 import { ProductDetailModal } from "./ProductDetailModal";
 import { useLikes } from "@/hooks/useLikes";
@@ -28,12 +29,12 @@ interface ProductCardProps {
   product: Product;
   onProductClick: (product: Product) => void;
   onDeleteProduct?: (productId: number) => void;
-  onDuplicateProduct?: (product: Product) => void;
+  onDuplicateClick?: (product: Product) => void;
   vendorId?: string;
   vendorName?: string;
 }
 
-const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProduct, vendorId, vendorName }: ProductCardProps) => {
+const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClick, vendorId, vendorName }: ProductCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { toggleLike, isLiked } = useLikes();
 
@@ -132,7 +133,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProd
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-2">
           <h3 className="font-normal text-sm flex-1">{product.name}</h3>
-          {(onDeleteProduct || onDuplicateProduct) && (
+          {(onDeleteProduct || onDuplicateClick) && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
@@ -145,11 +146,11 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProd
                 </Button>
               </DropdownMenuTrigger>
                <DropdownMenuContent align="end" className="w-32">
-                {onDuplicateProduct && (
+                {onDuplicateClick && (
                   <DropdownMenuItem 
                     onClick={(e) => {
                       e.stopPropagation();
-                      onDuplicateProduct(product);
+                      onDuplicateClick(product);
                     }}
                     className="cursor-pointer"
                   >
@@ -196,6 +197,8 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProd
 export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, vendorId, vendorName, hideVendorName = false }: ProductGridProps) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [duplicateProduct, setDuplicateProduct] = useState<Product | null>(null);
+  const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
@@ -205,6 +208,24 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, ven
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedProduct(null);
+  };
+
+  const handleDuplicateClick = (product: Product) => {
+    setDuplicateProduct(product);
+    setIsDuplicateModalOpen(true);
+  };
+
+  const handleConfirmDuplicate = () => {
+    if (duplicateProduct && onDuplicateProduct) {
+      onDuplicateProduct(duplicateProduct);
+    }
+    setIsDuplicateModalOpen(false);
+    setDuplicateProduct(null);
+  };
+
+  const handleCancelDuplicate = () => {
+    setIsDuplicateModalOpen(false);
+    setDuplicateProduct(null);
   };
 
   if (products.length === 0) {
@@ -224,7 +245,7 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, ven
             product={product} 
             onProductClick={handleProductClick}
             onDeleteProduct={onDeleteProduct}
-            onDuplicateProduct={onDuplicateProduct}
+            onDuplicateClick={onDuplicateProduct ? handleDuplicateClick : undefined}
             vendorId={vendorId}
             vendorName={vendorName}
           />
@@ -241,6 +262,25 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, ven
         vendorName={vendorName}
         hideVendorName={hideVendorName}
       />
+
+      <Dialog open={isDuplicateModalOpen} onOpenChange={setIsDuplicateModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Duplicate Product</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to duplicate "{duplicateProduct?.name}"? This will create a copy of the product.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelDuplicate}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmDuplicate}>
+              Duplicate Product
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
