@@ -275,21 +275,21 @@ export default function AccountSettings() {
         <p className="text-muted-foreground">Manage your account information and preferences</p>
       </div>
 
-      <Tabs defaultValue="account" orientation="vertical" className="flex flex-col lg:flex-row gap-6">
-        {/* Vertical Tab Navigation */}
-        <div className="lg:w-64 lg:flex-shrink-0">
-          <Card>
-            <CardContent className="p-4">
-              <TabsList className="grid w-full grid-rows-3 h-auto p-1 bg-muted">
-                <TabsTrigger value="account" className="flex items-center justify-start gap-2 w-full px-4 py-3 text-left">
+      <Tabs defaultValue="account" orientation="vertical" className="flex flex-row gap-8">
+        {/* Vertical Tab Navigation - Fixed to left */}
+        <div className="w-64 flex-shrink-0">
+          <Card className="sticky top-4">
+            <CardContent className="p-0">
+              <TabsList className="flex flex-col w-full h-auto p-0 bg-transparent">
+                <TabsTrigger value="account" className="flex items-center justify-start gap-3 w-full px-6 py-4 text-left rounded-none border-b data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <User className="h-4 w-4" />
                   Account
                 </TabsTrigger>
-                <TabsTrigger value="addresses" className="flex items-center justify-start gap-2 w-full px-4 py-3 text-left">
+                <TabsTrigger value="addresses" className="flex items-center justify-start gap-3 w-full px-6 py-4 text-left rounded-none border-b data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <MapPin className="h-4 w-4" />
                   Addresses
                 </TabsTrigger>
-                <TabsTrigger value="payment" className="flex items-center justify-start gap-2 w-full px-4 py-3 text-left">
+                <TabsTrigger value="payment" className="flex items-center justify-start gap-3 w-full px-6 py-4 text-left rounded-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <CreditCard className="h-4 w-4" />
                   Payment
                 </TabsTrigger>
