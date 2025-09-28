@@ -112,11 +112,6 @@ export function ShoppingCart() {
                             )}
                             <div className="flex-1 min-w-0">
                               <p className="font-medium truncate">{item.product_name}</p>
-                              {item.product_description && (
-                                <p className="text-sm text-muted-foreground truncate">
-                                  {item.product_description}
-                                </p>
-                              )}
                               <p className="text-sm font-medium">
                                 {formatPrice(item.unit_price)}
                               </p>
