@@ -331,7 +331,9 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
           setEditingProduct(null);
         }}
         onProductAdded={(productData: any) => {
+          console.log('onProductAdded called', { editingProduct, productData });
           if (editingProduct) {
+            console.log('Updating existing product:', editingProduct.id);
             // Update existing product
             const updatedProduct: Product = {
               id: editingProduct.id, // Keep the same ID
@@ -353,6 +355,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
               description: "Your product has been successfully updated.",
             });
           } else {
+            console.log('Adding new product');
             // Add new product
             handleProductAdded(productData);
           }
