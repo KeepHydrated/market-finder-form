@@ -21,13 +21,15 @@ interface AcceptedSubmission {
   primary_specialty: string;
   website: string;
   description: string;
-  products: any[];
+  products: any;
   selected_market: string;
   search_term: string;
   market_address?: string;
   market_days?: string[];
-  market_hours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
+  market_hours?: any;
   created_at: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface VendorRating {
@@ -149,24 +151,25 @@ const Homepage = () => {
       });
     }
 
-    // Apply location filter if user coordinates are available and it's not a nationwide search
-    if (userCoordinates && !isNationwideSearch) {
-      filtered = filtered.filter(submission => {
-        if (!submission.market_address) return true; // Include if no address to filter by
-        
-        try {
-          const distance = calculateDistance(
-            userCoordinates.lat,
-            userCoordinates.lng,
-            submission.market_address
-          );
-          return distance <= rangeMiles[0];
-        } catch (error) {
-          console.warn('Error calculating distance for submission:', submission.id, error);
-          return true; // Include in results if distance calculation fails
+        // Apply location filter if user coordinates are available and it's not a nationwide search
+        if (userCoordinates && !isNationwideSearch) {
+          filtered = filtered.filter(submission => {
+            if (!submission.latitude || !submission.longitude) return true; // Include if no coordinates to filter by
+            
+            try {
+              const distance = calculateDistance(
+                userCoordinates.lat,
+                userCoordinates.lng,
+                submission.latitude,
+                submission.longitude
+              );
+              return distance <= rangeMiles[0];
+            } catch (error) {
+              console.warn('Error calculating distance for submission:', submission.id, error);
+              return true; // Include in results if distance calculation fails
+            }
+          });
         }
-      });
-    }
 
     setFilteredSubmissions(filtered);
     console.log('Filtered submissions:', filtered.length, 'out of', acceptedSubmissions.length);
@@ -188,8 +191,9 @@ const Homepage = () => {
     try {
       console.log('Fetching accepted submissions...');
       const { data, error } = await supabase
-        .from('accepted_submissions')
+        .from('submissions')
         .select('*')
+        .eq('status', 'accepted')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -214,7 +218,7 @@ const Homepage = () => {
   const fetchVendorRatings = async () => {
     try {
       const { data, error } = await supabase
-        .from('vendor_reviews')
+        .from('reviews')
         .select('vendor_id, rating');
 
       if (error) {
@@ -392,8 +396,9 @@ const Homepage = () => {
     const allProducts: any[] = [];
     
     filteredSubmissions.forEach(submission => {
-      if (submission.products && submission.products.length > 0) {
-        submission.products.forEach((product: any) => {
+      const products = Array.isArray(submission.products) ? submission.products : [];
+      if (products && products.length > 0) {
+        products.forEach((product: any) => {
           allProducts.push({
             ...product,
             vendorName: submission.store_name,
@@ -416,15 +421,10 @@ const Homepage = () => {
       const uniqueMarkets = getUniqueMarkets();
       const distances: Record<string, string> = {};
       
-      for (const market of uniqueMarkets) {
-        try {
-          const distance = await getGoogleMapsDistance(userCoordinates, market.address);
-          distances[`${market.name}-${market.address}`] = distance;
-        } catch (error) {
-          console.error(`Error calculating distance to ${market.name}:`, error);
+        for (const market of uniqueMarkets) {
+          // For now, skip market distance calculations since we need coordinates
           distances[`${market.name}-${market.address}`] = 'Distance unavailable';
         }
-      }
       
       setMarketDistances(distances);
       setIsLoadingMarketDistances(false);
@@ -441,17 +441,22 @@ const Homepage = () => {
       const vendorsToCalculate = selectedMarket ? selectedMarket.vendors : filteredSubmissions;
       const distances: Record<string, string> = {};
       
-      for (const vendor of vendorsToCalculate) {
-        if (vendor.market_address) {
-          try {
-            const distance = await getGoogleMapsDistance(userCoordinates, vendor.market_address);
-            distances[vendor.id] = distance;
-          } catch (error) {
-            console.error(`Error calculating distance to ${vendor.store_name}:`, error);
-            distances[vendor.id] = 'Distance unavailable';
+        for (const vendor of vendorsToCalculate) {
+          if (vendor.latitude && vendor.longitude) {
+            try {
+              const distance = calculateDistance(
+                userCoordinates.lat,
+                userCoordinates.lng,
+                vendor.latitude,
+                vendor.longitude
+              );
+              distances[vendor.id] = `${distance.toFixed(1)} miles`;
+            } catch (error) {
+              console.error(`Error calculating distance to ${vendor.store_name}:`, error);
+              distances[vendor.id] = 'Distance unavailable';
+            }
           }
         }
-      }
       
       setVendorDistances(distances);
     };
@@ -836,14 +841,14 @@ const Homepage = () => {
                           <div className="text-sm">
                             <p className="font-medium mb-1">Vendor Categories:</p>
                             <div className="flex flex-wrap gap-1">
-                              {[...new Set(market.vendors.map(v => v.primary_specialty))].slice(0, 3).map((specialty) => (
-                                <Badge key={specialty} variant="outline" className="text-xs">
-                                  {specialty}
+                              {[...new Set(market.vendors.map((v: any) => v.primary_specialty))].slice(0, 3).map((specialty: any) => (
+                                <Badge key={specialty as string} variant="outline" className="text-xs">
+                                  {specialty as string}
                                 </Badge>
                               ))}
-                              {[...new Set(market.vendors.map(v => v.primary_specialty))].length > 3 && (
+                              {[...new Set(market.vendors.map((v: any) => v.primary_specialty))].length > 3 && (
                                 <Badge variant="outline" className="text-xs">
-                                  +{[...new Set(market.vendors.map(v => v.primary_specialty))].length - 3} more
+                                  +{[...new Set(market.vendors.map((v: any) => v.primary_specialty))].length - 3} more
                                 </Badge>
                               )}
                             </div>
@@ -887,14 +892,14 @@ const Homepage = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          toggleLike('product', `${product.vendorId}-${index}`);
+                          toggleLike('product', `${product.vendorId}-${index}` as any);
                         }}
                         className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
                       >
                         <Heart 
                           className={cn(
                             "h-4 w-4",
-                            isLiked('product', `${product.vendorId}-${index}`)
+                            isLiked('product', `${product.vendorId}-${index}` as any)
                               ? "fill-red-500 text-red-500" 
                               : "text-gray-600"
                           )}
