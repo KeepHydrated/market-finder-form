@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -1353,46 +1353,75 @@ const Homepage = () => {
                       }}
                     >
                       {/* Product Image */}
-                      <div className="aspect-[4/3] bg-muted relative">
+                      <div className="aspect-[4/3] bg-muted relative overflow-hidden group">
                         {product.images && product.images.length > 0 ? (
                           <img 
                             src={product.images[0]} 
                             alt={product.name || 'Product'} 
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-opacity duration-200"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                             No Image Available
                           </div>
                         )}
+                        
+                        {/* Like Button */}
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            await toggleLike(`${product.vendorId}-${product.name}`, 'product');
+                          }}
+                        >
+                          <Heart 
+                            className={cn(
+                              "h-4 w-4 transition-colors",
+                              isLiked(`${product.vendorId}-${product.name}`, 'product')
+                                ? "text-red-500 fill-current" 
+                                : "text-gray-600"
+                            )} 
+                          />
+                        </Button>
                       </div>
                       
                       {/* Product Information */}
-                      <div className="p-4 space-y-2">
-                        <h3 className="text-lg font-semibold text-foreground">
-                          {product.name || 'Product'}
-                        </h3>
-                        
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className="font-normal text-sm flex-1 text-black">
+                            {product.name || 'Product'}
+                          </h3>
+                        </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-xl font-bold text-primary">
+                          <span className="text-sm font-medium text-muted-foreground">
                             ${(product.price || 0).toFixed(2)}
                           </span>
-                          <span className="text-sm text-muted-foreground">
-                            {product.vendorDistance}
-                          </span>
                         </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            {product.vendorName}
-                          </Badge>
-                          {product.vendorSpecialty && (
-                            <Badge variant="secondary" className="text-xs">
-                              {product.vendorSpecialty}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
+                        {product.vendorName && (
+                          <div className="mt-2 pt-2 border-t border-muted">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const vendor = filteredSubmissions.find(v => v.id === product.vendorId);
+                                if (vendor) {
+                                  navigate('/market', { 
+                                    state: { 
+                                      type: 'vendor', 
+                                      selectedVendor: vendor,
+                                      allVendors: filteredSubmissions
+                                    } 
+                                  });
+                                }
+                              }}
+                              className="text-xs text-black hover:underline cursor-pointer"
+                            >
+                              {product.vendorName}
+                            </button>
+                          </div>
+                        )}
+                      </CardContent>
                     </Card>
                   ))}
                 </div>
