@@ -10,6 +10,7 @@ import { useShoppingCart } from '@/contexts/ShoppingCartContext';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { CustomCheckout } from './CustomCheckout';
 
 export function ShoppingCart() {
   const { 
@@ -25,6 +26,8 @@ export function ShoppingCart() {
   const { toast } = useToast();
   const [guestEmail, setGuestEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [checkoutItems, setCheckoutItems] = useState<typeof items>([]);
 
   const formatPrice = (cents: number) => {
     return `$${(cents / 100).toFixed(2)}`;
@@ -41,66 +44,48 @@ export function ShoppingCart() {
     return grouped;
   };
 
-  const handleCheckout = async (vendorId: string, vendorItems: typeof items) => {
-    if (!user && !guestEmail.trim()) {
-      toast({
-        title: "Email Required",
-        description: "Please enter your email address to continue as a guest.",
-        variant: "destructive",
-      });
-      return;
-    }
+  const handleCheckout = (vendorId: string, vendorItems: typeof items) => {
+    setCheckoutItems(vendorItems);
+    setShowCheckout(true);
+  };
 
-    setLoading(true);
-    try {
-      const checkoutItems = vendorItems.map(item => ({
-        product_name: item.product_name,
-        product_description: item.product_description,
-        unit_price: item.unit_price,
-        quantity: item.quantity,
-      }));
+  const handleCheckoutSuccess = () => {
+    // Remove items from cart
+    checkoutItems.forEach(item => removeItem(item.id));
+    setShowCheckout(false);
+    setCheckoutItems([]);
+    setIsOpen(false);
+    toast({
+      title: "Payment Successful!",
+      description: "Your order has been confirmed.",
+    });
+  };
 
-      const vendorName = vendorItems[0]?.vendor_name || 'Unknown Vendor';
-
-      const payload = {
-        items: checkoutItems,
-        vendor_id: vendorId,
-        vendor_name: vendorName,
-        ...((!user && guestEmail.trim()) && { customer_email: guestEmail.trim() })
-      };
-
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: payload
-      });
-
-      if (error) throw error;
-
-      // Remove items for this vendor from cart
-      vendorItems.forEach(item => removeItem(item.id));
-
-      // Redirect to Stripe checkout
-      if (data.url) {
-        window.open(data.url, '_blank');
-      }
-
-      toast({
-        title: "Redirecting to Checkout",
-        description: `Processing order for ${vendorName}`,
-      });
-
-    } catch (error: any) {
-      console.error('Checkout error:', error);
-      toast({
-        title: "Checkout Failed",
-        description: error.message || "Failed to create checkout session",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const handleCheckoutCancel = () => {
+    setShowCheckout(false);
+    setCheckoutItems([]);
   };
 
   const vendorGroups = groupItemsByVendor();
+
+  if (showCheckout) {
+    return (
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetContent className="w-full sm:max-w-4xl">
+          <SheetHeader>
+            <SheetTitle>Checkout</SheetTitle>
+          </SheetHeader>
+          <div className="py-6">
+            <CustomCheckout
+              items={checkoutItems}
+              onSuccess={handleCheckoutSuccess}
+              onCancel={handleCheckoutCancel}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
