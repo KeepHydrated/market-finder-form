@@ -419,6 +419,32 @@ export default function ShopManager() {
     }
   };
 
+  const handleEditProduct = async (product: any) => {
+    const updatedProducts = products.map(p => 
+      p.id === product.id ? product : p
+    );
+    setProducts(updatedProducts);
+
+    if (shopData) {
+      try {
+        await supabase
+          .from('submissions')
+          .update({
+            products: updatedProducts,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', shopData.id);
+        
+        toast({
+          title: "Product Updated",
+          description: "Your product has been updated successfully.",
+        });
+      } catch (error) {
+        console.error('Error updating products:', error);
+      }
+    }
+  };
+
   const handleDeleteAllProducts = async () => {
     if (!confirm('Are you sure you want to delete all products? This action cannot be undone.')) {
       return;
@@ -620,6 +646,7 @@ export default function ShopManager() {
             products={products}
             onDeleteProduct={handleDeleteProduct}
             onDuplicateProduct={handleDuplicateProduct}
+            onEditProduct={handleEditProduct}
             vendorId={shopData?.id || 'temp'}
             vendorName={formData.store_name || 'Your Shop'}
           />

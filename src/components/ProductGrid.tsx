@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Upload, X, ImageIcon } from "lucide-react";
+import { Upload, X, ImageIcon, Edit } from "lucide-react";
 import { ChevronLeft, ChevronRight, MoreVertical, Copy, Trash2, Heart } from "lucide-react";
 import { ProductDetailModal } from "./ProductDetailModal";
 import { useLikes } from "@/hooks/useLikes";
@@ -28,6 +28,7 @@ interface ProductGridProps {
   products: Product[];
   onDeleteProduct?: (productId: number) => void;
   onDuplicateProduct?: (product: Product) => void;
+  onEditProduct?: (product: Product) => void;
   vendorId?: string;
   vendorName?: string;
   hideVendorName?: boolean;
@@ -38,11 +39,12 @@ interface ProductCardProps {
   onProductClick: (product: Product) => void;
   onDeleteProduct?: (productId: number) => void;
   onDuplicateClick?: (product: Product) => void;
+  onEditClick?: (product: Product) => void;
   vendorId?: string;
   vendorName?: string;
 }
 
-const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClick, vendorId, vendorName }: ProductCardProps) => {
+const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClick, onEditClick, vendorId, vendorName }: ProductCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { toggleLike, isLiked } = useLikes();
 
@@ -139,9 +141,9 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClic
       </div>
       
       <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="font-normal text-sm flex-1">{product.name}</h3>
-          {(onDeleteProduct || onDuplicateClick) && (
+          <div className="flex items-start justify-between mb-2">
+            <h3 className="font-normal text-sm flex-1">{product.name}</h3>
+            {(onDeleteProduct || onDuplicateClick || onEditClick) && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
@@ -153,7 +155,19 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClic
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-               <DropdownMenuContent align="end" className="w-32">
+              <DropdownMenuContent align="end" className="w-32">
+                {onEditClick && (
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditClick(product);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit
+                  </DropdownMenuItem>
+                )}
                 {onDuplicateClick && (
                   <DropdownMenuItem 
                     onClick={(e) => {
@@ -202,7 +216,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClic
   );
 };
 
-export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, vendorId, vendorName, hideVendorName = false }: ProductGridProps) => {
+export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId, vendorName, hideVendorName = false }: ProductGridProps) => {
   // Character limits
   const NAME_LIMIT = 20;
   const DESCRIPTION_LIMIT = 200;
@@ -211,6 +225,8 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, ven
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [duplicateProduct, setDuplicateProduct] = useState<Product | null>(null);
   const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
+  const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
   // Duplicate form states
   const [productName, setProductName] = useState('');
@@ -244,6 +260,18 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, ven
     setImages([]);
     setWebsiteSaleEnabled(true);
     setIsDuplicateModalOpen(true);
+  };
+
+  const handleEditClick = (product: Product) => {
+    setEditProduct(product);
+    // Pre-fill the form with product data
+    setProductName(product.name);
+    setDescription(product.description);
+    setPrice(product.price.toString());
+    setExistingImages(product.images);
+    setImages([]);
+    setWebsiteSaleEnabled(true);
+    setIsEditModalOpen(true);
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -369,6 +397,73 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, ven
     setWebsiteSaleEnabled(true);
   };
 
+  const handleEditSubmit = async () => {
+    if (!productName || !description || !price) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to edit products.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    
+    try {
+      const uploadedImageUrls = images.length > 0 ? await uploadImages(images) : [];
+      const allImageUrls = [...existingImages, ...uploadedImageUrls];
+      
+      const productData = {
+        ...editProduct,
+        name: productName,
+        description,
+        price: parseFloat(price),
+        images: allImageUrls,
+        websiteSaleEnabled
+      };
+      
+      if (onEditProduct) {
+        onEditProduct(productData as any);
+      }
+      
+      handleCancelEdit();
+      toast({
+        title: "Product updated",
+        description: "Product has been updated successfully.",
+      });
+      
+    } catch (error: any) {
+      console.error('Error updating product:', error);
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update product. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditModalOpen(false);
+    setEditProduct(null);
+    setProductName('');
+    setDescription('');
+    setPrice('');
+    setImages([]);
+    setExistingImages([]);
+    setWebsiteSaleEnabled(true);
+  };
+
   if (products.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
@@ -387,6 +482,7 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, ven
             onProductClick={handleProductClick}
             onDeleteProduct={onDeleteProduct}
             onDuplicateClick={onDuplicateProduct ? handleDuplicateClick : undefined}
+            onEditClick={onEditProduct ? handleEditClick : undefined}
             vendorId={vendorId}
             vendorName={vendorName}
           />
@@ -579,6 +675,186 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, ven
             </Button>
             <Button onClick={handleDuplicateSubmit} disabled={isUploading}>
               {isUploading ? 'Uploading...' : 'Duplicate Product'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-6">
+          <DialogHeader className="pb-4">
+            <DialogTitle>Edit Product</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Product Images (Up to 5)</Label>
+              
+              {/* Image Upload Area */}
+              <div className="border-2 border-dashed border-border rounded-lg p-6">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <ImageIcon className="h-10 w-10 text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Drag and drop images here, or click to select
+                  </p>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="edit-image-upload"
+                    disabled={images.length + existingImages.length >= 5}
+                  />
+                  <Label
+                    htmlFor="edit-image-upload"
+                    className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium border border-border hover:bg-muted ${
+                      images.length + existingImages.length >= 5 ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <Upload className="h-4 w-4" />
+                    Choose Images
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {images.length + existingImages.length}/5 images uploaded
+                  </p>
+                </div>
+              </div>
+
+              {/* Image Previews */}
+              {(existingImages.length > 0 || images.length > 0) && (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                  {/* Existing images */}
+                  {existingImages.map((image, index) => (
+                    <div key={`existing-${index}`} className="relative group">
+                      <div className="aspect-square rounded-lg border border-border overflow-hidden bg-muted">
+                        <img
+                          src={image}
+                          alt={`Existing product image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                        onClick={() => removeExistingImage(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                  {/* New images */}
+                  {images.map((image, index) => (
+                    <div key={`new-${index}`} className="relative group">
+                      <div className="aspect-square rounded-lg border border-border overflow-hidden bg-muted">
+                        <img
+                          src={URL.createObjectURL(image)}
+                          alt={`Product image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                        onClick={() => removeImage(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label htmlFor="edit-product-name">Product Name *</Label>
+                <span className="text-xs text-muted-foreground">
+                  {productName.length}/{NAME_LIMIT}
+                </span>
+              </div>
+              <Input
+                id="edit-product-name"
+                value={productName}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= NAME_LIMIT) {
+                    setProductName(value);
+                  }
+                }}
+                placeholder="Enter product name"
+                maxLength={NAME_LIMIT}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label htmlFor="edit-description">Description *</Label>
+                <span className="text-xs text-muted-foreground">
+                  {description.length}/{DESCRIPTION_LIMIT}
+                </span>
+              </div>
+              <Textarea
+                id="edit-description"
+                value={description}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= DESCRIPTION_LIMIT) {
+                    setDescription(value);
+                  }
+                }}
+                placeholder="Describe your product..."
+                className="min-h-[100px] resize-none"
+                maxLength={DESCRIPTION_LIMIT}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-price">Price *</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                  $
+                </span>
+                <Input
+                  id="edit-price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="0.00"
+                  className="pl-8"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/50">
+              <div className="space-y-1">
+                <Label htmlFor="edit-website-sale" className="text-sm font-medium">
+                  Available for Online Purchase
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Allow customers to buy this product directly from your online store
+                </p>
+              </div>
+              <Switch
+                id="edit-website-sale"
+                checked={websiteSaleEnabled}
+                onCheckedChange={setWebsiteSaleEnabled}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-6 border-t mt-6">
+            <Button variant="outline" onClick={handleCancelEdit} disabled={isUploading}>
+              Cancel
+            </Button>
+            <Button onClick={handleEditSubmit} disabled={isUploading}>
+              {isUploading ? 'Uploading...' : 'Update Product'}
             </Button>
           </div>
         </DialogContent>
