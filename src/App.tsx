@@ -20,6 +20,7 @@ import Markets from "./pages/Markets";
 import Test from "./pages/Test";
 import Commissions from "./pages/Commissions";
 import Checkout from "./pages/Checkout";
+import AccountSettings from "./pages/AccountSettings";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
                 <Route path="/likes" element={<Likes />} />
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/account" element={<AccountSettings />} />
                 <Route path="/order-success" element={<OrderSuccess />} />
                 <Route path="/shop-manager" element={<ShopManager2 />} />
                 <Route path="/submit" element={<ShopManager2 />} />

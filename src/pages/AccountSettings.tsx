@@ -113,13 +113,13 @@ export default function AccountSettings() {
   const fetchAddresses = async () => {
     try {
       const { data, error } = await supabase
-        .from('user_addresses')
+        .from('user_addresses' as any)
         .select('*')
         .eq('user_id', user?.id)
         .order('is_default', { ascending: false });
 
       if (error) throw error;
-      setAddresses(data || []);
+      setAddresses((data as unknown as Address[]) || []);
     } catch (error) {
       console.error('Error fetching addresses:', error);
     }
@@ -165,7 +165,7 @@ export default function AccountSettings() {
       if (editingAddress) {
         // Update existing address
         const { error } = await supabase
-          .from('user_addresses')
+          .from('user_addresses' as any)
           .update(addressForm)
           .eq('id', editingAddress.id);
 
@@ -173,7 +173,7 @@ export default function AccountSettings() {
       } else {
         // Create new address
         const { error } = await supabase
-          .from('user_addresses')
+          .from('user_addresses' as any)
           .insert({
             user_id: user.id,
             ...addressForm
@@ -204,7 +204,7 @@ export default function AccountSettings() {
   const deleteAddress = async (addressId: string) => {
     try {
       const { error } = await supabase
-        .from('user_addresses')
+        .from('user_addresses' as any)
         .delete()
         .eq('id', addressId);
 
