@@ -332,7 +332,20 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
         }}
         onProductAdded={editingProduct ? async (productData: any) => {
           if (!editingProduct) return;
-          // Handle product update logic here
+          
+          // Update the existing product in the products array
+          const updatedProduct: Product = {
+            id: editingProduct.id, // Keep the same ID
+            name: productData.name,
+            description: productData.description,
+            price: productData.price,
+            images: productData.images
+          };
+          
+          setProducts(prev => prev.map(product => 
+            product.id === editingProduct.id ? updatedProduct : product
+          ));
+          
           setShowAddProductForm(false);
           setEditingProduct(null);
         } : handleProductAdded}
