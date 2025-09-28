@@ -25,12 +25,6 @@ interface ShopSidebarProps {
 
 const menuItems = [
   { 
-    title: "Overview", 
-    icon: Store, 
-    section: "overview",
-    requiresShop: true 
-  },
-  { 
     title: "Products", 
     icon: Package, 
     section: "products",
@@ -63,7 +57,7 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
   
   // Get current section from URL params or default
   const urlParams = new URLSearchParams(location.search);
-  const currentSection = urlParams.get('section') || 'overview';
+  const currentSection = urlParams.get('section') || 'products';
 
   // Filter items based on whether shop data exists
   const availableItems = menuItems.filter(item => 
@@ -74,9 +68,7 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
 
   const getNavClasses = (active: boolean, section: string) =>
     active 
-      ? (section === 'overview')
-        ? "bg-green-500 text-white font-medium hover:bg-green-600" 
-        : "bg-primary text-primary-foreground font-medium"
+      ? "bg-primary text-primary-foreground font-medium"
       : "hover:bg-muted/50 text-muted-foreground hover:text-foreground";
 
   return (
