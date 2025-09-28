@@ -12,6 +12,7 @@ import Homepage from "./pages/Homepage";
 import CategoryProducts from "./pages/CategoryProducts";
 import VendorDuplicate from "./pages/VendorDuplicate";
 import Likes from "./pages/Likes";
+import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
 import ShopManager2 from "./pages/ShopManager2";
@@ -38,6 +39,7 @@ const App = () => (
                 <Route path="/category" element={<CategoryProducts />} />
                 <Route path="/market" element={<VendorDuplicate />} />
                 <Route path="/likes" element={<Likes />} />
+                <Route path="/orders" element={<Orders />} />
                 <Route path="/order-success" element={<OrderSuccess />} />
                 <Route path="/shop-manager" element={<ShopManager2 />} />
                 <Route path="/submit" element={<ShopManager2 />} />
