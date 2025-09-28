@@ -467,7 +467,7 @@ const Likes = () => {
                 </span>
               </div>
               {product.vendorName && (
-                <div className="mt-2 pt-2 border-t border-black">
+                <div className="mt-2 pt-2 border-t border-muted">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
