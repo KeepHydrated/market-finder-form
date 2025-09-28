@@ -14,42 +14,22 @@ interface AddProductFormProps {
   open: boolean;
   onClose: () => void;
   onProductAdded: (product: { name: string; description: string; price: number; images: string[] }) => void;
-  editingProduct?: { id: number; name: string; description: string; price: number; images: string[] } | null;
 }
 
-export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }: AddProductFormProps) => {
+export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductFormProps) => {
   // Character limits
   const NAME_LIMIT = 20;
   const DESCRIPTION_LIMIT = 200;
   
-  const [productName, setProductName] = useState(editingProduct?.name || '');
-  const [description, setDescription] = useState(editingProduct?.description || '');
-  const [price, setPrice] = useState(editingProduct?.price?.toString() || '');
+  const [productName, setProductName] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
   const [images, setImages] = useState<File[]>([]);
-  const [existingImages, setExistingImages] = useState<string[]>(editingProduct?.images || []);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const [websiteSaleEnabled, setWebsiteSaleEnabled] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
-
-  // Update form when editingProduct changes
-  useEffect(() => {
-    if (editingProduct) {
-      setProductName(editingProduct.name);
-      setDescription(editingProduct.description);
-      setPrice(editingProduct.price.toString());
-      setExistingImages(editingProduct.images);
-      setImages([]);
-      setWebsiteSaleEnabled(true); // Default to enabled for existing products
-    } else {
-      setProductName('');
-      setDescription('');
-      setPrice('');
-      setExistingImages([]);
-      setImages([]);
-      setWebsiteSaleEnabled(true); // Default to enabled for new products
-    }
-  }, [editingProduct]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -146,11 +126,6 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
         images: allImageUrls,
         websiteSaleEnabled
       };
-
-      // Include the ID when editing an existing product
-      if (editingProduct) {
-        (productData as any).id = editingProduct.id;
-      }
       
       onProductAdded(productData);
       
@@ -162,14 +137,11 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
       setExistingImages([]);
       setWebsiteSaleEnabled(true);
       
-      // Only close and show toast if not editing (let parent handle edit case)
-      if (!editingProduct) {
-        onClose();
-        toast({
-          title: "Product added",
-          description: "Product has been added successfully.",
-        });
-      }
+      onClose();
+      toast({
+        title: "Product added",
+        description: "Product has been added successfully.",
+      });
       
     } catch (error: any) {
       console.error('Error uploading images:', error);
@@ -187,7 +159,7 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-6">
         <DialogHeader className="pb-4">
-          <DialogTitle>{editingProduct ? 'Edit Product' : 'Add Product'}</DialogTitle>
+          <DialogTitle>Add Product</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -358,7 +330,7 @@ export const AddProductForm = ({ open, onClose, onProductAdded, editingProduct }
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={isUploading}>
-            {isUploading ? 'Uploading...' : (editingProduct ? 'Update Product' : 'Add Product')}
+            {isUploading ? 'Uploading...' : 'Add Product'}
           </Button>
         </div>
       </DialogContent>

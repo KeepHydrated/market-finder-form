@@ -58,7 +58,6 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
     description: ""
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   // Memoize localStorage operations
   const loadProducts = useCallback(() => {
@@ -120,10 +119,6 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
     });
   }, [toast]);
 
-  const handleEditProduct = useCallback((product: Product) => {
-    setEditingProduct(product);
-    setShowAddProductForm(true);
-  }, []);
 
   const handleDeleteShop = useCallback(async () => {
     try {
@@ -266,7 +261,6 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
           products={products} 
           onDeleteProduct={handleDeleteProduct}
           onDuplicateProduct={handleDuplicateProduct}
-          onEditProduct={handleEditProduct}
         />
       </Card>
 
@@ -311,41 +305,22 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
         open={showAddProductForm} 
         onClose={() => {
           setShowAddProductForm(false);
-          setEditingProduct(null);
         }}
         onProductAdded={(productData: any) => {
-          if (productData.id && typeof productData.id === 'number') {
-            // This is an edit - product data includes the ID
-            console.log('Editing product with ID:', productData.id);
-            setProducts(prev => prev.map(product => 
-              product.id === productData.id 
-                ? { ...productData } as Product
-                : product
-            ));
-            toast({
-              title: "Product Updated",
-              description: "Your product has been successfully updated.",
-            });
-          } else {
-            // This is a new product
-            console.log('Adding new product');
-            const newProduct: Product = {
-              id: Date.now(),
-              name: productData.name,
-              description: productData.description,
-              price: productData.price,
-              images: productData.images
-            };
-            setProducts(prev => [...prev, newProduct]);
-            toast({
-              title: "Product Added",
-              description: "Your product has been successfully added.",
-            });
-          }
+          const newProduct: Product = {
+            id: Date.now(),
+            name: productData.name,
+            description: productData.description,
+            price: productData.price,
+            images: productData.images
+          };
+          setProducts(prev => [...prev, newProduct]);
+          toast({
+            title: "Product Added",
+            description: "Your product has been successfully added.",
+          });
           setShowAddProductForm(false);
-          setEditingProduct(null);
         }}
-        editingProduct={editingProduct}
       />
     </>
   );

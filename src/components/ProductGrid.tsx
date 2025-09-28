@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ChevronLeft, ChevronRight, MoreVertical, Edit, Copy, Trash2, Heart } from "lucide-react";
+import { ChevronLeft, ChevronRight, MoreVertical, Copy, Trash2, Heart } from "lucide-react";
 import { ProductDetailModal } from "./ProductDetailModal";
 import { useLikes } from "@/hooks/useLikes";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,6 @@ interface ProductGridProps {
   products: Product[];
   onDeleteProduct?: (productId: number) => void;
   onDuplicateProduct?: (product: Product) => void;
-  onEditProduct?: (product: Product) => void;
   vendorId?: string;
   vendorName?: string;
   hideVendorName?: boolean;
@@ -30,12 +29,11 @@ interface ProductCardProps {
   onProductClick: (product: Product) => void;
   onDeleteProduct?: (productId: number) => void;
   onDuplicateProduct?: (product: Product) => void;
-  onEditProduct?: (product: Product) => void;
   vendorId?: string;
   vendorName?: string;
 }
 
-const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId, vendorName }: ProductCardProps) => {
+const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProduct, vendorId, vendorName }: ProductCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { toggleLike, isLiked } = useLikes();
 
@@ -134,7 +132,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProd
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-2">
           <h3 className="font-normal text-sm flex-1">{product.name}</h3>
-          {(onDeleteProduct || onDuplicateProduct || onEditProduct) && (
+          {(onDeleteProduct || onDuplicateProduct) && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
@@ -146,19 +144,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProd
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-32">
-                {onEditProduct && (
-                  <DropdownMenuItem 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEditProduct(product);
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit
-                  </DropdownMenuItem>
-                )}
+               <DropdownMenuContent align="end" className="w-32">
                 {onDuplicateProduct && (
                   <DropdownMenuItem 
                     onClick={(e) => {
@@ -207,7 +193,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateProd
   );
 };
 
-export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId, vendorName, hideVendorName = false }: ProductGridProps) => {
+export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, vendorId, vendorName, hideVendorName = false }: ProductGridProps) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -239,7 +225,6 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
             onProductClick={handleProductClick}
             onDeleteProduct={onDeleteProduct}
             onDuplicateProduct={onDuplicateProduct}
-            onEditProduct={onEditProduct}
             vendorId={vendorId}
             vendorName={vendorName}
           />

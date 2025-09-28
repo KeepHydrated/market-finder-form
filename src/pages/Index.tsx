@@ -117,7 +117,6 @@ const Index = () => {
     hours: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
   } | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   // Load products from localStorage on component mount
   useEffect(() => {
@@ -225,52 +224,6 @@ const Index = () => {
     });
   };
 
-  // Handle product editing
-  const handleEditProduct = (product: Product) => {
-    setEditingProduct(product);
-    setShowAddProductForm(true);
-  };
-
-  // Handle product update (when editing)
-  const handleProductUpdated = async (productData: { name: string; description: string; price: number; images: any[] }) => {
-    if (!editingProduct) return;
-
-    // Process images: convert File objects to base64, keep existing base64 strings
-    const processedImages: string[] = [];
-    
-    for (const image of productData.images) {
-      if (typeof image === 'string') {
-        // Already a base64 string (existing image)
-        processedImages.push(image);
-      } else {
-        // File object (new image), convert to base64
-        const base64 = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(image);
-        });
-        processedImages.push(base64);
-      }
-    }
-
-    const updatedProduct: Product = {
-      ...editingProduct,
-      name: productData.name,
-      description: productData.description,
-      price: productData.price,
-      images: processedImages
-    };
-    
-    setProducts(prev => prev.map(product => 
-      product.id === editingProduct.id ? updatedProduct : product
-    ));
-    setShowAddProductForm(false);
-    setEditingProduct(null);
-    toast({
-      title: "Product Updated",
-      description: "Your product has been successfully updated.",
-    });
-  };
 
   // Handle profile picture upload
   const handleProfilePictureUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -629,12 +582,8 @@ const Index = () => {
       
       <AddProductForm 
         open={showAddProductForm} 
-        onClose={() => {
-          handleCloseAddProductForm();
-          setEditingProduct(null);
-        }}
-        onProductAdded={editingProduct ? handleProductUpdated : handleProductAdded}
-        editingProduct={editingProduct}
+        onClose={handleCloseAddProductForm}
+        onProductAdded={handleProductAdded}
       />
     </div>
   );

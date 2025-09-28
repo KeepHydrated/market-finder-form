@@ -66,7 +66,6 @@ export default function ShopManager() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadingShop, setLoadingShop] = useState(true);
   const [showAddProduct, setShowAddProduct] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [originalFormData, setOriginalFormData] = useState<any>(null);
   const isSavingRef = useRef(false);
@@ -390,10 +389,6 @@ export default function ShopManager() {
     }
   };
 
-  const handleEditProduct = (product: any) => {
-    setEditingProduct(product);
-    setShowAddProduct(true);
-  };
 
   const handleDuplicateProduct = async (product: any) => {
     const duplicatedProduct = {
@@ -626,7 +621,6 @@ export default function ShopManager() {
             products={products}
             onDeleteProduct={handleDeleteProduct}
             onDuplicateProduct={handleDuplicateProduct}
-            onEditProduct={handleEditProduct}
             vendorId={shopData?.id || 'temp'}
             vendorName={formData.store_name || 'Your Shop'}
           />
@@ -857,10 +851,8 @@ export default function ShopManager() {
       {showAddProduct && (
         <AddProductForm
           open={showAddProduct}
-          editingProduct={editingProduct}
           onClose={() => {
             setShowAddProduct(false);
-            setEditingProduct(null);
           }}
           onProductAdded={handleAddProduct}
         />
