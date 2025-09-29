@@ -367,7 +367,7 @@ export default function AccountSettings() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-col items-center gap-4">
+                  <div className="flex flex-col items-start gap-4">
                     <div className="relative">
                       <input
                         type="file"
@@ -390,7 +390,7 @@ export default function AccountSettings() {
                     </div>
                     
                     {/* Username section */}
-                    <div className="text-center space-y-2">
+                    <div className="text-left space-y-2">
                       {isEditingProfilePic ? (
                         <div className="flex items-center gap-2">
                           <Input
