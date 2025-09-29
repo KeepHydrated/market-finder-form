@@ -570,22 +570,9 @@ export default function AccountSettings() {
           {/* Addresses Tab */}
           <TabsContent value="addresses" className="mt-0">
             <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="text-lg font-semibold">Saved Addresses</h3>
-                  <p className="text-muted-foreground">Manage your shipping and billing addresses</p>
-                </div>
-                <Button 
-                  onClick={() => {
-                    resetAddressForm();
-                    setEditingAddress(null);
-                    setShowAddressForm(true);
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add Address
-                </Button>
+              <div>
+                <h3 className="text-lg font-semibold">Saved Addresses</h3>
+                <p className="text-muted-foreground">Manage your shipping and billing addresses</p>
               </div>
 
               {/* Address Form */}
