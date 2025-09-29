@@ -97,6 +97,14 @@ export default function AccountSettings() {
     }
   }, [user, profile, loading, navigate]);
 
+  // Add a manual refresh function
+  const refreshProfileData = async () => {
+    console.log('Manually refreshing profile...');
+    if (refreshProfile) {
+      await refreshProfile();
+    }
+  };
+
   const fetchAddresses = async () => {
     try {
       const { data, error } = await supabase
@@ -113,16 +121,19 @@ export default function AccountSettings() {
   };
 
   const saveProfile = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user found, cannot save profile');
+      return;
+    }
+
+    console.log('Starting profile save...');
+    console.log('Profile form data:', {
+      full_name: profileForm.full_name,
+      avatar_url: profileForm.avatar_url ? 'Present (' + profileForm.avatar_url.length + ' chars)' : 'null'
+    });
 
     setSavingProfile(true);
     try {
-      console.log('Saving profile with data:', {
-        user_id: user.id,
-        full_name: profileForm.full_name,
-        avatar_url: profileForm.avatar_url?.substring(0, 100) + '...' // Log first 100 chars only
-      });
-
       // Check if avatar_url is a base64 string and clear it if so
       let avatarUrl = profileForm.avatar_url;
       if (avatarUrl && avatarUrl.startsWith('data:image/')) {
@@ -130,6 +141,12 @@ export default function AccountSettings() {
         avatarUrl = null; // Clear base64 data
         setProfileForm(prev => ({ ...prev, avatar_url: null }));
       }
+
+      console.log('Saving to database with:', {
+        user_id: user.id,
+        full_name: profileForm.full_name,
+        avatar_url: avatarUrl
+      });
 
       const { error } = await supabase
         .from('profiles')
@@ -144,10 +161,13 @@ export default function AccountSettings() {
         throw error;
       }
 
-      console.log('Profile saved successfully');
+      console.log('Profile saved successfully to database');
 
       // Refresh profile data in the auth context
-      await refreshProfile();
+      if (refreshProfile) {
+        console.log('Refreshing auth context...');
+        await refreshProfile();
+      }
 
       toast({
         title: "Profile updated",
@@ -161,7 +181,7 @@ export default function AccountSettings() {
       console.error('Error saving profile:', error);
       toast({
         title: "Error",
-        description: "Failed to save profile. Please try again.",
+        description: `Failed to save profile: ${error.message || 'Unknown error'}`,
         variant: "destructive",
       });
     } finally {
@@ -449,6 +469,14 @@ export default function AccountSettings() {
                              Clear
                            </Button>
                          )}
+                         <Button 
+                           size="sm" 
+                           variant="ghost"
+                           onClick={refreshProfileData}
+                         >
+                           <RotateCcw className="h-4 w-4 mr-2" />
+                           Refresh
+                         </Button>
                        </>
                      )}
                   </div>
