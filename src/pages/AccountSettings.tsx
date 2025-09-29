@@ -56,8 +56,6 @@ export default function AccountSettings() {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [isEditingProfilePic, setIsEditingProfilePic] = useState(false);
-  const [isEditingUsername, setIsEditingUsername] = useState(false);
-  const [originalUsername, setOriginalUsername] = useState("");
   const [originalAvatarUrl, setOriginalAvatarUrl] = useState("");
 
   const [profileForm, setProfileForm] = useState({
@@ -138,7 +136,6 @@ export default function AccountSettings() {
       
       // Exit all edit modes
       setIsEditingProfilePic(false);
-      setIsEditingUsername(false);
       
     } catch (error) {
       console.error('Error saving profile:', error);
@@ -409,7 +406,7 @@ export default function AccountSettings() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
                       <Input
@@ -422,55 +419,6 @@ export default function AccountSettings() {
                       <p className="text-xs text-muted-foreground">
                         Email cannot be changed from here
                       </p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="full_name">Full Name</Label>
-                        {isEditingUsername ? (
-                          <div className="flex gap-2">
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              onClick={() => {
-                                setProfileForm(prev => ({ ...prev, full_name: originalUsername }));
-                                setIsEditingUsername(false);
-                              }}
-                            >
-                              Cancel
-                            </Button>
-                             <Button 
-                               size="sm" 
-                               onClick={async () => {
-                                 await saveProfile();
-                                 setIsEditingUsername(false);
-                               }}
-                               disabled={savingProfile}
-                             >
-                              {savingProfile ? 'Saving...' : 'Save'}
-                            </Button>
-                          </div>
-                        ) : (
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => {
-                              setOriginalUsername(profileForm.full_name);
-                              setIsEditingUsername(true);
-                            }}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                      <Input
-                        id="full_name"
-                        value={profileForm.full_name}
-                        onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
-                        placeholder="Enter your full name"
-                        disabled={!isEditingUsername}
-                        className={isEditingUsername ? "bg-background" : "bg-muted"}
-                      />
                     </div>
                   </div>
                 </CardContent>
