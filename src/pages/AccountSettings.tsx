@@ -154,6 +154,8 @@ export default function AccountSettings() {
           user_id: user.id,
           full_name: profileForm.full_name,
           avatar_url: avatarUrl
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) {
