@@ -387,7 +387,10 @@ export default function AccountSettings() {
                           <Upload className="h-8 w-8 text-muted-foreground" />
                         )}
                       </div>
-                    </div>
+                     </div>
+                     <div className="text-xs text-muted-foreground text-left">
+                       JPG, PNG or GIF (max 5MB)
+                     </div>
                     
                     {/* Username section */}
                     <div className="text-left space-y-2">
@@ -405,10 +408,6 @@ export default function AccountSettings() {
                           {profileForm.full_name || "No username set"}
                         </div>
                       )}
-                      
-                      <div className="text-xs text-muted-foreground">
-                        JPG, PNG or GIF (max 5MB)
-                      </div>
                     </div>
                   </div>
                 </CardContent>
