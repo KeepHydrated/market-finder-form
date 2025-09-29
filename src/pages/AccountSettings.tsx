@@ -117,15 +117,34 @@ export default function AccountSettings() {
 
     setSavingProfile(true);
     try {
+      console.log('Saving profile with data:', {
+        user_id: user.id,
+        full_name: profileForm.full_name,
+        avatar_url: profileForm.avatar_url?.substring(0, 100) + '...' // Log first 100 chars only
+      });
+
+      // Check if avatar_url is a base64 string and clear it if so
+      let avatarUrl = profileForm.avatar_url;
+      if (avatarUrl && avatarUrl.startsWith('data:image/')) {
+        console.log('Detected base64 image, clearing avatar_url');
+        avatarUrl = null; // Clear base64 data
+        setProfileForm(prev => ({ ...prev, avatar_url: null }));
+      }
+
       const { error } = await supabase
         .from('profiles')
         .upsert({
           user_id: user.id,
           full_name: profileForm.full_name,
-          avatar_url: profileForm.avatar_url
+          avatar_url: avatarUrl
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
+
+      console.log('Profile saved successfully');
 
       // Refresh profile data in the auth context
       await refreshProfile();
@@ -164,23 +183,32 @@ export default function AccountSettings() {
       }
 
       try {
-        // Upload to Supabase storage
+        console.log('Starting file upload...');
+        
+        // Upload to Supabase storage using the avatars bucket
         const fileExt = file.name.split('.').pop();
-        const fileName = `${user?.id}-${Date.now()}.${fileExt}`;
+        const fileName = `${user?.id}/${Date.now()}.${fileExt}`;
         
         const { data, error } = await supabase.storage
-          .from('product-images')
+          .from('avatars')
           .upload(fileName, file, {
             cacheControl: '3600',
-            upsert: false
+            upsert: true
           });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Storage upload error:', error);
+          throw error;
+        }
+
+        console.log('Upload successful:', data);
 
         // Get the public URL
         const { data: { publicUrl } } = supabase.storage
-          .from('product-images')
+          .from('avatars')
           .getPublicUrl(fileName);
+
+        console.log('Public URL:', publicUrl);
 
         setProfileForm(prev => ({
           ...prev,
@@ -199,6 +227,25 @@ export default function AccountSettings() {
           variant: "destructive"
         });
       }
+    }
+  };
+
+  // Clear profile avatar
+  const clearAvatar = async () => {
+    try {
+      setProfileForm(prev => ({ ...prev, avatar_url: null }));
+      
+      toast({
+        title: "Avatar cleared",
+        description: "Profile picture has been removed.",
+      });
+    } catch (error) {
+      console.error('Error clearing avatar:', error);
+      toast({
+        title: "Error",
+        description: "Failed to clear avatar.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -379,19 +426,31 @@ export default function AccountSettings() {
                           {savingProfile ? 'Saving...' : 'Save'}
                         </Button>
                       </>
-                    ) : (
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => {
-                          setOriginalAvatarUrl(profileForm.avatar_url);
-                          setIsEditingProfilePic(true);
-                        }}
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit
-                      </Button>
-                    )}
+                     ) : (
+                       <>
+                         <Button 
+                           size="sm" 
+                           variant="outline"
+                           onClick={() => {
+                             setOriginalAvatarUrl(profileForm.avatar_url);
+                             setIsEditingProfilePic(true);
+                           }}
+                         >
+                           <Edit className="h-4 w-4 mr-2" />
+                           Edit
+                         </Button>
+                         {profileForm.avatar_url && (
+                           <Button 
+                             size="sm" 
+                             variant="outline"
+                             onClick={clearAvatar}
+                           >
+                             <RotateCcw className="h-4 w-4 mr-2" />
+                             Clear
+                           </Button>
+                         )}
+                       </>
+                     )}
                   </div>
                 </CardHeader>
                 <CardContent>
