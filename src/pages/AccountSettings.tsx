@@ -384,10 +384,6 @@ export default function AccountSettings() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Shopping Settings</h1>
-        <p className="text-muted-foreground">Manage your account information and preferences</p>
-      </div>
 
       <Tabs defaultValue="account" orientation="vertical" className="flex flex-row gap-8">
         {/* Vertical Tab Navigation - Fixed to left */}
