@@ -387,8 +387,13 @@ export default function AccountSettings() {
                         )}
                       </div>
                     </div>
-                    <div className="text-muted-foreground">
-                      JPG, PNG or GIF (max 5MB)
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium">
+                        {profileForm.full_name || "No name set"}
+                      </div>
+                      <div className="text-muted-foreground">
+                        JPG, PNG or GIF (max 5MB)
+                      </div>
                     </div>
                   </div>
                 </CardContent>
