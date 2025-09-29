@@ -544,15 +544,18 @@ export default function AccountSettings() {
                   <CardDescription>Change your account password</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex gap-4 items-center mb-2">
-                    <div className="bg-muted p-4 rounded-md flex-1 text-muted-foreground tracking-widest">
-                      ••••••••••••
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Password</Label>
+                    <div className="flex gap-4 items-center">
+                      <div className="bg-muted p-4 rounded-md flex-1 text-muted-foreground tracking-widest">
+                        ••••••••••••
+                      </div>
+                      <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+                        Change Password
+                      </Button>
                     </div>
-                    <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-                      Change Password
-                    </Button>
                   </div>
-                  <p className="text-sm text-muted-foreground">Click to receive a password reset link via email</p>
+                  <p className="text-sm text-muted-foreground mt-2">Click to receive a password reset link via email</p>
                 </CardContent>
               </Card>
 
