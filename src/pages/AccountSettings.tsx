@@ -461,24 +461,6 @@ export default function AccountSettings() {
                            <Edit className="h-4 w-4 mr-2" />
                            Edit
                          </Button>
-                         {profileForm.avatar_url && (
-                           <Button 
-                             size="sm" 
-                             variant="outline"
-                             onClick={clearAvatar}
-                           >
-                             <RotateCcw className="h-4 w-4 mr-2" />
-                             Clear
-                           </Button>
-                         )}
-                         <Button 
-                           size="sm" 
-                           variant="ghost"
-                           onClick={refreshProfileData}
-                         >
-                           <RotateCcw className="h-4 w-4 mr-2" />
-                           Refresh
-                         </Button>
                        </>
                      )}
                   </div>
