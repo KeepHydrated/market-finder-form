@@ -321,14 +321,14 @@ export default function AccountSettings() {
             <div className="space-y-8">
               {/* Profile Picture */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Profile Picture</CardTitle>
-                  <CardDescription>Upload and manage your profile picture</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between mb-4">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <div>
+                    <CardTitle>Profile Picture</CardTitle>
+                    <CardDescription>Upload and manage your profile picture</CardDescription>
+                  </div>
+                  <div className="flex gap-2">
                     {isEditingProfilePic ? (
-                      <div className="flex gap-2">
+                      <>
                         <Button 
                           size="sm" 
                           variant="outline"
@@ -349,7 +349,7 @@ export default function AccountSettings() {
                          >
                           {savingProfile ? 'Saving...' : 'Save'}
                         </Button>
-                      </div>
+                      </>
                     ) : (
                       <Button 
                         size="sm" 
@@ -364,6 +364,8 @@ export default function AccountSettings() {
                       </Button>
                     )}
                   </div>
+                </CardHeader>
+                <CardContent>
                   <div className="flex items-center gap-4">
                     <div className="relative">
                       <input
