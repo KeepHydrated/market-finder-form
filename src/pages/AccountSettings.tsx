@@ -56,7 +56,9 @@ export default function AccountSettings() {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [isEditingProfilePic, setIsEditingProfilePic] = useState(false);
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [originalAvatarUrl, setOriginalAvatarUrl] = useState("");
+  const [originalUsername, setOriginalUsername] = useState("");
 
   const [profileForm, setProfileForm] = useState({
     full_name: '',
@@ -136,6 +138,7 @@ export default function AccountSettings() {
       
       // Exit all edit modes
       setIsEditingProfilePic(false);
+      setIsEditingUsername(false);
       
     } catch (error) {
       console.error('Error saving profile:', error);
@@ -366,7 +369,7 @@ export default function AccountSettings() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-col items-center gap-4">
                     <div className="relative">
                       <input
                         type="file"
@@ -387,11 +390,56 @@ export default function AccountSettings() {
                         )}
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <div className="text-sm font-medium">
-                        {profileForm.full_name || "No name set"}
-                      </div>
-                      <div className="text-muted-foreground">
+                    
+                    {/* Username section */}
+                    <div className="text-center space-y-2">
+                      {isEditingUsername ? (
+                        <div className="flex items-center gap-2">
+                          <Input
+                            value={profileForm.full_name}
+                            onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
+                            className="w-40 text-center"
+                            placeholder="Enter username"
+                          />
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            onClick={() => {
+                              setProfileForm(prev => ({ ...prev, full_name: originalUsername }));
+                              setIsEditingUsername(false);
+                            }}
+                          >
+                            ✕
+                          </Button>
+                          <Button 
+                            size="sm"
+                            onClick={async () => {
+                              await saveProfile();
+                              setIsEditingUsername(false);
+                            }}
+                            disabled={savingProfile}
+                          >
+                            ✓
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <div className="text-sm font-medium">
+                            {profileForm.full_name || "No username set"}
+                          </div>
+                          <button
+                            onClick={() => {
+                              setOriginalUsername(profileForm.full_name);
+                              setIsEditingUsername(true);
+                            }}
+                            className="text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <Edit2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                      )}
+                      
+                      <div className="text-xs text-muted-foreground">
                         JPG, PNG or GIF (max 5MB)
                       </div>
                     </div>
