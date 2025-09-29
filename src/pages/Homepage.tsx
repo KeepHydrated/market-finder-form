@@ -667,16 +667,9 @@ const Homepage = () => {
     console.log('🚀 Homepage useEffect running...');
     fetchAcceptedSubmissions();
     
-    // Add immediate test log
-    console.log('📍 About to try GPS location detection...');
-    
-    // Try GPS with error handling
-    try {
-      tryGPSLocationFirst();
-    } catch (error) {
-      console.error('❌ Error in tryGPSLocationFirst:', error);
-      getLocationFromIP(); // Fallback to IP
-    }
+    // Use IP-based location detection silently
+    console.log('🌐 Starting IP location detection...');
+    getLocationFromIP();
   }, []);
 
   // Initialize cached distances on component mount for instant display
@@ -824,12 +817,6 @@ const Homepage = () => {
           // GPS failed or denied, fallback to IP
           console.log('❌ GPS location failed/denied:', error.message);
           console.log('🔄 Falling back to IP location...');
-          
-          toast({
-            title: "Location Permission Needed",
-            description: "Using approximate IP location. Allow GPS for precise distances.",
-            variant: "destructive"
-          });
           
           getLocationFromIP();
         },

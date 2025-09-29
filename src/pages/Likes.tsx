@@ -93,7 +93,7 @@ const Likes = () => {
 
   // Initialize location detection
   useEffect(() => {
-    tryGPSLocationFirst();
+    getLocationFromIP();
   }, []);
 
   const fetchAcceptedSubmissions = async () => {
