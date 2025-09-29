@@ -151,7 +151,7 @@ export default function AccountSettings() {
   };
 
   // Handle profile picture upload
-  const handleProfilePictureUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePictureUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) { // 5MB limit
@@ -163,14 +163,42 @@ export default function AccountSettings() {
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = () => {
+      try {
+        // Upload to Supabase storage
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user?.id}-${Date.now()}.${fileExt}`;
+        
+        const { data, error } = await supabase.storage
+          .from('product-images')
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (error) throw error;
+
+        // Get the public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(fileName);
+
         setProfileForm(prev => ({
           ...prev,
-          avatar_url: reader.result as string
+          avatar_url: publicUrl
         }));
-      };
-      reader.readAsDataURL(file);
+
+        toast({
+          title: "Image uploaded",
+          description: "Profile picture uploaded successfully.",
+        });
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload image. Please try again.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
