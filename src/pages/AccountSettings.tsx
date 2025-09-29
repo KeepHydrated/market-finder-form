@@ -28,7 +28,6 @@ interface Profile {
   user_id: string;
   full_name: string | null;
   avatar_url: string | null;
-  zipcode: string | null;
 }
 
 interface Address {
@@ -59,12 +58,10 @@ export default function AccountSettings() {
   const [isEditingProfilePic, setIsEditingProfilePic] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [originalUsername, setOriginalUsername] = useState("");
-  const [originalZipcode, setOriginalZipcode] = useState("");
   const [originalAvatarUrl, setOriginalAvatarUrl] = useState("");
 
   const [profileForm, setProfileForm] = useState({
     full_name: '',
-    zipcode: '',
     avatar_url: ''
   });
 
@@ -90,7 +87,6 @@ export default function AccountSettings() {
     if (user && profile) {
       setProfileForm({
         full_name: profile.full_name || '',
-        zipcode: profile.zipcode || '',
         avatar_url: profile.avatar_url || ''
       });
       setLoadingProfile(false);
@@ -126,7 +122,6 @@ export default function AccountSettings() {
         .upsert({
           user_id: user.id,
           full_name: profileForm.full_name,
-          zipcode: profileForm.zipcode,
           avatar_url: profileForm.avatar_url
         });
 
@@ -469,16 +464,6 @@ export default function AccountSettings() {
                         placeholder="Enter your full name"
                         disabled={!isEditingUsername}
                         className={isEditingUsername ? "bg-background" : "bg-muted"}
-                      />
-                    </div>
-
-                    <div className="space-y-2 md:col-span-2">
-                      <Label htmlFor="zipcode">Zip Code</Label>
-                      <Input
-                        id="zipcode"
-                        value={profileForm.zipcode}
-                        onChange={(e) => setProfileForm(prev => ({ ...prev, zipcode: e.target.value }))}
-                        placeholder="Enter your zip code"
                       />
                     </div>
                   </div>
