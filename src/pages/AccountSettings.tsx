@@ -421,7 +421,7 @@ export default function AccountSettings() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <div>
-                    <CardTitle>Profile Picture</CardTitle>
+                    <CardTitle className="text-base">Profile Picture</CardTitle>
                     <CardDescription>Upload and manage your profile picture</CardDescription>
                   </div>
                   <div className="flex gap-2">
