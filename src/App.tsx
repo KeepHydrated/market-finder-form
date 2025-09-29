@@ -7,7 +7,6 @@ import { GlobalHeader } from "@/components/GlobalHeader";
 import { Footer } from "@/components/Footer";
 import { ShoppingCartProvider } from "@/contexts/ShoppingCartContext";
 import { ShoppingCart } from "@/components/shopping/ShoppingCart";
-import Index from "./pages/Index";
 import Homepage from "./pages/Homepage";
 import CategoryProducts from "./pages/CategoryProducts";
 import VendorDuplicate from "./pages/VendorDuplicate";
@@ -36,8 +35,7 @@ const App = () => (
             <ShoppingCart />
             <main className="flex-1">
               <Routes>
-                <Route path="/" element={<Navigate to="/profile" replace />} />
-                <Route path="/profile" element={<Index />} />
+                <Route path="/" element={<Navigate to="/homepage" replace />} />
                 <Route path="/homepage" element={<Homepage />} />
                 <Route path="/category" element={<CategoryProducts />} />
                 <Route path="/market" element={<VendorDuplicate />} />

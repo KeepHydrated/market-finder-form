@@ -26,7 +26,7 @@ export function UserMenu({ user, profile }: UserMenuProps) {
   };
 
   const handleProfileClick = () => {
-    navigate('/profile');
+    navigate('/account');
   };
 
   const handleOrdersClick = () => {
