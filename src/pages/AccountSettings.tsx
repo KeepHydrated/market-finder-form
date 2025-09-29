@@ -366,7 +366,7 @@ export default function AccountSettings() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-col items-center space-y-4">
                     <div className="relative">
                       <input
                         type="file"
@@ -387,11 +387,11 @@ export default function AccountSettings() {
                         )}
                       </div>
                     </div>
-                    <div className="space-y-2">
+                    <div className="text-center space-y-2">
                       <div className="text-sm font-medium">
                         {profileForm.full_name || "No name set"}
                       </div>
-                      <div className="text-muted-foreground">
+                      <div className="text-muted-foreground text-xs">
                         JPG, PNG or GIF (max 5MB)
                       </div>
                     </div>
