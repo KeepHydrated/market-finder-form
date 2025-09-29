@@ -539,10 +539,6 @@ export default function AccountSettings() {
 
               {/* Password */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Password</CardTitle>
-                  <CardDescription>Change your account password</CardDescription>
-                </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">Password</Label>
