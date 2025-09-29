@@ -85,6 +85,7 @@ export default function AccountSettings() {
     }
 
     if (user && profile) {
+      console.log('Profile data loaded:', profile);
       setProfileForm({
         full_name: profile.full_name || '',
         avatar_url: profile.avatar_url || ''
