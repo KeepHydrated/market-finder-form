@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useShoppingCart } from '@/contexts/ShoppingCartContext';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -210,7 +210,10 @@ export default function Checkout() {
             <Card>
               <CardContent className="pt-6 space-y-6">
                 {/* Vendor Info */}
-                <div className="flex items-center gap-3 pb-4 border-b">
+                <Link 
+                  to={`/market?id=${firstVendor.vendor_id}`}
+                  className="flex items-center gap-3 pb-4 border-b hover:opacity-80 transition-opacity"
+                >
                   <Avatar className="w-12 h-12">
                     <AvatarImage src={storeLogo || undefined} alt={vendorData?.store_name || firstVendor.vendor_name} />
                     <AvatarFallback className="bg-primary/10 text-primary font-semibold">
@@ -241,7 +244,7 @@ export default function Checkout() {
                       )}
                     </div>
                   </div>
-                </div>
+                </Link>
 
                 {/* Order Items */}
                 <div className="space-y-4">
