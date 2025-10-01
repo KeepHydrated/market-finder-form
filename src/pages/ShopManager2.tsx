@@ -863,7 +863,7 @@ export default function ShopManager() {
         <ShopSidebar hasShopData={!!shopData} />
         
         <main className="flex-1">
-          <div className="p-6 pt-12">
+          <div className="p-6 pt-12 pr-12">
             {renderContent()}
           </div>
         </main>
