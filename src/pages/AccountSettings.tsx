@@ -271,6 +271,37 @@ export default function AccountSettings() {
     }
   };
 
+  const handlePasswordReset = async () => {
+    if (!user?.email) {
+      toast({
+        title: "Error",
+        description: "No email address found.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+        redirectTo: `${window.location.origin}/account`,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Password reset email sent",
+        description: "Check your email for a password reset link.",
+      });
+    } catch (error) {
+      console.error('Error sending password reset:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send password reset email. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const saveAddress = async () => {
     if (!user) return;
 
@@ -540,7 +571,10 @@ export default function AccountSettings() {
                         <div className="bg-muted p-4 rounded-md flex-1 text-muted-foreground tracking-widest">
                           ••••••••••••
                         </div>
-                        <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+                        <Button 
+                          className="bg-blue-500 hover:bg-blue-600 text-white"
+                          onClick={handlePasswordReset}
+                        >
                           Change Password
                         </Button>
                       </div>
