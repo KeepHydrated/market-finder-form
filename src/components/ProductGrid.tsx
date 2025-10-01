@@ -244,11 +244,17 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
   // Open product modal if initialProductId is provided
   useEffect(() => {
     if (initialProductId && products.length > 0) {
+      console.log('ProductGrid: Opening modal for product ID:', initialProductId);
       const productId = parseInt(initialProductId);
+      console.log('ProductGrid: Parsed product ID:', productId);
+      console.log('ProductGrid: Available products:', products.map(p => ({ id: p.id, name: p.name })));
       const product = products.find(p => p.id === productId);
+      console.log('ProductGrid: Found product:', product);
       if (product) {
         setSelectedProduct(product);
         setIsModalOpen(true);
+      } else {
+        console.warn('ProductGrid: Product not found with ID:', productId);
       }
     }
   }, [initialProductId, products]);

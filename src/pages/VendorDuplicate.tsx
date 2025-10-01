@@ -91,6 +91,9 @@ const VendorDuplicate = () => {
     
     // Check for URL params first
     const vendorId = searchParams.get('id');
+    const productId = searchParams.get('product');
+    
+    console.log('URL params - vendorId:', vendorId, 'productId:', productId);
     
     if (vendorId) {
       console.log('Using URL param vendor ID:', vendorId);
