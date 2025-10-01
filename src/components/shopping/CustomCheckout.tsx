@@ -221,9 +221,6 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle>Complete Payment</CardTitle>
-        <p className="text-sm text-muted-foreground mt-2">
-          Total: {formatPrice(totalAmount)}
-        </p>
       </CardHeader>
       <CardContent>
         {clientSecret && (
