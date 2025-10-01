@@ -215,21 +215,16 @@ const Orders = () => {
           {orders.map((order) => (
             <Card key={order.id} className="overflow-hidden">
               <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-base">
-                    <span className="text-muted-foreground">Purchased from</span>
-                    <Store className="h-4 w-4" />
-                    <button
-                      onClick={() => handleVendorClick(order.vendor_id, order.vendor_name)}
-                      className="font-semibold hover:underline focus:outline-none focus:underline"
-                    >
-                      {order.vendor_name}
-                    </button>
-                    <span className="text-muted-foreground">on {formatDate(order.created_at)}</span>
-                  </div>
-                  <Badge className={`${getStatusColor(order.status)} text-white`}>
-                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                  </Badge>
+                <div className="flex items-center gap-2 text-base">
+                  <span className="text-muted-foreground">Purchased from</span>
+                  <Store className="h-4 w-4" />
+                  <button
+                    onClick={() => handleVendorClick(order.vendor_id, order.vendor_name)}
+                    className="font-semibold hover:underline focus:outline-none focus:underline"
+                  >
+                    {order.vendor_name}
+                  </button>
+                  <span className="text-muted-foreground">on {formatDate(order.created_at)}</span>
                 </div>
               </CardHeader>
               
