@@ -210,18 +210,21 @@ export default function Checkout() {
             <Card>
               <CardContent className="pt-6 space-y-6">
                 {/* Vendor Info */}
-                <Link 
-                  to={`/market?id=${firstVendor.vendor_id}`}
-                  className="flex items-center gap-3 pb-4 border-b hover:opacity-80 transition-opacity"
-                >
-                  <Avatar className="w-12 h-12">
-                    <AvatarImage src={storeLogo || undefined} alt={vendorData?.store_name || firstVendor.vendor_name} />
-                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                      {storeInitial}
-                    </AvatarFallback>
-                  </Avatar>
+                <div className="flex items-center gap-3 pb-4 border-b">
+                  <Link to={`/market?id=${firstVendor.vendor_id}`}>
+                    <Avatar className="w-12 h-12 cursor-pointer hover:opacity-80 transition-opacity">
+                      <AvatarImage src={storeLogo || undefined} alt={vendorData?.store_name || firstVendor.vendor_name} />
+                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                        {storeInitial}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Link>
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg">{vendorData?.store_name || firstVendor.vendor_name}</h3>
+                    <Link to={`/market?id=${firstVendor.vendor_id}`}>
+                      <h3 className="font-bold text-lg hover:opacity-80 transition-opacity cursor-pointer">
+                        {vendorData?.store_name || firstVendor.vendor_name}
+                      </h3>
+                    </Link>
                     <div className="flex items-center gap-1 text-sm">
                       {vendorData?.google_rating ? (
                         <>
@@ -244,7 +247,7 @@ export default function Checkout() {
                       )}
                     </div>
                   </div>
-                </Link>
+                </div>
 
                 {/* Order Items */}
                 <div className="space-y-4">
