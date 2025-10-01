@@ -255,19 +255,23 @@ export default function Checkout() {
                   {firstVendor.items.map((item, index) => (
                     <div key={index} className="flex gap-4">
                       {item.product_image && (
-                        <img
-                          src={item.product_image}
-                          alt={item.product_name}
-                          className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
-                        />
+                        <Link to={`/market?id=${firstVendor.vendor_id}&product=${item.id.split('-')[1]}`}>
+                          <img
+                            src={item.product_image}
+                            alt={item.product_name}
+                            className="w-20 h-20 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                          />
+                        </Link>
                       )}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm mb-1 line-clamp-2">
-                          {item.product_name}
-                          {item.quantity > 1 && (
-                            <span className="text-muted-foreground"> (Qty: {item.quantity})</span>
-                          )}
-                        </h4>
+                        <Link to={`/market?id=${firstVendor.vendor_id}&product=${item.id.split('-')[1]}`}>
+                          <h4 className="font-medium text-sm mb-1 line-clamp-2 cursor-pointer hover:text-primary transition-colors">
+                            {item.product_name}
+                            {item.quantity > 1 && (
+                              <span className="text-muted-foreground"> (Qty: {item.quantity})</span>
+                            )}
+                          </h4>
+                        </Link>
                       </div>
                       <div className="text-right font-semibold">
                         {item.quantity > 1 ? (
