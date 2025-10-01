@@ -278,24 +278,24 @@ const Orders = () => {
                 </CardContent>
               </Card>
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
                 <div>
-                  <h3 className="text-2xl font-serif mb-2">Arriving Friday, October 3rd</h3>
-                  <p className="text-sm mb-1">Estimated arrival from USPS</p>
-                  <p className="text-sm">
+                  <h3 className="text-lg font-serif mb-1">Arriving Friday, October 3rd</h3>
+                  <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
+                  <p className="text-xs">
                     From <span className="font-medium">GLENDALE, AZ</span> To{" "}
                     <span className="font-medium underline">San Antonio</span>
                   </p>
                 </div>
 
-                <div className="flex flex-col gap-3">
-                  <Button size="lg" className="w-full rounded-full">
+                <div className="flex flex-col gap-2">
+                  <Button size="default" className="w-full rounded-full">
                     Track package
                   </Button>
-                  <Button variant="outline" size="lg" className="w-full rounded-full">
+                  <Button variant="outline" size="default" className="w-full rounded-full">
                     Help with order
                   </Button>
-                  <Button variant="outline" size="lg" className="w-full rounded-full">
+                  <Button variant="outline" size="default" className="w-full rounded-full">
                     View receipt
                   </Button>
                 </div>
