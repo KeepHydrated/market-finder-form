@@ -59,7 +59,7 @@ const Likes = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<TabType>("markets");
+  const [activeTab, setActiveTab] = useState<TabType>("vendors");
   const { likes, loading, toggleLike, isLiked } = useLikes();
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<AcceptedSubmission[]>([]);
   const [vendorRatings, setVendorRatings] = useState<Record<string, VendorRating>>({});
@@ -73,8 +73,8 @@ const Likes = () => {
   const [currentVendorInfo, setCurrentVendorInfo] = useState<{id: string; name: string} | null>(null);
 
   const tabs = [
-    { id: "markets" as TabType, title: "Markets", icon: MapPin },
     { id: "vendors" as TabType, title: "Vendors", icon: Store },
+    { id: "markets" as TabType, title: "Markets", icon: MapPin },
     { id: "products" as TabType, title: "Products", icon: Package },
   ];
 
