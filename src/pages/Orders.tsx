@@ -268,13 +268,6 @@ const Orders = () => {
                       </div>
                     ))}
                   </div>
-
-                  <Separator className="my-4" />
-                  
-                  <div className="flex justify-between items-center font-semibold">
-                    <span>Total Amount</span>
-                    <span className="text-lg">{formatPrice(order.total_amount)}</span>
-                  </div>
                 </CardContent>
               </Card>
 
