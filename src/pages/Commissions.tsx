@@ -23,6 +23,7 @@ export default function Commissions() {
   const [commissions, setCommissions] = useState<Commission[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalEarnings, setTotalEarnings] = useState(0);
+  const [totalOrderProfits, setTotalOrderProfits] = useState(0);
 
   const AUTHORIZED_EMAIL = 'nadiachibri@gmail.com';
 
@@ -45,6 +46,8 @@ export default function Commissions() {
       setCommissions(data || []);
       const total = data?.reduce((sum, commission) => sum + commission.commission_amount, 0) || 0;
       setTotalEarnings(total);
+      const profits = data?.reduce((sum, commission) => sum + commission.order_total, 0) || 0;
+      setTotalOrderProfits(profits);
     } catch (error) {
       console.error('Error fetching commissions:', error);
       toast.error('Failed to load commission data');
@@ -121,11 +124,11 @@ export default function Commissions() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Commission Rate</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Total Order Profits</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3%</div>
+            <div className="text-2xl font-bold">{formatCurrency(totalOrderProfits)}</div>
           </CardContent>
         </Card>
       </div>
