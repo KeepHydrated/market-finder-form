@@ -259,13 +259,13 @@ export default function Checkout() {
                           <img
                             src={item.product_image}
                             alt={item.product_name}
-                            className="w-20 h-20 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                            className="w-20 h-20 rounded-lg object-cover flex-shrink-0 cursor-pointer"
                           />
                         </Link>
                       )}
                       <div className="flex-1 min-w-0">
                         <Link to={`/market?id=${firstVendor.vendor_id}&product=${item.id.split('-')[1]}`}>
-                          <h4 className="font-medium text-sm mb-1 line-clamp-2 cursor-pointer hover:text-primary transition-colors">
+                          <h4 className="font-medium text-sm mb-1 line-clamp-2 cursor-pointer">
                             {item.product_name}
                             {item.quantity > 1 && (
                               <span className="text-muted-foreground"> (Qty: {item.quantity})</span>
