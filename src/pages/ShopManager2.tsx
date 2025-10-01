@@ -616,6 +616,11 @@ export default function ShopManager() {
 
   const renderProducts = () => (
     <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Products</h2>
+        <p className="text-muted-foreground">Manage your product listings</p>
+      </div>
+
       <div className="flex flex-row items-center justify-end mb-6">
         <div className="flex items-center gap-2">
           {products.length > 0 && (
@@ -725,6 +730,11 @@ export default function ShopManager() {
 
   const renderTest = () => (
     <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Overview</h2>
+        <p className="text-muted-foreground">Performance metrics for your shop</p>
+      </div>
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
