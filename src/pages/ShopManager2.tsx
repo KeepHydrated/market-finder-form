@@ -616,55 +616,52 @@ export default function ShopManager() {
 
   const renderProducts = () => (
     <div className="space-y-6">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Product Catalog</CardTitle>
-          <div className="flex items-center gap-2">
-            {products.length > 0 && (
-              <Button 
-                variant="destructive" 
-                onClick={handleDeleteAllProducts}
-                size="sm"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete All
-              </Button>
-            )}
-            <Button onClick={() => setShowAddProduct(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Product
+      <div className="flex flex-row items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold">Product Catalog</h2>
+        <div className="flex items-center gap-2">
+          {products.length > 0 && (
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteAllProducts}
+              size="sm"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete All
+            </Button>
+          )}
+          <Button onClick={() => setShowAddProduct(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Product
+          </Button>
+        </div>
+      </div>
+      
+      <ProductGrid
+        products={products}
+        onDeleteProduct={handleDeleteProduct}
+        onDuplicateProduct={handleDuplicateProduct}
+        onEditProduct={handleEditProduct}
+        vendorId={shopData?.id || 'temp'}
+        vendorName={formData.store_name || 'Your Shop'}
+      />
+      
+      {!shopData && (
+        <div className="pt-6 border-t mt-6">
+          <div className="text-center space-y-4">
+            <p className="text-muted-foreground">
+              Ready to publish your market? You can always add more products later.
+            </p>
+            <Button 
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              size="lg"
+              className="w-full max-w-md"
+            >
+              {isSubmitting ? 'Publishing...' : 'Publish Your Market'}
             </Button>
           </div>
-        </CardHeader>
-        <CardContent>
-          <ProductGrid
-            products={products}
-            onDeleteProduct={handleDeleteProduct}
-            onDuplicateProduct={handleDuplicateProduct}
-            onEditProduct={handleEditProduct}
-            vendorId={shopData?.id || 'temp'}
-            vendorName={formData.store_name || 'Your Shop'}
-          />
-          
-          {!shopData && (
-            <div className="pt-6 border-t mt-6">
-              <div className="text-center space-y-4">
-                <p className="text-muted-foreground">
-                  Ready to publish your market? You can always add more products later.
-                </p>
-                <Button 
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  size="lg"
-                  className="w-full max-w-md"
-                >
-                  {isSubmitting ? 'Publishing...' : 'Publish Your Market'}
-                </Button>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </div>
+      )}
     </div>
   );
 
