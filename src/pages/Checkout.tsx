@@ -222,7 +222,7 @@ export default function Checkout() {
               onClick={handleCheckout}
               disabled={loading}
             >
-              {loading ? 'Processing...' : 'Checkout'}
+              {loading ? 'Processing...' : 'Purchase'}
             </Button>
           </div>
 
