@@ -129,6 +129,8 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
 
   // Automatically create payment intent on mount
   useEffect(() => {
+    if (clientSecret) return; // Prevent duplicate creation
+    
     const createPaymentIntent = async () => {
       setLoading(true);
       try {
@@ -143,6 +145,8 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
           setLoading(false);
           return;
         }
+        
+        console.log('Creating payment intent for:', customerEmail);
         
         const { data, error } = await supabase.functions.invoke('create-payment-intent', {
           body: {
@@ -161,6 +165,8 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
           throw error;
         }
         
+        console.log('Payment intent response:', data);
+        
         if (data?.client_secret) {
           setClientSecret(data.client_secret);
         } else {
@@ -169,16 +175,13 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
       } catch (error) {
         console.error('Error creating payment intent:', error);
         toast.error('Failed to initialize checkout. Please try again.');
-        setTimeout(() => {
-          onCancel();
-        }, 2000);
       } finally {
         setLoading(false);
       }
     };
 
     createPaymentIntent();
-  }, [user?.email, guestEmail]);
+  }, [user?.email, guestEmail, clientSecret]);
 
   const customerEmail = user?.email || guestEmail;
 
@@ -187,7 +190,7 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
       <Card className="w-full max-w-2xl mx-auto">
         <CardContent className="py-12 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading payment...</p>
+          <p className="text-muted-foreground">Setting up payment...</p>
         </CardContent>
       </Card>
     );
@@ -197,8 +200,8 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
     return (
       <Card className="w-full max-w-2xl mx-auto">
         <CardContent className="py-12 text-center">
-          <p className="text-destructive">Failed to initialize payment</p>
-          <Button onClick={onCancel} className="mt-4">Back to Cart</Button>
+          <p className="text-muted-foreground mb-4">Preparing checkout...</p>
+          <Button onClick={onCancel} variant="outline">Back to Cart</Button>
         </CardContent>
       </Card>
     );
@@ -208,6 +211,9 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
     clientSecret,
     appearance: {
       theme: 'stripe' as const,
+      variables: {
+        colorPrimary: '#0F172A',
+      },
     },
   };
 
@@ -215,6 +221,9 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle>Complete Payment</CardTitle>
+        <p className="text-sm text-muted-foreground mt-2">
+          Total: {formatPrice(totalAmount)}
+        </p>
       </CardHeader>
       <CardContent>
         <Elements options={options} stripe={stripePromise}>
