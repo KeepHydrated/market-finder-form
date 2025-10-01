@@ -28,6 +28,7 @@ export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductForm
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [websiteSaleEnabled, setWebsiteSaleEnabled] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -37,6 +38,36 @@ export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductForm
     const remainingSlots = 5 - totalImages;
     
     // Take only the first files that fit within the limit
+    const filesToAdd = files.slice(0, remainingSlots);
+    
+    setImages(prev => [...prev, ...filesToAdd]);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const totalImages = images.length + existingImages.length;
+    if (totalImages >= 5) return;
+
+    const files = Array.from(e.dataTransfer.files).filter(file => 
+      file.type.startsWith('image/')
+    );
+    
+    const remainingSlots = 5 - totalImages;
     const filesToAdd = files.slice(0, remainingSlots);
     
     setImages(prev => [...prev, ...filesToAdd]);
@@ -167,7 +198,16 @@ export const AddProductForm = ({ open, onClose, onProductAdded }: AddProductForm
             <Label className="text-sm font-medium">Product Images (Up to 5)</Label>
             
             {/* Image Upload Area */}
-            <div className="border-2 border-dashed border-border rounded-lg p-6">
+            <div 
+              className={`border-2 border-dashed rounded-lg p-6 transition-colors ${
+                isDragging 
+                  ? 'border-primary bg-primary/5' 
+                  : 'border-border'
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
               <div className="flex flex-col items-center justify-center text-center">
                 <ImageIcon className="h-10 w-10 text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground mb-2">
