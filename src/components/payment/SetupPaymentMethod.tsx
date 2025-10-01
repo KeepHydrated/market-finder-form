@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_...');
+const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
 
 interface SetupPaymentMethodProps {
   onSuccess: () => void;
@@ -111,16 +111,19 @@ export const SetupPaymentMethod: React.FC<SetupPaymentMethodProps> = ({
     createSetupIntent();
   }, [onCancel]);
 
-  const options = useMemo(() => ({
-    clientSecret: clientSecret || '',
-    appearance: {
-      theme: 'stripe' as const,
-      variables: {
-        colorPrimary: '#0F172A',
-        borderRadius: '8px',
+  const options = useMemo(() => {
+    if (!clientSecret) return null;
+    return {
+      clientSecret,
+      appearance: {
+        theme: 'stripe' as const,
+        variables: {
+          colorPrimary: '#22c55e',
+          borderRadius: '8px',
+        },
       },
-    },
-  }), [clientSecret]);
+    };
+  }, [clientSecret]);
 
   if (loading) {
     return (
@@ -144,17 +147,19 @@ export const SetupPaymentMethod: React.FC<SetupPaymentMethodProps> = ({
     );
   }
 
+  if (!options) {
+    return null;
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Add Payment Method</CardTitle>
       </CardHeader>
       <CardContent>
-        {clientSecret && (
-          <Elements options={options} stripe={stripePromise}>
-            <SetupForm onSuccess={onSuccess} onCancel={onCancel} />
-          </Elements>
-        )}
+        <Elements options={options} stripe={stripePromise}>
+          <SetupForm onSuccess={onSuccess} onCancel={onCancel} />
+        </Elements>
       </CardContent>
     </Card>
   );
