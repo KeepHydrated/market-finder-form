@@ -12,6 +12,7 @@ interface CheckoutItem {
   product_description?: string;
   unit_price: number; // in cents
   quantity: number;
+  product_image?: string;
 }
 
 interface PaymentRequest {
@@ -109,6 +110,7 @@ serve(async (req) => {
       order_id: order.id,
       product_name: item.product_name,
       product_description: item.product_description || null,
+      product_image: item.product_image || null,
       quantity: item.quantity,
       unit_price: item.unit_price,
       total_price: item.unit_price * item.quantity
