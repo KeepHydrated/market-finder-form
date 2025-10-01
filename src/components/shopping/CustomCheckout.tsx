@@ -133,31 +133,52 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
       setLoading(true);
       try {
         const vendorGroup = Object.values(groupedItems)[0];
+        const session = await supabase.auth.getSession();
+        
+        // Get customer email from session or guest input
+        const customerEmail = session.data.session?.user?.email || guestEmail;
+        
+        if (!customerEmail) {
+          // Wait for user to be loaded
+          setLoading(false);
+          return;
+        }
+        
         const { data, error } = await supabase.functions.invoke('create-payment-intent', {
           body: {
             items: vendorGroup.items,
             vendor_id: Object.keys(groupedItems)[0],
             vendor_name: vendorGroup.vendor_name,
-            customer_email: user?.email || guestEmail,
+            customer_email: customerEmail,
           },
-          headers: {
-            Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-          },
+          headers: session.data.session ? {
+            Authorization: `Bearer ${session.data.session.access_token}`,
+          } : {},
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Payment intent error:', error);
+          throw error;
+        }
         
-        setClientSecret(data.client_secret);
+        if (data?.client_secret) {
+          setClientSecret(data.client_secret);
+        } else {
+          throw new Error('No client secret returned');
+        }
       } catch (error) {
         console.error('Error creating payment intent:', error);
-        toast.error('Failed to initialize checkout');
+        toast.error('Failed to initialize checkout. Please try again.');
+        setTimeout(() => {
+          onCancel();
+        }, 2000);
       } finally {
         setLoading(false);
       }
     };
 
     createPaymentIntent();
-  }, []);
+  }, [user?.email, guestEmail]);
 
   const customerEmail = user?.email || guestEmail;
 
