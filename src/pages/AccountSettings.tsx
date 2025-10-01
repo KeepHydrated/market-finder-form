@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { SetupPaymentMethod } from '@/components/payment/SetupPaymentMethod';
 import { 
   User, 
   MapPin, 
@@ -45,6 +46,14 @@ interface Address {
   phone: string | null;
 }
 
+interface PaymentMethod {
+  id: string;
+  brand: string;
+  last4: string;
+  exp_month: number;
+  exp_year: number;
+}
+
 export default function AccountSettings() {
   const { user, profile, loading, refreshProfile } = useAuth();
   const { toast } = useToast();
@@ -58,6 +67,10 @@ export default function AccountSettings() {
   const [isEditingProfilePic, setIsEditingProfilePic] = useState(false);
   const [originalAvatarUrl, setOriginalAvatarUrl] = useState("");
   const [originalUsername, setOriginalUsername] = useState("");
+  
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [showAddPayment, setShowAddPayment] = useState(false);
+  const [loadingPayments, setLoadingPayments] = useState(false);
 
   const [profileForm, setProfileForm] = useState({
     full_name: '',
@@ -94,6 +107,7 @@ export default function AccountSettings() {
     
     if (user) {
       fetchAddresses();
+      fetchPaymentMethods();
     }
   }, [user, profile, loading, navigate]);
 
@@ -400,6 +414,53 @@ export default function AccountSettings() {
       phone: address.phone || ''
     });
     setShowAddressForm(true);
+  };
+
+  const fetchPaymentMethods = async () => {
+    setLoadingPayments(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('get-payment-methods');
+
+      if (error) {
+        console.error('Error fetching payment methods:', error);
+        return;
+      }
+
+      setPaymentMethods(data?.paymentMethods || []);
+    } catch (error) {
+      console.error('Error fetching payment methods:', error);
+    } finally {
+      setLoadingPayments(false);
+    }
+  };
+
+  const handleDeletePaymentMethod = async (paymentMethodId: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('delete-payment-method', {
+        body: { payment_method_id: paymentMethodId },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Payment method removed",
+        description: "Your payment method has been deleted successfully.",
+      });
+
+      fetchPaymentMethods();
+    } catch (error) {
+      console.error('Error deleting payment method:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete payment method. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePaymentMethodAdded = () => {
+    setShowAddPayment(false);
+    fetchPaymentMethods();
   };
 
   if (loading || loadingProfile) {
@@ -779,24 +840,74 @@ export default function AccountSettings() {
 
           {/* Payment Tab */}
           <TabsContent value="payment" className="mt-0">
-            <Card>
-              <CardHeader>
-                <CardTitle>Payment Methods</CardTitle>
-                <CardDescription>
-                  Manage your saved payment methods
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-center py-8">
-                <CreditCard className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Payment methods</h3>
-                <p className="text-muted-foreground mb-4">
-                  Payment methods are securely managed by Stripe during checkout
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  You can add and manage payment methods during your next purchase
-                </p>
-              </CardContent>
-            </Card>
+            <div className="space-y-6">
+              {showAddPayment ? (
+                <SetupPaymentMethod
+                  onSuccess={handlePaymentMethodAdded}
+                  onCancel={() => setShowAddPayment(false)}
+                />
+              ) : (
+                <>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                      <div>
+                        <CardTitle>Payment Methods</CardTitle>
+                        <CardDescription>
+                          Manage your saved payment methods
+                        </CardDescription>
+                      </div>
+                      <Button onClick={() => setShowAddPayment(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Payment Method
+                      </Button>
+                    </CardHeader>
+                    <CardContent>
+                      {loadingPayments ? (
+                        <div className="text-center py-8">
+                          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                          <p className="text-muted-foreground">Loading payment methods...</p>
+                        </div>
+                      ) : paymentMethods.length === 0 ? (
+                        <div className="text-center py-8">
+                          <CreditCard className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                          <h3 className="text-lg font-medium mb-2">No payment methods</h3>
+                          <p className="text-muted-foreground mb-4">
+                            Add a payment method for faster checkout
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {paymentMethods.map((method) => (
+                            <Card key={method.id}>
+                              <CardContent className="flex items-center justify-between p-4">
+                                <div className="flex items-center gap-4">
+                                  <CreditCard className="h-8 w-8 text-muted-foreground" />
+                                  <div>
+                                    <p className="font-medium capitalize">
+                                      {method.brand} •••• {method.last4}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                      Expires {method.exp_month}/{method.exp_year}
+                                    </p>
+                                  </div>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDeletePaymentMethod(method.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+            </div>
           </TabsContent>
         </div>
       </Tabs>
