@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import {
   Elements,
@@ -7,8 +7,6 @@ import {
   useElements
 } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -185,6 +183,18 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
 
   const customerEmail = user?.email || guestEmail;
 
+  // Memoize options to prevent unnecessary re-renders
+  const options = useMemo(() => ({
+    clientSecret: clientSecret || '',
+    appearance: {
+      theme: 'stripe' as const,
+      variables: {
+        colorPrimary: '#0F172A',
+        borderRadius: '8px',
+      },
+    },
+  }), [clientSecret]);
+
   if (loading) {
     return (
       <Card className="w-full max-w-2xl mx-auto">
@@ -207,16 +217,6 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
     );
   }
 
-  const options = {
-    clientSecret,
-    appearance: {
-      theme: 'stripe' as const,
-      variables: {
-        colorPrimary: '#0F172A',
-      },
-    },
-  };
-
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
@@ -226,14 +226,16 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
         </p>
       </CardHeader>
       <CardContent>
-        <Elements options={options} stripe={stripePromise}>
-          <CheckoutForm
-            clientSecret={clientSecret}
-            customerEmail={customerEmail}
-            onSuccess={onSuccess}
-            onCancel={onCancel}
-          />
-        </Elements>
+        {clientSecret && (
+          <Elements options={options} stripe={stripePromise}>
+            <CheckoutForm
+              clientSecret={clientSecret}
+              customerEmail={customerEmail}
+              onSuccess={onSuccess}
+              onCancel={onCancel}
+            />
+          </Elements>
+        )}
       </CardContent>
     </Card>
   );
