@@ -11,6 +11,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ShoppingCart, MapPin, Star, HelpCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast as sonnerToast } from 'sonner';
+import { ProductDetailModal } from '@/components/ProductDetailModal';
 
 interface VendorData {
   store_name: string;
@@ -28,6 +29,8 @@ export default function Checkout() {
   const [selectedPayment, setSelectedPayment] = useState('stripe');
   const [loading, setLoading] = useState(false);
   const [vendorData, setVendorData] = useState<VendorData | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 
   // Calculate totals
   const subtotal = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
@@ -72,6 +75,23 @@ export default function Checkout() {
 
     fetchVendorData();
   }, [firstVendor?.vendor_id, items.length]);
+
+  const handleProductClick = (item: any) => {
+    // Extract product ID from cart item ID
+    const lastHyphenIndex = item.id.lastIndexOf('-');
+    const productId = parseInt(item.id.substring(lastHyphenIndex + 1));
+    
+    const product = {
+      id: productId,
+      name: item.product_name,
+      description: item.product_description || '',
+      price: item.unit_price / 100, // Convert from cents to dollars
+      images: item.product_image ? [item.product_image] : []
+    };
+    
+    setSelectedProduct(product);
+    setIsProductModalOpen(true);
+  };
 
   const handleCheckout = async () => {
     setLoading(true);
@@ -253,27 +273,24 @@ export default function Checkout() {
                 {/* Order Items */}
                 <div className="space-y-4">
                   {firstVendor.items.map((item, index) => {
-                    // Extract product ID from cart item ID (format: "vendorUUID-productId")
-                    // Since vendor UUID contains hyphens, we need to split from the right
-                    const lastHyphenIndex = item.id.lastIndexOf('-');
-                    const productId = item.id.substring(lastHyphenIndex + 1);
-                    
                     return (
                       <div key={index} className="flex gap-4">
                         {item.product_image && (
-                          <Link to={`/market?id=${firstVendor.vendor_id}&product=${productId}`}>
-                            <img
-                              src={item.product_image}
-                              alt={item.product_name}
-                              className="w-20 h-20 rounded-lg object-cover flex-shrink-0 cursor-pointer"
-                            />
-                          </Link>
+                          <img
+                            src={item.product_image}
+                            alt={item.product_name}
+                            onClick={() => handleProductClick(item)}
+                            className="w-20 h-20 rounded-lg object-cover flex-shrink-0 cursor-pointer"
+                          />
                         )}
                         <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-sm mb-1 line-clamp-2">
-                            <Link to={`/market?id=${firstVendor.vendor_id}&product=${productId}`} className="cursor-pointer">
+                            <span 
+                              onClick={() => handleProductClick(item)}
+                              className="cursor-pointer"
+                            >
                               {item.product_name}
-                            </Link>
+                            </span>
                             {item.quantity > 1 && (
                               <span className="text-muted-foreground"> (Qty: {item.quantity})</span>
                             )}
@@ -323,6 +340,22 @@ export default function Checkout() {
           </div>
         </div>
       </div>
+
+      {/* Product Detail Modal */}
+      {selectedProduct && vendorData && (
+        <ProductDetailModal
+          product={selectedProduct}
+          products={vendorData.products || []}
+          open={isProductModalOpen}
+          onClose={() => {
+            setIsProductModalOpen(false);
+            setSelectedProduct(null);
+          }}
+          vendorId={firstVendor.vendor_id}
+          vendorName={vendorData.store_name || firstVendor.vendor_name}
+          hideVendorName={true}
+        />
+      )}
     </div>
   );
 }
