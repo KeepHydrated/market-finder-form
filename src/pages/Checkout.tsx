@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useShoppingCart } from '@/contexts/ShoppingCartContext';
 import { useToast } from '@/hooks/use-toast';
@@ -7,9 +7,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ShoppingCart, MapPin, Star, HelpCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast as sonnerToast } from 'sonner';
+
+interface VendorData {
+  store_name: string;
+  google_rating: number | null;
+  google_rating_count: number | null;
+  products: any; // Json type from Supabase
+}
 
 export default function Checkout() {
   const { items, clearCart } = useShoppingCart();
@@ -19,6 +27,7 @@ export default function Checkout() {
   const [selectedAddress, setSelectedAddress] = useState('default');
   const [selectedPayment, setSelectedPayment] = useState('stripe');
   const [loading, setLoading] = useState(false);
+  const [vendorData, setVendorData] = useState<VendorData | null>(null);
 
   // Calculate totals
   const subtotal = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
@@ -97,6 +106,41 @@ export default function Checkout() {
 
   const firstVendor = Object.values(groupedItems)[0];
 
+  // Fetch vendor data for ratings and profile
+  useEffect(() => {
+    const fetchVendorData = async () => {
+      if (!firstVendor) return;
+      
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('store_name, google_rating, google_rating_count, products')
+        .eq('id', firstVendor.vendor_id)
+        .eq('status', 'accepted')
+        .single();
+
+      if (!error && data) {
+        setVendorData(data);
+      }
+    };
+
+    fetchVendorData();
+  }, [firstVendor?.vendor_id]);
+
+  // Get store logo from first product image if available
+  const getStoreLogo = () => {
+    if (vendorData?.products && Array.isArray(vendorData.products)) {
+      for (const product of vendorData.products) {
+        if (product.images && product.images.length > 0) {
+          return product.images[0];
+        }
+      }
+    }
+    return null;
+  };
+
+  const storeLogo = getStoreLogo();
+  const storeInitial = (vendorData?.store_name || firstVendor?.vendor_name || '?')[0].toUpperCase();
+
   return (
     <div className="min-h-screen bg-muted/20 py-8">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -167,16 +211,34 @@ export default function Checkout() {
               <CardContent className="pt-6 space-y-6">
                 {/* Vendor Info */}
                 <div className="flex items-center gap-3 pb-4 border-b">
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-xl">
-                    🏪
-                  </div>
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src={storeLogo || undefined} alt={vendorData?.store_name || firstVendor.vendor_name} />
+                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                      {storeInitial}
+                    </AvatarFallback>
+                  </Avatar>
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg">{firstVendor.vendor_name}</h3>
+                    <h3 className="font-bold text-lg">{vendorData?.store_name || firstVendor.vendor_name}</h3>
                     <div className="flex items-center gap-1 text-sm">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} className="w-4 h-4 fill-primary text-primary" />
-                      ))}
-                      <span className="ml-1 text-muted-foreground">(297)</span>
+                      {vendorData?.google_rating ? (
+                        <>
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star 
+                              key={star} 
+                              className={`w-4 h-4 ${
+                                star <= Math.round(vendorData.google_rating!) 
+                                  ? 'fill-primary text-primary' 
+                                  : 'text-muted-foreground'
+                              }`} 
+                            />
+                          ))}
+                          <span className="ml-1 text-muted-foreground">
+                            ({vendorData.google_rating_count || 0})
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">No ratings yet</span>
+                      )}
                     </div>
                   </div>
                 </div>
