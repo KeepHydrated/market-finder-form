@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,6 +62,7 @@ interface ReviewStats {
 const VendorDuplicate = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { user, profile, loading } = useAuth();
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
@@ -87,8 +88,16 @@ const VendorDuplicate = () => {
 
   useEffect(() => {
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
+    
+    // Check for URL params first
+    const vendorId = searchParams.get('id');
+    
+    if (vendorId) {
+      console.log('Using URL param vendor ID:', vendorId);
+      fetchVendorById(vendorId);
+    }
     // Check if data was passed from navigation
-    if (location.state) {
+    else if (location.state) {
       console.log('Using location state data');
       const { type, selectedVendor, selectedMarket, allVendors, marketCoordinates, marketDistance } = location.state as {
         type: 'vendor' | 'market';
@@ -134,7 +143,7 @@ const VendorDuplicate = () => {
       // Fallback to loading all vendors if no state passed
       fetchAllVendors();
     }
-  }, [location.state]);
+  }, [location.state, searchParams]);
 
   const fetchVendorReviews = async () => {
     if (!acceptedSubmission?.id) {
@@ -263,6 +272,44 @@ const VendorDuplicate = () => {
       fetchReviews();
     }
   }, [selectedVendor]);
+
+  const fetchVendorById = async (vendorId: string) => {
+    setLoadingData(true);
+    try {
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('*')
+        .eq('id', vendorId)
+        .eq('status', 'accepted')
+        .single();
+
+      if (error) throw error;
+      
+      const parsedSubmission = {
+        ...data,
+        products: typeof data.products === 'string' ? JSON.parse(data.products) : data.products,
+        market_hours: data.market_hours && typeof data.market_hours === 'object' && data.market_hours !== null 
+          ? data.market_hours as Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>
+          : undefined
+      };
+      
+      setAcceptedSubmission(parsedSubmission);
+      setSelectedVendor(parsedSubmission);
+      setAllVendors([parsedSubmission]);
+      setLoadingData(false);
+      
+      // Fetch ratings for this vendor
+      fetchVendorRatings([vendorId]);
+    } catch (error) {
+      console.error('Error fetching vendor by ID:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load vendor details",
+        variant: "destructive",
+      });
+      setLoadingData(false);
+    }
+  };
 
   const fetchAllVendors = async () => {
     try {
@@ -819,7 +866,7 @@ const VendorDuplicate = () => {
                )}
             </div>
 
-            {/* Products Section */}
+             {/* Products Section */}
             <div className="space-y-6">
               {selectedVendor.products && selectedVendor.products.length > 0 ? (
                 <ProductGrid 
@@ -827,6 +874,7 @@ const VendorDuplicate = () => {
                   vendorId={selectedVendor.id}
                   vendorName={selectedVendor.store_name}
                   hideVendorName={true}
+                  initialProductId={searchParams.get('product') || undefined}
                 />
               ) : (
                 <div className="text-center py-8 text-muted-foreground">

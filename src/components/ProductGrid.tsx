@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -32,6 +32,7 @@ interface ProductGridProps {
   vendorId?: string;
   vendorName?: string;
   hideVendorName?: boolean;
+  initialProductId?: string; // Product ID to open on mount
 }
 
 interface ProductCardProps {
@@ -216,7 +217,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClic
   );
 };
 
-export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId, vendorName, hideVendorName = false }: ProductGridProps) => {
+export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId, vendorName, hideVendorName = false, initialProductId }: ProductGridProps) => {
   // Character limits
   const NAME_LIMIT = 20;
   const DESCRIPTION_LIMIT = 200;
@@ -239,6 +240,18 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
   
   const { toast } = useToast();
   const { user } = useAuth();
+
+  // Open product modal if initialProductId is provided
+  useEffect(() => {
+    if (initialProductId && products.length > 0) {
+      const productId = parseInt(initialProductId);
+      const product = products.find(p => p.id === productId);
+      if (product) {
+        setSelectedProduct(product);
+        setIsModalOpen(true);
+      }
+    }
+  }, [initialProductId, products]);
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
