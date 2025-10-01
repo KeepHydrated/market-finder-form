@@ -213,7 +213,7 @@ export default function Checkout() {
                 {/* Vendor Info */}
                 <div className="flex items-center gap-3 pb-4 border-b">
                   <Link to={`/market?id=${firstVendor.vendor_id}`}>
-                    <Avatar className="w-12 h-12 cursor-pointer hover:opacity-80 transition-opacity">
+                    <Avatar className="w-12 h-12 cursor-pointer">
                       <AvatarImage src={storeLogo || undefined} alt={vendorData?.store_name || firstVendor.vendor_name} />
                       <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                         {storeInitial}
@@ -222,7 +222,7 @@ export default function Checkout() {
                   </Link>
                   <div className="flex-1">
                     <Link to={`/market?id=${firstVendor.vendor_id}`}>
-                      <h3 className="font-bold text-lg hover:opacity-80 transition-opacity cursor-pointer">
+                      <h3 className="font-bold text-lg cursor-pointer">
                         {vendorData?.store_name || firstVendor.vendor_name}
                       </h3>
                     </Link>
