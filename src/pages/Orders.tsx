@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,11 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Package, Calendar, Store, DollarSign } from "lucide-react";
 import { AuthForm } from "@/components/auth/AuthForm";
+import { useToast } from "@/hooks/use-toast";
 
 interface Order {
   id: string;
   total_amount: number;
   vendor_name: string;
+  vendor_id: string;
   email: string;
   status: string;
   created_at: string;
@@ -27,6 +30,8 @@ interface Order {
 
 const Orders = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +53,7 @@ const Orders = () => {
           id,
           total_amount,
           vendor_name,
+          vendor_id,
           email,
           status,
           created_at,
@@ -99,6 +105,45 @@ const Orders = () => {
         return 'bg-blue-500 hover:bg-blue-600';
       default:
         return 'bg-gray-500 hover:bg-gray-600';
+    }
+  };
+
+  const handleVendorClick = async (vendorId: string, vendorName: string) => {
+    try {
+      // Fetch the vendor data from submissions
+      const { data: vendor, error } = await supabase
+        .from('submissions')
+        .select('*')
+        .eq('id', vendorId)
+        .eq('status', 'accepted')
+        .single();
+
+      if (error) throw error;
+
+      if (!vendor) {
+        toast({
+          title: "Store not found",
+          description: "This store is no longer available.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Navigate to the vendor page with the vendor data
+      navigate('/market', {
+        state: {
+          type: 'vendor',
+          selectedVendor: vendor,
+          allVendors: [vendor],
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching vendor:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load store information.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -174,7 +219,12 @@ const Orders = () => {
                   <div className="flex items-center gap-2 text-base">
                     <span className="text-muted-foreground">Purchased from</span>
                     <Store className="h-4 w-4" />
-                    <span className="font-semibold">{order.vendor_name}</span>
+                    <button
+                      onClick={() => handleVendorClick(order.vendor_id, order.vendor_name)}
+                      className="font-semibold hover:underline focus:outline-none focus:underline"
+                    >
+                      {order.vendor_name}
+                    </button>
                     <span className="text-muted-foreground">on {formatDate(order.created_at)}</span>
                   </div>
                   <Badge className={`${getStatusColor(order.status)} text-white`}>
