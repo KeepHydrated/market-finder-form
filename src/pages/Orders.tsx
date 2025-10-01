@@ -231,71 +231,47 @@ const Orders = () => {
               <CardContent className="pt-0">
                 <Separator className="mb-4" />
                 
-                <div className="grid md:grid-cols-[300px,1fr] gap-6">
-                  <div className="space-y-3">
-                    <div className="mb-4">
-                      <h3 className="text-2xl font-semibold mb-2">Order Status</h3>
-                      <p className="text-muted-foreground capitalize">{order.status}</p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        From {order.vendor_name}
-                      </p>
-                    </div>
-                    
-                    <button className="w-full bg-primary text-primary-foreground py-3 rounded-full font-medium hover:bg-primary/90 transition-colors">
-                      Contact Vendor
-                    </button>
-                    
-                    <button className="w-full border-2 border-foreground py-3 rounded-full font-medium hover:bg-muted transition-colors">
-                      Help with order
-                    </button>
-                    
-                    <button className="w-full border-2 border-foreground py-3 rounded-full font-medium hover:bg-muted transition-colors">
-                      View receipt
-                    </button>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {order.order_items.map((item) => (
-                      <div key={item.id} className="flex justify-between items-start py-2">
-                        <div className="flex items-start gap-3 flex-1">
-                          <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            {item.product_image ? (
-                              <img 
-                                src={item.product_image} 
-                                alt={item.product_name}
-                                className="w-full h-full object-cover rounded-lg"
-                                onError={(e) => {
-                                  // Show Package icon as fallback if image fails to load
-                                  e.currentTarget.style.display = 'none';
-                                  e.currentTarget.parentElement.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-green-600"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>';
-                                }}
-                              />
-                            ) : (
-                              <Package className="h-6 w-6 text-green-600" />
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <h5 className="font-medium">
-                              {item.quantity > 1 && (
-                                <span className="text-muted-foreground mr-2">(x {item.quantity})</span>
-                              )}
-                              {item.product_name}
-                            </h5>
-                          </div>
+                <div className="space-y-3">
+                  {order.order_items.map((item) => (
+                    <div key={item.id} className="flex justify-between items-start py-2">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          {item.product_image ? (
+                            <img 
+                              src={item.product_image} 
+                              alt={item.product_name}
+                              className="w-full h-full object-cover rounded-lg"
+                              onError={(e) => {
+                                // Show Package icon as fallback if image fails to load
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.parentElement.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-green-600"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>';
+                              }}
+                            />
+                          ) : (
+                            <Package className="h-6 w-6 text-green-600" />
+                          )}
                         </div>
-                        <div className="text-right ml-4">
-                          <p className="font-medium">{formatPrice(item.total_price)}</p>
+                        <div className="flex-1">
+                          <h5 className="font-medium">
+                            {item.quantity > 1 && (
+                              <span className="text-muted-foreground mr-2">(x {item.quantity})</span>
+                            )}
+                            {item.product_name}
+                          </h5>
                         </div>
                       </div>
-                    ))}
-                    
-                    <Separator className="my-4" />
-                    
-                    <div className="flex justify-between items-center font-semibold">
-                      <span>Total Amount</span>
-                      <span className="text-lg">{formatPrice(order.total_amount)}</span>
+                      <div className="text-right ml-4">
+                        <p className="font-medium">{formatPrice(item.total_price)}</p>
+                      </div>
                     </div>
-                  </div>
+                  ))}
+                </div>
+
+                <Separator className="my-4" />
+                
+                <div className="flex justify-between items-center font-semibold">
+                  <span>Total Amount</span>
+                  <span className="text-lg">{formatPrice(order.total_amount)}</span>
                 </div>
               </CardContent>
             </Card>
