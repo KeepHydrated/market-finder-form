@@ -29,6 +29,8 @@ interface CustomCheckoutProps {
   items: CartItem[];
   onSuccess: () => void;
   onCancel: () => void;
+  selectedPaymentMethodId?: string;
+  showCancelButton?: boolean;
 }
 
 interface CheckoutFormProps {
@@ -36,6 +38,7 @@ interface CheckoutFormProps {
   customerEmail: string;
   onSuccess: () => void;
   onCancel: () => void;
+  showCancelButton?: boolean;
 }
 
 const CheckoutForm: React.FC<CheckoutFormProps> = ({
@@ -43,6 +46,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   customerEmail,
   onSuccess,
   onCancel,
+  showCancelButton = true,
 }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -78,19 +82,21 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <PaymentElement />
-      <div className="flex gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          className="flex-1"
-        >
-          Cancel
-        </Button>
+      <div className={showCancelButton ? "flex gap-3" : ""}>
+        {showCancelButton && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+        )}
         <Button
           type="submit"
           disabled={!stripe || isLoading}
-          className="flex-1"
+          className={showCancelButton ? "flex-1" : "w-full"}
         >
           {isLoading ? 'Processing...' : 'Pay Now'}
         </Button>
@@ -103,6 +109,8 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
   items,
   onSuccess,
   onCancel,
+  selectedPaymentMethodId,
+  showCancelButton = true,
 }) => {
   const [clientSecret, setClientSecret] = useState<string>('');
   const [guestEmail, setGuestEmail] = useState('');
@@ -152,6 +160,7 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
             vendor_id: Object.keys(groupedItems)[0],
             vendor_name: vendorGroup.vendor_name,
             customer_email: customerEmail,
+            payment_method_id: selectedPaymentMethodId,
           },
           headers: session.data.session ? {
             Authorization: `Bearer ${session.data.session.access_token}`,
@@ -217,6 +226,53 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
     );
   }
 
+  // If using saved payment method, show simplified UI
+  if (selectedPaymentMethodId && selectedPaymentMethodId !== 'new') {
+    return (
+      <Button 
+        className="w-full h-14 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90"
+        onClick={async () => {
+          setLoading(true);
+          try {
+            const vendorGroup = Object.values(groupedItems)[0];
+            const session = await supabase.auth.getSession();
+            
+            const { data, error } = await supabase.functions.invoke('create-payment-intent', {
+              body: {
+                items: vendorGroup.items,
+                vendor_id: Object.keys(groupedItems)[0],
+                vendor_name: vendorGroup.vendor_name,
+                customer_email: customerEmail,
+                payment_method_id: selectedPaymentMethodId,
+                confirm: true,
+              },
+              headers: session.data.session ? {
+                Authorization: `Bearer ${session.data.session.access_token}`,
+              } : {},
+            });
+
+            if (error) throw error;
+            
+            if (data?.success) {
+              toast.success('Payment successful!');
+              onSuccess();
+            } else {
+              throw new Error('Payment failed');
+            }
+          } catch (error) {
+            console.error('Payment error:', error);
+            toast.error('Payment failed. Please try again.');
+          } finally {
+            setLoading(false);
+          }
+        }}
+        disabled={loading}
+      >
+        {loading ? 'Processing...' : 'Pay Now'}
+      </Button>
+    );
+  }
+
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
@@ -229,7 +285,8 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
               clientSecret={clientSecret}
               customerEmail={customerEmail}
               onSuccess={onSuccess}
-              onCancel={onCancel}
+              onCancel={showCancelButton ? onCancel : () => {}}
+              showCancelButton={showCancelButton}
             />
           </Elements>
         )}

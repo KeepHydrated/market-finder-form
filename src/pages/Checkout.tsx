@@ -8,11 +8,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { ShoppingCart, MapPin, Star, HelpCircle } from 'lucide-react';
+import { ShoppingCart, MapPin, Star, HelpCircle, CreditCard, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast as sonnerToast } from 'sonner';
 import { ProductDetailModal } from '@/components/ProductDetailModal';
 import { CustomCheckout } from '@/components/shopping/CustomCheckout';
+
+interface PaymentMethod {
+  id: string;
+  brand: string;
+  last4: string;
+  exp_month: number;
+  exp_year: number;
+}
 
 interface VendorData {
   store_name: string;
@@ -27,12 +35,14 @@ export default function Checkout() {
   const { toast } = useToast();
   const { user } = useAuth();
   const [selectedAddress, setSelectedAddress] = useState('default');
-  const [selectedPayment, setSelectedPayment] = useState('stripe');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(true);
   const [loading, setLoading] = useState(false);
   const [vendorData, setVendorData] = useState<VendorData | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
 
   // Calculate totals
   const subtotal = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
@@ -57,6 +67,39 @@ export default function Checkout() {
   }, {} as Record<string, { vendor_name: string; vendor_id: string; items: typeof items }>);
 
   const firstVendor = Object.values(groupedItems)[0];
+
+  // Fetch saved payment methods
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      if (!user) {
+        setLoadingPaymentMethods(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.functions.invoke('get-payment-methods');
+        
+        if (error) throw error;
+        
+        const methods = data?.payment_methods || [];
+        setPaymentMethods(methods);
+        
+        // Auto-select first payment method if available
+        if (methods.length > 0) {
+          setSelectedPaymentMethod(methods[0].id);
+        } else {
+          setSelectedPaymentMethod('new');
+        }
+      } catch (error) {
+        console.error('Error fetching payment methods:', error);
+        setSelectedPaymentMethod('new');
+      } finally {
+        setLoadingPaymentMethods(false);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, [user]);
 
   // Fetch vendor data for ratings and profile - MUST be before any conditional returns
   useEffect(() => {
@@ -95,17 +138,9 @@ export default function Checkout() {
     setIsProductModalOpen(true);
   };
 
-  const handleCheckout = () => {
-    setShowPayment(true);
-  };
-
   const handlePaymentSuccess = () => {
     clearCart();
     navigate('/order-success');
-  };
-
-  const handlePaymentCancel = () => {
-    setShowPayment(false);
   };
 
   if (items.length === 0) {
@@ -147,21 +182,6 @@ export default function Checkout() {
   const storeLogo = getStoreLogo();
   const storeInitial = (vendorData?.store_name || firstVendor?.vendor_name || '?')[0].toUpperCase();
 
-  // Show embedded payment form
-  if (showPayment) {
-    return (
-      <div className="min-h-screen bg-muted/20 py-8">
-        <div className="container mx-auto px-4">
-          <CustomCheckout
-            items={firstVendor.items}
-            onSuccess={handlePaymentSuccess}
-            onCancel={handlePaymentCancel}
-          />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-muted/20 py-8">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -196,34 +216,75 @@ export default function Checkout() {
               </CardContent>
             </Card>
 
-            {/* Payment Type */}
+            {/* Payment Method */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl font-bold">Payment type</CardTitle>
+                <CardTitle className="text-xl font-bold">Payment</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <RadioGroup value={selectedPayment} onValueChange={setSelectedPayment}>
-                  <div className="flex items-center space-x-3 py-2">
-                    <RadioGroupItem value="stripe" id="stripe" />
-                    <Label htmlFor="stripe" className="flex items-center gap-2 cursor-pointer flex-1">
-                      <div className="w-10 h-6 bg-primary/10 rounded flex items-center justify-center text-xs font-semibold">
-                        💳
-                      </div>
-                      <span>Stripe Checkout</span>
-                    </Label>
+                {loadingPaymentMethods ? (
+                  <div className="py-4 text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                   </div>
-                </RadioGroup>
+                ) : (
+                  <>
+                    <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+                      {paymentMethods.map((method) => (
+                        <div key={method.id} className="flex items-center space-x-3 py-3 px-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                          <RadioGroupItem value={method.id} id={method.id} />
+                          <Label htmlFor={method.id} className="flex items-center gap-3 cursor-pointer flex-1">
+                            <CreditCard className="w-5 h-5 text-muted-foreground" />
+                            <div>
+                              <p className="font-medium capitalize">{method.brand} •••• {method.last4}</p>
+                              <p className="text-xs text-muted-foreground">
+                                Expires {method.exp_month}/{method.exp_year}
+                              </p>
+                            </div>
+                          </Label>
+                        </div>
+                      ))}
+                      <div className="flex items-center space-x-3 py-3 px-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                        <RadioGroupItem value="new" id="new" />
+                        <Label htmlFor="new" className="flex items-center gap-3 cursor-pointer flex-1">
+                          <Plus className="w-5 h-5 text-muted-foreground" />
+                          <span className="font-medium">Add new card</span>
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                    
+                    {selectedPaymentMethod === 'new' && !showPaymentForm && (
+                      <Button 
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => setShowPaymentForm(true)}
+                      >
+                        Continue to add card
+                      </Button>
+                    )}
+                  </>
+                )}
               </CardContent>
             </Card>
 
-            {/* Checkout Button */}
-            <Button 
-              className="w-full h-14 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90"
-              onClick={handleCheckout}
-              disabled={loading}
-            >
-              {loading ? 'Processing...' : 'Purchase'}
-            </Button>
+            {/* Payment Form or Checkout Button */}
+            {showPaymentForm || selectedPaymentMethod === 'new' ? (
+              showPaymentForm && (
+                <CustomCheckout
+                  items={firstVendor.items}
+                  onSuccess={handlePaymentSuccess}
+                  onCancel={() => setShowPaymentForm(false)}
+                  selectedPaymentMethodId={selectedPaymentMethod !== 'new' ? selectedPaymentMethod : undefined}
+                />
+              )
+            ) : (
+              <CustomCheckout
+                items={firstVendor.items}
+                onSuccess={handlePaymentSuccess}
+                onCancel={() => {}}
+                selectedPaymentMethodId={selectedPaymentMethod}
+                showCancelButton={false}
+              />
+            )}
           </div>
 
           {/* Right Column - Order Summary */}

@@ -20,6 +20,8 @@ interface PaymentRequest {
   vendor_id: string;
   vendor_name: string;
   customer_email?: string; // for guest checkout
+  payment_method_id?: string; // for saved payment methods
+  confirm?: boolean; // whether to confirm payment immediately
 }
 
 const logStep = (step: string, details?: any) => {
@@ -45,7 +47,7 @@ serve(async (req) => {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
 
-    const { items, vendor_id, vendor_name, customer_email }: PaymentRequest = await req.json();
+    const { items, vendor_id, vendor_name, customer_email, payment_method_id, confirm }: PaymentRequest = await req.json();
     if (!items?.length) throw new Error("No items provided");
 
     logStep("Processing payment request", { itemCount: items.length, vendor_id });
@@ -148,7 +150,7 @@ serve(async (req) => {
     }
 
     // Create Payment Intent
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntentParams: any = {
       amount: totalAmount,
       currency: 'usd',
       customer: customerId,
@@ -158,7 +160,18 @@ serve(async (req) => {
         vendor_name
       },
       receipt_email: finalCustomerEmail,
-    });
+    };
+
+    // If payment method provided, attach it and optionally confirm
+    if (payment_method_id) {
+      paymentIntentParams.payment_method = payment_method_id;
+      if (confirm) {
+        paymentIntentParams.confirm = true;
+        paymentIntentParams.return_url = `${req.headers.get("origin")}/order-success`;
+      }
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create(paymentIntentParams);
 
     // Update order with Payment Intent ID
     await supabaseClient
@@ -166,7 +179,27 @@ serve(async (req) => {
       .update({ stripe_payment_intent_id: paymentIntent.id })
       .eq('id', order.id);
 
-    logStep("Created payment intent", { paymentIntentId: paymentIntent.id });
+    logStep("Created payment intent", { paymentIntentId: paymentIntent.id, status: paymentIntent.status });
+
+    // If confirmed, check payment status
+    if (confirm && paymentIntent.status === 'succeeded') {
+      // Update order status
+      await supabaseClient
+        .from('orders')
+        .update({ status: 'paid' })
+        .eq('id', order.id);
+      
+      logStep("Payment confirmed", { orderId: order.id });
+      
+      return new Response(JSON.stringify({ 
+        success: true,
+        order_id: order.id,
+        payment_intent_id: paymentIntent.id
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
 
     return new Response(JSON.stringify({ 
       client_secret: paymentIntent.client_secret,
