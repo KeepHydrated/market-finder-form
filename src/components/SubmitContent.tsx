@@ -73,9 +73,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
   }, []);
 
   const saveProducts = useCallback((productsToSave: Product[]) => {
-    if (productsToSave.length > 0) {
-      localStorage.setItem('farmer-market-products', JSON.stringify(productsToSave));
-    }
+    localStorage.setItem('farmer-market-products', JSON.stringify(productsToSave));
   }, []);
 
   // Load products once on mount
