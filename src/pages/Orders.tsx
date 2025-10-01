@@ -232,10 +232,6 @@ const Orders = () => {
                 <Separator className="mb-4" />
                 
                 <div className="space-y-3">
-                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
-                    Order Items
-                  </h4>
-                  
                   {order.order_items.map((item) => (
                     <div key={item.id} className="flex justify-between items-start py-2">
                       <div className="flex items-start gap-3 flex-1">
