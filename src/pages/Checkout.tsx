@@ -51,6 +51,28 @@ export default function Checkout() {
     return groups;
   }, {} as Record<string, { vendor_name: string; vendor_id: string; items: typeof items }>);
 
+  const firstVendor = Object.values(groupedItems)[0];
+
+  // Fetch vendor data for ratings and profile - MUST be before any conditional returns
+  useEffect(() => {
+    const fetchVendorData = async () => {
+      if (!firstVendor || items.length === 0) return;
+      
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('store_name, google_rating, google_rating_count, products')
+        .eq('id', firstVendor.vendor_id)
+        .eq('status', 'accepted')
+        .single();
+
+      if (!error && data) {
+        setVendorData(data);
+      }
+    };
+
+    fetchVendorData();
+  }, [firstVendor?.vendor_id, items.length]);
+
   const handleCheckout = async () => {
     setLoading(true);
     try {
@@ -104,27 +126,6 @@ export default function Checkout() {
     );
   }
 
-  const firstVendor = Object.values(groupedItems)[0];
-
-  // Fetch vendor data for ratings and profile
-  useEffect(() => {
-    const fetchVendorData = async () => {
-      if (!firstVendor) return;
-      
-      const { data, error } = await supabase
-        .from('submissions')
-        .select('store_name, google_rating, google_rating_count, products')
-        .eq('id', firstVendor.vendor_id)
-        .eq('status', 'accepted')
-        .single();
-
-      if (!error && data) {
-        setVendorData(data);
-      }
-    };
-
-    fetchVendorData();
-  }, [firstVendor?.vendor_id]);
 
   // Get store logo from first product image if available
   const getStoreLogo = () => {
