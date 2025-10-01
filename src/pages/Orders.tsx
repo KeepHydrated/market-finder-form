@@ -289,13 +289,13 @@ const Orders = () => {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Button size="default" className="w-full rounded-full">
+                  <Button size="sm" className="w-full rounded-full">
                     Track package
                   </Button>
-                  <Button variant="outline" size="default" className="w-full rounded-full">
+                  <Button variant="outline" size="sm" className="w-full rounded-full">
                     Help with order
                   </Button>
-                  <Button variant="outline" size="default" className="w-full rounded-full">
+                  <Button variant="outline" size="sm" className="w-full rounded-full">
                     View receipt
                   </Button>
                 </div>
