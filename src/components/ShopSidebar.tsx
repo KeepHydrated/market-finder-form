@@ -79,7 +79,7 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
       <div className="h-16 border-b flex items-center px-4">
         <span className="font-semibold text-sm text-muted-foreground">Navigation</span>
       </div>
-      <SidebarContent className="pt-8">
+      <SidebarContent className="pt-12">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
