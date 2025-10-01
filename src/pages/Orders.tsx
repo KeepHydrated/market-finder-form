@@ -253,11 +253,6 @@ const Orders = () => {
                         </div>
                         <div className="flex-1">
                           <h5 className="font-medium">{item.product_name}</h5>
-                          {item.product_description && (
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {item.product_description}
-                            </p>
-                          )}
                           <p className="text-sm text-muted-foreground mt-1">
                             Quantity: {item.quantity} × {formatPrice(item.unit_price)}
                           </p>
