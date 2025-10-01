@@ -211,7 +211,7 @@ const Orders = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-6 max-w-4xl">
+        <div className="space-y-6 max-w-2xl">
           {orders.map((order) => (
             <Card key={order.id} className="overflow-hidden">
               <CardHeader className="pb-4">
