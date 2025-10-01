@@ -616,8 +616,7 @@ export default function ShopManager() {
 
   const renderProducts = () => (
     <div className="space-y-6">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Product Catalog</h2>
+      <div className="flex flex-row items-center justify-end mb-6">
         <div className="flex items-center gap-2">
           {products.length > 0 && (
             <Button 
