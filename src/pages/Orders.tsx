@@ -280,20 +280,22 @@ const Orders = () => {
 
               <div className="flex flex-col gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-2">Order Status</p>
-                  <Badge className={getStatusColor(order.status)}>
-                    {order.status}
-                  </Badge>
+                  <h3 className="text-2xl font-serif mb-2">Arriving Friday, October 3rd</h3>
+                  <p className="text-sm mb-1">Estimated arrival from USPS</p>
+                  <p className="text-sm">
+                    From <span className="font-medium">GLENDALE, AZ</span> To{" "}
+                    <span className="font-medium underline">San Antonio</span>
+                  </p>
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <Button variant="outline" size="sm" className="w-full justify-start">
-                    Contact Vendor
+                <div className="flex flex-col gap-3">
+                  <Button size="lg" className="w-full rounded-full">
+                    Track package
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full justify-start">
+                  <Button variant="outline" size="lg" className="w-full rounded-full">
                     Help with order
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full justify-start">
+                  <Button variant="outline" size="lg" className="w-full rounded-full">
                     View receipt
                   </Button>
                 </div>
