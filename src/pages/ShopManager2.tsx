@@ -734,10 +734,6 @@ export default function ShopManager() {
 
   const renderTest = () => (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Overview</h2>
-      </div>
-
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
