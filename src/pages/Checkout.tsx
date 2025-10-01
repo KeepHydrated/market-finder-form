@@ -265,11 +265,6 @@ export default function Checkout() {
                         <h4 className="font-medium text-sm mb-1 line-clamp-2">
                           {item.product_name}
                         </h4>
-                        {item.product_description && (
-                          <p className="text-xs text-muted-foreground mb-1">
-                            {item.product_description}
-                          </p>
-                        )}
                         <p className="text-xs text-muted-foreground">
                           Qty: {item.quantity}
                         </p>
