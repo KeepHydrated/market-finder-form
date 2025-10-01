@@ -112,7 +112,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
       id: Date.now(),
       name: `${product.name} (Copy)`
     };
-    setProducts(prev => [...prev, duplicatedProduct]);
+    setProducts(prev => [duplicatedProduct, ...prev]);
     toast({
       title: "Product Duplicated",
       description: "The product has been successfully duplicated.",
@@ -314,7 +314,7 @@ export const SubmitContent = ({ user }: SubmitContentProps) => {
             price: productData.price,
             images: productData.images
           };
-          setProducts(prev => [...prev, newProduct]);
+          setProducts(prev => [newProduct, ...prev]);
           toast({
             title: "Product Added",
             description: "Your product has been successfully added.",
