@@ -264,14 +264,14 @@ export default function Checkout() {
                         </Link>
                       )}
                       <div className="flex-1 min-w-0">
-                        <Link to={`/market?id=${firstVendor.vendor_id}&product=${item.id.split('-')[1]}`}>
-                          <h4 className="font-medium text-sm mb-1 line-clamp-2 cursor-pointer">
+                        <h4 className="font-medium text-sm mb-1 line-clamp-2">
+                          <Link to={`/market?id=${firstVendor.vendor_id}&product=${item.id.split('-')[1]}`} className="cursor-pointer">
                             {item.product_name}
-                            {item.quantity > 1 && (
-                              <span className="text-muted-foreground"> (Qty: {item.quantity})</span>
-                            )}
-                          </h4>
-                        </Link>
+                          </Link>
+                          {item.quantity > 1 && (
+                            <span className="text-muted-foreground"> (Qty: {item.quantity})</span>
+                          )}
+                        </h4>
                       </div>
                       <div className="text-right font-semibold">
                         {item.quantity > 1 ? (
