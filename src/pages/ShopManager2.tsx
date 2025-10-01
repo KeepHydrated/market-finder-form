@@ -616,11 +616,6 @@ export default function ShopManager() {
 
   const renderProducts = () => (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Products</h2>
-        <p className="text-muted-foreground">Manage your product catalog</p>
-      </div>
-
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Product Catalog</CardTitle>
