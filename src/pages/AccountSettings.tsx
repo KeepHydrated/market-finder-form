@@ -530,7 +530,7 @@ export default function AccountSettings() {
                         className="bg-muted"
                       />
                       <p className="text-xs text-muted-foreground">
-                        Email cannot be changed from here
+                        Email cannot be changed
                       </p>
                     </div>
                     
