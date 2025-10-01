@@ -12,6 +12,7 @@ import { ShoppingCart, MapPin, Star, HelpCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast as sonnerToast } from 'sonner';
 import { ProductDetailModal } from '@/components/ProductDetailModal';
+import { CustomCheckout } from '@/components/shopping/CustomCheckout';
 
 interface VendorData {
   store_name: string;
@@ -31,6 +32,7 @@ export default function Checkout() {
   const [vendorData, setVendorData] = useState<VendorData | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
 
   // Calculate totals
   const subtotal = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
@@ -93,34 +95,17 @@ export default function Checkout() {
     setIsProductModalOpen(true);
   };
 
-  const handleCheckout = async () => {
-    if (!user) {
-      sonnerToast.error('Please sign in to complete your purchase');
-      return;
-    }
+  const handleCheckout = () => {
+    setShowPayment(true);
+  };
 
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          items: firstVendor.items,
-          vendor_id: firstVendor.vendor_id,
-          vendor_name: firstVendor.vendor_name,
-        },
-      });
+  const handlePaymentSuccess = () => {
+    clearCart();
+    navigate('/order-success');
+  };
 
-      if (error) throw error;
-
-      if (data?.url) {
-        // Redirect to Stripe Checkout
-        window.open(data.url, '_blank');
-      }
-    } catch (error) {
-      console.error('Checkout error:', error);
-      sonnerToast.error('Failed to start checkout. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  const handlePaymentCancel = () => {
+    setShowPayment(false);
   };
 
   if (items.length === 0) {
@@ -161,6 +146,21 @@ export default function Checkout() {
 
   const storeLogo = getStoreLogo();
   const storeInitial = (vendorData?.store_name || firstVendor?.vendor_name || '?')[0].toUpperCase();
+
+  // Show embedded payment form
+  if (showPayment) {
+    return (
+      <div className="min-h-screen bg-muted/20 py-8">
+        <div className="container mx-auto px-4">
+          <CustomCheckout
+            items={firstVendor.items}
+            onSuccess={handlePaymentSuccess}
+            onCancel={handlePaymentCancel}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/20 py-8">
