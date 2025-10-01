@@ -264,10 +264,10 @@ export default function Checkout() {
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-sm mb-1 line-clamp-2">
                           {item.product_name}
+                          {item.quantity > 1 && (
+                            <span className="text-muted-foreground"> (Qty: {item.quantity})</span>
+                          )}
                         </h4>
-                        <p className="text-xs text-muted-foreground">
-                          Qty: {item.quantity}
-                        </p>
                       </div>
                       <div className="text-right font-semibold">
                         {formatPrice(item.unit_price * item.quantity)}
