@@ -252,41 +252,48 @@ export default function Checkout() {
 
                 {/* Order Items */}
                 <div className="space-y-4">
-                  {firstVendor.items.map((item, index) => (
-                    <div key={index} className="flex gap-4">
-                      {item.product_image && (
-                        <Link to={`/market?id=${firstVendor.vendor_id}&product=${item.id.split('-')[1]}`}>
-                          <img
-                            src={item.product_image}
-                            alt={item.product_name}
-                            className="w-20 h-20 rounded-lg object-cover flex-shrink-0 cursor-pointer"
-                          />
-                        </Link>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm mb-1 line-clamp-2">
-                          <Link to={`/market?id=${firstVendor.vendor_id}&product=${item.id.split('-')[1]}`} className="cursor-pointer">
-                            {item.product_name}
+                  {firstVendor.items.map((item, index) => {
+                    // Extract product ID from cart item ID (format: "vendorUUID-productId")
+                    // Since vendor UUID contains hyphens, we need to split from the right
+                    const lastHyphenIndex = item.id.lastIndexOf('-');
+                    const productId = item.id.substring(lastHyphenIndex + 1);
+                    
+                    return (
+                      <div key={index} className="flex gap-4">
+                        {item.product_image && (
+                          <Link to={`/market?id=${firstVendor.vendor_id}&product=${productId}`}>
+                            <img
+                              src={item.product_image}
+                              alt={item.product_name}
+                              className="w-20 h-20 rounded-lg object-cover flex-shrink-0 cursor-pointer"
+                            />
                           </Link>
-                          {item.quantity > 1 && (
-                            <span className="text-muted-foreground"> (Qty: {item.quantity})</span>
-                          )}
-                        </h4>
-                      </div>
-                      <div className="text-right font-semibold">
-                        {item.quantity > 1 ? (
-                          <div className="text-sm">
-                            <span className="text-muted-foreground font-normal">
-                              {formatPrice(item.unit_price)} × {item.quantity} =
-                            </span>
-                            <span className="ml-1">{formatPrice(item.unit_price * item.quantity)}</span>
-                          </div>
-                        ) : (
-                          formatPrice(item.unit_price * item.quantity)
                         )}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm mb-1 line-clamp-2">
+                            <Link to={`/market?id=${firstVendor.vendor_id}&product=${productId}`} className="cursor-pointer">
+                              {item.product_name}
+                            </Link>
+                            {item.quantity > 1 && (
+                              <span className="text-muted-foreground"> (Qty: {item.quantity})</span>
+                            )}
+                          </h4>
+                        </div>
+                        <div className="text-right font-semibold">
+                          {item.quantity > 1 ? (
+                            <div className="text-sm">
+                              <span className="text-muted-foreground font-normal">
+                                {formatPrice(item.unit_price)} × {item.quantity} =
+                              </span>
+                              <span className="ml-1">{formatPrice(item.unit_price * item.quantity)}</span>
+                            </div>
+                          ) : (
+                            formatPrice(item.unit_price * item.quantity)
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Cost Breakdown */}
