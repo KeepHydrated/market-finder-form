@@ -7,6 +7,7 @@ import { GlobalHeader } from "@/components/GlobalHeader";
 import { Footer } from "@/components/Footer";
 import { ShoppingCartProvider } from "@/contexts/ShoppingCartContext";
 import { ShoppingCart } from "@/components/shopping/ShoppingCart";
+import ScrollToTop from "@/components/ScrollToTop";
 import Homepage from "./pages/Homepage";
 import CategoryProducts from "./pages/CategoryProducts";
 import VendorDuplicate from "./pages/VendorDuplicate";
@@ -30,6 +31,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <div className="min-h-screen flex flex-col">
             <GlobalHeader />
             <ShoppingCart />
