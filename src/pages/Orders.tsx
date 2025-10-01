@@ -252,10 +252,12 @@ const Orders = () => {
                           )}
                         </div>
                         <div className="flex-1">
-                          <h5 className="font-medium">{item.product_name}</h5>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Quantity: {item.quantity} × {formatPrice(item.unit_price)}
-                          </p>
+                          <h5 className="font-medium">
+                            {item.quantity > 1 && (
+                              <span className="text-muted-foreground mr-2">(x {item.quantity})</span>
+                            )}
+                            {item.product_name}
+                          </h5>
                         </div>
                       </div>
                       <div className="text-right ml-4">
