@@ -231,7 +231,29 @@ const Orders = () => {
               <CardContent className="pt-0">
                 <Separator className="mb-4" />
                 
-                <div className="grid md:grid-cols-[1fr,300px] gap-6">
+                <div className="grid md:grid-cols-[300px,1fr] gap-6">
+                  <div className="space-y-3">
+                    <div className="mb-4">
+                      <h3 className="text-2xl font-semibold mb-2">Order Status</h3>
+                      <p className="text-muted-foreground capitalize">{order.status}</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        From {order.vendor_name}
+                      </p>
+                    </div>
+                    
+                    <button className="w-full bg-primary text-primary-foreground py-3 rounded-full font-medium hover:bg-primary/90 transition-colors">
+                      Contact Vendor
+                    </button>
+                    
+                    <button className="w-full border-2 border-foreground py-3 rounded-full font-medium hover:bg-muted transition-colors">
+                      Help with order
+                    </button>
+                    
+                    <button className="w-full border-2 border-foreground py-3 rounded-full font-medium hover:bg-muted transition-colors">
+                      View receipt
+                    </button>
+                  </div>
+                  
                   <div className="space-y-3">
                     {order.order_items.map((item) => (
                       <div key={item.id} className="flex justify-between items-start py-2">
@@ -273,28 +295,6 @@ const Orders = () => {
                       <span>Total Amount</span>
                       <span className="text-lg">{formatPrice(order.total_amount)}</span>
                     </div>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="mb-4">
-                      <h3 className="text-2xl font-semibold mb-2">Order Status</h3>
-                      <p className="text-muted-foreground capitalize">{order.status}</p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        From {order.vendor_name}
-                      </p>
-                    </div>
-                    
-                    <button className="w-full bg-primary text-primary-foreground py-3 rounded-full font-medium hover:bg-primary/90 transition-colors">
-                      Contact Vendor
-                    </button>
-                    
-                    <button className="w-full border-2 border-foreground py-3 rounded-full font-medium hover:bg-muted transition-colors">
-                      Help with order
-                    </button>
-                    
-                    <button className="w-full border-2 border-foreground py-3 rounded-full font-medium hover:bg-muted transition-colors">
-                      View receipt
-                    </button>
                   </div>
                 </div>
               </CardContent>
