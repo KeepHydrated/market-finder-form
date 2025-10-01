@@ -78,10 +78,8 @@ const Orders = () => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
     });
   };
 
@@ -172,22 +170,12 @@ const Orders = () => {
           {orders.map((order) => (
             <Card key={order.id} className="overflow-hidden">
               <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Store className="h-5 w-5" />
-                      {order.vendor_name}
-                    </CardTitle>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {formatDate(order.created_at)}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4" />
-                        {formatPrice(order.total_amount)}
-                      </div>
-                    </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-base">
+                    <span className="text-muted-foreground">Purchased from</span>
+                    <Store className="h-4 w-4" />
+                    <span className="font-semibold">{order.vendor_name}</span>
+                    <span className="text-muted-foreground">on {formatDate(order.created_at)}</span>
                   </div>
                   <Badge className={`${getStatusColor(order.status)} text-white`}>
                     {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
