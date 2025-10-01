@@ -48,7 +48,8 @@ export function ShoppingCart() {
   };
 
   const handleCheckout = () => {
-    setShowOrderConfirm(true);
+    setIsOpen(false);
+    navigate('/checkout');
   };
 
   const handleOrderConfirm = () => {
