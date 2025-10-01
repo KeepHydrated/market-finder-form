@@ -616,12 +616,12 @@ export default function ShopManager() {
 
   const renderProducts = () => (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Products</h2>
-        <p className="text-muted-foreground">Manage your product listings</p>
-      </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Products</h2>
+          <p className="text-muted-foreground">Manage your product listings</p>
+        </div>
 
-      <div className="flex flex-row items-center justify-end mb-6">
         <div className="flex items-center gap-2">
           {products.length > 0 && (
             <Button 
