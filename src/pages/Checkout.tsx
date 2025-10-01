@@ -270,7 +270,16 @@ export default function Checkout() {
                         </h4>
                       </div>
                       <div className="text-right font-semibold">
-                        {formatPrice(item.unit_price * item.quantity)}
+                        {item.quantity > 1 ? (
+                          <div className="text-sm">
+                            <span className="text-muted-foreground font-normal">
+                              {formatPrice(item.unit_price)} × {item.quantity} =
+                            </span>
+                            <span className="ml-1">{formatPrice(item.unit_price * item.quantity)}</span>
+                          </div>
+                        ) : (
+                          formatPrice(item.unit_price * item.quantity)
+                        )}
                       </div>
                     </div>
                   ))}
