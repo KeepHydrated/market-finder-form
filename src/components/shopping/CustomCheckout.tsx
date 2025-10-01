@@ -108,7 +108,7 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
 }) => {
   const [clientSecret, setClientSecret] = useState<string>('');
   const [guestEmail, setGuestEmail] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   const totalAmount = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
@@ -127,115 +127,57 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
     return groups;
   }, {} as Record<string, { vendor_name: string; items: CartItem[] }>);
 
-  const handleCreatePaymentIntent = async () => {
-    setLoading(true);
-    try {
-      const vendorGroup = Object.values(groupedItems)[0]; // For now, handle one vendor
-      const { data, error } = await supabase.functions.invoke('create-payment-intent', {
-        body: {
-          items: vendorGroup.items,
-          vendor_id: Object.keys(groupedItems)[0],
-          vendor_name: vendorGroup.vendor_name,
-          customer_email: user?.email || guestEmail,
-        },
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
-      });
+  // Automatically create payment intent on mount
+  useEffect(() => {
+    const createPaymentIntent = async () => {
+      setLoading(true);
+      try {
+        const vendorGroup = Object.values(groupedItems)[0];
+        const { data, error } = await supabase.functions.invoke('create-payment-intent', {
+          body: {
+            items: vendorGroup.items,
+            vendor_id: Object.keys(groupedItems)[0],
+            vendor_name: vendorGroup.vendor_name,
+            customer_email: user?.email || guestEmail,
+          },
+          headers: {
+            Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          },
+        });
 
-      if (error) throw error;
-      
-      setClientSecret(data.client_secret);
-    } catch (error) {
-      console.error('Error creating payment intent:', error);
-      toast.error('Failed to initialize checkout');
-    } finally {
-      setLoading(false);
-    }
-  };
+        if (error) throw error;
+        
+        setClientSecret(data.client_secret);
+      } catch (error) {
+        console.error('Error creating payment intent:', error);
+        toast.error('Failed to initialize checkout');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    createPaymentIntent();
+  }, []);
 
   const customerEmail = user?.email || guestEmail;
+
+  if (loading) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardContent className="py-12 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading payment...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!clientSecret) {
     return (
       <Card className="w-full max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Checkout</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Order Summary */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">Order Summary</h3>
-            {Object.values(groupedItems).map((group, index) => (
-              <div key={index} className="space-y-2">
-                <h4 className="font-medium text-sm text-muted-foreground">
-                  {group.vendor_name}
-                </h4>
-                {group.items.map((item, itemIndex) => (
-                  <div key={itemIndex} className="flex items-center gap-3 py-2">
-                    {item.product_image && (
-                      <img
-                        src={item.product_image}
-                        alt={item.product_name}
-                        className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
-                      />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-sm">{item.product_name}</p>
-                          {item.product_description && (
-                            <p className="text-xs text-muted-foreground truncate">
-                              {item.product_description}
-                            </p>
-                          )}
-                          <p className="text-xs text-muted-foreground">
-                            Qty: {item.quantity} × {formatPrice(item.unit_price)}
-                          </p>
-                        </div>
-                        <span className="text-sm font-medium">{formatPrice(item.unit_price * item.quantity)}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))}
-            <div className="border-t pt-2">
-              <div className="flex justify-between font-semibold">
-                <span>Total</span>
-                <span>{formatPrice(totalAmount)}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Guest Email Input */}
-          {!user && (
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={guestEmail}
-                onChange={(e) => setGuestEmail(e.target.value)}
-                required
-              />
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={onCancel} className="flex-1">
-              Back to Cart
-            </Button>
-            <Button
-              onClick={handleCreatePaymentIntent}
-              disabled={loading || (!user && !guestEmail)}
-              className="flex-1"
-            >
-              {loading ? 'Loading...' : 'Continue to Payment'}
-            </Button>
-          </div>
+        <CardContent className="py-12 text-center">
+          <p className="text-destructive">Failed to initialize payment</p>
+          <Button onClick={onCancel} className="mt-4">Back to Cart</Button>
         </CardContent>
       </Card>
     );
