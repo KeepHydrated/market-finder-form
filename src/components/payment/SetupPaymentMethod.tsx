@@ -49,7 +49,7 @@ const SetupForm: React.FC<{ onSuccess: () => void; onCancel: () => void }> = ({
     const result = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/payment-methods`,
+        return_url: `${window.location.origin}/account`,
       },
       redirect: 'if_required',
     });
