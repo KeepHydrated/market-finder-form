@@ -8,10 +8,12 @@ import { supabase } from "@/integrations/supabase/client";
 import ShopInfoSection from "@/components/settings/ShopInfoSection";
 import PaymentMethodsSection from "@/components/settings/PaymentMethodsSection";
 import ShippingAddressesSection from "@/components/settings/ShippingAddressesSection";
+import AccountSection from "@/components/settings/AccountSection";
+import SecuritySection from "@/components/settings/SecuritySection";
 
 const Quiz = () => {
   const { user, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState('payment');
+  const [activeTab, setActiveTab] = useState('account');
   const { toast } = useToast();
 
   // Local state for form inputs
@@ -156,6 +158,19 @@ const Quiz = () => {
             <li>
               <button
                 className={`w-full flex items-center px-4 py-2 text-sm font-medium text-left ${
+                  activeTab === 'account' 
+                    ? 'bg-gray-100 text-gray-900 border-r-2 border-blue-500' 
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+                onClick={() => handleTabClick('account')}
+              >
+                <User className="h-5 w-5 mr-3" />
+                Account
+              </button>
+            </li>
+            <li>
+              <button
+                className={`w-full flex items-center px-4 py-2 text-sm font-medium text-left ${
                   activeTab === 'payment' 
                     ? 'bg-gray-100 text-gray-900 border-r-2 border-blue-500' 
                     : 'text-gray-600 hover:bg-gray-50'
@@ -166,13 +181,55 @@ const Quiz = () => {
                 Payment Methods
               </button>
             </li>
+            <li>
+              <button
+                className={`w-full flex items-center px-4 py-2 text-sm font-medium text-left ${
+                  activeTab === 'shipping' 
+                    ? 'bg-gray-100 text-gray-900 border-r-2 border-blue-500' 
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+                onClick={() => handleTabClick('shipping')}
+              >
+                <MapPin className="h-5 w-5 mr-3" />
+                Shipping Addresses
+              </button>
+            </li>
+            <li>
+              <button
+                className={`w-full flex items-center px-4 py-2 text-sm font-medium text-left ${
+                  activeTab === 'security' 
+                    ? 'bg-gray-100 text-gray-900 border-r-2 border-blue-500' 
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+                onClick={() => handleTabClick('security')}
+              >
+                <Shield className="h-5 w-5 mr-3" />
+                Security
+              </button>
+            </li>
           </ul>
         </nav>
       </div>
 
       {/* Main content area */}
       <div className="flex-1 p-8">
+        {activeTab === 'account' && (
+          <AccountSection 
+            formData={formData}
+            setFormData={setFormData}
+            isSaving={isSaving}
+            onEmailUpdate={handleEmailUpdate}
+            onPasswordReset={handlePasswordReset}
+          />
+        )}
         {activeTab === 'payment' && <PaymentMethodsSection />}
+        {activeTab === 'shipping' && <ShippingAddressesSection />}
+        {activeTab === 'security' && (
+          <SecuritySection 
+            isSaving={isSaving}
+            onDeleteAccount={handleDeleteAccount}
+          />
+        )}
       </div>
     </div>
   );
