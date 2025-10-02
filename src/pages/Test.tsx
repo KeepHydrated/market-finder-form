@@ -24,12 +24,10 @@ export default function Test() {
   const [showAddPayment, setShowAddPayment] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/');
-      return;
+    if (user) {
+      fetchPaymentMethods();
     }
-    fetchPaymentMethods();
-  }, [user, navigate]);
+  }, [user]);
 
   const fetchPaymentMethods = async () => {
     try {
@@ -69,13 +67,18 @@ export default function Test() {
     toast.success('Payment method added successfully');
   };
 
-  if (!user) {
-    return null;
-  }
-
   return (
     <div className="min-h-screen bg-muted/20 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
+        {!user ? (
+          <div className="mb-6 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <h2 className="text-xl font-semibold mb-2">⚠️ Please Log In</h2>
+            <p className="text-muted-foreground">
+              You need to be logged in to manage payment methods. Please log in to continue.
+            </p>
+          </div>
+        ) : null}
+        
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">Payment Methods Test Page</h1>
           <p className="text-muted-foreground">Add and manage your payment methods</p>
@@ -95,13 +98,24 @@ export default function Test() {
                   Securely manage your saved payment methods
                 </CardDescription>
               </div>
-              <Button onClick={() => setShowAddPayment(true)}>
+              <Button 
+                onClick={() => setShowAddPayment(true)}
+                disabled={!user}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Payment Method
               </Button>
             </CardHeader>
             <CardContent>
-              {loading ? (
+              {!user ? (
+                <div className="text-center py-8">
+                  <CreditCard className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Authentication Required</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Please log in to view and manage your payment methods
+                  </p>
+                </div>
+              ) : loading ? (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
                   <p className="text-muted-foreground">Loading payment methods...</p>
