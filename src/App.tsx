@@ -16,7 +16,6 @@ import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
 import ShopManager2 from "./pages/ShopManager2";
-import Markets from "./pages/Markets";
 
 import Commissions from "./pages/Commissions";
 import Checkout from "./pages/Checkout";
@@ -48,7 +47,6 @@ const App = () => (
                 <Route path="/order-success" element={<OrderSuccess />} />
                 <Route path="/shop-manager" element={<ShopManager2 />} />
                 <Route path="/submit" element={<ShopManager2 />} />
-                <Route path="/markets" element={<Markets />} />
                 <Route path="/commissions" element={<Commissions />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
