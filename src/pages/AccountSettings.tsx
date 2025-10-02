@@ -12,7 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   User, 
-  MapPin, 
+  MapPin,
+  CreditCard, 
   Plus,
   Edit2,
   Trash2,
@@ -44,6 +45,14 @@ interface Address {
   phone: string | null;
 }
 
+interface Order {
+  id: string;
+  created_at: string;
+  total_amount: number;
+  status: string;
+  vendor_name: string;
+}
+
 export default function AccountSettings() {
   const { user, profile, loading, refreshProfile } = useAuth();
   const { toast } = useToast();
@@ -57,6 +66,8 @@ export default function AccountSettings() {
   const [isEditingProfilePic, setIsEditingProfilePic] = useState(false);
   const [originalAvatarUrl, setOriginalAvatarUrl] = useState("");
   const [originalUsername, setOriginalUsername] = useState("");
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
 
   const [profileForm, setProfileForm] = useState({
     full_name: '',
@@ -93,6 +104,7 @@ export default function AccountSettings() {
     
     if (user) {
       fetchAddresses();
+      fetchOrders();
     }
   }, [user, profile, loading, navigate]);
 
@@ -401,6 +413,27 @@ export default function AccountSettings() {
     setShowAddressForm(true);
   };
 
+  const fetchOrders = async () => {
+    setLoadingOrders(true);
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setOrders(data || []);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
+  const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+  const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString();
+
   if (loading || loadingProfile) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -425,9 +458,13 @@ export default function AccountSettings() {
                   <User className="h-4 w-4" />
                   Account
                 </TabsTrigger>
-                <TabsTrigger value="addresses" className="flex items-center justify-start gap-3 w-full px-6 py-4 text-left rounded-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="addresses" className="flex items-center justify-start gap-3 w-full px-6 py-4 text-left rounded-none border-b data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <MapPin className="h-4 w-4" />
                   Addresses
+                </TabsTrigger>
+                <TabsTrigger value="payments" className="flex items-center justify-start gap-3 w-full px-6 py-4 text-left rounded-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <CreditCard className="h-4 w-4" />
+                  Payments
                 </TabsTrigger>
               </TabsList>
             </CardContent>
@@ -769,6 +806,107 @@ export default function AccountSettings() {
                   </Card>
                 )}
               </div>
+            </div>
+          </TabsContent>
+
+          {/* Payments Tab */}
+          <TabsContent value="payments" className="mt-0">
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold">Payment History</h3>
+                <p className="text-muted-foreground">View your order and payment transactions</p>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Orders</CardTitle>
+                  <CardDescription>
+                    Your purchase history and payment status
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {loadingOrders ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                      <p className="text-muted-foreground">Loading orders...</p>
+                    </div>
+                  ) : orders.length === 0 ? (
+                    <div className="text-center py-8">
+                      <CreditCard className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No orders yet</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Your payment history will appear here once you make a purchase
+                      </p>
+                      <Button onClick={() => navigate('/')}>
+                        Start Shopping
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {orders.map((order) => (
+                        <Card key={order.id}>
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="space-y-1">
+                                <p className="font-medium">{order.vendor_name}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  Order placed on {formatDate(order.created_at)}
+                                </p>
+                                <Badge variant={order.status === 'completed' ? 'default' : 'secondary'}>
+                                  {order.status}
+                                </Badge>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-lg font-semibold">
+                                  {formatPrice(order.total_amount)}
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Payment Information</CardTitle>
+                  <CardDescription>
+                    Secure payments powered by Stripe
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Secure Checkout</p>
+                      <p className="text-sm text-muted-foreground">
+                        All payments are processed securely through Stripe
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Multiple Payment Methods</p>
+                      <p className="text-sm text-muted-foreground">
+                        Pay with credit cards, debit cards, and more
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Order Tracking</p>
+                      <p className="text-sm text-muted-foreground">
+                        Track all your orders and payment status in real-time
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
         </div>
