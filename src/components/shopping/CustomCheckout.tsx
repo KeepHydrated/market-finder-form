@@ -12,7 +12,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
-const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
+const getStripe = async () => {
+  const { data } = await supabase.functions.invoke('get-stripe-key');
+  if (data?.publishableKey) {
+    return loadStripe(data.publishableKey);
+  }
+  throw new Error('Failed to load Stripe key');
+};
 
 interface CartItem {
   id: string;
@@ -115,6 +121,7 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
   const [clientSecret, setClientSecret] = useState<string>('');
   const [guestEmail, setGuestEmail] = useState('');
   const [loading, setLoading] = useState(true);
+  const [stripe, setStripe] = useState<any>(null);
   const { user } = useAuth();
 
   const totalAmount = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
@@ -142,43 +149,34 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
       try {
         const vendorGroup = Object.values(groupedItems)[0];
         const session = await supabase.auth.getSession();
-        
-        // Get customer email from session or guest input
         const customerEmail = session.data.session?.user?.email || guestEmail;
         
         if (!customerEmail) {
-          // Wait for user to be loaded
           setLoading(false);
           return;
         }
         
-        console.log('Creating payment intent for:', customerEmail);
-        
-        const { data, error } = await supabase.functions.invoke('create-payment-intent', {
-          body: {
-            items: vendorGroup.items,
-            vendor_id: Object.keys(groupedItems)[0],
-            vendor_name: vendorGroup.vendor_name,
-            customer_email: customerEmail,
-            payment_method_id: selectedPaymentMethodId,
-          },
-          headers: session.data.session ? {
-            Authorization: `Bearer ${session.data.session.access_token}`,
-          } : {},
-        });
+        const [stripeInstance, paymentData] = await Promise.all([
+          getStripe(),
+          supabase.functions.invoke('create-payment', {
+            body: {
+              amount: totalAmount / 100,
+              orderId: crypto.randomUUID(),
+              metadata: {
+                vendorId: Object.keys(groupedItems)[0],
+                vendorName: vendorGroup.vendor_name,
+                email: customerEmail,
+              }
+            }
+          })
+        ]);
 
-        if (error) {
-          console.error('Payment intent error:', error);
-          throw error;
+        if (paymentData.error || !paymentData.data?.clientSecret) {
+          throw new Error('Failed to initialize payment');
         }
-        
-        console.log('Payment intent response:', data);
-        
-        if (data?.client_secret) {
-          setClientSecret(data.client_secret);
-        } else {
-          throw new Error('No client secret returned');
-        }
+
+        setStripe(stripeInstance);
+        setClientSecret(paymentData.data.clientSecret);
       } catch (error) {
         console.error('Error creating payment intent:', error);
         toast.error('Failed to initialize checkout. Please try again.');
@@ -188,21 +186,23 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
     };
 
     createPaymentIntent();
-  }, [user?.email, guestEmail, clientSecret]);
+  }, [user?.email, guestEmail, clientSecret, totalAmount]);
 
   const customerEmail = user?.email || guestEmail;
 
   // Memoize options to prevent unnecessary re-renders
-  const options = useMemo(() => ({
-    clientSecret: clientSecret || '',
-    appearance: {
-      theme: 'stripe' as const,
-      variables: {
-        colorPrimary: '#0F172A',
-        borderRadius: '8px',
+  const options = useMemo(() => {
+    if (!clientSecret) return null;
+    return {
+      clientSecret,
+      appearance: {
+        theme: 'stripe' as const,
+        variables: {
+          colorPrimary: '#10b981',
+        },
       },
-    },
-  }), [clientSecret]);
+    };
+  }, [clientSecret]);
 
   if (loading) {
     return (
@@ -226,51 +226,8 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
     );
   }
 
-  // If using saved payment method, show simplified UI
-  if (selectedPaymentMethodId && selectedPaymentMethodId !== 'new') {
-    return (
-      <Button 
-        className="w-full h-14 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90"
-        onClick={async () => {
-          setLoading(true);
-          try {
-            const vendorGroup = Object.values(groupedItems)[0];
-            const session = await supabase.auth.getSession();
-            
-            const { data, error } = await supabase.functions.invoke('create-payment-intent', {
-              body: {
-                items: vendorGroup.items,
-                vendor_id: Object.keys(groupedItems)[0],
-                vendor_name: vendorGroup.vendor_name,
-                customer_email: customerEmail,
-                payment_method_id: selectedPaymentMethodId,
-                confirm: true,
-              },
-              headers: session.data.session ? {
-                Authorization: `Bearer ${session.data.session.access_token}`,
-              } : {},
-            });
-
-            if (error) throw error;
-            
-            if (data?.success) {
-              toast.success('Payment successful!');
-              onSuccess();
-            } else {
-              throw new Error('Payment failed');
-            }
-          } catch (error) {
-            console.error('Payment error:', error);
-            toast.error('Payment failed. Please try again.');
-          } finally {
-            setLoading(false);
-          }
-        }}
-        disabled={loading}
-      >
-        {loading ? 'Processing...' : 'Pay Now'}
-      </Button>
-    );
+  if (!options || !stripe) {
+    return null;
   }
 
   return (
@@ -279,17 +236,15 @@ export const CustomCheckout: React.FC<CustomCheckoutProps> = ({
         <CardTitle>Complete Payment</CardTitle>
       </CardHeader>
       <CardContent>
-        {clientSecret && (
-          <Elements options={options} stripe={stripePromise}>
-            <CheckoutForm
-              clientSecret={clientSecret}
-              customerEmail={customerEmail}
-              onSuccess={onSuccess}
-              onCancel={showCancelButton ? onCancel : () => {}}
-              showCancelButton={showCancelButton}
-            />
-          </Elements>
-        )}
+        <Elements options={options} stripe={stripe}>
+          <CheckoutForm
+            clientSecret={clientSecret}
+            customerEmail={customerEmail}
+            onSuccess={onSuccess}
+            onCancel={showCancelButton ? onCancel : () => {}}
+            showCancelButton={showCancelButton}
+          />
+        </Elements>
       </CardContent>
     </Card>
   );
