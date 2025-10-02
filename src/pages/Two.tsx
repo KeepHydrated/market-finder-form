@@ -53,53 +53,120 @@ export default function Two() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="card-brand" className="text-base font-semibold">Card Brand</Label>
-                <Input
-                  id="card-brand"
-                  placeholder="Visa, Mastercard, etc."
-                  value={formData.cardBrand}
-                  onChange={(e) => setFormData(prev => ({ ...prev, cardBrand: e.target.value }))}
-                  className="h-12 text-base border-2 rounded-xl"
-                />
-              </div>
+              {formData.paymentType === 'credit-debit' && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="card-brand" className="text-base font-semibold">Card Brand</Label>
+                    <Input
+                      id="card-brand"
+                      placeholder="Visa, Mastercard, etc."
+                      value={formData.cardBrand}
+                      onChange={(e) => setFormData(prev => ({ ...prev, cardBrand: e.target.value }))}
+                      className="h-12 text-base border-2 rounded-xl"
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="last-4" className="text-base font-semibold">Last 4 Digits</Label>
-                <Input
-                  id="last-4"
-                  placeholder="1234"
-                  maxLength={4}
-                  value={formData.last4Digits}
-                  onChange={(e) => setFormData(prev => ({ ...prev, last4Digits: e.target.value }))}
-                  className="h-12 text-base border-2 rounded-xl"
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="last-4" className="text-base font-semibold">Last 4 Digits</Label>
+                    <Input
+                      id="last-4"
+                      placeholder="1234"
+                      maxLength={4}
+                      value={formData.last4Digits}
+                      onChange={(e) => setFormData(prev => ({ ...prev, last4Digits: e.target.value }))}
+                      className="h-12 text-base border-2 rounded-xl"
+                    />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="exp-month" className="text-base font-semibold">Exp Month</Label>
-                  <Input
-                    id="exp-month"
-                    placeholder="12"
-                    maxLength={2}
-                    value={formData.expMonth}
-                    onChange={(e) => setFormData(prev => ({ ...prev, expMonth: e.target.value }))}
-                    className="h-12 text-base border-2 rounded-xl"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="exp-year" className="text-base font-semibold">Exp Year</Label>
-                  <Input
-                    id="exp-year"
-                    placeholder="2025"
-                    maxLength={4}
-                    value={formData.expYear}
-                    onChange={(e) => setFormData(prev => ({ ...prev, expYear: e.target.value }))}
-                    className="h-12 text-base border-2 rounded-xl"
-                  />
-                </div>
-              </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="exp-month" className="text-base font-semibold">Exp Month</Label>
+                      <Input
+                        id="exp-month"
+                        placeholder="12"
+                        maxLength={2}
+                        value={formData.expMonth}
+                        onChange={(e) => setFormData(prev => ({ ...prev, expMonth: e.target.value }))}
+                        className="h-12 text-base border-2 rounded-xl"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="exp-year" className="text-base font-semibold">Exp Year</Label>
+                      <Input
+                        id="exp-year"
+                        placeholder="2025"
+                        maxLength={4}
+                        value={formData.expYear}
+                        onChange={(e) => setFormData(prev => ({ ...prev, expYear: e.target.value }))}
+                        className="h-12 text-base border-2 rounded-xl"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {formData.paymentType === 'bank' && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="bank-name" className="text-base font-semibold">Bank Name</Label>
+                    <Input
+                      id="bank-name"
+                      placeholder="Enter bank name"
+                      className="h-12 text-base border-2 rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="account-holder" className="text-base font-semibold">Account Holder Name</Label>
+                    <Input
+                      id="account-holder"
+                      placeholder="Enter account holder name"
+                      className="h-12 text-base border-2 rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="routing-number" className="text-base font-semibold">Routing Number</Label>
+                    <Input
+                      id="routing-number"
+                      placeholder="Enter routing number"
+                      className="h-12 text-base border-2 rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="account-number" className="text-base font-semibold">Account Number</Label>
+                    <Input
+                      id="account-number"
+                      placeholder="Enter account number"
+                      className="h-12 text-base border-2 rounded-xl"
+                    />
+                  </div>
+                </>
+              )}
+
+              {formData.paymentType === 'paypal' && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="paypal-email" className="text-base font-semibold">PayPal Email</Label>
+                    <Input
+                      id="paypal-email"
+                      type="email"
+                      placeholder="Enter PayPal email address"
+                      className="h-12 text-base border-2 rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="paypal-name" className="text-base font-semibold">Account Name</Label>
+                    <Input
+                      id="paypal-name"
+                      placeholder="Enter PayPal account name"
+                      className="h-12 text-base border-2 rounded-xl"
+                    />
+                  </div>
+                </>
+              )}
 
               <div className="flex items-center space-x-2">
                 <Checkbox 
