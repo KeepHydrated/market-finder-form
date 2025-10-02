@@ -5,7 +5,9 @@ import { User, Store, Bell, CreditCard, MapPin, Shield, Loader2 } from "lucide-r
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
+import ShopInfoSection from "@/components/settings/ShopInfoSection";
 import PaymentMethodsSection from "@/components/settings/PaymentMethodsSection";
+import ShippingAddressesSection from "@/components/settings/ShippingAddressesSection";
 
 const Quiz = () => {
   const { user, loading } = useAuth();
