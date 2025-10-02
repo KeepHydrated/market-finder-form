@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -13,15 +15,21 @@ function PaymentMethodForm({ onSuccess, onCancel }: { onSuccess: () => void; onC
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
   const [setAsDefault, setSetAsDefault] = useState(false);
+  const [paymentType, setPaymentType] = useState('credit-debit');
+  const [bankData, setBankData] = useState({
+    bankName: '',
+    accountHolderName: '',
+    routingNumber: '',
+    accountNumber: '',
+  });
+  const [paypalData, setPaypalData] = useState({
+    email: '',
+    accountName: '',
+  });
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!stripe || !elements) {
-      return;
-    }
-
     setIsLoading(true);
 
     try {
@@ -36,47 +44,73 @@ function PaymentMethodForm({ onSuccess, onCancel }: { onSuccess: () => void; onC
         return;
       }
 
-      // Get client secret from edge function
-      const { data: setupData, error: setupError } = await supabase.functions.invoke('create-setup-intent');
-      
-      if (setupError) throw setupError;
-
-      const cardElement = elements.getElement(CardElement);
-      if (!cardElement) throw new Error('Card element not found');
-
-      // Confirm card setup with Stripe
-      const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(
-        setupData.client_secret,
-        {
-          payment_method: {
-            card: cardElement,
-          },
+      if (paymentType === 'credit-debit') {
+        // Handle Stripe card payment
+        if (!stripe || !elements) {
+          throw new Error('Stripe not loaded');
         }
-      );
 
-      if (stripeError) throw stripeError;
-      if (!setupIntent.payment_method) throw new Error('No payment method created');
+        const { data: setupData, error: setupError } = await supabase.functions.invoke('create-setup-intent');
+        if (setupError) throw setupError;
 
-      // Get payment method ID (can be string or object)
-      const paymentMethodId = typeof setupIntent.payment_method === 'string' 
-        ? setupIntent.payment_method 
-        : setupIntent.payment_method.id;
-      
-      // We need to fetch the payment method details from Stripe via edge function
-      // For now, save with minimal info and let Stripe handle the details
-      const { error: dbError } = await supabase
-        .from('payment_methods')
-        .insert({
-          user_id: user.id,
-          payment_type: 'credit-debit',
-          card_brand: 'card', // Will be updated when fetched
-          last_4_digits: '****', // Will be updated when fetched
-          exp_month: '01', // Will be updated when fetched
-          exp_year: '2099', // Will be updated when fetched
-          is_default: setAsDefault,
-        });
+        const cardElement = elements.getElement(CardElement);
+        if (!cardElement) throw new Error('Card element not found');
 
-      if (dbError) throw dbError;
+        const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(
+          setupData.client_secret,
+          {
+            payment_method: {
+              card: cardElement,
+            },
+          }
+        );
+
+        if (stripeError) throw stripeError;
+
+        const { error: dbError } = await supabase
+          .from('payment_methods')
+          .insert({
+            user_id: user.id,
+            payment_type: 'credit-debit',
+            card_brand: 'card',
+            last_4_digits: '****',
+            exp_month: '01',
+            exp_year: '2099',
+            is_default: setAsDefault,
+          });
+
+        if (dbError) throw dbError;
+
+      } else if (paymentType === 'bank') {
+        // Handle bank account
+        const { error: dbError } = await supabase
+          .from('payment_methods')
+          .insert({
+            user_id: user.id,
+            payment_type: 'bank',
+            bank_name: bankData.bankName,
+            account_holder_name: bankData.accountHolderName,
+            routing_number: bankData.routingNumber,
+            account_number_last_4: bankData.accountNumber.slice(-4),
+            is_default: setAsDefault,
+          });
+
+        if (dbError) throw dbError;
+
+      } else if (paymentType === 'paypal') {
+        // Handle PayPal
+        const { error: dbError } = await supabase
+          .from('payment_methods')
+          .insert({
+            user_id: user.id,
+            payment_type: 'paypal',
+            paypal_email: paypalData.email,
+            paypal_account_name: paypalData.accountName,
+            is_default: setAsDefault,
+          });
+
+        if (dbError) throw dbError;
+      }
 
       toast({
         title: "Success",
@@ -98,29 +132,129 @@ function PaymentMethodForm({ onSuccess, onCancel }: { onSuccess: () => void; onC
   return (
     <form onSubmit={handleSubmit} className="space-y-6 py-4">
       <div className="space-y-2">
-        <Label className="text-base font-semibold">Card Information</Label>
-        <div className="p-4 border-2 rounded-xl">
-          <CardElement
-            options={{
-              style: {
-                base: {
-                  fontSize: '16px',
-                  color: '#424770',
-                  '::placeholder': {
-                    color: '#aab7c4',
+        <Label htmlFor="payment-type" className="text-base font-semibold">Payment Type</Label>
+        <Select value={paymentType} onValueChange={setPaymentType}>
+          <SelectTrigger className="w-full h-12 text-base border-2 rounded-xl">
+            <SelectValue placeholder="Select payment type" />
+          </SelectTrigger>
+          <SelectContent className="bg-background z-50">
+            <SelectItem value="credit-debit" className="text-base py-3">Credit/Debit Card</SelectItem>
+            <SelectItem value="bank" className="text-base py-3">Bank Account</SelectItem>
+            <SelectItem value="paypal" className="text-base py-3">PayPal</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {paymentType === 'credit-debit' && (
+        <div className="space-y-2">
+          <Label className="text-base font-semibold">Card Information</Label>
+          <div className="p-4 border-2 rounded-xl">
+            <CardElement
+              options={{
+                style: {
+                  base: {
+                    fontSize: '16px',
+                    color: '#424770',
+                    '::placeholder': {
+                      color: '#aab7c4',
+                    },
+                  },
+                  invalid: {
+                    color: '#9e2146',
                   },
                 },
-                invalid: {
-                  color: '#9e2146',
-                },
-              },
-            }}
-          />
+              }}
+            />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Your card details are securely processed by Stripe with full autofill support
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Your card details are securely processed by Stripe with full autofill support
-        </p>
-      </div>
+      )}
+
+      {paymentType === 'bank' && (
+        <>
+          <div className="space-y-2">
+            <Label htmlFor="bank-name" className="text-base font-semibold">Bank Name</Label>
+            <Input
+              id="bank-name"
+              placeholder="Enter bank name"
+              value={bankData.bankName}
+              onChange={(e) => setBankData(prev => ({ ...prev, bankName: e.target.value }))}
+              className="h-12 text-base border-2 rounded-xl"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="account-holder" className="text-base font-semibold">Account Holder Name</Label>
+            <Input
+              id="account-holder"
+              placeholder="Enter account holder name"
+              value={bankData.accountHolderName}
+              onChange={(e) => setBankData(prev => ({ ...prev, accountHolderName: e.target.value }))}
+              className="h-12 text-base border-2 rounded-xl"
+              autoComplete="name"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="routing-number" className="text-base font-semibold">Routing Number</Label>
+            <Input
+              id="routing-number"
+              placeholder="Enter routing number"
+              value={bankData.routingNumber}
+              onChange={(e) => setBankData(prev => ({ ...prev, routingNumber: e.target.value }))}
+              className="h-12 text-base border-2 rounded-xl"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="account-number" className="text-base font-semibold">Account Number</Label>
+            <Input
+              id="account-number"
+              placeholder="Enter account number"
+              value={bankData.accountNumber}
+              onChange={(e) => setBankData(prev => ({ ...prev, accountNumber: e.target.value }))}
+              className="h-12 text-base border-2 rounded-xl"
+              required
+            />
+          </div>
+        </>
+      )}
+
+      {paymentType === 'paypal' && (
+        <>
+          <div className="space-y-2">
+            <Label htmlFor="paypal-email" className="text-base font-semibold">PayPal Email</Label>
+            <Input
+              id="paypal-email"
+              type="email"
+              placeholder="Enter PayPal email address"
+              value={paypalData.email}
+              onChange={(e) => setPaypalData(prev => ({ ...prev, email: e.target.value }))}
+              className="h-12 text-base border-2 rounded-xl"
+              autoComplete="email"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="paypal-name" className="text-base font-semibold">Account Name</Label>
+            <Input
+              id="paypal-name"
+              placeholder="Enter PayPal account name"
+              value={paypalData.accountName}
+              onChange={(e) => setPaypalData(prev => ({ ...prev, accountName: e.target.value }))}
+              className="h-12 text-base border-2 rounded-xl"
+              autoComplete="name"
+              required
+            />
+          </div>
+        </>
+      )}
 
       <div className="flex items-center space-x-2">
         <Checkbox 
@@ -145,7 +279,7 @@ function PaymentMethodForm({ onSuccess, onCancel }: { onSuccess: () => void; onC
         <Button 
           type="submit"
           className="flex-1 h-12 text-base rounded-xl bg-teal-500 hover:bg-teal-600"
-          disabled={isLoading || !stripe}
+          disabled={isLoading || (paymentType === 'credit-debit' && !stripe)}
         >
           {isLoading ? "Saving..." : "Add Payment Method"}
         </Button>
