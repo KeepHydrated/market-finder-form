@@ -143,6 +143,7 @@ export default function Two() {
                       value={formData.cardBrand}
                       onChange={(e) => setFormData(prev => ({ ...prev, cardBrand: e.target.value }))}
                       className="h-12 text-base border-2 rounded-xl"
+                      autoComplete="cc-type"
                     />
                   </div>
 
@@ -155,6 +156,7 @@ export default function Two() {
                       value={formData.last4Digits}
                       onChange={(e) => setFormData(prev => ({ ...prev, last4Digits: e.target.value }))}
                       className="h-12 text-base border-2 rounded-xl"
+                      autoComplete="cc-number"
                     />
                   </div>
 
@@ -168,6 +170,7 @@ export default function Two() {
                         value={formData.expMonth}
                         onChange={(e) => setFormData(prev => ({ ...prev, expMonth: e.target.value }))}
                         className="h-12 text-base border-2 rounded-xl"
+                        autoComplete="cc-exp-month"
                       />
                     </div>
                     <div className="space-y-2">
@@ -179,6 +182,7 @@ export default function Two() {
                         value={formData.expYear}
                         onChange={(e) => setFormData(prev => ({ ...prev, expYear: e.target.value }))}
                         className="h-12 text-base border-2 rounded-xl"
+                        autoComplete="cc-exp-year"
                       />
                     </div>
                   </div>
@@ -206,6 +210,7 @@ export default function Two() {
                       value={formData.accountHolderName}
                       onChange={(e) => setFormData(prev => ({ ...prev, accountHolderName: e.target.value }))}
                       className="h-12 text-base border-2 rounded-xl"
+                      autoComplete="name"
                     />
                   </div>
 
@@ -244,6 +249,7 @@ export default function Two() {
                       value={formData.paypalEmail}
                       onChange={(e) => setFormData(prev => ({ ...prev, paypalEmail: e.target.value }))}
                       className="h-12 text-base border-2 rounded-xl"
+                      autoComplete="email"
                     />
                   </div>
 
@@ -255,6 +261,7 @@ export default function Two() {
                       value={formData.paypalAccountName}
                       onChange={(e) => setFormData(prev => ({ ...prev, paypalAccountName: e.target.value }))}
                       className="h-12 text-base border-2 rounded-xl"
+                      autoComplete="name"
                     />
                   </div>
                 </>
