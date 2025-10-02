@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 function PaymentMethodForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel: () => void }) {
   const stripe = useStripe();
@@ -45,25 +45,27 @@ function PaymentMethodForm({ onSuccess, onCancel }: { onSuccess: () => void; onC
       }
 
       if (paymentType === 'credit-debit') {
-        // Handle Stripe card payment with Link
+        // Handle Stripe card payment
         if (!stripe || !elements) {
           throw new Error('Stripe not loaded');
         }
 
-        // Submit the payment element to confirm setup
-        const { error: submitError } = await elements.submit();
-        if (submitError) throw submitError;
+        const { data: setupData, error: setupError } = await supabase.functions.invoke('create-setup-intent');
+        if (setupError) throw setupError;
 
-        // Confirm the setup
-        const { error: confirmError } = await stripe.confirmSetup({
-          elements,
-          confirmParams: {
-            return_url: window.location.href, // Not used for setup but required
-          },
-          redirect: 'if_required', // Don't redirect, handle in-page
-        });
+        const cardElement = elements.getElement(CardElement);
+        if (!cardElement) throw new Error('Card element not found');
 
-        if (confirmError) throw confirmError;
+        const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(
+          setupData.client_secret,
+          {
+            payment_method: {
+              card: cardElement,
+            },
+          }
+        );
+
+        if (stripeError) throw stripeError;
 
         const { error: dbError } = await supabase
           .from('payment_methods')
@@ -146,18 +148,26 @@ function PaymentMethodForm({ onSuccess, onCancel }: { onSuccess: () => void; onC
       {paymentType === 'credit-debit' && (
         <div className="space-y-2">
           <Label className="text-base font-semibold">Card Information</Label>
-          <div className="rounded-xl">
-            <PaymentElement
+          <div className="p-4 border-2 rounded-xl">
+            <CardElement
               options={{
-                layout: {
-                  type: 'tabs',
-                  defaultCollapsed: false,
+                style: {
+                  base: {
+                    fontSize: '16px',
+                    color: '#424770',
+                    '::placeholder': {
+                      color: '#aab7c4',
+                    },
+                  },
+                  invalid: {
+                    color: '#9e2146',
+                  },
                 },
               }}
             />
           </div>
           <p className="text-sm text-muted-foreground">
-            💳 Save your payment info with Link for instant autofill on your next purchase
+            Your card details are securely processed by Stripe with full autofill support
           </p>
         </div>
       )}
@@ -281,7 +291,6 @@ function PaymentMethodForm({ onSuccess, onCancel }: { onSuccess: () => void; onC
 export default function Two() {
   const [isOpen, setIsOpen] = useState(false);
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
-  const [clientSecret, setClientSecret] = useState<string>('');
 
   useEffect(() => {
     // Fetch Stripe publishable key
@@ -299,22 +308,6 @@ export default function Two() {
     initStripe();
   }, []);
 
-  useEffect(() => {
-    // Get setup intent client secret when modal opens
-    if (isOpen) {
-      const getClientSecret = async () => {
-        try {
-          const { data, error } = await supabase.functions.invoke('create-setup-intent');
-          if (error) throw error;
-          setClientSecret(data.client_secret);
-        } catch (error) {
-          console.error('Failed to get client secret:', error);
-        }
-      };
-      getClientSecret();
-    }
-  }, [isOpen]);
-
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -327,16 +320,8 @@ export default function Two() {
               <DialogTitle className="text-2xl font-bold">Add Payment Method</DialogTitle>
             </DialogHeader>
             
-            {stripePromise && clientSecret ? (
-              <Elements 
-                stripe={stripePromise}
-                options={{
-                  clientSecret,
-                  appearance: {
-                    theme: 'stripe',
-                  },
-                }}
-              >
+            {stripePromise ? (
+              <Elements stripe={stripePromise}>
                 <PaymentMethodForm 
                   onSuccess={() => setIsOpen(false)}
                   onCancel={() => setIsOpen(false)}
