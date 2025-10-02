@@ -45,10 +45,10 @@ export default function Two() {
                   <SelectTrigger className="w-full h-12 text-base border-2 border-black rounded-xl">
                     <SelectValue placeholder="Select payment type" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="credit-debit">Credit/Debit Card</SelectItem>
-                    <SelectItem value="bank">Bank Account</SelectItem>
-                    <SelectItem value="paypal">PayPal</SelectItem>
+                  <SelectContent className="bg-white z-50">
+                    <SelectItem value="credit-debit" className="text-base py-3">Credit/Debit Card</SelectItem>
+                    <SelectItem value="bank" className="text-base py-3">Bank Account</SelectItem>
+                    <SelectItem value="paypal" className="text-base py-3">PayPal</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
