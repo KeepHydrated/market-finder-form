@@ -6,21 +6,101 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { X } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Two() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     paymentType: 'credit-debit',
     cardBrand: '',
     last4Digits: '',
     expMonth: '',
     expYear: '',
+    bankName: '',
+    accountHolderName: '',
+    routingNumber: '',
+    accountNumber: '',
+    paypalEmail: '',
+    paypalAccountName: '',
     setAsDefault: false
   });
 
-  const handleSubmit = () => {
-    console.log('Form submitted:', formData);
-    setIsOpen(false);
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to add a payment method.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const paymentMethodData: any = {
+        user_id: user.id,
+        payment_type: formData.paymentType,
+        is_default: formData.setAsDefault,
+      };
+
+      if (formData.paymentType === 'credit-debit') {
+        paymentMethodData.card_brand = formData.cardBrand;
+        paymentMethodData.last_4_digits = formData.last4Digits;
+        paymentMethodData.exp_month = formData.expMonth;
+        paymentMethodData.exp_year = formData.expYear;
+      } else if (formData.paymentType === 'bank') {
+        paymentMethodData.bank_name = formData.bankName;
+        paymentMethodData.account_holder_name = formData.accountHolderName;
+        paymentMethodData.routing_number = formData.routingNumber;
+        // Store only last 4 digits of account number
+        paymentMethodData.account_number_last_4 = formData.accountNumber.slice(-4);
+      } else if (formData.paymentType === 'paypal') {
+        paymentMethodData.paypal_email = formData.paypalEmail;
+        paymentMethodData.paypal_account_name = formData.paypalAccountName;
+      }
+
+      const { error } = await supabase
+        .from('payment_methods')
+        .insert(paymentMethodData);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Payment method added successfully.",
+      });
+
+      // Reset form
+      setFormData({
+        paymentType: 'credit-debit',
+        cardBrand: '',
+        last4Digits: '',
+        expMonth: '',
+        expYear: '',
+        bankName: '',
+        accountHolderName: '',
+        routingNumber: '',
+        accountNumber: '',
+        paypalEmail: '',
+        paypalAccountName: '',
+        setAsDefault: false
+      });
+      setIsOpen(false);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add payment method.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -112,6 +192,8 @@ export default function Two() {
                     <Input
                       id="bank-name"
                       placeholder="Enter bank name"
+                      value={formData.bankName}
+                      onChange={(e) => setFormData(prev => ({ ...prev, bankName: e.target.value }))}
                       className="h-12 text-base border-2 rounded-xl"
                     />
                   </div>
@@ -121,6 +203,8 @@ export default function Two() {
                     <Input
                       id="account-holder"
                       placeholder="Enter account holder name"
+                      value={formData.accountHolderName}
+                      onChange={(e) => setFormData(prev => ({ ...prev, accountHolderName: e.target.value }))}
                       className="h-12 text-base border-2 rounded-xl"
                     />
                   </div>
@@ -130,6 +214,8 @@ export default function Two() {
                     <Input
                       id="routing-number"
                       placeholder="Enter routing number"
+                      value={formData.routingNumber}
+                      onChange={(e) => setFormData(prev => ({ ...prev, routingNumber: e.target.value }))}
                       className="h-12 text-base border-2 rounded-xl"
                     />
                   </div>
@@ -139,6 +225,8 @@ export default function Two() {
                     <Input
                       id="account-number"
                       placeholder="Enter account number"
+                      value={formData.accountNumber}
+                      onChange={(e) => setFormData(prev => ({ ...prev, accountNumber: e.target.value }))}
                       className="h-12 text-base border-2 rounded-xl"
                     />
                   </div>
@@ -153,6 +241,8 @@ export default function Two() {
                       id="paypal-email"
                       type="email"
                       placeholder="Enter PayPal email address"
+                      value={formData.paypalEmail}
+                      onChange={(e) => setFormData(prev => ({ ...prev, paypalEmail: e.target.value }))}
                       className="h-12 text-base border-2 rounded-xl"
                     />
                   </div>
@@ -162,6 +252,8 @@ export default function Two() {
                     <Input
                       id="paypal-name"
                       placeholder="Enter PayPal account name"
+                      value={formData.paypalAccountName}
+                      onChange={(e) => setFormData(prev => ({ ...prev, paypalAccountName: e.target.value }))}
                       className="h-12 text-base border-2 rounded-xl"
                     />
                   </div>
@@ -190,8 +282,9 @@ export default function Two() {
                 <Button 
                   className="flex-1 h-12 text-base rounded-xl bg-teal-500 hover:bg-teal-600"
                   onClick={handleSubmit}
+                  disabled={isLoading}
                 >
-                  Add Payment Method
+                  {isLoading ? "Saving..." : "Add Payment Method"}
                 </Button>
               </div>
             </div>

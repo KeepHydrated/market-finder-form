@@ -225,6 +225,63 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_methods: {
+        Row: {
+          account_holder_name: string | null
+          account_number_last_4: string | null
+          bank_name: string | null
+          card_brand: string | null
+          created_at: string
+          exp_month: string | null
+          exp_year: string | null
+          id: string
+          is_default: boolean | null
+          last_4_digits: string | null
+          payment_type: string
+          paypal_account_name: string | null
+          paypal_email: string | null
+          routing_number: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_holder_name?: string | null
+          account_number_last_4?: string | null
+          bank_name?: string | null
+          card_brand?: string | null
+          created_at?: string
+          exp_month?: string | null
+          exp_year?: string | null
+          id?: string
+          is_default?: boolean | null
+          last_4_digits?: string | null
+          payment_type: string
+          paypal_account_name?: string | null
+          paypal_email?: string | null
+          routing_number?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_holder_name?: string | null
+          account_number_last_4?: string | null
+          bank_name?: string | null
+          card_brand?: string | null
+          created_at?: string
+          exp_month?: string | null
+          exp_year?: string | null
+          id?: string
+          is_default?: boolean | null
+          last_4_digits?: string | null
+          payment_type?: string
+          paypal_account_name?: string | null
+          paypal_email?: string | null
+          routing_number?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
