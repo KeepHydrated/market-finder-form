@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
+import { loadStripe, Stripe } from '@stripe/stripe-js';
 import {
   Elements,
   PaymentElement,
@@ -11,7 +11,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
+let stripePromise: Promise<Stripe | null> | null = null;
+
+const getStripe = async () => {
+  if (!stripePromise) {
+    const { data, error } = await supabase.functions.invoke('get-stripe-key');
+    if (error || !data?.publishableKey) {
+      throw new Error('Failed to load Stripe configuration');
+    }
+    stripePromise = loadStripe(data.publishableKey);
+  }
+  return stripePromise;
+};
 
 interface SetupPaymentMethodProps {
   onSuccess: () => void;
@@ -82,25 +93,31 @@ export const SetupPaymentMethod: React.FC<SetupPaymentMethodProps> = ({
 }) => {
   const [clientSecret, setClientSecret] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [stripe, setStripe] = useState<Stripe | null>(null);
 
   useEffect(() => {
-    const createSetupIntent = async () => {
+    const initialize = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase.functions.invoke('create-setup-intent');
+        // Load Stripe and setup intent in parallel
+        const [stripeInstance, setupIntentData] = await Promise.all([
+          getStripe(),
+          supabase.functions.invoke('create-setup-intent'),
+        ]);
 
-        if (error) {
-          console.error('Setup intent error:', error);
-          throw error;
+        if (setupIntentData.error) {
+          console.error('Setup intent error:', setupIntentData.error);
+          throw setupIntentData.error;
         }
 
-        if (data?.client_secret) {
-          setClientSecret(data.client_secret);
-        } else {
+        if (!setupIntentData.data?.client_secret) {
           throw new Error('No client secret returned');
         }
+
+        setStripe(stripeInstance);
+        setClientSecret(setupIntentData.data.client_secret);
       } catch (error) {
-        console.error('Error creating setup intent:', error);
+        console.error('Error initializing payment setup:', error);
         toast.error('Failed to initialize payment method setup');
         onCancel();
       } finally {
@@ -108,7 +125,7 @@ export const SetupPaymentMethod: React.FC<SetupPaymentMethodProps> = ({
       }
     };
 
-    createSetupIntent();
+    initialize();
   }, [onCancel]);
 
   const options = useMemo(() => {
@@ -147,7 +164,7 @@ export const SetupPaymentMethod: React.FC<SetupPaymentMethodProps> = ({
     );
   }
 
-  if (!options) {
+  if (!options || !stripe) {
     return null;
   }
 
@@ -157,7 +174,7 @@ export const SetupPaymentMethod: React.FC<SetupPaymentMethodProps> = ({
         <CardTitle>Add Payment Method</CardTitle>
       </CardHeader>
       <CardContent>
-        <Elements options={options} stripe={stripePromise}>
+        <Elements options={options} stripe={stripe}>
           <SetupForm onSuccess={onSuccess} onCancel={onCancel} />
         </Elements>
       </CardContent>
