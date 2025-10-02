@@ -18,6 +18,7 @@ import OrderSuccess from "./pages/OrderSuccess";
 import ShopManager2 from "./pages/ShopManager2";
 import Test from "./pages/Test";
 import Quiz from "./pages/Quiz";
+import Two from "./pages/Two";
 
 import Commissions from "./pages/Commissions";
 import Checkout from "./pages/Checkout";
@@ -52,6 +53,7 @@ const App = () => (
                 <Route path="/commissions" element={<Commissions />} />
                 <Route path="/test" element={<Test />} />
                 <Route path="/quiz" element={<Quiz />} />
+                <Route path="/2" element={<Two />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
