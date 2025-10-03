@@ -603,6 +603,9 @@ export default function AccountSettings() {
             title: "Success",
             description: "Payment method updated successfully.",
           });
+          
+          // Refresh and keep editing the same payment method
+          await fetchSavedPaymentMethods();
         } else {
           // Check for duplicates before adding
           const isDuplicate = savedPaymentMethods.some(method => {
@@ -701,25 +704,8 @@ export default function AccountSettings() {
           });
         }
 
-        // Reset form fields
-        if (paymentType === 'bank') {
-          setBankData({
-            bankName: '',
-            accountHolderName: '',
-            routingNumber: '',
-            accountNumber: '',
-          });
-        } else if (paymentType === 'paypal') {
-          setPaypalData({
-            email: '',
-            accountName: '',
-          });
-        }
-        setSetAsDefault(false);
-        setEditingPaymentMethod(null);
-        
-        // Refresh saved payment methods
-        fetchSavedPaymentMethods();
+        // Refresh saved payment methods and keep the form populated
+        await fetchSavedPaymentMethods();
         
       } catch (error: any) {
         toast({
