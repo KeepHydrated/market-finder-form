@@ -1268,9 +1268,15 @@ export default function AccountSettings() {
                   </div>
                   
                   {savedPaymentMethods.map((method) => (
-                    <Card key={method.id}>
+                    <Card 
+                      key={method.id}
+                      className={`cursor-pointer transition-colors hover:bg-accent ${editingPaymentMethod?.id === method.id ? 'ring-2 ring-primary' : ''}`}
+                    >
                       <CardContent className="flex items-center justify-between p-4">
-                        <div className="flex items-center gap-4">
+                        <div 
+                          className="flex items-center gap-4 flex-1"
+                          onClick={() => setEditingPaymentMethod(method)}
+                        >
                           <CreditCard className="h-8 w-8 text-muted-foreground" />
                           <div>
                             {method.payment_type === 'credit-debit' && (
@@ -1304,22 +1310,16 @@ export default function AccountSettings() {
                             )}
                           </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setEditingPaymentMethod(method)}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deletePaymentMethod(method.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deletePaymentMethod(method.id);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </CardContent>
                     </Card>
                   ))}
