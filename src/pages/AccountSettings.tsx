@@ -77,6 +77,7 @@ export default function AccountSettings() {
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
   const [savedPaymentMethods, setSavedPaymentMethods] = useState<any[]>([]);
   const [loadingSavedPaymentMethods, setLoadingSavedPaymentMethods] = useState(false);
+  const [editingPaymentMethod, setEditingPaymentMethod] = useState<any>(null);
 
   const [profileForm, setProfileForm] = useState({
     full_name: '',
@@ -531,6 +532,28 @@ export default function AccountSettings() {
       accountName: '',
     });
 
+    // Load editing payment method data
+    useEffect(() => {
+      if (editingPaymentMethod) {
+        setPaymentType(editingPaymentMethod.payment_type);
+        setSetAsDefault(editingPaymentMethod.is_default);
+        
+        if (editingPaymentMethod.payment_type === 'bank') {
+          setBankData({
+            bankName: editingPaymentMethod.bank_name || '',
+            accountHolderName: editingPaymentMethod.account_holder_name || '',
+            routingNumber: editingPaymentMethod.routing_number || '',
+            accountNumber: editingPaymentMethod.account_number_last_4 || '',
+          });
+        } else if (editingPaymentMethod.payment_type === 'paypal') {
+          setPaypalData({
+            email: editingPaymentMethod.paypal_email || '',
+            accountName: editingPaymentMethod.paypal_account_name || '',
+          });
+        }
+      }
+    }, [editingPaymentMethod]);
+
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       setIsLoading(true);
@@ -547,78 +570,114 @@ export default function AccountSettings() {
           return;
         }
 
-        if (paymentType === 'credit-debit') {
-          // Handle Stripe card payment
-          if (!stripe || !elements) {
-            throw new Error('Stripe not loaded');
-          }
+        if (editingPaymentMethod) {
+          // Update existing payment method
+          let updateData: any = {
+            is_default: setAsDefault,
+          };
 
-          const { data: setupData, error: setupError } = await supabase.functions.invoke('create-setup-intent');
-          if (setupError) throw setupError;
-
-          const cardElement = elements.getElement(CardElement);
-          if (!cardElement) throw new Error('Card element not found');
-
-          const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(
-            setupData.client_secret,
-            {
-              payment_method: {
-                card: cardElement,
-              },
-            }
-          );
-
-          if (stripeError) throw stripeError;
-
-          const { error: dbError } = await supabase
-            .from('payment_methods')
-            .insert({
-              user_id: authUser.id,
-              payment_type: 'credit-debit',
-              card_brand: 'card',
-              last_4_digits: '****',
-              exp_month: '01',
-              exp_year: '2099',
-              is_default: setAsDefault,
-            });
-
-          if (dbError) throw dbError;
-
-        } else if (paymentType === 'bank') {
-          // Handle bank account
-          const { error: dbError } = await supabase
-            .from('payment_methods')
-            .insert({
-              user_id: authUser.id,
-              payment_type: 'bank',
+          if (paymentType === 'bank') {
+            updateData = {
+              ...updateData,
               bank_name: bankData.bankName,
               account_holder_name: bankData.accountHolderName,
               routing_number: bankData.routingNumber,
               account_number_last_4: bankData.accountNumber.slice(-4),
-              is_default: setAsDefault,
-            });
-
-          if (dbError) throw dbError;
-
-        } else if (paymentType === 'paypal') {
-          // Handle PayPal
-          const { error: dbError } = await supabase
-            .from('payment_methods')
-            .insert({
-              user_id: authUser.id,
-              payment_type: 'paypal',
+            };
+          } else if (paymentType === 'paypal') {
+            updateData = {
+              ...updateData,
               paypal_email: paypalData.email,
               paypal_account_name: paypalData.accountName,
-              is_default: setAsDefault,
-            });
+            };
+          }
+
+          const { error: dbError } = await supabase
+            .from('payment_methods')
+            .update(updateData)
+            .eq('id', editingPaymentMethod.id);
 
           if (dbError) throw dbError;
-        }
 
-        toast({
-          title: "Success",
-          description: "Payment method added successfully.",
-        });
+          toast({
+            title: "Success",
+            description: "Payment method updated successfully.",
+          });
+        } else {
+          // Add new payment method
+          if (paymentType === 'credit-debit') {
+            // Handle Stripe card payment
+            if (!stripe || !elements) {
+              throw new Error('Stripe not loaded');
+            }
+
+            const { data: setupData, error: setupError } = await supabase.functions.invoke('create-setup-intent');
+            if (setupError) throw setupError;
+
+            const cardElement = elements.getElement(CardElement);
+            if (!cardElement) throw new Error('Card element not found');
+
+            const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(
+              setupData.client_secret,
+              {
+                payment_method: {
+                  card: cardElement,
+                },
+              }
+            );
+
+            if (stripeError) throw stripeError;
+
+            const { error: dbError } = await supabase
+              .from('payment_methods')
+              .insert({
+                user_id: authUser.id,
+                payment_type: 'credit-debit',
+                card_brand: 'card',
+                last_4_digits: '****',
+                exp_month: '01',
+                exp_year: '2099',
+                is_default: setAsDefault,
+              });
+
+            if (dbError) throw dbError;
+
+          } else if (paymentType === 'bank') {
+            // Handle bank account
+            const { error: dbError } = await supabase
+              .from('payment_methods')
+              .insert({
+                user_id: authUser.id,
+                payment_type: 'bank',
+                bank_name: bankData.bankName,
+                account_holder_name: bankData.accountHolderName,
+                routing_number: bankData.routingNumber,
+                account_number_last_4: bankData.accountNumber.slice(-4),
+                is_default: setAsDefault,
+              });
+
+            if (dbError) throw dbError;
+
+          } else if (paymentType === 'paypal') {
+            // Handle PayPal
+            const { error: dbError } = await supabase
+              .from('payment_methods')
+              .insert({
+                user_id: authUser.id,
+                payment_type: 'paypal',
+                paypal_email: paypalData.email,
+                paypal_account_name: paypalData.accountName,
+                is_default: setAsDefault,
+              });
+
+            if (dbError) throw dbError;
+          }
+
+          toast({
+            title: "Success",
+            description: "Payment method added successfully.",
+          });
+        }
 
         // Reset form fields
         if (paymentType === 'bank') {
@@ -635,6 +694,7 @@ export default function AccountSettings() {
           });
         }
         setSetAsDefault(false);
+        setEditingPaymentMethod(null);
         
         // Refresh saved payment methods
         fetchSavedPaymentMethods();
@@ -793,8 +853,25 @@ export default function AccountSettings() {
           className="w-full h-12 text-base rounded-xl bg-teal-500 hover:bg-teal-600"
           disabled={isLoading || (paymentType === 'credit-debit' && !stripe)}
         >
-          {isLoading ? "Saving..." : "Add Payment Method"}
+          {isLoading ? "Saving..." : editingPaymentMethod ? "Update Payment Method" : "Add Payment Method"}
         </Button>
+
+        {editingPaymentMethod && (
+          <Button 
+            type="button"
+            variant="outline"
+            className="w-full h-12 text-base rounded-xl"
+            onClick={() => {
+              setEditingPaymentMethod(null);
+              setBankData({ bankName: '', accountHolderName: '', routingNumber: '', accountNumber: '' });
+              setPaypalData({ email: '', accountName: '' });
+              setSetAsDefault(false);
+              setPaymentType('credit-debit');
+            }}
+          >
+            Cancel Edit
+          </Button>
+        )}
       </form>
     );
   }
@@ -1227,22 +1304,33 @@ export default function AccountSettings() {
                             )}
                           </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deletePaymentMethod(method.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setEditingPaymentMethod(method)}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deletePaymentMethod(method.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
               )}
 
-              {/* Add Payment Method Form */}
+              {/* Add/Edit Payment Method Form */}
               <div>
-                <h3 className="text-lg font-semibold">Add Payment Method</h3>
+                <h3 className="text-lg font-semibold">
+                  {editingPaymentMethod ? 'Edit Payment Method' : 'Add Payment Method'}
+                </h3>
                 <p className="text-muted-foreground">Manage your payment methods securely</p>
               </div>
 
