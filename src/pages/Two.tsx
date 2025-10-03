@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-function PaymentMethodForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel: () => void }) {
+function PaymentMethodForm() {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
@@ -116,8 +115,6 @@ function PaymentMethodForm({ onSuccess, onCancel }: { onSuccess: () => void; onC
         title: "Success",
         description: "Payment method added successfully.",
       });
-
-      onSuccess();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -267,29 +264,18 @@ function PaymentMethodForm({ onSuccess, onCancel }: { onSuccess: () => void; onC
         </Label>
       </div>
 
-      <div className="flex gap-4 pt-4">
-        <Button 
-          type="button"
-          variant="outline" 
-          className="flex-1 h-12 text-base border-2 rounded-xl"
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
-        <Button 
-          type="submit"
-          className="flex-1 h-12 text-base rounded-xl bg-teal-500 hover:bg-teal-600"
-          disabled={isLoading || (paymentType === 'credit-debit' && !stripe)}
-        >
-          {isLoading ? "Saving..." : "Add Payment Method"}
-        </Button>
-      </div>
+      <Button 
+        type="submit"
+        className="w-full h-12 text-base rounded-xl bg-teal-500 hover:bg-teal-600"
+        disabled={isLoading || (paymentType === 'credit-debit' && !stripe)}
+      >
+        {isLoading ? "Saving..." : "Add Payment Method"}
+      </Button>
     </form>
   );
 }
 
 export default function Two() {
-  const [isOpen, setIsOpen] = useState(false);
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
 
   useEffect(() => {
@@ -310,30 +296,18 @@ export default function Two() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold">Page 2</h1>
-        <Button className="mt-4" onClick={() => setIsOpen(true)}>test</Button>
-
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold">Add Payment Method</DialogTitle>
-            </DialogHeader>
-            
-            {stripePromise ? (
-              <Elements stripe={stripePromise}>
-                <PaymentMethodForm 
-                  onSuccess={() => setIsOpen(false)}
-                  onCancel={() => setIsOpen(false)}
-                />
-              </Elements>
-            ) : (
-              <div className="py-8 text-center text-muted-foreground">
-                Loading payment form...
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <h1 className="text-3xl font-bold mb-8">Add Payment Method</h1>
+        
+        {stripePromise ? (
+          <Elements stripe={stripePromise}>
+            <PaymentMethodForm />
+          </Elements>
+        ) : (
+          <div className="py-8 text-center text-muted-foreground">
+            Loading payment form...
+          </div>
+        )}
       </div>
     </div>
   );
