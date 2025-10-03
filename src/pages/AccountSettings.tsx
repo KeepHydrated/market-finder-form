@@ -75,6 +75,8 @@ export default function AccountSettings() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
+  const [savedPaymentMethods, setSavedPaymentMethods] = useState<any[]>([]);
+  const [loadingSavedPaymentMethods, setLoadingSavedPaymentMethods] = useState(false);
 
   const [profileForm, setProfileForm] = useState({
     full_name: '',
@@ -118,6 +120,7 @@ export default function AccountSettings() {
     if (user) {
       fetchAddresses();
       fetchOrders();
+      fetchSavedPaymentMethods();
       initStripe();
     }
   }, [user, profile, loading, navigate, searchParams]);
@@ -457,6 +460,51 @@ export default function AccountSettings() {
     }
   };
 
+  const fetchSavedPaymentMethods = async () => {
+    if (!user) return;
+    
+    setLoadingSavedPaymentMethods(true);
+    try {
+      const { data, error } = await supabase
+        .from('payment_methods')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('is_default', { ascending: false });
+
+      if (error) throw error;
+      setSavedPaymentMethods(data || []);
+    } catch (error) {
+      console.error('Error fetching payment methods:', error);
+    } finally {
+      setLoadingSavedPaymentMethods(false);
+    }
+  };
+
+  const deletePaymentMethod = async (paymentMethodId: string) => {
+    try {
+      const { error } = await supabase
+        .from('payment_methods')
+        .delete()
+        .eq('id', paymentMethodId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Payment method deleted",
+        description: "The payment method has been removed.",
+      });
+      
+      fetchSavedPaymentMethods();
+    } catch (error) {
+      console.error('Error deleting payment method:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete payment method. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString();
 
@@ -565,6 +613,26 @@ export default function AccountSettings() {
           title: "Success",
           description: "Payment method added successfully.",
         });
+
+        // Reset form fields
+        if (paymentType === 'bank') {
+          setBankData({
+            bankName: '',
+            accountHolderName: '',
+            routingNumber: '',
+            accountNumber: '',
+          });
+        } else if (paymentType === 'paypal') {
+          setPaypalData({
+            email: '',
+            accountName: '',
+          });
+        }
+        setSetAsDefault(false);
+        
+        // Refresh saved payment methods
+        fetchSavedPaymentMethods();
+        
       } catch (error: any) {
         toast({
           title: "Error",
@@ -1103,6 +1171,70 @@ export default function AccountSettings() {
           {/* Payments Tab */}
           <TabsContent value="payments" className="mt-0">
             <div className="space-y-6">
+              {/* Saved Payment Methods */}
+              {loadingSavedPaymentMethods ? (
+                <div className="py-8 text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading payment methods...</p>
+                </div>
+              ) : savedPaymentMethods.length > 0 && (
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold">Saved Payment Methods</h3>
+                    <p className="text-muted-foreground">Your saved payment methods</p>
+                  </div>
+                  
+                  {savedPaymentMethods.map((method) => (
+                    <Card key={method.id}>
+                      <CardContent className="flex items-center justify-between p-4">
+                        <div className="flex items-center gap-4">
+                          <CreditCard className="h-8 w-8 text-muted-foreground" />
+                          <div>
+                            {method.payment_type === 'credit-debit' && (
+                              <>
+                                <p className="font-medium capitalize">
+                                  {method.card_brand} •••• {method.last_4_digits}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  Expires {method.exp_month}/{method.exp_year}
+                                </p>
+                              </>
+                            )}
+                            {method.payment_type === 'bank' && (
+                              <>
+                                <p className="font-medium">{method.bank_name}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {method.account_holder_name} •••• {method.account_number_last_4}
+                                </p>
+                              </>
+                            )}
+                            {method.payment_type === 'paypal' && (
+                              <>
+                                <p className="font-medium">PayPal</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {method.paypal_email}
+                                </p>
+                              </>
+                            )}
+                            {method.is_default && (
+                              <Badge variant="secondary" className="mt-1">Default</Badge>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deletePaymentMethod(method.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              {/* Add Payment Method Form */}
               <div>
                 <h3 className="text-lg font-semibold">Add Payment Method</h3>
                 <p className="text-muted-foreground">Manage your payment methods securely</p>
