@@ -604,6 +604,28 @@ export default function AccountSettings() {
             description: "Payment method updated successfully.",
           });
         } else {
+          // Check for duplicates before adding
+          const isDuplicate = savedPaymentMethods.some(method => {
+            if (paymentType === 'paypal' && method.payment_type === 'paypal') {
+              return method.paypal_email === paypalData.email;
+            }
+            if (paymentType === 'bank' && method.payment_type === 'bank') {
+              return method.routing_number === bankData.routingNumber && 
+                     method.account_number_last_4 === bankData.accountNumber.slice(-4);
+            }
+            return false;
+          });
+
+          if (isDuplicate) {
+            toast({
+              title: "Duplicate Payment Method",
+              description: "This payment method already exists.",
+              variant: "destructive",
+            });
+            setIsLoading(false);
+            return;
+          }
+
           // Add new payment method
           if (paymentType === 'credit-debit') {
             // Handle Stripe card payment
