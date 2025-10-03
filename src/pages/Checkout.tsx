@@ -22,6 +22,21 @@ interface PaymentMethod {
   exp_year: number;
 }
 
+interface Address {
+  id: string;
+  user_id: string;
+  type: 'billing' | 'shipping';
+  is_default: boolean;
+  full_name: string;
+  address_line_1: string;
+  address_line_2: string | null;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+  phone: string | null;
+}
+
 interface VendorData {
   store_name: string;
   google_rating: number | null;
@@ -34,7 +49,10 @@ export default function Checkout() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
-  const [selectedAddress, setSelectedAddress] = useState('default');
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<string>('');
+  const [showAllAddresses, setShowAllAddresses] = useState(false);
+  const [loadingAddresses, setLoadingAddresses] = useState(true);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(true);
@@ -67,6 +85,42 @@ export default function Checkout() {
   }, {} as Record<string, { vendor_name: string; vendor_id: string; items: typeof items }>);
 
   const firstVendor = Object.values(groupedItems)[0];
+
+  // Fetch saved addresses
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      if (!user) {
+        setLoadingAddresses(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('user_addresses')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('type', 'shipping')
+          .order('is_default', { ascending: false });
+
+        if (error) throw error;
+
+        const addressList = (data as unknown as Address[]) || [];
+        setAddresses(addressList);
+
+        // Auto-select default address or first address
+        if (addressList.length > 0) {
+          const defaultAddress = addressList.find(addr => addr.is_default);
+          setSelectedAddress(defaultAddress?.id || addressList[0].id);
+        }
+      } catch (error) {
+        console.error('Error fetching addresses:', error);
+      } finally {
+        setLoadingAddresses(false);
+      }
+    };
+
+    fetchAddresses();
+  }, [user]);
 
   // Fetch saved payment methods
   useEffect(() => {
@@ -194,25 +248,69 @@ export default function Checkout() {
                 <CardTitle className="text-xl font-bold">Shipping address</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <RadioGroup value={selectedAddress} onValueChange={setSelectedAddress}>
-                  <div className="flex items-start space-x-3">
-                    <RadioGroupItem value="default" id="default" className="mt-1" />
-                    <Label htmlFor="default" className="flex-1 cursor-pointer">
-                      <div className="flex items-start gap-2">
-                        <MapPin className="w-4 h-4 mt-0.5 text-muted-foreground" />
-                        <span className="text-sm">
-                          {user?.email || 'Guest'}, 323 Beacon Street, Boston, 02116, United States
-                        </span>
-                      </div>
-                    </Label>
+                {loadingAddresses ? (
+                  <div className="py-4 text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                   </div>
-                </RadioGroup>
-                <Button variant="link" className="px-0 text-primary">
-                  Show more
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Add new address
-                </Button>
+                ) : addresses.length === 0 ? (
+                  <div className="text-center py-4">
+                    <p className="text-muted-foreground mb-4">No saved addresses</p>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => navigate('/account?tab=addresses')}
+                    >
+                      Add new address
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <RadioGroup value={selectedAddress} onValueChange={setSelectedAddress}>
+                      {(showAllAddresses ? addresses : addresses.slice(0, 1)).map((address) => (
+                        <div key={address.id} className="flex items-start space-x-3 py-2">
+                          <RadioGroupItem value={address.id} id={address.id} className="mt-1" />
+                          <Label htmlFor={address.id} className="flex-1 cursor-pointer">
+                            <div className="flex items-start gap-2">
+                              <MapPin className="w-4 h-4 mt-0.5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm">
+                                {address.full_name}, {address.address_line_1}
+                                {address.address_line_2 && `, ${address.address_line_2}`}, {address.city}, {address.postal_code}, {address.country}
+                              </span>
+                            </div>
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                    
+                    {addresses.length > 1 && !showAllAddresses && (
+                      <Button 
+                        variant="link" 
+                        className="px-0 text-primary"
+                        onClick={() => setShowAllAddresses(true)}
+                      >
+                        Show more
+                      </Button>
+                    )}
+                    
+                    {showAllAddresses && addresses.length > 1 && (
+                      <Button 
+                        variant="link" 
+                        className="px-0 text-primary"
+                        onClick={() => setShowAllAddresses(false)}
+                      >
+                        Show less
+                      </Button>
+                    )}
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => navigate('/account?tab=addresses')}
+                    >
+                      Add new address
+                    </Button>
+                  </>
+                )}
               </CardContent>
             </Card>
 
