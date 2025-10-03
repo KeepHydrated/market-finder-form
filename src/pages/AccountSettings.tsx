@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -61,6 +61,8 @@ export default function AccountSettings() {
   const { user, profile, loading, refreshProfile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState('account');
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -98,6 +100,12 @@ export default function AccountSettings() {
       return;
     }
 
+    // Handle tab parameter from URL
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['account', 'addresses', 'payments'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+
     if (user && profile) {
       console.log('Profile data loaded:', profile);
       setProfileForm({
@@ -112,7 +120,7 @@ export default function AccountSettings() {
       fetchOrders();
       initStripe();
     }
-  }, [user, profile, loading, navigate]);
+  }, [user, profile, loading, navigate, searchParams]);
 
   const initStripe = async () => {
     try {
@@ -731,7 +739,7 @@ export default function AccountSettings() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
 
-      <Tabs defaultValue="account" orientation="vertical" className="flex flex-row gap-8">
+      <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="flex flex-row gap-8">
         {/* Vertical Tab Navigation - Fixed to left */}
         <div className="w-64 flex-shrink-0">
           <Card className="sticky top-4">
