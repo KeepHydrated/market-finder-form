@@ -1289,6 +1289,65 @@ export default function AccountSettings() {
           {/* Payments Tab */}
           <TabsContent value="payments" className="mt-0">
             <div className="space-y-6">
+              {/* Saved Payment Methods List */}
+              {loadingSavedPaymentMethods ? (
+                <div className="py-8 text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading payment methods...</p>
+                </div>
+              ) : savedPaymentMethods.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Saved Payment Methods</CardTitle>
+                    <CardDescription>Manage your saved payment methods</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {savedPaymentMethods.map((method) => (
+                      <div
+                        key={method.id}
+                        className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-colors hover:bg-accent ${
+                          editingPaymentMethod?.id === method.id ? 'ring-2 ring-primary' : ''
+                        }`}
+                        onClick={() => setEditingPaymentMethod(method)}
+                      >
+                        <div className="flex items-center gap-4">
+                          <CreditCard className="h-8 w-8 text-muted-foreground" />
+                          <div>
+                            {method.payment_type === 'paypal' && (
+                              <>
+                                <p className="font-medium">PayPal</p>
+                                <p className="text-sm text-muted-foreground">{method.paypal_email}</p>
+                              </>
+                            )}
+                            {method.payment_type === 'bank' && (
+                              <>
+                                <p className="font-medium">{method.bank_name}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {method.account_holder_name} •••• {method.account_number_last_4}
+                                </p>
+                              </>
+                            )}
+                            {method.is_default && (
+                              <Badge variant="secondary" className="mt-1">Default</Badge>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deletePaymentMethod(method.id);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Add/Edit Payment Method Form */}
               <div>
                 <h3 className="text-lg font-semibold">
