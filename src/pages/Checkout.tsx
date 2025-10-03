@@ -326,6 +326,82 @@ export default function Checkout() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Payment Method */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl font-bold">Payment</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {loadingPaymentMethods ? (
+                  <div className="py-4 text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                  </div>
+                ) : paymentMethods.length === 0 ? (
+                  <div className="text-center py-4">
+                    <p className="text-muted-foreground mb-4">No saved payment methods</p>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => navigate('/account?tab=payments')}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add new card
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+                      {paymentMethods.map((method) => (
+                        <div key={method.id} className="flex items-center space-x-3 py-3 px-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                          <RadioGroupItem value={method.id} id={method.id} />
+                          <Label htmlFor={method.id} className="flex items-center gap-3 cursor-pointer flex-1">
+                            <CreditCard className="w-5 h-5 text-muted-foreground" />
+                            <div>
+                              {method.payment_type === 'credit-debit' && (
+                                <>
+                                  <p className="font-medium capitalize">
+                                    {method.card_brand} •••• {method.last_4_digits}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Expires {method.exp_month}/{method.exp_year}
+                                  </p>
+                                </>
+                              )}
+                              {method.payment_type === 'bank' && (
+                                <>
+                                  <p className="font-medium">{method.bank_name}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {method.account_holder_name} •••• {method.account_number_last_4}
+                                  </p>
+                                </>
+                              )}
+                              {method.payment_type === 'paypal' && (
+                                <>
+                                  <p className="font-medium">PayPal</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {method.paypal_email}
+                                  </p>
+                                </>
+                              )}
+                            </div>
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => navigate('/account?tab=payments')}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add new card
+                    </Button>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Right Column - Order Summary */}
