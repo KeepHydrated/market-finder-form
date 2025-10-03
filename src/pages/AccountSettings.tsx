@@ -719,22 +719,19 @@ export default function AccountSettings() {
           });
         }
 
-        // Refresh saved payment methods and keep the form populated
+        // Refresh saved payment methods
         await fetchSavedPaymentMethods();
         
-        // Keep the form showing the newly saved payment method
-        if (paymentType === 'bank') {
-          setBankData({
-            bankName: bankData.bankName,
-            accountHolderName: bankData.accountHolderName,
-            routingNumber: bankData.routingNumber,
-            accountNumber: bankData.accountNumber,
-          });
-        } else if (paymentType === 'paypal') {
-          setPaypalData({
-            email: paypalData.email,
-            accountName: paypalData.accountName,
-          });
+        // Find and set the newly created payment method as editing to keep form populated
+        const { data: newPaymentMethods } = await supabase
+          .from('payment_methods')
+          .select('*')
+          .eq('user_id', authUser.id)
+          .order('created_at', { ascending: false })
+          .limit(1);
+        
+        if (newPaymentMethods && newPaymentMethods.length > 0) {
+          setEditingPaymentMethod(newPaymentMethods[0]);
         }
         
       } catch (error: any) {
