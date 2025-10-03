@@ -463,6 +463,7 @@ export default function AccountSettings() {
   const fetchSavedPaymentMethods = async () => {
     if (!user) return;
     
+    console.log('Fetching saved payment methods for user:', user.id);
     setLoadingSavedPaymentMethods(true);
     try {
       const { data, error } = await supabase
@@ -471,7 +472,12 @@ export default function AccountSettings() {
         .eq('user_id', user.id)
         .order('is_default', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching payment methods:', error);
+        throw error;
+      }
+      
+      console.log('Fetched payment methods:', data);
       setSavedPaymentMethods(data || []);
     } catch (error) {
       console.error('Error fetching payment methods:', error);
