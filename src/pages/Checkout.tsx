@@ -16,10 +16,18 @@ import { CustomCheckout } from '@/components/shopping/CustomCheckout';
 
 interface PaymentMethod {
   id: string;
-  brand: string;
-  last4: string;
-  exp_month: number;
-  exp_year: number;
+  user_id: string;
+  payment_type: string;
+  card_brand?: string;
+  last_4_digits?: string;
+  exp_month?: string;
+  exp_year?: string;
+  bank_name?: string;
+  account_holder_name?: string;
+  account_number_last_4?: string;
+  paypal_email?: string;
+  paypal_account_name?: string;
+  is_default: boolean;
 }
 
 interface Address {
@@ -122,7 +130,7 @@ export default function Checkout() {
     fetchAddresses();
   }, [user]);
 
-  // Fetch saved payment methods
+  // Fetch saved payment methods from database
   useEffect(() => {
     const fetchPaymentMethods = async () => {
       if (!user) {
@@ -131,16 +139,21 @@ export default function Checkout() {
       }
 
       try {
-        const { data, error } = await supabase.functions.invoke('get-payment-methods');
+        const { data, error } = await supabase
+          .from('payment_methods')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('is_default', { ascending: false });
         
         if (error) throw error;
         
-        const methods = data?.payment_methods || [];
+        const methods = (data as unknown as PaymentMethod[]) || [];
         setPaymentMethods(methods);
         
-        // Auto-select first payment method if available
+        // Auto-select default or first payment method if available
         if (methods.length > 0) {
-          setSelectedPaymentMethod(methods[0].id);
+          const defaultMethod = methods.find(m => m.is_default);
+          setSelectedPaymentMethod(defaultMethod?.id || methods[0].id);
         } else {
           setSelectedPaymentMethod('new');
         }
@@ -333,10 +346,32 @@ export default function Checkout() {
                           <Label htmlFor={method.id} className="flex items-center gap-3 cursor-pointer flex-1">
                             <CreditCard className="w-5 h-5 text-muted-foreground" />
                             <div>
-                              <p className="font-medium capitalize">{method.brand} •••• {method.last4}</p>
-                              <p className="text-xs text-muted-foreground">
-                                Expires {method.exp_month}/{method.exp_year}
-                              </p>
+                              {method.payment_type === 'credit-debit' && (
+                                <>
+                                  <p className="font-medium capitalize">
+                                    {method.card_brand} •••• {method.last_4_digits}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Expires {method.exp_month}/{method.exp_year}
+                                  </p>
+                                </>
+                              )}
+                              {method.payment_type === 'bank' && (
+                                <>
+                                  <p className="font-medium">{method.bank_name}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {method.account_holder_name} •••• {method.account_number_last_4}
+                                  </p>
+                                </>
+                              )}
+                              {method.payment_type === 'paypal' && (
+                                <>
+                                  <p className="font-medium">PayPal</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {method.paypal_email}
+                                  </p>
+                                </>
+                              )}
                             </div>
                           </Label>
                         </div>
