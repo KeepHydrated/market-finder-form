@@ -6,5 +6,8 @@ verify_jwt = false
 [functions.get-distance]
 verify_jwt = false
 
+[functions.get-payment-method-details]
+verify_jwt = true
+
 [functions.stripe-webhook]
 verify_jwt = false

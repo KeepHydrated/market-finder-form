@@ -614,15 +614,28 @@ export default function AccountSettings() {
               throw new Error('No setup intent returned from Stripe');
             }
 
-            // Extract card details from the payment_method if available
-            let cardBrand = 'card';
-            let last4 = '****';
-            
-            if (setupIntent.payment_method && typeof setupIntent.payment_method === 'object') {
-              const pm = setupIntent.payment_method as any;
-              cardBrand = pm.card?.brand || 'card';
-              last4 = pm.card?.last4 || '****';
+            // Get payment method ID
+            const paymentMethodId = typeof setupIntent.payment_method === 'string' 
+              ? setupIntent.payment_method 
+              : setupIntent.payment_method?.id;
+
+            if (!paymentMethodId) {
+              throw new Error('No payment method ID in setup intent');
             }
+
+            console.log('Fetching payment method details from server...');
+            // Fetch the actual card details from the server
+            const { data: cardDetails, error: cardError } = await supabase.functions.invoke(
+              'get-payment-method-details',
+              { body: { paymentMethodId } }
+            );
+
+            if (cardError) {
+              console.error('Failed to get card details:', cardError);
+              throw new Error(`Failed to get card details: ${cardError.message}`);
+            }
+            
+            console.log('Card details received:', cardDetails);
 
             // Update the payment method with card info
             const { error: dbError } = await supabase
@@ -630,8 +643,10 @@ export default function AccountSettings() {
               .update({
                 payment_type: 'credit-debit',
                 is_default: setAsDefault,
-                card_brand: cardBrand,
-                last_4_digits: last4,
+                card_brand: cardDetails.brand,
+                last_4_digits: cardDetails.last4,
+                exp_month: cardDetails.exp_month,
+                exp_year: cardDetails.exp_year,
                 // Clear out other payment type fields
                 bank_name: null,
                 account_holder_name: null,
@@ -763,23 +778,38 @@ export default function AccountSettings() {
               throw new Error('No setup intent returned from Stripe');
             }
 
-            // Extract card details from the payment_method if available
-            let cardBrand = 'card';
-            let last4 = '****';
-            
-            if (setupIntent.payment_method && typeof setupIntent.payment_method === 'object') {
-              const pm = setupIntent.payment_method as any;
-              cardBrand = pm.card?.brand || 'card';
-              last4 = pm.card?.last4 || '****';
+            // Get payment method ID
+            const paymentMethodId = typeof setupIntent.payment_method === 'string' 
+              ? setupIntent.payment_method 
+              : setupIntent.payment_method?.id;
+
+            if (!paymentMethodId) {
+              throw new Error('No payment method ID in setup intent');
             }
+
+            console.log('Fetching payment method details from server...');
+            // Fetch the actual card details from the server
+            const { data: cardDetails, error: cardError } = await supabase.functions.invoke(
+              'get-payment-method-details',
+              { body: { paymentMethodId } }
+            );
+
+            if (cardError) {
+              console.error('Failed to get card details:', cardError);
+              throw new Error(`Failed to get card details: ${cardError.message}`);
+            }
+            
+            console.log('Card details received:', cardDetails);
 
             const { error: dbError } = await supabase
               .from('payment_methods')
               .insert({
                 user_id: authUser.id,
                 payment_type: 'credit-debit',
-                card_brand: cardBrand,
-                last_4_digits: last4,
+                card_brand: cardDetails.brand,
+                last_4_digits: cardDetails.last4,
+                exp_month: cardDetails.exp_month,
+                exp_year: cardDetails.exp_year,
                 is_default: setAsDefault,
               });
 
