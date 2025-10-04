@@ -580,8 +580,21 @@ export default function AccountSettings() {
         }
 
         if (editingPaymentMethod) {
-          // Update existing payment method
-          if (paymentType === 'credit-debit') {
+          // If payment type changed, treat as new addition instead of update
+          if (editingPaymentMethod.payment_type !== paymentType && paymentType === 'credit-debit') {
+            // Delete the old payment method
+            const { error: deleteError } = await supabase
+              .from('payment_methods')
+              .delete()
+              .eq('id', editingPaymentMethod.id);
+
+            if (deleteError) throw deleteError;
+
+            // Clear editing state to proceed with adding new card
+            setEditingPaymentMethod(null);
+            
+            // Now proceed with adding the new credit card below
+          } else if (paymentType === 'credit-debit') {
             // For credit cards, only update the default flag (card details cannot be changed)
             const { error: dbError } = await supabase
               .from('payment_methods')
@@ -594,6 +607,14 @@ export default function AccountSettings() {
               console.error('Database error:', dbError);
               throw new Error(`Failed to update card: ${dbError.message}`);
             }
+
+            toast({
+              title: "Success",
+              description: "Payment method updated successfully.",
+            });
+            
+            await fetchSavedPaymentMethods();
+            return;
 
           } else {
             // Handle bank and PayPal updates
@@ -641,16 +662,19 @@ export default function AccountSettings() {
               .eq('id', editingPaymentMethod.id);
 
             if (dbError) throw dbError;
-          }
 
-          toast({
-            title: "Success",
-            description: "Payment method updated successfully.",
-          });
-          
-          // Refresh and maintain the form state
-          await fetchSavedPaymentMethods();
-        } else {
+            toast({
+              title: "Success",
+              description: "Payment method updated successfully.",
+            });
+            
+            await fetchSavedPaymentMethods();
+            return;
+          }
+        }
+
+        // Add new payment method
+        {
           // Check for duplicates before adding
           const isDuplicate = savedPaymentMethods.some(method => {
             if (paymentType === 'paypal' && method.payment_type === 'paypal') {
