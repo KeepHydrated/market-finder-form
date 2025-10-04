@@ -940,30 +940,19 @@ export default function AccountSettings() {
         </div>
 
         {paymentType === 'credit-debit' && (
-          <div className="space-y-4">
-            {editingPaymentMethod && editingPaymentMethod.payment_type === 'credit-debit' && (
-              <div className="rounded-xl border-2 bg-muted/50 p-4 space-y-3">
-                <div className="text-sm font-medium text-muted-foreground">Current Card on File:</div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3 text-base">
-                    <CreditCard className="h-5 w-5 text-muted-foreground" />
+          <div className="space-y-2">
+            <Label className="text-base font-semibold">Card Information</Label>
+            {editingPaymentMethod && editingPaymentMethod.payment_type === 'credit-debit' ? (
+              <div className="p-4 border-2 rounded-xl bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
                     <span className="font-medium capitalize">{editingPaymentMethod.card_brand}</span>
-                    <span>•••• •••• •••• {editingPaymentMethod.last_4_digits}</span>
+                    <span className="text-muted-foreground">•••• •••• •••• {editingPaymentMethod.last_4_digits}</span>
                   </div>
-                  <div className="text-sm text-muted-foreground pl-8">
-                    Expires {editingPaymentMethod.exp_month}/{editingPaymentMethod.exp_year}
-                  </div>
-                </div>
-                <div className="text-xs text-muted-foreground pt-2 border-t">
-                  Enter new card details below to replace this card
+                  <span className="text-muted-foreground">{editingPaymentMethod.exp_month}/{editingPaymentMethod.exp_year}</span>
                 </div>
               </div>
-            )}
-            
-            <div className="space-y-2">
-              <Label className="text-base font-semibold">
-                {editingPaymentMethod ? 'New Card Information' : 'Card Information'}
-              </Label>
+            ) : (
               <div className="p-4 border-2 rounded-xl">
                 <CardElement
                   options={{
@@ -982,10 +971,10 @@ export default function AccountSettings() {
                   }}
                 />
               </div>
-              <p className="text-sm text-muted-foreground">
-                Your card details are securely processed by Stripe with full autofill support
-              </p>
-            </div>
+            )}
+            <p className="text-sm text-muted-foreground">
+              Your card details are securely processed by Stripe with full autofill support
+            </p>
           </div>
         )}
 
