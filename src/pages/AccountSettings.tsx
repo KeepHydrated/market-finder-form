@@ -526,6 +526,7 @@ export default function AccountSettings() {
     const [isLoading, setIsLoading] = useState(false);
     const [setAsDefault, setSetAsDefault] = useState(false);
     const [paymentType, setPaymentType] = useState('credit-debit');
+    const [isEditMode, setIsEditMode] = useState(!editingPaymentMethod);
     const [bankData, setBankData] = useState({
       bankName: '',
       accountHolderName: '',
@@ -542,6 +543,7 @@ export default function AccountSettings() {
       if (editingPaymentMethod) {
         setPaymentType(editingPaymentMethod.payment_type);
         setSetAsDefault(editingPaymentMethod.is_default);
+        setIsEditMode(false); // Start in view mode when editing
         
         if (editingPaymentMethod.payment_type === 'bank') {
           setBankData({
@@ -556,6 +558,8 @@ export default function AccountSettings() {
             accountName: editingPaymentMethod.paypal_account_name || '',
           });
         }
+      } else {
+        setIsEditMode(true); // Start in edit mode when adding new
       }
     }, [editingPaymentMethod]);
 
@@ -927,7 +931,7 @@ export default function AccountSettings() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="payment-type" className="text-base font-semibold">Payment Type</Label>
-          <Select value={paymentType} onValueChange={setPaymentType}>
+          <Select value={paymentType} onValueChange={setPaymentType} disabled={!isEditMode}>
             <SelectTrigger className="w-full h-12 text-base border-2 rounded-xl">
               <SelectValue placeholder="Select payment type" />
             </SelectTrigger>
@@ -942,7 +946,7 @@ export default function AccountSettings() {
         {paymentType === 'credit-debit' && (
           <div className="space-y-2">
             <Label className="text-base font-semibold">Card Information</Label>
-            {editingPaymentMethod && editingPaymentMethod.payment_type === 'credit-debit' ? (
+            {editingPaymentMethod && editingPaymentMethod.payment_type === 'credit-debit' && !isEditMode ? (
               <div className="p-4 border-2 rounded-xl bg-muted/30">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -988,6 +992,7 @@ export default function AccountSettings() {
                 value={bankData.bankName}
                 onChange={(e) => setBankData(prev => ({ ...prev, bankName: e.target.value }))}
                 className="h-12 text-base border-2 rounded-xl"
+                disabled={!isEditMode}
                 required
               />
             </div>
@@ -1001,6 +1006,7 @@ export default function AccountSettings() {
                 onChange={(e) => setBankData(prev => ({ ...prev, accountHolderName: e.target.value }))}
                 className="h-12 text-base border-2 rounded-xl"
                 autoComplete="name"
+                disabled={!isEditMode}
                 required
               />
             </div>
@@ -1013,6 +1019,7 @@ export default function AccountSettings() {
                 value={bankData.routingNumber}
                 onChange={(e) => setBankData(prev => ({ ...prev, routingNumber: e.target.value }))}
                 className="h-12 text-base border-2 rounded-xl"
+                disabled={!isEditMode}
                 required
               />
             </div>
@@ -1025,6 +1032,7 @@ export default function AccountSettings() {
                 value={bankData.accountNumber}
                 onChange={(e) => setBankData(prev => ({ ...prev, accountNumber: e.target.value }))}
                 className="h-12 text-base border-2 rounded-xl"
+                disabled={!isEditMode}
                 required
               />
             </div>
@@ -1043,6 +1051,7 @@ export default function AccountSettings() {
                 onChange={(e) => setPaypalData(prev => ({ ...prev, email: e.target.value }))}
                 className="h-12 text-base border-2 rounded-xl"
                 autoComplete="email"
+                disabled={!isEditMode}
                 required
               />
             </div>
@@ -1056,6 +1065,7 @@ export default function AccountSettings() {
                 onChange={(e) => setPaypalData(prev => ({ ...prev, accountName: e.target.value }))}
                 className="h-12 text-base border-2 rounded-xl"
                 autoComplete="name"
+                disabled={!isEditMode}
                 required
               />
             </div>
@@ -1067,34 +1077,28 @@ export default function AccountSettings() {
             id="default"
             checked={setAsDefault}
             onCheckedChange={(checked) => setSetAsDefault(checked as boolean)}
+            disabled={!isEditMode}
           />
           <Label htmlFor="default" className="text-base font-normal cursor-pointer">
             Set as default payment method
           </Label>
         </div>
 
-        <Button 
-          type="submit"
-          className="w-full h-12 text-base rounded-xl bg-teal-500 hover:bg-teal-600"
-          disabled={isLoading || (paymentType === 'credit-debit' && !stripe)}
-        >
-          {isLoading ? "Saving..." : editingPaymentMethod ? "Update Payment Method" : "Add Payment Method"}
-        </Button>
-
-        {editingPaymentMethod && (
+        {editingPaymentMethod && !isEditMode ? (
           <Button 
             type="button"
-            variant="outline"
             className="w-full h-12 text-base rounded-xl"
-            onClick={() => {
-              setEditingPaymentMethod(null);
-              setBankData({ bankName: '', accountHolderName: '', routingNumber: '', accountNumber: '' });
-              setPaypalData({ email: '', accountName: '' });
-              setSetAsDefault(false);
-              setPaymentType('credit-debit');
-            }}
+            onClick={() => setIsEditMode(true)}
           >
-            Cancel Edit
+            Edit
+          </Button>
+        ) : (
+          <Button 
+            type="submit"
+            className="w-full h-12 text-base rounded-xl bg-teal-500 hover:bg-teal-600"
+            disabled={isLoading || (paymentType === 'credit-debit' && !stripe)}
+          >
+            {isLoading ? "Saving..." : editingPaymentMethod ? "Save" : "Add Payment Method"}
           </Button>
         )}
       </form>
