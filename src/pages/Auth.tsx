@@ -26,13 +26,7 @@ const Auth = () => {
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-b from-background to-muted/20 py-12 px-4">
       <div className="w-full max-w-md">
         <Card className="border-border shadow-lg">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Account Access</CardTitle>
-            <CardDescription className="text-center">
-              Enter your details to continue
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <AuthForm onSuccess={() => navigate('/homepage')} />
           </CardContent>
         </Card>
