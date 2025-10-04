@@ -480,11 +480,6 @@ export default function AccountSettings() {
       
       console.log('Fetched payment methods:', data);
       setSavedPaymentMethods(data || []);
-      
-      // Automatically set the first/default payment method for editing to populate the form
-      if (data && data.length > 0 && !editingPaymentMethod) {
-        setEditingPaymentMethod(data[0]);
-      }
     } catch (error) {
       console.error('Error fetching payment methods:', error);
     } finally {
