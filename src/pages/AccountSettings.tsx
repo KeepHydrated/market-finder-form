@@ -630,31 +630,46 @@ export default function AccountSettings() {
               { body: { paymentMethodId } }
             );
 
+            console.log('Raw response from edge function:', { cardDetails, cardError });
+
             if (cardError) {
               console.error('Failed to get card details:', cardError);
               throw new Error(`Failed to get card details: ${cardError.message}`);
             }
+
+            if (!cardDetails) {
+              console.error('No card details in response');
+              throw new Error('No card details received from server');
+            }
             
             console.log('Card details received:', cardDetails);
+            console.log('Card brand:', cardDetails.brand);
+            console.log('Last 4:', cardDetails.last4);
+            console.log('Exp month:', cardDetails.exp_month);
+            console.log('Exp year:', cardDetails.exp_year);
 
             // Update the payment method with card info
+            const updateData = {
+              payment_type: 'credit-debit',
+              is_default: setAsDefault,
+              card_brand: cardDetails.brand || 'unknown',
+              last_4_digits: cardDetails.last4 || '0000',
+              exp_month: cardDetails.exp_month?.toString() || '01',
+              exp_year: cardDetails.exp_year?.toString() || '2099',
+              // Clear out other payment type fields
+              bank_name: null,
+              account_holder_name: null,
+              routing_number: null,
+              account_number_last_4: null,
+              paypal_email: null,
+              paypal_account_name: null,
+            };
+            
+            console.log('Updating database with:', updateData);
+
             const { error: dbError } = await supabase
               .from('payment_methods')
-              .update({
-                payment_type: 'credit-debit',
-                is_default: setAsDefault,
-                card_brand: cardDetails.brand,
-                last_4_digits: cardDetails.last4,
-                exp_month: cardDetails.exp_month,
-                exp_year: cardDetails.exp_year,
-                // Clear out other payment type fields
-                bank_name: null,
-                account_holder_name: null,
-                routing_number: null,
-                account_number_last_4: null,
-                paypal_email: null,
-                paypal_account_name: null,
-              })
+              .update(updateData)
               .eq('id', editingPaymentMethod.id);
 
             if (dbError) {
@@ -794,24 +809,39 @@ export default function AccountSettings() {
               { body: { paymentMethodId } }
             );
 
+            console.log('Raw response from edge function:', { cardDetails, cardError });
+
             if (cardError) {
               console.error('Failed to get card details:', cardError);
               throw new Error(`Failed to get card details: ${cardError.message}`);
             }
+
+            if (!cardDetails) {
+              console.error('No card details in response');
+              throw new Error('No card details received from server');
+            }
             
             console.log('Card details received:', cardDetails);
+            console.log('Card brand:', cardDetails.brand);
+            console.log('Last 4:', cardDetails.last4);
+            console.log('Exp month:', cardDetails.exp_month);
+            console.log('Exp year:', cardDetails.exp_year);
+
+            const insertData = {
+              user_id: authUser.id,
+              payment_type: 'credit-debit',
+              card_brand: cardDetails.brand || 'unknown',
+              last_4_digits: cardDetails.last4 || '0000',
+              exp_month: cardDetails.exp_month?.toString() || '01',
+              exp_year: cardDetails.exp_year?.toString() || '2099',
+              is_default: setAsDefault,
+            };
+            
+            console.log('Inserting into database:', insertData);
 
             const { error: dbError } = await supabase
               .from('payment_methods')
-              .insert({
-                user_id: authUser.id,
-                payment_type: 'credit-debit',
-                card_brand: cardDetails.brand,
-                last_4_digits: cardDetails.last4,
-                exp_month: cardDetails.exp_month,
-                exp_year: cardDetails.exp_year,
-                is_default: setAsDefault,
-              });
+              .insert(insertData);
 
             if (dbError) {
               console.error('Database error:', dbError);
