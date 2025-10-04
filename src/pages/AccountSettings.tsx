@@ -577,32 +577,72 @@ export default function AccountSettings() {
 
         if (editingPaymentMethod) {
           // Update existing payment method
-          let updateData: any = {
-            is_default: setAsDefault,
-          };
+          if (paymentType === 'credit-debit') {
+            // For credit cards, need to create new setup intent and update
+            if (!stripe || !elements) {
+              throw new Error('Stripe not loaded');
+            }
 
-          if (paymentType === 'bank') {
-            updateData = {
-              ...updateData,
-              bank_name: bankData.bankName,
-              account_holder_name: bankData.accountHolderName,
-              routing_number: bankData.routingNumber,
-              account_number_last_4: bankData.accountNumber.slice(-4),
+            const { data: setupData, error: setupError } = await supabase.functions.invoke('create-setup-intent');
+            if (setupError) throw setupError;
+
+            const cardElement = elements.getElement(CardElement);
+            if (!cardElement) throw new Error('Card element not found');
+
+            const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(
+              setupData.client_secret,
+              {
+                payment_method: {
+                  card: cardElement,
+                },
+              }
+            );
+
+            if (stripeError) throw stripeError;
+
+            // Update the payment method with new card info
+            const { error: dbError } = await supabase
+              .from('payment_methods')
+              .update({
+                is_default: setAsDefault,
+                card_brand: 'card',
+                last_4_digits: '****',
+                exp_month: '01',
+                exp_year: '2099',
+              })
+              .eq('id', editingPaymentMethod.id);
+
+            if (dbError) throw dbError;
+
+          } else {
+            // Handle bank and PayPal updates
+            let updateData: any = {
+              is_default: setAsDefault,
             };
-          } else if (paymentType === 'paypal') {
-            updateData = {
-              ...updateData,
-              paypal_email: paypalData.email,
-              paypal_account_name: paypalData.accountName,
-            };
+
+            if (paymentType === 'bank') {
+              updateData = {
+                ...updateData,
+                bank_name: bankData.bankName,
+                account_holder_name: bankData.accountHolderName,
+                routing_number: bankData.routingNumber,
+                account_number_last_4: bankData.accountNumber.slice(-4),
+              };
+            } else if (paymentType === 'paypal') {
+              updateData = {
+                ...updateData,
+                paypal_email: paypalData.email,
+                paypal_account_name: paypalData.accountName,
+              };
+            }
+
+            const { error: dbError } = await supabase
+              .from('payment_methods')
+              .update(updateData)
+              .eq('id', editingPaymentMethod.id);
+
+            if (dbError) throw dbError;
           }
-
-          const { error: dbError } = await supabase
-            .from('payment_methods')
-            .update(updateData)
-            .eq('id', editingPaymentMethod.id);
-
-          if (dbError) throw dbError;
 
           toast({
             title: "Success",
@@ -611,21 +651,6 @@ export default function AccountSettings() {
           
           // Refresh and maintain the form state
           await fetchSavedPaymentMethods();
-          
-          // Keep the form populated with the updated values
-          if (paymentType === 'bank') {
-            setBankData({
-              bankName: bankData.bankName,
-              accountHolderName: bankData.accountHolderName,
-              routingNumber: bankData.routingNumber,
-              accountNumber: bankData.accountNumber,
-            });
-          } else if (paymentType === 'paypal') {
-            setPaypalData({
-              email: paypalData.email,
-              accountName: paypalData.accountName,
-            });
-          }
         } else {
           // Check for duplicates before adding
           const isDuplicate = savedPaymentMethods.some(method => {
