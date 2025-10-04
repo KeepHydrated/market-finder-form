@@ -984,18 +984,18 @@ export default function AccountSettings() {
         )}
 
         <div className="flex items-center space-x-2">
-          <Checkbox 
+          <Checkbox
             id="default"
             checked={setAsDefault}
             onCheckedChange={(checked) => setSetAsDefault(checked as boolean)}
-            disabled={!isEditMode}
+            disabled={paymentType !== 'credit-debit' && !isEditMode}
           />
           <Label htmlFor="default" className="text-base font-normal cursor-pointer">
             Set as default payment method
           </Label>
         </div>
 
-        {editingPaymentMethod && !isEditMode ? (
+        {editingPaymentMethod && !isEditMode && paymentType !== 'credit-debit' ? (
           <Button 
             type="button"
             className="w-full h-12 text-base rounded-xl"
@@ -1013,7 +1013,7 @@ export default function AccountSettings() {
             className="w-full h-12 text-base rounded-xl bg-teal-500 hover:bg-teal-600"
             disabled={isLoading || (paymentType === 'credit-debit' && !stripe)}
           >
-            {isLoading ? "Saving..." : editingPaymentMethod ? "Save" : "Add Payment Method"}
+            {isLoading ? "Saving..." : editingPaymentMethod ? "Save Changes" : "Add Payment Method"}
           </Button>
         )}
       </form>
