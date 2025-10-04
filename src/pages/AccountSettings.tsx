@@ -628,9 +628,17 @@ export default function AccountSettings() {
             const { error: dbError } = await supabase
               .from('payment_methods')
               .update({
+                payment_type: 'credit-debit',
                 is_default: setAsDefault,
                 card_brand: cardBrand,
                 last_4_digits: last4,
+                // Clear out other payment type fields
+                bank_name: null,
+                account_holder_name: null,
+                routing_number: null,
+                account_number_last_4: null,
+                paypal_email: null,
+                paypal_account_name: null,
               })
               .eq('id', editingPaymentMethod.id);
 
@@ -648,16 +656,34 @@ export default function AccountSettings() {
             if (paymentType === 'bank') {
               updateData = {
                 ...updateData,
+                payment_type: 'bank',
                 bank_name: bankData.bankName,
                 account_holder_name: bankData.accountHolderName,
                 routing_number: bankData.routingNumber,
                 account_number_last_4: bankData.accountNumber.slice(-4),
+                // Clear out other payment type fields
+                card_brand: null,
+                last_4_digits: null,
+                exp_month: null,
+                exp_year: null,
+                paypal_email: null,
+                paypal_account_name: null,
               };
             } else if (paymentType === 'paypal') {
               updateData = {
                 ...updateData,
+                payment_type: 'paypal',
                 paypal_email: paypalData.email,
                 paypal_account_name: paypalData.accountName,
+                // Clear out other payment type fields
+                card_brand: null,
+                last_4_digits: null,
+                exp_month: null,
+                exp_year: null,
+                bank_name: null,
+                account_holder_name: null,
+                routing_number: null,
+                account_number_last_4: null,
               };
             }
 
