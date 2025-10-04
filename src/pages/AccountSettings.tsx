@@ -595,6 +595,20 @@ export default function AccountSettings() {
             
             // Now proceed with adding the new credit card below
           } else if (paymentType === 'credit-debit') {
+            // If setting as default, unset default on all other payment methods first
+            if (setAsDefault) {
+              const { error: updateError } = await supabase
+                .from('payment_methods')
+                .update({ is_default: false })
+                .eq('user_id', authUser.id)
+                .neq('id', editingPaymentMethod.id);
+              
+              if (updateError) {
+                console.error('Error unsetting other defaults:', updateError);
+                throw updateError;
+              }
+            }
+
             // For credit cards, only update the default flag (card details cannot be changed)
             const { error: dbError } = await supabase
               .from('payment_methods')
@@ -617,6 +631,20 @@ export default function AccountSettings() {
             return;
 
           } else {
+            // If setting as default, unset default on all other payment methods first
+            if (setAsDefault) {
+              const { error: updateError } = await supabase
+                .from('payment_methods')
+                .update({ is_default: false })
+                .eq('user_id', authUser.id)
+                .neq('id', editingPaymentMethod.id);
+              
+              if (updateError) {
+                console.error('Error unsetting other defaults:', updateError);
+                throw updateError;
+              }
+            }
+
             // Handle bank and PayPal updates
             let updateData: any = {
               is_default: setAsDefault,
@@ -695,6 +723,19 @@ export default function AccountSettings() {
             });
             setIsLoading(false);
             return;
+          }
+
+          // If setting as default, unset default on all other payment methods first
+          if (setAsDefault) {
+            const { error: updateError } = await supabase
+              .from('payment_methods')
+              .update({ is_default: false })
+              .eq('user_id', authUser.id);
+            
+            if (updateError) {
+              console.error('Error unsetting other defaults:', updateError);
+              throw updateError;
+            }
           }
 
           // Add new payment method
