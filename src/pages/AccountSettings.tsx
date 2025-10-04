@@ -1525,9 +1525,23 @@ export default function AccountSettings() {
               {/* Add/Edit Payment Method Form */}
               <div>
                 <h3 className="text-lg font-semibold">
-                  {editingPaymentMethod ? 'Edit Payment Method' : 'Add Payment Method'}
+                  {editingPaymentMethod ? (
+                    editingPaymentMethod.payment_type === 'credit-debit' ? 
+                      'Replace Credit Card' : 
+                      'Edit Payment Method'
+                  ) : 'Add Payment Method'}
                 </h3>
-                <p className="text-muted-foreground">Manage your payment methods securely</p>
+                <p className="text-muted-foreground">
+                  {editingPaymentMethod?.payment_type === 'credit-debit' ? (
+                    <>
+                      Currently replacing: <span className="font-medium capitalize">{editingPaymentMethod.card_brand} •••• {editingPaymentMethod.last_4_digits}</span>
+                      <br />
+                      Enter new card details below (Stripe doesn't allow editing existing cards for security)
+                    </>
+                  ) : (
+                    'Manage your payment methods securely'
+                  )}
+                </p>
               </div>
 
               <Card>
