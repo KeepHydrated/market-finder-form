@@ -582,109 +582,17 @@ export default function AccountSettings() {
         if (editingPaymentMethod) {
           // Update existing payment method
           if (paymentType === 'credit-debit') {
-            // For credit cards, need to create new setup intent and update
-            if (!stripe || !elements) {
-              throw new Error('Stripe not loaded');
-            }
-
-            console.log('Creating setup intent...');
-            const { data: setupData, error: setupError } = await supabase.functions.invoke('create-setup-intent');
-            if (setupError) {
-              console.error('Setup intent error:', setupError);
-              throw new Error(`Setup intent failed: ${setupError.message}`);
-            }
-            console.log('Setup intent created:', setupData);
-
-            const cardElement = elements.getElement(CardElement);
-            if (!cardElement) throw new Error('Card element not found');
-
-            console.log('Confirming card setup...');
-            const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(
-              setupData.client_secret,
-              {
-                payment_method: {
-                  card: cardElement,
-                },
-              }
-            );
-
-            if (stripeError) {
-              console.error('Stripe error:', stripeError);
-              setIsLoading(false);
-              toast({
-                title: "Card Validation Error",
-                description: stripeError.message || "Please check your card details and try again.",
-                variant: "destructive",
-              });
-              return;
-            }
-            console.log('Card setup confirmed:', setupIntent);
-
-            if (!setupIntent) {
-              throw new Error('No setup intent returned from Stripe');
-            }
-
-            // Get payment method ID
-            const paymentMethodId = typeof setupIntent.payment_method === 'string' 
-              ? setupIntent.payment_method 
-              : setupIntent.payment_method?.id;
-
-            if (!paymentMethodId) {
-              throw new Error('No payment method ID in setup intent');
-            }
-
-            console.log('Fetching payment method details from server...');
-            // Fetch the actual card details from the server
-            const { data: cardDetails, error: cardError } = await supabase.functions.invoke(
-              'get-payment-method-details',
-              { body: { paymentMethodId } }
-            );
-
-            console.log('Raw response from edge function:', { cardDetails, cardError });
-
-            if (cardError) {
-              console.error('Failed to get card details:', cardError);
-              throw new Error(`Failed to get card details: ${cardError.message}`);
-            }
-
-            if (!cardDetails) {
-              console.error('No card details in response');
-              throw new Error('No card details received from server');
-            }
-            
-            console.log('Card details received:', cardDetails);
-            console.log('Card brand:', cardDetails.brand);
-            console.log('Last 4:', cardDetails.last4);
-            console.log('Exp month:', cardDetails.exp_month);
-            console.log('Exp year:', cardDetails.exp_year);
-
-            // Update the payment method with card info
-            const updateData = {
-              payment_type: 'credit-debit',
-              is_default: setAsDefault,
-              card_brand: cardDetails.brand || 'unknown',
-              last_4_digits: cardDetails.last4 || '0000',
-              exp_month: cardDetails.exp_month?.toString() || '01',
-              exp_year: cardDetails.exp_year?.toString() || '2099',
-              // Clear out other payment type fields
-              bank_name: null,
-              account_holder_name: null,
-              routing_number: null,
-              account_number_last_4: null,
-              paypal_email: null,
-              paypal_account_name: null,
-            };
-            
-            console.log('Updating database with:', updateData);
-
+            // For credit cards, only update the default flag (card details cannot be changed)
             const { error: dbError } = await supabase
               .from('payment_methods')
-              .update(updateData)
+              .update({
+                is_default: setAsDefault,
+              })
               .eq('id', editingPaymentMethod.id);
 
             if (dbError) {
               console.error('Database error:', dbError);
-              throw new Error(`Failed to save card: ${dbError.message}`);
+              throw new Error(`Failed to update card: ${dbError.message}`);
             }
 
           } else {
@@ -946,7 +854,7 @@ export default function AccountSettings() {
         {paymentType === 'credit-debit' && (
           <div className="space-y-2">
             <Label className="text-base font-semibold">Card Information</Label>
-            {editingPaymentMethod && editingPaymentMethod.payment_type === 'credit-debit' && !isEditMode ? (
+            {editingPaymentMethod && editingPaymentMethod.payment_type === 'credit-debit' ? (
               <div className="p-4 border-2 rounded-xl bg-muted/30">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -977,7 +885,10 @@ export default function AccountSettings() {
               </div>
             )}
             <p className="text-sm text-muted-foreground">
-              Your card details are securely processed by Stripe with full autofill support
+              {editingPaymentMethod 
+                ? "Card details cannot be changed for security. Delete and add a new card to replace."
+                : "Your card details are securely processed by Stripe with full autofill support"
+              }
             </p>
           </div>
         )}
