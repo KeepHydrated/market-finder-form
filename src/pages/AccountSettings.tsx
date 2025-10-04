@@ -583,12 +583,18 @@ export default function AccountSettings() {
               throw new Error('Stripe not loaded');
             }
 
+            console.log('Creating setup intent...');
             const { data: setupData, error: setupError } = await supabase.functions.invoke('create-setup-intent');
-            if (setupError) throw setupError;
+            if (setupError) {
+              console.error('Setup intent error:', setupError);
+              throw new Error(`Setup intent failed: ${setupError.message}`);
+            }
+            console.log('Setup intent created:', setupData);
 
             const cardElement = elements.getElement(CardElement);
             if (!cardElement) throw new Error('Card element not found');
 
+            console.log('Confirming card setup...');
             const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(
               setupData.client_secret,
               {
@@ -598,21 +604,40 @@ export default function AccountSettings() {
               }
             );
 
-            if (stripeError) throw stripeError;
+            if (stripeError) {
+              console.error('Stripe error:', stripeError);
+              throw new Error(`Card setup failed: ${stripeError.message}`);
+            }
+            console.log('Card setup confirmed:', setupIntent);
 
-            // Update the payment method with new card info
+            if (!setupIntent) {
+              throw new Error('No setup intent returned from Stripe');
+            }
+
+            // Extract card details from the payment_method if available
+            let cardBrand = 'card';
+            let last4 = '****';
+            
+            if (setupIntent.payment_method && typeof setupIntent.payment_method === 'object') {
+              const pm = setupIntent.payment_method as any;
+              cardBrand = pm.card?.brand || 'card';
+              last4 = pm.card?.last4 || '****';
+            }
+
+            // Update the payment method with card info
             const { error: dbError } = await supabase
               .from('payment_methods')
               .update({
                 is_default: setAsDefault,
-                card_brand: 'card',
-                last_4_digits: '****',
-                exp_month: '01',
-                exp_year: '2099',
+                card_brand: cardBrand,
+                last_4_digits: last4,
               })
               .eq('id', editingPaymentMethod.id);
 
-            if (dbError) throw dbError;
+            if (dbError) {
+              console.error('Database error:', dbError);
+              throw new Error(`Failed to save card: ${dbError.message}`);
+            }
 
           } else {
             // Handle bank and PayPal updates
@@ -681,12 +706,18 @@ export default function AccountSettings() {
               throw new Error('Stripe not loaded');
             }
 
+            console.log('Creating setup intent for new card...');
             const { data: setupData, error: setupError } = await supabase.functions.invoke('create-setup-intent');
-            if (setupError) throw setupError;
+            if (setupError) {
+              console.error('Setup intent error:', setupError);
+              throw new Error(`Setup intent failed: ${setupError.message}`);
+            }
+            console.log('Setup intent created:', setupData);
 
             const cardElement = elements.getElement(CardElement);
             if (!cardElement) throw new Error('Card element not found');
 
+            console.log('Confirming card setup...');
             const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(
               setupData.client_secret,
               {
@@ -696,21 +727,40 @@ export default function AccountSettings() {
               }
             );
 
-            if (stripeError) throw stripeError;
+            if (stripeError) {
+              console.error('Stripe error:', stripeError);
+              throw new Error(`Card setup failed: ${stripeError.message}`);
+            }
+            console.log('Card setup confirmed:', setupIntent);
+
+            if (!setupIntent) {
+              throw new Error('No setup intent returned from Stripe');
+            }
+
+            // Extract card details from the payment_method if available
+            let cardBrand = 'card';
+            let last4 = '****';
+            
+            if (setupIntent.payment_method && typeof setupIntent.payment_method === 'object') {
+              const pm = setupIntent.payment_method as any;
+              cardBrand = pm.card?.brand || 'card';
+              last4 = pm.card?.last4 || '****';
+            }
 
             const { error: dbError } = await supabase
               .from('payment_methods')
               .insert({
                 user_id: authUser.id,
                 payment_type: 'credit-debit',
-                card_brand: 'card',
-                last_4_digits: '****',
-                exp_month: '01',
-                exp_year: '2099',
+                card_brand: cardBrand,
+                last_4_digits: last4,
                 is_default: setAsDefault,
               });
 
-            if (dbError) throw dbError;
+            if (dbError) {
+              console.error('Database error:', dbError);
+              throw new Error(`Failed to save card: ${dbError.message}`);
+            }
 
           } else if (paymentType === 'bank') {
             // Handle bank account
