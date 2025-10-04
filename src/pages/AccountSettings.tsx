@@ -579,22 +579,24 @@ export default function AccountSettings() {
           return;
         }
 
-        if (editingPaymentMethod) {
-          // If payment type changed, treat as new addition instead of update
-          if (editingPaymentMethod.payment_type !== paymentType && paymentType === 'credit-debit') {
-            // Delete the old payment method
-            const { error: deleteError } = await supabase
-              .from('payment_methods')
-              .delete()
-              .eq('id', editingPaymentMethod.id);
+        // Check if we're switching payment types (treat as delete + add new)
+        const isSwitchingToCredit = editingPaymentMethod && 
+                                    editingPaymentMethod.payment_type !== paymentType && 
+                                    paymentType === 'credit-debit';
+        
+        if (isSwitchingToCredit) {
+          // Delete the old payment method
+          const { error: deleteError } = await supabase
+            .from('payment_methods')
+            .delete()
+            .eq('id', editingPaymentMethod.id);
 
-            if (deleteError) throw deleteError;
+          if (deleteError) throw deleteError;
+        }
 
-            // Clear editing state to proceed with adding new card
-            setEditingPaymentMethod(null);
-            
-            // Now proceed with adding the new credit card below
-          } else if (paymentType === 'credit-debit') {
+        // Update existing payment method (skip if switching types)
+        if (editingPaymentMethod && !isSwitchingToCredit) {
+          if (paymentType === 'credit-debit') {
             // If setting as default, unset default on all other payment methods first
             if (setAsDefault) {
               const { error: updateError } = await supabase
