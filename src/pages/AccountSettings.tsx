@@ -839,7 +839,7 @@ export default function AccountSettings() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="payment-type" className="text-base font-semibold">Payment Type</Label>
-          <Select value={paymentType} onValueChange={setPaymentType} disabled={!isEditMode}>
+          <Select value={paymentType} onValueChange={setPaymentType}>
             <SelectTrigger className="w-full h-12 text-base border-2 rounded-xl">
               <SelectValue placeholder="Select payment type" />
             </SelectTrigger>
