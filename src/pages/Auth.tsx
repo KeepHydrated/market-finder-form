@@ -1,0 +1,55 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthForm } from '@/components/auth/AuthForm';
+import { useAuth } from '@/hooks/useAuth';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+const Auth = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user && !loading) {
+      navigate('/homepage');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-b from-background to-muted/20 py-12 px-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-2">Welcome to Farmer's Market Hub</h1>
+          <p className="text-muted-foreground">
+            Sign in to your account or create a new one to get started
+          </p>
+        </div>
+        
+        <Card className="border-border shadow-lg">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl text-center">Account Access</CardTitle>
+            <CardDescription className="text-center">
+              Enter your details to continue
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AuthForm onSuccess={() => navigate('/homepage')} />
+          </CardContent>
+        </Card>
+
+        <p className="text-center text-sm text-muted-foreground mt-6">
+          By continuing, you agree to our Terms of Service and Privacy Policy
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default Auth;

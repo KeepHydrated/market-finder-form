@@ -23,6 +23,7 @@ import Two from "./pages/Two";
 import Commissions from "./pages/Commissions";
 import Checkout from "./pages/Checkout";
 import AccountSettings from "./pages/AccountSettings";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Navigate to="/homepage" replace />} />
                 <Route path="/homepage" element={<Homepage />} />
+                <Route path="/auth" element={<Auth />} />
                 <Route path="/category" element={<CategoryProducts />} />
                 <Route path="/market" element={<VendorDuplicate />} />
                 <Route path="/likes" element={<Likes />} />
