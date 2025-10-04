@@ -606,7 +606,13 @@ export default function AccountSettings() {
 
             if (stripeError) {
               console.error('Stripe error:', stripeError);
-              throw new Error(`Card setup failed: ${stripeError.message}`);
+              setIsLoading(false);
+              toast({
+                title: "Card Validation Error",
+                description: stripeError.message || "Please check your card details and try again.",
+                variant: "destructive",
+              });
+              return;
             }
             console.log('Card setup confirmed:', setupIntent);
 
@@ -785,7 +791,13 @@ export default function AccountSettings() {
 
             if (stripeError) {
               console.error('Stripe error:', stripeError);
-              throw new Error(`Card setup failed: ${stripeError.message}`);
+              setIsLoading(false);
+              toast({
+                title: "Card Validation Error",
+                description: stripeError.message || "Please check your card details and try again.",
+                variant: "destructive",
+              });
+              return;
             }
             console.log('Card setup confirmed:', setupIntent);
 
