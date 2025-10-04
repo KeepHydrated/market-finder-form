@@ -999,7 +999,11 @@ export default function AccountSettings() {
           <Button 
             type="button"
             className="w-full h-12 text-base rounded-xl"
-            onClick={() => setIsEditMode(true)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsEditMode(true);
+            }}
           >
             Edit
           </Button>
