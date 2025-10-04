@@ -1467,6 +1467,61 @@ export default function AccountSettings() {
           {/* Payments Tab */}
           <TabsContent value="payments" className="mt-0">
             <div className="space-y-6">
+              {/* Saved Payment Methods List */}
+              {savedPaymentMethods.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Saved Payment Methods</h3>
+                  <div className="space-y-3">
+                    {savedPaymentMethods.map((method) => (
+                      <Card key={method.id}>
+                        <CardContent className="flex items-center justify-between p-4">
+                          <div className="flex items-center gap-4">
+                            <CreditCard className="h-8 w-8 text-muted-foreground" />
+                            <div>
+                              <p className="font-medium capitalize flex items-center gap-2">
+                                {method.payment_type === 'credit-debit' && (
+                                  <span>{method.card_brand} •••• {method.last_4_digits}</span>
+                                )}
+                                {method.payment_type === 'bank' && (
+                                  <span>{method.bank_name} •••• {method.account_number_last_4}</span>
+                                )}
+                                {method.payment_type === 'paypal' && (
+                                  <span>PayPal - {method.paypal_email}</span>
+                                )}
+                                {method.is_default && (
+                                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">Default</span>
+                                )}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {method.payment_type === 'credit-debit' && `Expires ${method.exp_month}/${method.exp_year}`}
+                                {method.payment_type === 'bank' && `Account ending in ${method.account_number_last_4}`}
+                                {method.payment_type === 'paypal' && method.paypal_account_name}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingPaymentMethod(method)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deletePaymentMethod(method.id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Add/Edit Payment Method Form */}
               <div>
                 <h3 className="text-lg font-semibold">
