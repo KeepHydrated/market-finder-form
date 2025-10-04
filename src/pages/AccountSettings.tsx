@@ -877,6 +877,14 @@ export default function AccountSettings() {
         // Refresh saved payment methods and reset form
         await fetchSavedPaymentMethods();
         
+        // Clear Stripe CardElement if it exists
+        if (elements) {
+          const cardElement = elements.getElement(CardElement);
+          if (cardElement) {
+            cardElement.clear();
+          }
+        }
+        
         // Reset form to allow adding another payment method
         setEditingPaymentMethod(null);
         setPaymentType('credit-debit');
