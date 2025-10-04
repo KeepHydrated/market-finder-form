@@ -1479,28 +1479,6 @@ export default function AccountSettings() {
           {/* Payments Tab */}
           <TabsContent value="payments" className="mt-0">
             <div className="space-y-6">
-              {/* Add/Edit Payment Method Form */}
-              <div>
-                <h3 className="text-lg font-semibold">
-                  {editingPaymentMethod ? (
-                    editingPaymentMethod.payment_type === 'credit-debit' ? 
-                      'Replace Credit Card' : 
-                      'Edit Payment Method'
-                  ) : 'Add Payment Method'}
-                </h3>
-                <p className="text-muted-foreground">
-                  {editingPaymentMethod?.payment_type === 'credit-debit' ? (
-                    <>
-                      Currently replacing: <span className="font-medium capitalize">{editingPaymentMethod.card_brand} •••• {editingPaymentMethod.last_4_digits}</span>
-                      <br />
-                      Enter new card details below (Stripe doesn't allow editing existing cards for security)
-                    </>
-                  ) : (
-                    'Manage your payment methods securely'
-                  )}
-                </p>
-              </div>
-
               <Card>
                 <CardContent className="pt-6">
                   {stripePromise ? (
