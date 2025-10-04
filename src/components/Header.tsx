@@ -185,7 +185,15 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 </Button>
               </Link>
             )}
-            <UserMenu user={user} profile={profile} />
+            {user ? (
+              <UserMenu user={user} profile={profile} />
+            ) : (
+              <Link to="/auth">
+                <Button variant="default" size="sm">
+                  Log In
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
