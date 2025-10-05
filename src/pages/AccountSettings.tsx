@@ -105,7 +105,7 @@ export default function AccountSettings() {
 
     // Handle tab parameter from URL
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['account', 'addresses', 'payments'].includes(tabParam)) {
+    if (tabParam && ['account', 'addresses', 'payments', 'test'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
 
@@ -1123,9 +1123,13 @@ export default function AccountSettings() {
                   <MapPin className="h-4 w-4" />
                   Addresses
                 </TabsTrigger>
-                <TabsTrigger value="payments" className="flex items-center justify-start gap-3 w-full px-6 py-4 text-left rounded-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="payments" className="flex items-center justify-start gap-3 w-full px-6 py-4 text-left rounded-none border-b data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <CreditCard className="h-4 w-4" />
                   Payments
+                </TabsTrigger>
+                <TabsTrigger value="test" className="flex items-center justify-start gap-3 w-full px-6 py-4 text-left rounded-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <CreditCard className="h-4 w-4" />
+                  Test
                 </TabsTrigger>
               </TabsList>
             </CardContent>
@@ -1484,6 +1488,25 @@ export default function AccountSettings() {
                       Loading payment form...
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Test Tab */}
+          <TabsContent value="test" className="mt-0">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Test Section</CardTitle>
+                  <CardDescription>
+                    This is a test tab for demonstration purposes
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    Test content goes here. You can add any components or functionality you need.
+                  </p>
                 </CardContent>
               </Card>
             </div>
