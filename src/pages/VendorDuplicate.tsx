@@ -1137,7 +1137,7 @@ const VendorDuplicate = () => {
             // Review Form View
             <>
               <DialogHeader className="pb-6">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
                   <Button 
                     variant="ghost" 
                     size="sm" 
@@ -1146,8 +1146,8 @@ const VendorDuplicate = () => {
                   >
                     ← Back to Reviews
                   </Button>
+                  <DialogTitle className="m-0">{editingReviewId ? 'Edit Your Review' : 'Write a Review'}</DialogTitle>
                 </div>
-                <DialogTitle>{editingReviewId ? 'Edit Your Review' : 'Write a Review'}</DialogTitle>
               </DialogHeader>
 
               {!user ? (
