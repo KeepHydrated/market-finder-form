@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ProductGrid } from "@/components/ProductGrid";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/auth/AuthForm";
@@ -1144,7 +1145,26 @@ const VendorDuplicate = () => {
                   <div className="space-y-4 max-h-96 overflow-y-auto">
                     {reviews.map((review) => (
                       <Card key={review.id} className="p-4">
-                        <div className="space-y-2">
+                        <div className="space-y-3">
+                          {/* User Profile Section */}
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage src={review.profiles?.avatar_url || undefined} />
+                              <AvatarFallback>
+                                {review.profiles?.full_name?.charAt(0).toUpperCase() || '?'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <p className="font-semibold text-sm">
+                                {review.profiles?.full_name || 'Anonymous'}
+                              </p>
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(review.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* Rating */}
                           <div className="flex items-center gap-2">
                             <div className="flex gap-1">
                               {[1, 2, 3, 4, 5].map((star) => (
@@ -1156,10 +1176,9 @@ const VendorDuplicate = () => {
                                 />
                               ))}
                             </div>
-                            <span className="text-sm text-muted-foreground">
-                              {new Date(review.created_at).toLocaleDateString()}
-                            </span>
                           </div>
+                          
+                          {/* Comment */}
                           <p className="text-sm text-foreground">{review.comment}</p>
                           {review.photos && review.photos.length > 0 && (
                             <div className="flex gap-2 mt-2">
