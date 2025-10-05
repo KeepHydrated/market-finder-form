@@ -53,6 +53,10 @@ interface Review {
   comment: string;
   created_at: string;
   photos?: string[];
+  profiles?: {
+    full_name: string | null;
+    avatar_url: string | null;
+  };
 }
 
 interface ReviewStats {
@@ -367,7 +371,13 @@ const VendorDuplicate = () => {
     try {
       const { data, error } = await supabase
         .from('reviews')
-        .select('*')
+        .select(`
+          *,
+          profiles (
+            full_name,
+            avatar_url
+          )
+        `)
         .eq('vendor_id', selectedVendor.id)
         .order('created_at', { ascending: false });
 
