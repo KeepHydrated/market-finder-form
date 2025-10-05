@@ -72,7 +72,7 @@ const VendorDuplicate = () => {
   const [loadingData, setLoadingData] = useState(true);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewStats, setReviewStats] = useState<ReviewStats>({ averageRating: 0, totalReviews: 0 });
-  const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
+  const [newReview, setNewReview] = useState({ rating: 0, comment: '' });
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [hasUserReviewed, setHasUserReviewed] = useState(false);
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
@@ -507,7 +507,7 @@ const VendorDuplicate = () => {
         setHasUserReviewed(true);
       }
 
-      setNewReview({ rating: 5, comment: '' });
+      setNewReview({ rating: 0, comment: '' });
       setSelectedPhotos([]);
       setEditingReviewId(null);
       setExistingReviewPhotos([]);
@@ -1062,7 +1062,7 @@ const VendorDuplicate = () => {
                       }
                     } else {
                       // Reset for new review
-                      setNewReview({ rating: 5, comment: '' });
+                      setNewReview({ rating: 0, comment: '' });
                       setEditingReviewId(null);
                       setExistingReviewPhotos([]);
                       setSelectedPhotos([]);
