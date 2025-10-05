@@ -227,57 +227,45 @@ export type Database = {
       }
       payment_methods: {
         Row: {
-          account_holder_name: string | null
-          account_number_last_4: string | null
-          bank_name: string | null
+          apple_pay_email: string | null
           card_brand: string | null
+          card_exp_month: number | null
+          card_exp_year: number | null
+          card_last_four: string | null
+          cardholder_name: string | null
           created_at: string
-          exp_month: string | null
-          exp_year: string | null
           id: string
-          is_default: boolean | null
-          last_4_digits: string | null
-          payment_type: string
-          paypal_account_name: string | null
+          is_default: boolean
+          payment_type: Database["public"]["Enums"]["payment_type"]
           paypal_email: string | null
-          routing_number: string | null
-          updated_at: string
           user_id: string
         }
         Insert: {
-          account_holder_name?: string | null
-          account_number_last_4?: string | null
-          bank_name?: string | null
+          apple_pay_email?: string | null
           card_brand?: string | null
+          card_exp_month?: number | null
+          card_exp_year?: number | null
+          card_last_four?: string | null
+          cardholder_name?: string | null
           created_at?: string
-          exp_month?: string | null
-          exp_year?: string | null
           id?: string
-          is_default?: boolean | null
-          last_4_digits?: string | null
-          payment_type: string
-          paypal_account_name?: string | null
+          is_default?: boolean
+          payment_type?: Database["public"]["Enums"]["payment_type"]
           paypal_email?: string | null
-          routing_number?: string | null
-          updated_at?: string
           user_id: string
         }
         Update: {
-          account_holder_name?: string | null
-          account_number_last_4?: string | null
-          bank_name?: string | null
+          apple_pay_email?: string | null
           card_brand?: string | null
+          card_exp_month?: number | null
+          card_exp_year?: number | null
+          card_last_four?: string | null
+          cardholder_name?: string | null
           created_at?: string
-          exp_month?: string | null
-          exp_year?: string | null
           id?: string
-          is_default?: boolean | null
-          last_4_digits?: string | null
-          payment_type?: string
-          paypal_account_name?: string | null
+          is_default?: boolean
+          payment_type?: Database["public"]["Enums"]["payment_type"]
           paypal_email?: string | null
-          routing_number?: string | null
-          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -476,7 +464,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      payment_type: "card" | "paypal" | "apple_pay"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -603,6 +591,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      payment_type: ["card", "paypal", "apple_pay"],
+    },
   },
 } as const

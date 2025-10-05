@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
+import PaymentMethodsManager from '@/components/PaymentMethodsManager';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -815,11 +816,11 @@ export default function AccountSettings() {
 
             const insertData = {
               user_id: authUser.id,
-              payment_type: 'credit-debit',
+              payment_type: 'card' as const,
               card_brand: cardDetails.brand || 'unknown',
-              last_4_digits: cardDetails.last4 || '0000',
-              exp_month: cardDetails.exp_month?.toString() || '01',
-              exp_year: cardDetails.exp_year?.toString() || '2099',
+              card_last_four: cardDetails.last4 || '0000',
+              card_exp_month: cardDetails.exp_month || 1,
+              card_exp_year: cardDetails.exp_year || 2099,
               is_default: setAsDefault,
             };
             
@@ -834,31 +835,14 @@ export default function AccountSettings() {
               throw new Error(`Failed to save card: ${dbError.message}`);
             }
 
-          } else if (paymentType === 'bank') {
-            // Handle bank account
-            const { error: dbError } = await supabase
-              .from('payment_methods')
-              .insert({
-                user_id: authUser.id,
-                payment_type: 'bank',
-                bank_name: bankData.bankName,
-                account_holder_name: bankData.accountHolderName,
-                routing_number: bankData.routingNumber,
-                account_number_last_4: bankData.accountNumber.slice(-4),
-                is_default: setAsDefault,
-              });
-
-            if (dbError) throw dbError;
-
           } else if (paymentType === 'paypal') {
             // Handle PayPal
             const { error: dbError } = await supabase
               .from('payment_methods')
               .insert({
                 user_id: authUser.id,
-                payment_type: 'paypal',
+                payment_type: 'paypal' as const,
                 paypal_email: paypalData.email,
-                paypal_account_name: paypalData.accountName,
                 is_default: setAsDefault,
               });
 
@@ -1493,22 +1477,10 @@ export default function AccountSettings() {
             </div>
           </TabsContent>
 
-          {/* Test Tab */}
+          {/* Test Tab - Payment Methods */}
           <TabsContent value="test" className="mt-0">
             <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Test Section</CardTitle>
-                  <CardDescription>
-                    This is a test tab for demonstration purposes
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Test content goes here. You can add any components or functionality you need.
-                  </p>
-                </CardContent>
-              </Card>
+              <PaymentMethodsManager />
             </div>
           </TabsContent>
         </div>

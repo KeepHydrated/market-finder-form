@@ -70,27 +70,11 @@ function PaymentMethodForm() {
           .from('payment_methods')
           .insert({
             user_id: user.id,
-            payment_type: 'credit-debit',
+            payment_type: 'card',
             card_brand: 'card',
-            last_4_digits: '****',
-            exp_month: '01',
-            exp_year: '2099',
-            is_default: setAsDefault,
-          });
-
-        if (dbError) throw dbError;
-
-      } else if (paymentType === 'bank') {
-        // Handle bank account
-        const { error: dbError } = await supabase
-          .from('payment_methods')
-          .insert({
-            user_id: user.id,
-            payment_type: 'bank',
-            bank_name: bankData.bankName,
-            account_holder_name: bankData.accountHolderName,
-            routing_number: bankData.routingNumber,
-            account_number_last_4: bankData.accountNumber.slice(-4),
+            card_last_four: '****',
+            card_exp_month: 1,
+            card_exp_year: 2099,
             is_default: setAsDefault,
           });
 
@@ -102,9 +86,8 @@ function PaymentMethodForm() {
           .from('payment_methods')
           .insert({
             user_id: user.id,
-            payment_type: 'paypal',
+            payment_type: 'paypal' as const,
             paypal_email: paypalData.email,
-            paypal_account_name: paypalData.accountName,
             is_default: setAsDefault,
           });
 
