@@ -1031,6 +1031,7 @@ const VendorDuplicate = () => {
             <>
               <DialogHeader className="pb-6">
                 <div className="flex items-center gap-4">
+                  <DialogTitle className="m-0">Customer Reviews</DialogTitle>
                   <div className="flex items-center gap-2">
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
@@ -1051,7 +1052,6 @@ const VendorDuplicate = () => {
                       ({reviewStats.totalReviews})
                     </span>
                   </div>
-                  <DialogTitle className="m-0">Customer Reviews</DialogTitle>
                 </div>
               </DialogHeader>
 
