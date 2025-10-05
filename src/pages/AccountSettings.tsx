@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
-import { PaymentMethodsManager } from '@/components/PaymentMethodsManager';
+import PaymentMethodsSection from '@/components/settings/PaymentMethodsSection';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -1456,7 +1456,9 @@ export default function AccountSettings() {
 
           {/* Payments Tab */}
           <TabsContent value="payments" className="mt-0">
-            <PaymentMethodsManager />
+            <div className="space-y-6">
+              <PaymentMethodsSection />
+            </div>
           </TabsContent>
         </div>
       </Tabs>
