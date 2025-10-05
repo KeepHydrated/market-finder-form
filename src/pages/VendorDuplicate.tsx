@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { ProductGrid } from "@/components/ProductGrid";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/auth/AuthForm";
@@ -77,6 +78,7 @@ const VendorDuplicate = () => {
   const [hasUserReviewed, setHasUserReviewed] = useState(false);
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
   const [existingReviewPhotos, setExistingReviewPhotos] = useState<string[]>([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
@@ -545,10 +547,8 @@ const VendorDuplicate = () => {
   const deleteReview = async () => {
     if (!user || !editingReviewId) return;
 
-    const confirmed = window.confirm('Are you sure you want to delete this review? This action cannot be undone.');
-    if (!confirmed) return;
-
     setIsSubmittingReview(true);
+    setShowDeleteConfirm(false);
 
     try {
       const { error } = await supabase
@@ -1330,7 +1330,7 @@ const VendorDuplicate = () => {
                   {/* Delete Button - Only show when editing */}
                   {editingReviewId && (
                     <Button 
-                      onClick={deleteReview} 
+                      onClick={() => setShowDeleteConfirm(true)} 
                       disabled={isSubmittingReview}
                       variant="destructive"
                       className="w-full"
@@ -1344,6 +1344,24 @@ const VendorDuplicate = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Review</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this review? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={deleteReview} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
     </div>
   );
