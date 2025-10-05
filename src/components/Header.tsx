@@ -178,13 +178,6 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 </Button>
               </Link>
             )}
-            {user?.email === 'nadiachibri@gmail.com' && (
-              <Link to="/commissions">
-                <Button variant="ghost" size="sm" title="Commission Dashboard">
-                  <DollarSign className="h-5 w-5" />
-                </Button>
-              </Link>
-            )}
             {user ? (
               <UserMenu user={user} profile={profile} />
             ) : (
