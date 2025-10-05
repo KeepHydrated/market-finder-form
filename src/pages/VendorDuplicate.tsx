@@ -50,7 +50,7 @@ interface Review {
   id: string;
   user_id: string;
   vendor_id: string;
-  rating: number;
+  rating: number | null;
   comment: string;
   created_at: string;
   photos?: string[];
@@ -180,12 +180,20 @@ const VendorDuplicate = () => {
       console.log('Vendor reviews data:', reviews);
 
       if (reviews && reviews.length > 0) {
-        const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
-        setVendorReviews({
-          rating: averageRating,
-          reviewCount: reviews.length
-        });
-        console.log('Calculated vendor rating:', { rating: averageRating, count: reviews.length });
+        const reviewsWithRatings = reviews.filter(review => review.rating && review.rating > 0);
+        if (reviewsWithRatings.length > 0) {
+          const averageRating = reviewsWithRatings.reduce((sum, review) => sum + review.rating!, 0) / reviewsWithRatings.length;
+          setVendorReviews({
+            rating: averageRating,
+            reviewCount: reviews.length
+          });
+          console.log('Calculated vendor rating:', { rating: averageRating, count: reviews.length });
+        } else {
+          setVendorReviews({
+            rating: 0,
+            reviewCount: reviews.length
+          });
+        }
       } else {
         setVendorReviews({
           rating: 0,
@@ -394,12 +402,17 @@ const VendorDuplicate = () => {
       
       // Calculate review stats
       if (data && data.length > 0) {
-        const totalRating = data.reduce((sum, review) => sum + review.rating, 0);
-        const averageRating = totalRating / data.length;
-        setReviewStats({
-          averageRating: Math.round(averageRating * 10) / 10,
-          totalReviews: data.length
-        });
+        const reviewsWithRatings = data.filter(review => review.rating && review.rating > 0);
+        if (reviewsWithRatings.length > 0) {
+          const totalRating = reviewsWithRatings.reduce((sum, review) => sum + review.rating!, 0);
+          const averageRating = totalRating / reviewsWithRatings.length;
+          setReviewStats({
+            averageRating: Math.round(averageRating * 10) / 10,
+            totalReviews: data.length
+          });
+        } else {
+          setReviewStats({ averageRating: 0, totalReviews: data.length });
+        }
       } else {
         setReviewStats({ averageRating: 0, totalReviews: 0 });
       }
@@ -426,14 +439,23 @@ const VendorDuplicate = () => {
         const vendorReviews = reviews?.filter(review => review.vendor_id === vendorId) || [];
         
         if (vendorReviews.length > 0) {
-          const totalRating = vendorReviews.reduce((sum, review) => sum + review.rating, 0);
-          const averageRating = totalRating / vendorReviews.length;
-          
-          ratingsMap[vendorId] = {
-            vendorId,
-            averageRating: Math.round(averageRating * 10) / 10,
-            totalReviews: vendorReviews.length
-          };
+          const reviewsWithRatings = vendorReviews.filter(review => review.rating && review.rating > 0);
+          if (reviewsWithRatings.length > 0) {
+            const totalRating = reviewsWithRatings.reduce((sum, review) => sum + review.rating!, 0);
+            const averageRating = totalRating / reviewsWithRatings.length;
+            
+            ratingsMap[vendorId] = {
+              vendorId,
+              averageRating: Math.round(averageRating * 10) / 10,
+              totalReviews: vendorReviews.length
+            };
+          } else {
+            ratingsMap[vendorId] = {
+              vendorId,
+              averageRating: 0,
+              totalReviews: vendorReviews.length
+            };
+          }
         } else {
           ratingsMap[vendorId] = {
             vendorId,
@@ -459,11 +481,15 @@ const VendorDuplicate = () => {
       return;
     }
 
-    // Rating is required
-    if (newReview.rating === 0) {
+    // Check that at least one field is filled (rating, comment, or photos)
+    const hasRating = newReview.rating > 0;
+    const hasComment = newReview.comment.trim().length > 0;
+    const hasPhotos = selectedPhotos.length > 0 || existingReviewPhotos.length > 0;
+    
+    if (!hasRating && !hasComment && !hasPhotos) {
       toast({
-        title: "Rating required",
-        description: "Please select a star rating for your review.",
+        title: "Review content required",
+        description: "Please add at least a rating, comment, or photo to submit your review.",
         variant: "destructive"
       });
       return;
@@ -486,7 +512,7 @@ const VendorDuplicate = () => {
         const { error } = await supabase
           .from('reviews')
           .update({
-            rating: newReview.rating,
+            rating: newReview.rating > 0 ? newReview.rating : null,
             comment: newReview.comment.trim(),
             photos: photoUrls,
             updated_at: new Date().toISOString()
@@ -506,7 +532,7 @@ const VendorDuplicate = () => {
           .insert({
             user_id: user.id,
             vendor_id: selectedVendor.id,
-            rating: newReview.rating,
+            rating: newReview.rating > 0 ? newReview.rating : null,
             comment: newReview.comment.trim(),
             photos: photoUrls
           });
@@ -1160,22 +1186,26 @@ const VendorDuplicate = () => {
                             </div>
                           </div>
                           
-                          {/* Rating */}
-                          <div className="flex items-center gap-2">
-                            <div className="flex gap-1">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <Star 
-                                  key={star}
-                                  className={`h-4 w-4 fill-current ${
-                                    star <= review.rating ? 'text-yellow-500' : 'text-gray-300'
-                                  }`}
-                                />
-                              ))}
+                          {/* Rating - Only show if rating exists */}
+                          {review.rating && review.rating > 0 && (
+                            <div className="flex items-center gap-2">
+                              <div className="flex gap-1">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <Star 
+                                    key={star}
+                                    className={`h-4 w-4 fill-current ${
+                                      star <= review.rating! ? 'text-yellow-500' : 'text-gray-300'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
                             </div>
-                          </div>
+                          )}
                           
-                          {/* Comment */}
-                          <p className="text-sm text-foreground">{review.comment}</p>
+                          {/* Comment - Only show if comment exists */}
+                          {review.comment && review.comment.trim().length > 0 && (
+                            <p className="text-sm text-foreground">{review.comment}</p>
+                          )}
                           {review.photos && review.photos.length > 0 && (
                             <div className="flex gap-2 mt-2">
                               {review.photos.map((photo, index) => (

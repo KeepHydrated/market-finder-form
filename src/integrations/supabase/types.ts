@@ -306,7 +306,7 @@ export type Database = {
           created_at: string
           id: string
           photos: string[] | null
-          rating: number
+          rating: number | null
           updated_at: string
           user_id: string
           vendor_id: string
@@ -316,7 +316,7 @@ export type Database = {
           created_at?: string
           id?: string
           photos?: string[] | null
-          rating: number
+          rating?: number | null
           updated_at?: string
           user_id: string
           vendor_id: string
@@ -326,7 +326,7 @@ export type Database = {
           created_at?: string
           id?: string
           photos?: string[] | null
-          rating?: number
+          rating?: number | null
           updated_at?: string
           user_id?: string
           vendor_id?: string
