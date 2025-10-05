@@ -94,10 +94,27 @@ const AddPaymentDialog = ({ open, onOpenChange, onSuccess }: AddPaymentDialogPro
         return;
       }
 
+      // Check if user has any existing payment methods
+      const { data: existingMethods, error: fetchError } = await supabase
+        .from("payment_methods")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1);
+
+      if (fetchError) {
+        toast.error("Error checking payment methods");
+        console.error(fetchError);
+        setLoading(false);
+        return;
+      }
+
+      // If this is the first payment method, set it as default automatically
+      const shouldBeDefault = !existingMethods || existingMethods.length === 0 ? true : isDefault;
+
       let insertData: any = {
         user_id: user.id,
         payment_type: paymentType,
-        is_default: isDefault,
+        is_default: shouldBeDefault,
       };
 
       if (paymentType === "card") {
