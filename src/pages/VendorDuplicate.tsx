@@ -542,6 +542,47 @@ const VendorDuplicate = () => {
     }
   };
 
+  const deleteReview = async () => {
+    if (!user || !editingReviewId) return;
+
+    const confirmed = window.confirm('Are you sure you want to delete this review? This action cannot be undone.');
+    if (!confirmed) return;
+
+    setIsSubmittingReview(true);
+
+    try {
+      const { error } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('id', editingReviewId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Review deleted",
+        description: "Your review has been deleted successfully.",
+      });
+
+      setNewReview({ rating: 0, comment: '' });
+      setSelectedPhotos([]);
+      setEditingReviewId(null);
+      setExistingReviewPhotos([]);
+      setHasUserReviewed(false);
+      setShowReviewForm(false);
+      fetchReviews(); // Refresh reviews
+    } catch (error) {
+      console.error('Error deleting review:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete review. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
   const uploadReviewPhotos = async (photos: File[]): Promise<string[]> => {
     const uploadPromises = photos.map(async (photo, index) => {
       const fileExt = photo.name.split('.').pop();
@@ -1285,6 +1326,18 @@ const VendorDuplicate = () => {
                         : (editingReviewId ? 'Update Review' : 'Submit Review')
                     }
                   </Button>
+
+                  {/* Delete Button - Only show when editing */}
+                  {editingReviewId && (
+                    <Button 
+                      onClick={deleteReview} 
+                      disabled={isSubmittingReview}
+                      variant="destructive"
+                      className="w-full"
+                    >
+                      Delete Review
+                    </Button>
+                  )}
                 </div>
               )}
             </>
