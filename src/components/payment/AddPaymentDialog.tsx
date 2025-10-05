@@ -385,7 +385,7 @@ const AddPaymentDialog = ({ open, onOpenChange, onSuccess }: AddPaymentDialogPro
 
           <Button
             type="submit"
-            className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
             disabled={loading}
           >
             {loading ? (
