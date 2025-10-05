@@ -63,6 +63,7 @@ interface Review {
 interface ReviewStats {
   averageRating: number;
   totalReviews: number;
+  reviewsWithRatings: number;
 }
 
 const VendorDuplicate = () => {
@@ -77,7 +78,7 @@ const VendorDuplicate = () => {
   const [allVendors, setAllVendors] = useState<AcceptedSubmission[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [reviewStats, setReviewStats] = useState<ReviewStats>({ averageRating: 0, totalReviews: 0 });
+  const [reviewStats, setReviewStats] = useState<ReviewStats>({ averageRating: 0, totalReviews: 0, reviewsWithRatings: 0 });
   const [newReview, setNewReview] = useState({ rating: 0, comment: '' });
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [hasUserReviewed, setHasUserReviewed] = useState(false);
@@ -408,13 +409,14 @@ const VendorDuplicate = () => {
           const averageRating = totalRating / reviewsWithRatings.length;
           setReviewStats({
             averageRating: Math.round(averageRating * 10) / 10,
-            totalReviews: data.length
+            totalReviews: data.length,
+            reviewsWithRatings: reviewsWithRatings.length
           });
         } else {
-          setReviewStats({ averageRating: 0, totalReviews: data.length });
+          setReviewStats({ averageRating: 0, totalReviews: data.length, reviewsWithRatings: 0 });
         }
       } else {
-        setReviewStats({ averageRating: 0, totalReviews: 0 });
+        setReviewStats({ averageRating: 0, totalReviews: 0, reviewsWithRatings: 0 });
       }
     } catch (error) {
       console.error('Error fetching reviews:', error);
@@ -1123,7 +1125,7 @@ const VendorDuplicate = () => {
                       {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'}
                     </span>
                     <span className="text-muted-foreground">
-                      ({reviewStats.totalReviews})
+                      ({reviewStats.reviewsWithRatings})
                     </span>
                   </div>
                 </div>
