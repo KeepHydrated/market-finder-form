@@ -294,7 +294,7 @@ const CategoryProducts = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/market?vendor=${product.vendorId}`);
+                          navigate(`/market?id=${product.vendorId}`);
                         }}
                         className="text-xs text-black hover:underline cursor-pointer"
                       >
