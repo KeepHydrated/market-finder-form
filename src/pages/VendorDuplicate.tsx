@@ -1154,7 +1154,7 @@ const VendorDuplicate = () => {
                 <div className="space-y-4">
                   {/* Rating */}
                   <div className="space-y-2">
-                    <Label>Rating</Label>
+                    <Label>Rating (optional)</Label>
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
