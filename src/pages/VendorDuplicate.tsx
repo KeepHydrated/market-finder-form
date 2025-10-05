@@ -459,15 +459,11 @@ const VendorDuplicate = () => {
       return;
     }
 
-    // Check that at least one field is filled (rating, comment, or photos)
-    const hasRating = newReview.rating > 0;
-    const hasComment = newReview.comment.trim().length > 0;
-    const hasPhotos = selectedPhotos.length > 0 || existingReviewPhotos.length > 0;
-    
-    if (!hasRating && !hasComment && !hasPhotos) {
+    // Rating is required
+    if (newReview.rating === 0) {
       toast({
-        title: "Review content required",
-        description: "Please add at least a rating, comment, or photo to submit your review.",
+        title: "Rating required",
+        description: "Please select a star rating for your review.",
         variant: "destructive"
       });
       return;
