@@ -1111,10 +1111,6 @@ export default function AccountSettings() {
                   <CreditCard className="h-4 w-4" />
                   Payments
                 </TabsTrigger>
-                <TabsTrigger value="test" className="flex items-center justify-start gap-3 w-full px-6 py-4 text-left rounded-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <CreditCard className="h-4 w-4" />
-                  Test
-                </TabsTrigger>
               </TabsList>
             </CardContent>
           </Card>
@@ -1460,28 +1456,7 @@ export default function AccountSettings() {
 
           {/* Payments Tab */}
           <TabsContent value="payments" className="mt-0">
-            <div className="space-y-6">
-              <Card>
-                <CardContent className="pt-6">
-                  {stripePromise ? (
-                    <Elements stripe={stripePromise}>
-                      <PaymentMethodForm />
-                    </Elements>
-                  ) : (
-                    <div className="py-8 text-center text-muted-foreground">
-                      Loading payment form...
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Test Tab - Payment Methods */}
-          <TabsContent value="test" className="mt-0">
-            <div className="space-y-6">
-              <PaymentMethodsManager />
-            </div>
+            <PaymentMethodsManager />
           </TabsContent>
         </div>
       </Tabs>
