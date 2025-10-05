@@ -446,10 +446,15 @@ const VendorDuplicate = () => {
       return;
     }
 
-    if (!newReview.comment.trim()) {
+    // Check that at least one field is filled (rating, comment, or photos)
+    const hasRating = newReview.rating > 0;
+    const hasComment = newReview.comment.trim().length > 0;
+    const hasPhotos = selectedPhotos.length > 0 || existingReviewPhotos.length > 0;
+    
+    if (!hasRating && !hasComment && !hasPhotos) {
       toast({
-        title: "Comment required",
-        description: "Please enter a comment for your review.",
+        title: "Review content required",
+        description: "Please add at least a rating, comment, or photo to submit your review.",
         variant: "destructive"
       });
       return;
@@ -1174,7 +1179,7 @@ const VendorDuplicate = () => {
 
                   {/* Comment */}
                   <div className="space-y-2">
-                    <Label htmlFor="comment">Your Review</Label>
+                    <Label htmlFor="comment">Your Review (optional)</Label>
                     <Textarea
                       id="comment"
                       placeholder="Tell others about your experience..."
