@@ -26,8 +26,19 @@ export const MarketCard = ({ id, name, address, days, hours, rating, ratingCount
       {/* Rating Badge - Top Left */}
       {rating && (
         <div className="absolute top-3 left-3 z-10">
-          <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5">
+            <div className="flex gap-0.5">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star 
+                  key={star}
+                  className={`h-3.5 w-3.5 fill-current ${
+                    star <= rating 
+                      ? 'text-yellow-400' 
+                      : 'text-gray-300'
+                  }`}
+                />
+              ))}
+            </div>
             <span className="text-sm font-semibold">
               {rating.toFixed(1)} {ratingCount && `(${ratingCount})`}
             </span>
