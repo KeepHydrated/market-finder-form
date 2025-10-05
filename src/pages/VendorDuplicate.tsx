@@ -1114,7 +1114,7 @@ const VendorDuplicate = () => {
                         <Star 
                           key={star}
                           className={`h-5 w-5 fill-current ${
-                            reviewStats.totalReviews > 0 && star <= reviewStats.averageRating 
+                            reviewStats.reviewsWithRatings > 0 && star <= reviewStats.averageRating 
                               ? 'text-yellow-500' 
                               : 'text-gray-300'
                           }`}
@@ -1122,10 +1122,10 @@ const VendorDuplicate = () => {
                       ))}
                     </div>
                     <span className="text-lg font-semibold text-foreground">
-                      {reviewStats.reviewsWithRatings > 0 ? reviewStats.averageRating : '0'}
+                      {reviewStats.reviewsWithRatings > 0 ? reviewStats.averageRating : 'No rating'}
                     </span>
                     <span className="text-muted-foreground">
-                      ({reviewStats.reviewsWithRatings})
+                      ({reviewStats.reviewsWithRatings}) {reviewStats.totalReviews === 1 ? 'review' : 'reviews'}
                     </span>
                   </div>
                 </div>
