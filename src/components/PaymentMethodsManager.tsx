@@ -24,7 +24,7 @@ interface PaymentMethod {
   is_default: boolean;
 }
 
-export default function PaymentMethodsManager() {
+export function PaymentMethodsManager() {
   const { user } = useAuth();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
@@ -398,3 +398,5 @@ export default function PaymentMethodsManager() {
     </div>
   );
 }
+
+export default PaymentMethodsManager;
