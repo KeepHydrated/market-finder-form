@@ -1030,27 +1030,29 @@ const VendorDuplicate = () => {
             // Reviews List View
             <>
               <DialogHeader className="pb-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star 
-                        key={star}
-                        className={`h-5 w-5 fill-current ${
-                          reviewStats.totalReviews > 0 && star <= reviewStats.averageRating 
-                            ? 'text-yellow-500' 
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    ))}
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star 
+                          key={star}
+                          className={`h-5 w-5 fill-current ${
+                            reviewStats.totalReviews > 0 && star <= reviewStats.averageRating 
+                              ? 'text-yellow-500' 
+                              : 'text-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-lg font-semibold text-foreground">
+                      {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'}
+                    </span>
+                    <span className="text-muted-foreground">
+                      ({reviewStats.totalReviews})
+                    </span>
                   </div>
-                  <span className="text-lg font-semibold text-foreground">
-                    {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'}
-                  </span>
-                  <span className="text-muted-foreground">
-                    ({reviewStats.totalReviews})
-                  </span>
+                  <DialogTitle className="m-0">Customer Reviews</DialogTitle>
                 </div>
-                <DialogTitle>Customer Reviews</DialogTitle>
               </DialogHeader>
 
               <div className="space-y-4">
