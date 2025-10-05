@@ -1483,7 +1483,7 @@ const Homepage = () => {
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <p className="text-sm text-muted-foreground">
-                          {market.address}
+                          {market.address.replace(/, United States$/, '')}
                         </p>
                       </div>
                       
