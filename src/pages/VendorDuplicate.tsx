@@ -74,6 +74,7 @@ const VendorDuplicate = () => {
   const [reviewStats, setReviewStats] = useState<ReviewStats>({ averageRating: 0, totalReviews: 0 });
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [hasUserReviewed, setHasUserReviewed] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
@@ -274,7 +275,7 @@ const VendorDuplicate = () => {
     if (selectedVendor) {
       fetchReviews();
     }
-  }, [selectedVendor]);
+  }, [selectedVendor, user]);
 
   const fetchVendorById = async (vendorId: string) => {
     setLoadingData(true);
@@ -370,6 +371,12 @@ const VendorDuplicate = () => {
 
       setReviews(data || []);
       
+      // Check if the current user has already reviewed this vendor
+      if (user && data) {
+        const userReview = data.find(review => review.user_id === user.id);
+        setHasUserReviewed(!!userReview);
+      }
+      
       // Calculate review stats
       if (data && data.length > 0) {
         const totalRating = data.reduce((sum, review) => sum + review.rating, 0);
@@ -437,6 +444,15 @@ const VendorDuplicate = () => {
       return;
     }
 
+    if (hasUserReviewed) {
+      toast({
+        title: "Already reviewed",
+        description: "You have already submitted a review for this market.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!newReview.comment.trim()) {
       toast({
         title: "Comment required",
@@ -476,14 +492,26 @@ const VendorDuplicate = () => {
 
       setNewReview({ rating: 5, comment: '' });
       setSelectedPhotos([]);
+      setHasUserReviewed(true);
       fetchReviews(); // Refresh reviews
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting review:', error);
-      toast({
-        title: "Error",
-        description: "Failed to submit review. Please try again.",
-        variant: "destructive"
-      });
+      
+      // Check if it's a unique constraint violation
+      if (error?.code === '23505') {
+        toast({
+          title: "Already reviewed",
+          description: "You have already submitted a review for this market.",
+          variant: "destructive"
+        });
+        setHasUserReviewed(true);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to submit review. Please try again.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsSubmittingReview(false);
       setUploadingPhotos(false);
@@ -1007,10 +1035,17 @@ const VendorDuplicate = () => {
                   onClick={() => setShowReviewForm(true)}
                   className="w-full"
                   variant="outline"
+                  disabled={!user || hasUserReviewed}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Write a Review
+                  {hasUserReviewed ? 'Already Reviewed' : 'Write a Review'}
                 </Button>
+                
+                {hasUserReviewed && user && (
+                  <p className="text-sm text-muted-foreground text-center">
+                    You have already submitted a review for this market.
+                  </p>
+                )}
 
                 {/* Reviews List */}
                 {reviews.length > 0 ? (
