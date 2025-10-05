@@ -120,17 +120,9 @@ export default function PaymentMethodsSection() {
             <div className="text-center py-12">
               <CreditCard className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
               <h3 className="text-xl font-semibold mb-2">No payment methods</h3>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground">
                 Add a payment method to get started
               </p>
-              <Button 
-                onClick={() => setShowAddDialog(true)}
-                size="lg"
-                className="bg-primary hover:bg-primary/90"
-              >
-                <Plus className="h-5 w-5 mr-2" />
-                Add Payment Method
-              </Button>
             </div>
           ) : (
             <div className="space-y-3">
