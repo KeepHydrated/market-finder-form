@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation } from "lucide-react";
+import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -1073,7 +1073,11 @@ const VendorDuplicate = () => {
                   variant="outline"
                   disabled={!user}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
+                  {hasUserReviewed ? (
+                    <Pencil className="h-4 w-4 mr-2" />
+                  ) : (
+                    <Plus className="h-4 w-4 mr-2" />
+                  )}
                   {hasUserReviewed ? 'Edit Your Review' : 'Write a Review'}
                 </Button>
 
