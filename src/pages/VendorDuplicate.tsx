@@ -75,6 +75,8 @@ const VendorDuplicate = () => {
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [hasUserReviewed, setHasUserReviewed] = useState(false);
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [existingReviewPhotos, setExistingReviewPhotos] = useState<string[]>([]);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
@@ -444,15 +446,6 @@ const VendorDuplicate = () => {
       return;
     }
 
-    if (hasUserReviewed) {
-      toast({
-        title: "Already reviewed",
-        description: "You have already submitted a review for this market.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (!newReview.comment.trim()) {
       toast({
         title: "Comment required",
@@ -465,34 +458,60 @@ const VendorDuplicate = () => {
     setIsSubmittingReview(true);
 
     try {
-      let photoUrls: string[] = [];
+      let photoUrls: string[] = [...existingReviewPhotos];
 
-      // Upload photos if any are selected
+      // Upload new photos if any are selected
       if (selectedPhotos.length > 0) {
         setUploadingPhotos(true);
-        photoUrls = await uploadReviewPhotos(selectedPhotos);
+        const newPhotoUrls = await uploadReviewPhotos(selectedPhotos);
+        photoUrls = [...photoUrls, ...newPhotoUrls];
       }
 
-      const { error } = await supabase
-        .from('reviews')
-        .insert({
-          user_id: user.id,
-          vendor_id: selectedVendor.id,
-          rating: newReview.rating,
-          comment: newReview.comment.trim(),
-          photos: photoUrls
+      if (editingReviewId) {
+        // Update existing review
+        const { error } = await supabase
+          .from('reviews')
+          .update({
+            rating: newReview.rating,
+            comment: newReview.comment.trim(),
+            photos: photoUrls,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', editingReviewId);
+
+        if (error) throw error;
+
+        toast({
+          title: "Review updated",
+          description: "Your review has been updated successfully!",
         });
+      } else {
+        // Insert new review
+        const { error } = await supabase
+          .from('reviews')
+          .insert({
+            user_id: user.id,
+            vendor_id: selectedVendor.id,
+            rating: newReview.rating,
+            comment: newReview.comment.trim(),
+            photos: photoUrls
+          });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "Review submitted",
-        description: "Thank you for your review!",
-      });
+        toast({
+          title: "Review submitted",
+          description: "Thank you for your review!",
+        });
+        
+        setHasUserReviewed(true);
+      }
 
       setNewReview({ rating: 5, comment: '' });
       setSelectedPhotos([]);
-      setHasUserReviewed(true);
+      setEditingReviewId(null);
+      setExistingReviewPhotos([]);
+      setShowReviewForm(false);
       fetchReviews(); // Refresh reviews
     } catch (error: any) {
       console.error('Error submitting review:', error);
@@ -508,7 +527,7 @@ const VendorDuplicate = () => {
       } else {
         toast({
           title: "Error",
-          description: "Failed to submit review. Please try again.",
+          description: `Failed to ${editingReviewId ? 'update' : 'submit'} review. Please try again.`,
           variant: "destructive"
         });
       }
@@ -541,7 +560,7 @@ const VendorDuplicate = () => {
 
   const handlePhotoSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    const remainingSlots = 3 - selectedPhotos.length;
+    const remainingSlots = 3 - selectedPhotos.length - existingReviewPhotos.length;
     const filesToAdd = files.slice(0, remainingSlots);
     
     // Validate file types and sizes
@@ -1032,20 +1051,31 @@ const VendorDuplicate = () => {
               <div className="space-y-4">
                 {/* Add Review Button */}
                 <Button 
-                  onClick={() => setShowReviewForm(true)}
+                  onClick={() => {
+                    if (hasUserReviewed && user) {
+                      // Load existing review
+                      const userReview = reviews.find(r => r.user_id === user.id);
+                      if (userReview) {
+                        setNewReview({ rating: userReview.rating, comment: userReview.comment });
+                        setEditingReviewId(userReview.id);
+                        setExistingReviewPhotos(userReview.photos || []);
+                      }
+                    } else {
+                      // Reset for new review
+                      setNewReview({ rating: 5, comment: '' });
+                      setEditingReviewId(null);
+                      setExistingReviewPhotos([]);
+                      setSelectedPhotos([]);
+                    }
+                    setShowReviewForm(true);
+                  }}
                   className="w-full"
                   variant="outline"
-                  disabled={!user || hasUserReviewed}
+                  disabled={!user}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  {hasUserReviewed ? 'Already Reviewed' : 'Write a Review'}
+                  {hasUserReviewed ? 'Edit Your Review' : 'Write a Review'}
                 </Button>
-                
-                {hasUserReviewed && user && (
-                  <p className="text-sm text-muted-foreground text-center">
-                    You have already submitted a review for this market.
-                  </p>
-                )}
 
                 {/* Reviews List */}
                 {reviews.length > 0 ? (
@@ -1106,7 +1136,7 @@ const VendorDuplicate = () => {
                     ← Back to Reviews
                   </Button>
                 </div>
-                <DialogTitle>Write a Review</DialogTitle>
+                <DialogTitle>{editingReviewId ? 'Edit Your Review' : 'Write a Review'}</DialogTitle>
               </DialogHeader>
 
               {!user ? (
@@ -1154,7 +1184,24 @@ const VendorDuplicate = () => {
                   <div className="space-y-2">
                     <Label>Photos (optional)</Label>
                     <div className="space-y-2">
-                      {selectedPhotos.length < 3 && (
+                      {/* Show existing photos when editing */}
+                      {editingReviewId && existingReviewPhotos.length > 0 && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">Current photos:</p>
+                          <div className="flex gap-2 flex-wrap">
+                            {existingReviewPhotos.map((photo, index) => (
+                              <img 
+                                key={index} 
+                                src={photo} 
+                                alt={`Existing photo ${index + 1}`}
+                                className="w-16 h-16 object-cover rounded-md border"
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {(selectedPhotos.length + existingReviewPhotos.length) < 3 && (
                         <div className="flex items-center gap-2">
                           <input
                             type="file"
@@ -1174,7 +1221,7 @@ const VendorDuplicate = () => {
                             Add Photos
                           </Button>
                           <span className="text-xs text-muted-foreground">
-                            {selectedPhotos.length}/3 photos
+                            {selectedPhotos.length + existingReviewPhotos.length}/3 photos
                           </span>
                         </div>
                       )}
@@ -1208,7 +1255,12 @@ const VendorDuplicate = () => {
                     disabled={isSubmittingReview || uploadingPhotos}
                     className="w-full"
                   >
-                    {isSubmittingReview ? 'Submitting...' : uploadingPhotos ? 'Uploading photos...' : 'Submit Review'}
+                    {isSubmittingReview 
+                      ? (editingReviewId ? 'Updating...' : 'Submitting...') 
+                      : uploadingPhotos 
+                        ? 'Uploading photos...' 
+                        : (editingReviewId ? 'Update Review' : 'Submit Review')
+                    }
                   </Button>
                 </div>
               )}
