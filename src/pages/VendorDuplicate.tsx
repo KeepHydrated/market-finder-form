@@ -1159,7 +1159,7 @@ const VendorDuplicate = () => {
                 <div className="space-y-4">
                   {/* Rating */}
                   <div className="space-y-2">
-                    <Label>Rating (optional)</Label>
+                    <Label>Rating</Label>
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
@@ -1179,7 +1179,7 @@ const VendorDuplicate = () => {
 
                   {/* Comment */}
                   <div className="space-y-2">
-                    <Label htmlFor="comment">Your Review (optional)</Label>
+                    <Label htmlFor="comment">Your Review</Label>
                     <Textarea
                       id="comment"
                       placeholder="Tell others about your experience..."
