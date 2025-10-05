@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { CreditCard, Trash2, Star } from 'lucide-react';
+import { CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import PaymentMethodCard from '@/components/payment/PaymentMethodCard';
 
 type PaymentType = 'card' | 'paypal' | 'apple_pay';
 
@@ -326,70 +327,12 @@ export function PaymentMethodsManager() {
           ) : (
             <div className="space-y-3">
               {paymentMethods.map((method) => (
-                <Card key={method.id} className={method.is_default ? 'ring-2 ring-primary' : ''}>
-                  <CardContent className="flex items-center justify-between p-4">
-                    <div className="flex items-center gap-4">
-                      <CreditCard className="h-8 w-8 text-muted-foreground" />
-                      <div>
-                        {method.payment_type === 'card' && (
-                          <>
-                            <p className="font-medium capitalize">
-                              {method.card_brand} •••• {method.card_last_four}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              Expires {method.card_exp_month}/{method.card_exp_year}
-                            </p>
-                            {method.cardholder_name && (
-                              <p className="text-sm text-muted-foreground">
-                                {method.cardholder_name}
-                              </p>
-                            )}
-                          </>
-                        )}
-                        {method.payment_type === 'paypal' && (
-                          <>
-                            <p className="font-medium">PayPal</p>
-                            <p className="text-sm text-muted-foreground">
-                              {method.paypal_email}
-                            </p>
-                          </>
-                        )}
-                        {method.payment_type === 'apple_pay' && (
-                          <>
-                            <p className="font-medium">Apple Pay</p>
-                            <p className="text-sm text-muted-foreground">
-                              {method.apple_pay_email}
-                            </p>
-                          </>
-                        )}
-                        {method.is_default && (
-                          <span className="inline-flex items-center gap-1 text-xs text-primary mt-1">
-                            <Star className="h-3 w-3 fill-primary" />
-                            Default
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {!method.is_default && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleSetDefault(method.id)}
-                        >
-                          Set Default
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(method.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                <PaymentMethodCard
+                  key={method.id}
+                  method={method}
+                  onSetDefault={handleSetDefault}
+                  onDelete={handleDelete}
+                />
               ))}
             </div>
           )}
