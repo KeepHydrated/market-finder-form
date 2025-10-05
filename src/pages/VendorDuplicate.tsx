@@ -1042,7 +1042,7 @@ const VendorDuplicate = () => {
                     {reviewStats.totalReviews > 0 ? reviewStats.averageRating : '0.0'}
                   </span>
                   <span className="text-muted-foreground">
-                    ({reviewStats.totalReviews} reviews)
+                    ({reviewStats.totalReviews})
                   </span>
                 </div>
                 <DialogTitle>Customer Reviews</DialogTitle>
