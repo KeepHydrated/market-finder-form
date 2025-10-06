@@ -234,7 +234,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
                     <button
                       onClick={() => {
                         onClose();
-                        navigate(`/market?vendor=${vendorId}`);
+                        navigate(`/market?id=${vendorId}`);
                       }}
                       className="text-sm text-black hover:text-gray-800"
                     >
