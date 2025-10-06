@@ -74,8 +74,9 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             )}
-            <Link to="/homepage" className="hover:opacity-80 transition-opacity">
-              <h1 className="text-2xl font-bold cursor-pointer">
+            <Link to="/homepage" className="hover:opacity-80 transition-opacity flex items-center">
+              <Store className="h-8 w-8 lg:hidden" />
+              <h1 className="text-2xl font-bold cursor-pointer hidden lg:block">
                 My Local Farmers Markets
               </h1>
             </Link>
