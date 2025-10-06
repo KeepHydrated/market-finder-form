@@ -121,9 +121,9 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
             variant="ghost"
             size="sm"
             onClick={goToPrevious}
-            className="absolute -left-14 top-1/2 transform -translate-y-1/2 z-[60] h-12 w-12 p-0 rounded-full bg-white hover:bg-gray-100 border border-gray-200 shadow-lg"
+            className="absolute left-2 top-1/2 transform -translate-y-1/2 z-[60] h-10 w-10 p-0 rounded-full bg-white/95 hover:bg-white border border-gray-300 shadow-lg"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-5 w-5" />
           </Button>
         )}
         
@@ -132,9 +132,9 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
             variant="ghost"
             size="sm"
             onClick={goToNext}
-            className="absolute -right-14 top-1/2 transform -translate-y-1/2 z-[60] h-12 w-12 p-0 rounded-full bg-white hover:bg-gray-100 border border-gray-200 shadow-lg"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 z-[60] h-10 w-10 p-0 rounded-full bg-white/95 hover:bg-white border border-gray-300 shadow-lg"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-5 w-5" />
           </Button>
         )}
 
