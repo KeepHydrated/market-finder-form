@@ -1153,7 +1153,7 @@ const Homepage = () => {
                 {(selectedMarket ? selectedMarket.vendors : filteredSubmissions).map((submission) => (
                    <Card 
                      key={submission.id} 
-                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]" 
+                     className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
                      onClick={async () => {
                        // Get the same cached coordinates used for distance calculation
                         const cachedCoords = submission.market_address 
@@ -1279,7 +1279,7 @@ const Homepage = () => {
                 {groupVendorsByMarket().map((market, index) => (
                    <Card 
                       key={index}
-                      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer min-h-[450px]"
+                      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                        onClick={() => {
                          const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
                          const marketDistance = marketDistances[marketId];
