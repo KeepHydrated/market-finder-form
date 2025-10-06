@@ -39,36 +39,16 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   if (!product || !products.length) return null;
 
   const currentProductIndex = products.findIndex(p => p.id === product.id);
-  const hasPrevious = currentProductIndex > 0;
   const hasNext = currentProductIndex < products.length - 1;
-  const shouldShowArrow = hasPrevious || hasNext;
   
   console.log('ProductDetailModal render:', {
     currentProductIndex,
     hasNext,
-    hasPrevious,
     totalProducts: products.length,
-    shouldShowArrow,
     currentProductId: product.id,
     currentProductName: product.name,
     allProductNames: products.map(p => p.name)
   });
-
-  const goToPrevious = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    console.log('ProductDetailModal: goToPrevious clicked', { 
-      hasPrevious, 
-      currentProductIndex, 
-      totalProducts: products.length 
-    });
-    if (hasPrevious) {
-      const previousProduct = products[currentProductIndex - 1];
-      console.log('ProductDetailModal: Going to previous product:', previousProduct);
-      setCurrentImageIndex(0);
-      onProductChange?.(previousProduct);
-    }
-  };
 
   const goToNext = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -85,14 +65,6 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
       console.log('ProductDetailModal: Going to next product:', nextProduct);
       setCurrentImageIndex(0);
       onProductChange?.(nextProduct);
-    }
-  };
-
-  const handleNavigate = (e: React.MouseEvent) => {
-    if (hasNext) {
-      goToNext(e);
-    } else if (hasPrevious) {
-      goToPrevious(e);
     }
   };
 
@@ -178,20 +150,16 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         
 
         <div className="flex flex-row w-full bg-white min-h-[400px] relative">
-          {/* Product navigation arrow */}
-          {shouldShowArrow && (
+          {/* Product navigation arrow - only show when there's a next product */}
+          {hasNext && (
             <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 z-[100]">
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleNavigate}
+                onClick={goToNext}
                 className="h-10 w-10 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
               >
-                {hasNext ? (
-                  <ChevronRight className="h-5 w-5 text-gray-700" />
-                ) : (
-                  <ChevronLeft className="h-5 w-5 text-gray-700" />
-                )}
+                <ChevronRight className="h-5 w-5 text-gray-700" />
               </Button>
             </div>
           )}
