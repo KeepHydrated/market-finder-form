@@ -144,25 +144,25 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
           {/* Left side - Images */}
           <div className="w-1/2 relative bg-gray-50">
             {/* Product navigation arrows - positioned over image section */}
-            {hasPrevious && (
+            {hasNext && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={goToNext}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 z-[60] h-10 w-10 p-0 rounded-full bg-white/95 hover:bg-white border border-gray-300 shadow-lg"
               >
-                <ChevronLeft className="h-5 w-5" />
+                <ChevronRight className="h-5 w-5" />
               </Button>
             )}
             
-            {hasNext && (
+            {hasPrevious && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={goToPrevious}
                 className="absolute left-4 top-1/2 transform -translate-y-1/2 z-[60] h-10 w-10 p-0 rounded-full bg-white/95 hover:bg-white border border-gray-300 shadow-lg"
               >
-                <ChevronRight className="h-5 w-5" />
+                <ChevronLeft className="h-5 w-5" />
               </Button>
             )}
             
