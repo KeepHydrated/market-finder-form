@@ -164,19 +164,17 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         
 
         <div className="flex flex-row w-full bg-white min-h-[400px] relative">
-          {/* Product navigation arrow - only shows for first product */}
-          {currentProductIndex === 0 && hasNext && (
-            <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 z-[100]">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={goToNext}
-                className="h-10 w-10 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
-              >
-                <ChevronRight className="h-5 w-5 text-gray-700" />
-              </Button>
-            </div>
-          )}
+          {/* Product navigation arrow - showing for debugging */}
+          <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 z-[100]">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goToNext}
+              className="h-10 w-10 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
+            >
+              <ChevronRight className="h-5 w-5 text-gray-700" />
+            </Button>
+          </div>
           
           {/* Left side - Images */}
           <div className="w-1/2 relative bg-gray-50">
