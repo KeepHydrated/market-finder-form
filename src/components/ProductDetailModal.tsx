@@ -41,13 +41,14 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   const currentProductIndex = products.findIndex(p => p.id === product.id);
   const hasPrevious = currentProductIndex > 0;
   const hasNext = currentProductIndex < products.length - 1;
+  const shouldShowArrow = hasPrevious || hasNext;
   
   console.log('ProductDetailModal render:', {
     currentProductIndex,
     hasNext,
     hasPrevious,
     totalProducts: products.length,
-    shouldShowArrow: currentProductIndex === 0 && hasNext,
+    shouldShowArrow,
     currentProductId: product.id,
     currentProductName: product.name,
     allProductNames: products.map(p => p.name)
@@ -79,12 +80,20 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
       onProductChangeExists: !!onProductChange
     });
     
-    // Navigate to next product, or loop to first if at end
-    const nextIndex = currentProductIndex < products.length - 1 ? currentProductIndex + 1 : 0;
-    const nextProduct = products[nextIndex];
-    console.log('ProductDetailModal: Going to product at index:', nextIndex, nextProduct);
-    setCurrentImageIndex(0);
-    onProductChange?.(nextProduct);
+    if (hasNext) {
+      const nextProduct = products[currentProductIndex + 1];
+      console.log('ProductDetailModal: Going to next product:', nextProduct);
+      setCurrentImageIndex(0);
+      onProductChange?.(nextProduct);
+    }
+  };
+
+  const handleNavigate = (e: React.MouseEvent) => {
+    if (hasNext) {
+      goToNext(e);
+    } else if (hasPrevious) {
+      goToPrevious(e);
+    }
   };
 
   const nextImage = () => {
@@ -169,17 +178,23 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         
 
         <div className="flex flex-row w-full bg-white min-h-[400px] relative">
-          {/* Product navigation arrow - showing always for testing */}
-          <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 z-[100]">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={goToNext}
-              className="h-10 w-10 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
-            >
-              <ChevronRight className="h-5 w-5 text-gray-700" />
-            </Button>
-          </div>
+          {/* Product navigation arrow */}
+          {shouldShowArrow && (
+            <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 z-[100]">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleNavigate}
+                className="h-10 w-10 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
+              >
+                {hasNext ? (
+                  <ChevronRight className="h-5 w-5 text-gray-700" />
+                ) : (
+                  <ChevronLeft className="h-5 w-5 text-gray-700" />
+                )}
+              </Button>
+            </div>
+          )}
           
           {/* Left side - Images */}
           <div className="w-1/2 relative bg-gray-50">
