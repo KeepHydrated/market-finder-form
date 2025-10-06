@@ -937,7 +937,18 @@ const VendorDuplicate = () => {
                     className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
                     onClick={() => setIsReviewModalOpen(true)}
                   >
-                    <Star className="h-5 w-5 text-yellow-500 fill-current" />
+                    <div className="flex gap-0.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star 
+                          key={star}
+                          className={`h-4 w-4 fill-current ${
+                            vendorReviews?.rating && star <= vendorReviews.rating
+                              ? 'text-yellow-500' 
+                              : 'text-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
                     <span className="text-foreground font-medium">
                       {vendorReviews?.rating ? vendorReviews.rating.toFixed(1) : 'No rating'}
                     </span>
