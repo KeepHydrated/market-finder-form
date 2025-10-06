@@ -10,7 +10,7 @@ export function CartButton() {
 
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="sm"
       className="relative"
       onClick={() => setIsOpen(true)}
