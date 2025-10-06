@@ -76,7 +76,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             )}
             <Link to="/homepage" className="hover:opacity-80 transition-opacity">
               <h1 className="text-2xl font-bold cursor-pointer">
-                Farmer's Market Hub
+                My Local Farmers Markets
               </h1>
             </Link>
             <DropdownMenu>
