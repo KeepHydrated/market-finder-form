@@ -41,6 +41,14 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   const currentProductIndex = products.findIndex(p => p.id === product.id);
   const hasPrevious = currentProductIndex > 0;
   const hasNext = currentProductIndex < products.length - 1;
+  
+  console.log('ProductDetailModal render:', {
+    currentProductIndex,
+    hasNext,
+    hasPrevious,
+    totalProducts: products.length,
+    shouldShowArrow: currentProductIndex === 0 && hasNext
+  });
 
   const goToPrevious = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -159,19 +167,17 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
           {/* Left side - Images */}
           <div className="w-1/2 relative bg-gray-50">
             <div className="h-[400px] bg-muted relative group">
-                {/* Product navigation arrow - only for first product */}
-                {currentProductIndex === 0 && hasNext && (
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 z-[100]">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={goToNext}
-                      className="h-14 w-14 p-0 rounded-full bg-red-500 hover:bg-red-600 shadow-2xl"
-                    >
-                      <ChevronRight className="h-8 w-8 text-white" />
-                    </Button>
-                  </div>
-                )}
+                {/* Product navigation arrow - TESTING: showing always */}
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 z-[100]">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={goToNext}
+                    className="h-14 w-14 p-0 rounded-full bg-red-500 hover:bg-red-600 shadow-2xl"
+                  >
+                    <ChevronRight className="h-8 w-8 text-white" />
+                  </Button>
+                </div>
                 
                 {product.images.length > 0 ? (
                   <>
