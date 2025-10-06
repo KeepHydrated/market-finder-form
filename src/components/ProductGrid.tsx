@@ -43,9 +43,10 @@ interface ProductCardProps {
   onEditClick?: (product: Product) => void;
   vendorId?: string;
   vendorName?: string;
+  hideVendorName?: boolean;
 }
 
-const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClick, onEditClick, vendorId, vendorName }: ProductCardProps) => {
+const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClick, onEditClick, vendorId, vendorName, hideVendorName = false }: ProductCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { toggleLike, isLiked } = useLikes();
 
@@ -202,7 +203,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClic
             ${product.price.toFixed(2)}
           </span>
         </div>
-        {vendorName && !onDeleteProduct && (
+        {vendorName && !onDeleteProduct && !hideVendorName && (
           <div className="mt-2 pt-2 border-t border-muted">
             <button 
               onClick={(e) => e.stopPropagation()}
@@ -504,6 +505,7 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
             onEditClick={onEditProduct ? handleEditClick : undefined}
             vendorId={vendorId}
             vendorName={vendorName}
+            hideVendorName={hideVendorName}
           />
         ))}
       </div>
