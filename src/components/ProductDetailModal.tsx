@@ -170,9 +170,9 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
               variant="ghost"
               size="sm"
               onClick={goToNext}
-              className="h-14 w-14 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-2xl"
+              className="h-10 w-10 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
             >
-              <ChevronRight className="h-8 w-8 text-gray-700" />
+              <ChevronRight className="h-5 w-5 text-gray-700" />
             </Button>
           </div>
           
