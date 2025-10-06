@@ -126,25 +126,22 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      {/* Navigation arrow - positioned outside modal content */}
-      {currentProductIndex === 0 && hasNext && (
-        <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
-          <div className="relative w-[700px] h-full flex items-center">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible">
+        <DialogTitle className="sr-only">{product.name}</DialogTitle>
+        <DialogDescription className="sr-only">{product.description}</DialogDescription>
+        
+        <div className="relative overflow-y-auto max-h-[80vh]">
+          {/* Navigation arrow - only for first product */}
+          {currentProductIndex === 0 && hasNext && (
             <Button
               variant="ghost"
               size="sm"
               onClick={goToNext}
-              className="absolute -right-16 top-1/2 transform -translate-y-1/2 pointer-events-auto h-12 w-12 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-lg"
+              className="absolute -right-16 top-1/2 transform -translate-y-1/2 z-[70] h-12 w-12 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
             >
               <ChevronRight className="h-6 w-6 text-gray-700" />
             </Button>
-          </div>
-        </div>
-      )}
-      
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white">
-        <DialogTitle className="sr-only">{product.name}</DialogTitle>
-        <DialogDescription className="sr-only">{product.description}</DialogDescription>
+          )}
         
         {/* Heart button positioned at top right of entire modal */}
         <Button
@@ -276,7 +273,8 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
               )}
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
