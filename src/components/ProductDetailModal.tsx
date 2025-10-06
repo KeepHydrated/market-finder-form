@@ -78,14 +78,13 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
       totalProducts: products.length,
       onProductChangeExists: !!onProductChange
     });
-    if (hasNext) {
-      const nextProduct = products[currentProductIndex + 1];
-      console.log('ProductDetailModal: Going to next product:', nextProduct);
-      setCurrentImageIndex(0);
-      console.log('ProductDetailModal: Calling onProductChange...');
-      onProductChange?.(nextProduct);
-      console.log('ProductDetailModal: onProductChange called');
-    }
+    
+    // Navigate to next product, or loop to first if at end
+    const nextIndex = currentProductIndex < products.length - 1 ? currentProductIndex + 1 : 0;
+    const nextProduct = products[nextIndex];
+    console.log('ProductDetailModal: Going to product at index:', nextIndex, nextProduct);
+    setCurrentImageIndex(0);
+    onProductChange?.(nextProduct);
   };
 
   const nextImage = () => {
