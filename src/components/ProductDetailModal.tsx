@@ -47,7 +47,10 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
     hasNext,
     hasPrevious,
     totalProducts: products.length,
-    shouldShowArrow: currentProductIndex === 0 && hasNext
+    shouldShowArrow: currentProductIndex === 0 && hasNext,
+    currentProductId: product.id,
+    currentProductName: product.name,
+    allProductNames: products.map(p => p.name)
   });
 
   const goToPrevious = (e: React.MouseEvent) => {
