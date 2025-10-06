@@ -831,8 +831,8 @@ const VendorDuplicate = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="flex">
-        {/* Left column - sticky, non-scrolling */}
-        <div className="w-96 h-screen sticky top-0 bg-green-50 border-r overflow-y-auto">
+        {/* Left column - sticky on iPad only, normal on desktop */}
+        <div className="w-96 min-h-screen md:h-screen md:sticky md:top-0 lg:min-h-screen lg:relative bg-green-50 border-r md:overflow-y-auto lg:overflow-visible">
         <div className="space-y-6 px-4 pt-6 pb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -922,8 +922,8 @@ const VendorDuplicate = () => {
         </div>
       </div>
       
-      {/* Main content - right column, scrollable */}
-      <div className="flex-1 px-4 py-6 overflow-y-auto h-screen">
+      {/* Main content - scrollable on iPad only, normal on desktop */}
+      <div className="flex-1 px-4 py-6 md:overflow-y-auto md:h-screen lg:overflow-visible lg:h-auto">
         {selectedVendor ? (
           // Show selected vendor details
           <div className="space-y-6">
