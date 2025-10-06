@@ -319,9 +319,19 @@ const CategoryProducts = () => {
             images: selectedProduct.images,
             description: selectedProduct.description
           }}
-          products={[selectedProduct]} // Pass as array for the modal
+          products={sortedProducts.map(p => ({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            images: p.images,
+            description: p.description
+          }))}
           open={true}
           onClose={() => setSelectedProduct(null)}
+          onProductChange={(product) => {
+            const fullProduct = sortedProducts.find(p => p.id === product.id);
+            if (fullProduct) setSelectedProduct(fullProduct);
+          }}
           vendorId={selectedProduct.vendorId}
           vendorName={selectedProduct.vendorName}
         />
