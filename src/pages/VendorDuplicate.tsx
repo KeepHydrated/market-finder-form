@@ -950,11 +950,7 @@ const VendorDuplicate = () => {
                       ))}
                     </div>
                     <span className="text-foreground font-medium">
-                      {vendorReviews?.rating 
-                        ? (vendorReviews.rating % 1 === 0 
-                            ? vendorReviews.rating.toFixed(0) 
-                            : vendorReviews.rating.toFixed(1))
-                        : 'No rating'}
+                      {vendorReviews?.rating ? vendorReviews.rating.toFixed(1) : 'No rating'}
                     </span>
                     <span className="text-muted-foreground">
                       ({vendorReviews?.reviewCount ?? 0})
