@@ -40,32 +40,28 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   const currentProductIndex = products.findIndex(p => p.id === product.id);
   const hasNext = currentProductIndex < products.length - 1;
-  
-  console.log('ProductDetailModal render:', {
-    currentProductIndex,
-    hasNext,
-    totalProducts: products.length,
-    currentProductId: product.id,
-    currentProductName: product.name,
-    allProductNames: products.map(p => p.name)
-  });
+  const hasPrevious = currentProductIndex > 0;
 
-  const goToNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    console.log('ProductDetailModal: goToNext clicked', { 
-      hasNext, 
-      currentProductIndex, 
-      totalProducts: products.length,
-      onProductChangeExists: !!onProductChange
-    });
-    
+  const goToNextProduct = () => {
     if (hasNext) {
       const nextProduct = products[currentProductIndex + 1];
-      console.log('ProductDetailModal: Going to next product:', nextProduct);
       setCurrentImageIndex(0);
       onProductChange?.(nextProduct);
     }
+  };
+
+  const goToPreviousProduct = () => {
+    if (hasPrevious) {
+      const previousProduct = products[currentProductIndex - 1];
+      setCurrentImageIndex(0);
+      onProductChange?.(previousProduct);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowRight") goToNextProduct();
+    if (e.key === "ArrowLeft") goToPreviousProduct();
+    if (e.key === "Escape") onClose();
   };
 
   const nextImage = () => {
@@ -120,7 +116,10 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible">
+      <DialogContent 
+        className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible"
+        onKeyDown={handleKeyDown}
+      >
         <DialogTitle className="sr-only">{product.name}</DialogTitle>
         <DialogDescription className="sr-only">{product.description}</DialogDescription>
         
@@ -150,16 +149,29 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         
 
         <div className="flex flex-row w-full bg-white min-h-[400px] relative">
-          {/* Product navigation arrow - only show when there's a next product */}
+          {/* Product navigation arrows */}
+          {hasPrevious && (
+            <div className="absolute -left-16 top-1/2 transform -translate-y-1/2 z-[100]">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goToPreviousProduct}
+                className="h-12 w-12 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
+              >
+                <ChevronLeft className="h-6 w-6 text-gray-700" />
+              </Button>
+            </div>
+          )}
+          
           {hasNext && (
             <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 z-[100]">
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={goToNext}
-                className="h-10 w-10 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
+                onClick={goToNextProduct}
+                className="h-12 w-12 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
               >
-                <ChevronRight className="h-5 w-5 text-gray-700" />
+                <ChevronRight className="h-6 w-6 text-gray-700" />
               </Button>
             </div>
           )}
