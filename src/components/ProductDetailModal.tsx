@@ -126,9 +126,23 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-visible p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white relative">
         <DialogTitle className="sr-only">{product.name}</DialogTitle>
         <DialogDescription className="sr-only">{product.description}</DialogDescription>
+        
+        {/* Product navigation arrow - only for first product */}
+        {currentProductIndex === 0 && hasNext && (
+          <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 z-[100]">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goToNext}
+              className="h-14 w-14 p-0 rounded-full bg-green-500 hover:bg-green-600 shadow-2xl"
+            >
+              <ChevronRight className="h-8 w-8 text-white" />
+            </Button>
+          </div>
+        )}
         
         {/* Heart button positioned at top right of entire modal */}
         <Button
