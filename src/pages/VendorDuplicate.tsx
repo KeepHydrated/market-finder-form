@@ -1178,7 +1178,7 @@ const VendorDuplicate = () => {
                                 {review.profiles?.full_name?.charAt(0).toUpperCase() || '?'}
                               </AvatarFallback>
                             </Avatar>
-                            <div className="flex-1">
+                            <div className="flex-1 flex items-center justify-between">
                               <p className="font-semibold text-sm">
                                 {review.profiles?.full_name || 'Anonymous'}
                               </p>
