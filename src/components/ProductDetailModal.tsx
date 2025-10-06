@@ -42,9 +42,14 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   const hasNext = currentProductIndex < products.length - 1;
   const hasPrevious = currentProductIndex > 0;
 
+  console.log('🎯 MODAL - Current product:', product.name, 'at index:', currentProductIndex);
+  console.log('🎯 MODAL - All products:', products.map(p => p.name));
+  console.log('🎯 MODAL - Navigation:', { hasNext, hasPrevious });
+
   const goToNextProduct = () => {
     if (hasNext) {
       const nextProduct = products[currentProductIndex + 1];
+      console.log('➡️ Going to NEXT product:', nextProduct.name);
       setCurrentImageIndex(0);
       onProductChange?.(nextProduct);
     }
@@ -53,6 +58,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   const goToPreviousProduct = () => {
     if (hasPrevious) {
       const previousProduct = products[currentProductIndex - 1];
+      console.log('⬅️ Going to PREVIOUS product:', previousProduct.name);
       setCurrentImageIndex(0);
       onProductChange?.(previousProduct);
     }

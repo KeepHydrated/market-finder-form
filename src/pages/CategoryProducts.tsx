@@ -139,6 +139,7 @@ const CategoryProducts = () => {
     }
   });
 
+  console.log('🔍 SORTED PRODUCTS ORDER:', sortedProducts.map(p => p.name));
   console.log(`Total products available for purchase: ${sortedProducts.length}`);
 
   const handleAddToCart = (product: Product & { vendorName: string; vendorId: string }) => {
