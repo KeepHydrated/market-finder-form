@@ -45,8 +45,14 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   const goToPrevious = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
+    console.log('ProductDetailModal: goToPrevious clicked', { 
+      hasPrevious, 
+      currentProductIndex, 
+      totalProducts: products.length 
+    });
     if (hasPrevious) {
       const previousProduct = products[currentProductIndex - 1];
+      console.log('ProductDetailModal: Going to previous product:', previousProduct);
       setCurrentImageIndex(0);
       onProductChange?.(previousProduct);
     }
@@ -55,8 +61,14 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   const goToNext = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
+    console.log('ProductDetailModal: goToNext clicked', { 
+      hasNext, 
+      currentProductIndex, 
+      totalProducts: products.length 
+    });
     if (hasNext) {
       const nextProduct = products[currentProductIndex + 1];
+      console.log('ProductDetailModal: Going to next product:', nextProduct);
       setCurrentImageIndex(0);
       onProductChange?.(nextProduct);
     }
