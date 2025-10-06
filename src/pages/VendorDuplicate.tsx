@@ -1125,7 +1125,7 @@ const VendorDuplicate = () => {
                       {reviewStats.reviewsWithRatings > 0 ? reviewStats.averageRating : 'No rating'}
                     </span>
                     <span className="text-muted-foreground">
-                      ({reviewStats.reviewsWithRatings}) {reviewStats.totalReviews === 1 ? 'review' : 'reviews'}
+                      ({reviewStats.reviewsWithRatings})
                     </span>
                   </div>
                 </div>
