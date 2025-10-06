@@ -161,7 +161,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={goToPreviousProduct}
+                onClick={goToNextProduct}
                 className="h-12 w-12 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
               >
                 <ChevronLeft className="h-6 w-6 text-gray-700" />
@@ -174,7 +174,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={goToNextProduct}
+                onClick={goToPreviousProduct}
                 className="h-12 w-12 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
               >
                 <ChevronRight className="h-6 w-6 text-gray-700" />
