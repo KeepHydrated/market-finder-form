@@ -134,7 +134,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible">
         <DialogTitle className="sr-only">{product.name}</DialogTitle>
         <DialogDescription className="sr-only">{product.description}</DialogDescription>
         
@@ -163,22 +163,22 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         </Button>
         
 
-        <div className="flex flex-row w-full bg-white min-h-[400px]">
+        <div className="flex flex-row w-full bg-white min-h-[400px] relative">
+          {/* Product navigation arrow - positioned outside on the right */}
+          <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 z-[100]">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goToNext}
+              className="h-14 w-14 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-2xl"
+            >
+              <ChevronRight className="h-8 w-8 text-gray-700" />
+            </Button>
+          </div>
+          
           {/* Left side - Images */}
           <div className="w-1/2 relative bg-gray-50">
             <div className="h-[400px] bg-muted relative group">
-                {/* Product navigation arrow - TESTING: showing always */}
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 z-[100]">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={goToNext}
-                    className="h-14 w-14 p-0 rounded-full bg-red-500 hover:bg-red-600 shadow-2xl"
-                  >
-                    <ChevronRight className="h-8 w-8 text-white" />
-                  </Button>
-                </div>
-                
                 {product.images.length > 0 ? (
                   <>
                     <img
