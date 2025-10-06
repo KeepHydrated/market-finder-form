@@ -923,7 +923,8 @@ const VendorDuplicate = () => {
       </div>
       
       {/* Main content - right column, scrollable */}
-      <div className="flex-1 px-4 py-6 overflow-y-auto h-screen">
+      <div className="flex-1 overflow-y-auto h-screen">
+        <div className="container mx-auto px-4 py-6">
         {selectedVendor ? (
           // Show selected vendor details
           <div className="space-y-6">
@@ -1103,6 +1104,7 @@ const VendorDuplicate = () => {
           </div>
         )}
       </div>
+        </div>
 
       {/* Review Modal */}
       <Dialog open={isReviewModalOpen} onOpenChange={(open) => {
