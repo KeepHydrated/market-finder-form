@@ -157,27 +157,27 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         <div className="flex flex-row w-full bg-white min-h-[400px] relative">
           {/* Product navigation arrows */}
           {hasPrevious && (
-            <div className="absolute -left-16 top-1/2 transform -translate-y-1/2 z-[100]">
+            <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 z-[100]">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={goToNextProduct}
                 className="h-12 w-12 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
               >
-                <ChevronLeft className="h-6 w-6 text-gray-700" />
+                <ChevronRight className="h-6 w-6 text-gray-700" />
               </Button>
             </div>
           )}
           
           {hasNext && (
-            <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 z-[100]">
+            <div className="absolute -left-16 top-1/2 transform -translate-y-1/2 z-[100]">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={goToPreviousProduct}
                 className="h-12 w-12 p-0 rounded-full bg-white hover:bg-gray-50 border-2 border-gray-300 shadow-xl"
               >
-                <ChevronRight className="h-6 w-6 text-gray-700" />
+                <ChevronLeft className="h-6 w-6 text-gray-700" />
               </Button>
             </div>
           )}
