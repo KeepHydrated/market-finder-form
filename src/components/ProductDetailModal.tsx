@@ -115,29 +115,6 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white">
-        {/* Product navigation arrows */}
-        {hasPrevious && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={goToPrevious}
-            className="absolute left-2 top-1/2 transform -translate-y-1/2 z-[60] h-10 w-10 p-0 rounded-full bg-white/95 hover:bg-white border border-gray-300 shadow-lg"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-        )}
-        
-        {hasNext && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={goToNext}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 z-[60] h-10 w-10 p-0 rounded-full bg-white/95 hover:bg-white border border-gray-300 shadow-lg"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </Button>
-        )}
-
         {/* Heart button positioned at top right of entire modal */}
         <Button
           variant="ghost"
@@ -166,6 +143,29 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         <div className="flex flex-row w-full bg-white min-h-[400px]">
           {/* Left side - Images */}
           <div className="w-1/2 relative bg-gray-50">
+            {/* Product navigation arrows - positioned over image section */}
+            {hasPrevious && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goToPrevious}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 z-[60] h-10 w-10 p-0 rounded-full bg-white/95 hover:bg-white border border-gray-300 shadow-lg"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+            )}
+            
+            {hasNext && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goToNext}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 z-[60] h-10 w-10 p-0 rounded-full bg-white/95 hover:bg-white border border-gray-300 shadow-lg"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            )}
+            
             <div className="h-[400px] bg-muted relative group">
                 {product.images.length > 0 ? (
                   <>
