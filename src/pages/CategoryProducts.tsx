@@ -320,13 +320,17 @@ const CategoryProducts = () => {
             images: selectedProduct.images,
             description: selectedProduct.description
           }}
-          products={sortedProducts.map(p => ({
-            id: p.id,
-            name: p.name,
-            price: p.price,
-            images: p.images,
-            description: p.description
-          }))}
+          products={(() => {
+            const mappedProducts = sortedProducts.map(p => ({
+              id: p.id,
+              name: p.name,
+              price: p.price,
+              images: p.images,
+              description: p.description
+            }));
+            console.log('Products passed to modal:', mappedProducts.map(p => p.name));
+            return mappedProducts;
+          })()}
           open={true}
           onClose={() => setSelectedProduct(null)}
           onProductChange={(product) => {
