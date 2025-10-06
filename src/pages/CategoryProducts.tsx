@@ -320,7 +320,7 @@ const CategoryProducts = () => {
             images: selectedProduct.images,
             description: selectedProduct.description
           }}
-          products={sortedProducts.map(p => ({
+          products={[...sortedProducts].reverse().map(p => ({
             id: p.id,
             name: p.name,
             price: p.price,
