@@ -74,9 +74,8 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             )}
-            <Link to="/homepage" className="hover:opacity-80 transition-opacity flex items-center">
-              <Store className="h-8 w-8 lg:hidden" />
-              <h1 className="text-2xl font-bold cursor-pointer hidden lg:block">
+            <Link to="/homepage" className="hover:opacity-80 transition-opacity">
+              <h1 className="text-2xl font-bold cursor-pointer">
                 My Local Farmers Markets
               </h1>
             </Link>
@@ -152,7 +151,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             </DropdownMenu>
           </div>
           
-          <div className="flex-1 max-w-md ml-4 mr-8">
+          <div className="flex-1 max-w-md mx-8">
             <form onSubmit={handleSearch} className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
