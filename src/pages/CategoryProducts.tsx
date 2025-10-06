@@ -134,7 +134,8 @@ const CategoryProducts = () => {
         return new Date(b.vendorCreatedAt).getTime() - new Date(a.vendorCreatedAt).getTime();
       case 'relevancy':
       default:
-        return 0; // Keep original order for relevancy
+        // Default to newest first (most recent)
+        return new Date(b.vendorCreatedAt).getTime() - new Date(a.vendorCreatedAt).getTime();
     }
   });
 
@@ -319,7 +320,7 @@ const CategoryProducts = () => {
             images: selectedProduct.images,
             description: selectedProduct.description
           }}
-          products={sortedProducts.slice().reverse().map(p => ({
+          products={sortedProducts.map(p => ({
             id: p.id,
             name: p.name,
             price: p.price,
