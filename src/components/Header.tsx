@@ -62,8 +62,9 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
   return (
     <header className="bg-card shadow-sm border-b sticky top-0 z-50">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-wrap justify-between items-center lg:h-16">
+          {/* First row on all screens */}
+          <div className="flex items-center space-x-4 h-16">
             {showBackButton && onBackClick && (
               <Button
                 variant="ghost"
@@ -79,9 +80,10 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 My Local Farmers Markets
               </h1>
             </Link>
+            {/* Category dropdown - hidden on md, shown on lg+ */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                 <Button variant="ghost" size="sm" className="ml-4">
+                 <Button variant="ghost" size="sm" className="ml-4 hidden lg:flex">
                   Category
                   <ChevronDown className="h-4 w-4 ml-1" />
                 </Button>
@@ -151,7 +153,8 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             </DropdownMenu>
           </div>
           
-          <div className="flex-1 max-w-md mx-8">
+          {/* Search bar - hidden on md, shown on lg+ in first row */}
+          <div className="flex-1 max-w-md mx-8 hidden lg:block">
             <form onSubmit={handleSearch} className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
@@ -164,7 +167,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             </form>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 h-16">
             <Link to="/likes">
               <Button variant="ghost" size="sm">
                 <Heart className="h-5 w-5" />
@@ -187,6 +190,93 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 </Button>
               </Link>
             )}
+          </div>
+          
+          {/* Second row on md (iPad), hidden on lg+ */}
+          <div className="w-full flex items-center space-x-4 pb-3 lg:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                 <Button variant="ghost" size="sm">
+                  Category
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
+                <DropdownMenuItem>
+                  <Link to="/category?category=Fresh Flowers & Plants" className="w-full">
+                    Fresh Flowers & Plants
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/category?category=Bakery" className="w-full">
+                    Bakery
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/category?category=Dairy" className="w-full">
+                    Dairy
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/category?category=Rancher" className="w-full">
+                    Rancher
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/category?category=Beverages" className="w-full">
+                    Beverages
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/category?category=Seasonings & Spices" className="w-full">
+                    Seasonings & Spices
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/category?category=Pets" className="w-full">
+                    Pets
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/category?category=Home Goods" className="w-full">
+                    Home Goods
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/category?category=Farmers" className="w-full">
+                    Farmers
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/category?category=Ready to Eat" className="w-full">
+                    Ready to Eat
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/category?category=Packaged Goods & Snacks" className="w-full">
+                    Packaged Goods & Snacks
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to="/category?category=Artisan" className="w-full">
+                    Artisan
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            <div className="flex-1 max-w-md">
+              <form onSubmit={handleSearch} className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  type="text"
+                  placeholder="Search vendors, products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 bg-background/50 border-border"
+                />
+              </form>
+            </div>
           </div>
         </div>
       </div>
