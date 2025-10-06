@@ -78,6 +78,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
     if (hasNext) {
       const nextProduct = products[currentProductIndex + 1];
       console.log('ProductDetailModal: Going to next product:', nextProduct);
+      setCurrentImageIndex(0);
       console.log('ProductDetailModal: Calling onProductChange...');
       onProductChange?.(nextProduct);
       console.log('ProductDetailModal: onProductChange called');

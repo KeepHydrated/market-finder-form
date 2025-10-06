@@ -330,7 +330,10 @@ const CategoryProducts = () => {
           onClose={() => setSelectedProduct(null)}
           onProductChange={(product) => {
             const fullProduct = sortedProducts.find(p => p.id === product.id);
-            if (fullProduct) setSelectedProduct(fullProduct);
+            if (fullProduct) {
+              console.log('CategoryProducts: Updating to product:', fullProduct);
+              setSelectedProduct(fullProduct);
+            }
           }}
           vendorId={selectedProduct.vendorId}
           vendorName={selectedProduct.vendorName}
