@@ -1171,8 +1171,19 @@ const VendorDuplicate = () => {
                 onClick={() => {
                   setAcceptedSubmission(vendor);
                   setSelectedVendor(vendor);
-                  // Preserve the current market being viewed, don't switch to vendor's default market
-                  if (!selectedMarketName) {
+                  // Find and set the current market if it exists in vendor's markets
+                  if (selectedMarketName && vendor.selected_markets && Array.isArray(vendor.selected_markets)) {
+                    const marketExists = (vendor.selected_markets as string[]).find(m => 
+                      m.toLowerCase().includes(selectedMarketName.toLowerCase()) || 
+                      selectedMarketName.toLowerCase().includes(m.toLowerCase())
+                    );
+                    if (marketExists) {
+                      setSelectedMarketName(marketExists);
+                    } else {
+                      setSelectedMarketName(vendor.selected_market || '');
+                      setSelectedMarketAddress(vendor.market_address || '');
+                    }
+                  } else if (!selectedMarketName) {
                     setSelectedMarketName(vendor.selected_market || '');
                     setSelectedMarketAddress(vendor.market_address || '');
                   }
