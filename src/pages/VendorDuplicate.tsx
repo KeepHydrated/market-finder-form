@@ -164,6 +164,16 @@ const VendorDuplicate = () => {
     }
   }, [location.state, searchParams]);
 
+  // Initialize selectedMarketName when acceptedSubmission loads
+  useEffect(() => {
+    if (acceptedSubmission && !selectedMarketName) {
+      const initialMarket = acceptedSubmission.selected_market || acceptedSubmission.search_term || '';
+      const initialAddress = acceptedSubmission.market_address || '';
+      setSelectedMarketName(initialMarket);
+      setSelectedMarketAddress(initialAddress);
+    }
+  }, [acceptedSubmission]);
+
   const fetchVendorReviews = async () => {
     if (!acceptedSubmission?.id) {
       console.log('No vendor ID found, skipping reviews fetch');
