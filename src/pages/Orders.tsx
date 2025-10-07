@@ -242,6 +242,51 @@ const Orders = () => {
     }
   };
 
+  const handleMessageSeller = async (order: Order) => {
+    if (!user) return;
+
+    try {
+      // Check if conversation already exists
+      const { data: existingConvo, error: convoError } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('buyer_id', user.id)
+        .eq('seller_id', order.vendor_id)
+        .maybeSingle();
+
+      if (convoError && convoError.code !== 'PGRST116') {
+        throw convoError;
+      }
+
+      if (existingConvo) {
+        // Navigate to existing conversation
+        navigate(`/messages/${existingConvo.id}`);
+      } else {
+        // Create new conversation
+        const { data: newConvo, error: createError } = await supabase
+          .from('conversations')
+          .insert({
+            buyer_id: user.id,
+            seller_id: order.vendor_id,
+            order_id: order.id,
+          })
+          .select()
+          .single();
+
+        if (createError) throw createError;
+
+        navigate(`/messages/${newConvo.id}`);
+      }
+    } catch (error) {
+      console.error('Error opening conversation:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to open conversation with seller',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleHelpWithOrder = (order: Order) => {
     setSelectedOrder(order);
     setShowHelpDialog(true);
@@ -415,9 +460,9 @@ const Orders = () => {
                     variant="outline" 
                     size="sm" 
                     className="w-full rounded-full"
-                    onClick={() => handleHelpWithOrder(order)}
+                    onClick={() => handleMessageSeller(order)}
                   >
-                    Help with order
+                    Message seller
                   </Button>
                   <Button 
                     variant="outline" 

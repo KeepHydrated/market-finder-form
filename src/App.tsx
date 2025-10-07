@@ -19,6 +19,8 @@ import ShopManager2 from "./pages/ShopManager2";
 import Test from "./pages/Test";
 import Quiz from "./pages/Quiz";
 import Two from "./pages/Two";
+import Messages from "./pages/Messages";
+import Conversation from "./pages/Conversation";
 
 import Commissions from "./pages/Commissions";
 import Checkout from "./pages/Checkout";
@@ -56,6 +58,8 @@ const App = () => (
                 <Route path="/test" element={<Test />} />
                 <Route path="/quiz" element={<Quiz />} />
                 <Route path="/2" element={<Two />} />
+                <Route path="/messages" element={<Messages />} />
+                <Route path="/messages/:conversationId" element={<Conversation />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
