@@ -637,7 +637,7 @@ const Homepage = () => {
     console.log('=== END VENDOR DISTANCE CALCULATION ===');
   };
 
-  // Group vendors by market
+  // Group vendors by market - includes ALL markets from selected_markets array
   const groupVendorsByMarket = () => {
     const markets: Record<string, {
       name: string;
@@ -646,18 +646,29 @@ const Homepage = () => {
     }> = {};
 
     filteredSubmissions.forEach(submission => {
-      const marketKey = submission.selected_market || submission.search_term || 'Unknown Market';
-      const marketAddress = submission.market_address || 'Address not available';
+      // Get the selected_markets array from the submission
+      const selectedMarkets = (submission as any).selected_markets || [];
       
-      if (!markets[marketKey]) {
-        markets[marketKey] = {
-          name: marketKey,
-          address: marketAddress,
-          vendors: []
-        };
-      }
+      // If no markets in array, fall back to old single market field
+      const marketsToProcess = selectedMarkets.length > 0 
+        ? selectedMarkets 
+        : [submission.selected_market || submission.search_term || 'Unknown Market'];
       
-      markets[marketKey].vendors.push(submission);
+      // Add vendor to each market they're part of
+      marketsToProcess.forEach((marketName: string) => {
+        const marketKey = marketName;
+        const marketAddress = submission.market_address || 'Address not available';
+        
+        if (!markets[marketKey]) {
+          markets[marketKey] = {
+            name: marketKey,
+            address: marketAddress,
+            vendors: []
+          };
+        }
+        
+        markets[marketKey].vendors.push(submission);
+      });
     });
 
     return Object.values(markets);
