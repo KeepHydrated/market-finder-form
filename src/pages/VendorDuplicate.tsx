@@ -1031,13 +1031,14 @@ const VendorDuplicate = () => {
                   size="icon"
                   className="h-8 w-8 shrink-0"
                   onClick={() => {
-                    // Go back through navigation history
-                    if (marketNavigationHistory.length > 0) {
-                      const previousMarket = marketNavigationHistory[marketNavigationHistory.length - 1];
-                      switchToMarket(previousMarket, true);
+                    // Go backwards in navigation order
+                    if (currentPosition > 0) {
+                      const previousMarket = navigationMarketsOrder[currentPosition - 1];
+                      console.log('Navigating backwards to:', previousMarket);
+                      switchToMarket(previousMarket, false);
                     }
                   }}
-                  disabled={marketNavigationHistory.length === 0}
+                  disabled={currentPosition <= 0}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
