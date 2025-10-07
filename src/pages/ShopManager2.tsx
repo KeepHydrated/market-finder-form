@@ -494,20 +494,7 @@ export default function ShopManager() {
 
   const renderOverviewWithTabs = () => (
     <div className="space-y-6">
-      <Tabs defaultValue="analytics" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="preview">Preview</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="analytics" className="space-y-6 mt-6">
-          {renderTest()}
-        </TabsContent>
-        
-        <TabsContent value="preview" className="space-y-6 mt-6">
-          {renderPreview()}
-        </TabsContent>
-      </Tabs>
+      {renderTest()}
     </div>
   );
 
