@@ -750,6 +750,7 @@ const VendorDuplicate = () => {
     console.log('Switching to market:', marketName);
     setCurrentMarketIndex(index);
     setSelectedMarketName(marketName);
+    setActualSelectedMarket(null); // Clear the actual selected market to allow new market details to show
     
     // Fetch market details for the selected market
     try {
