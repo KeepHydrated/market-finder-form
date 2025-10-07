@@ -16,9 +16,11 @@ import { FarmersMarketSearch } from '@/components/FarmersMarketSearch';
 import { ShopSidebar } from '@/components/ShopSidebar';
 import { VendorOrders } from '@/components/VendorOrders';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Star } from 'lucide-react';
 
 interface ShopData {
   id: string;
@@ -476,7 +478,7 @@ export default function ShopManager() {
     console.log("Rendering content for section:", currentSection);
     switch (currentSection) {
       case 'overview':
-        return renderTest();
+        return shopData ? renderOverviewWithTabs() : renderShop();
       case 'products':
         return renderProducts();
       case 'orders':
@@ -484,9 +486,145 @@ export default function ShopManager() {
       case 'account':
         return renderAccount();
       default:
-        return renderTest();
+        return shopData ? renderOverviewWithTabs() : renderShop();
     }
   };
+
+  const renderOverviewWithTabs = () => (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Shop Overview</h2>
+        <p className="text-muted-foreground">Manage your shop and preview how it appears to customers</p>
+      </div>
+
+      <Tabs defaultValue="analytics" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="preview">Preview</TabsTrigger>
+          <TabsTrigger value="setup">Setup</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="analytics" className="space-y-6 mt-6">
+          {renderTest()}
+        </TabsContent>
+        
+        <TabsContent value="preview" className="space-y-6 mt-6">
+          {renderPreview()}
+        </TabsContent>
+        
+        <TabsContent value="setup" className="space-y-6 mt-6">
+          {renderShop()}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+
+  const renderPreview = () => (
+    <div className="space-y-6">
+      <Card>
+        <CardContent className="pt-8">
+          {/* Store Header */}
+          <div className="space-y-4">
+            <div className="flex items-start justify-between">
+              <h1 className="text-4xl font-bold">{formData.store_name || 'Your Store Name'}</h1>
+              {analytics.reviewCount > 0 && (
+                <div className="flex items-center gap-2">
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`h-5 w-5 ${
+                          star <= Math.round(analytics.averageRating)
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : 'text-gray-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xl font-semibold">{analytics.averageRating.toFixed(1)}</span>
+                  <span className="text-muted-foreground">({analytics.reviewCount})</span>
+                </div>
+              )}
+            </div>
+
+            {/* Specialty Badge */}
+            {formData.primary_specialty && (
+              <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-base px-4 py-1">
+                {formData.primary_specialty}
+              </Badge>
+            )}
+
+            {/* Description */}
+            {formData.description && (
+              <p className="text-muted-foreground text-lg">{formData.description}</p>
+            )}
+
+            {/* Website */}
+            {formData.website && (
+              <a 
+                href={formData.website} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-green-600 hover:text-green-700 text-lg font-medium inline-block"
+              >
+                {formData.website}
+              </a>
+            )}
+
+            {/* Markets */}
+            {selectedFarmersMarkets.length > 0 && (
+              <div className="pt-4 border-t">
+                <h3 className="font-semibold mb-2">Available at:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {selectedFarmersMarkets.map((market, index) => (
+                    <Badge key={index} variant="outline">
+                      {market.name}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Products */}
+      {products.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold">Products</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {products.map((product) => (
+              <Card key={product.id} className="overflow-hidden">
+                {product.images && product.images.length > 0 && (
+                  <img 
+                    src={product.images[0]} 
+                    alt={product.name}
+                    className="w-full h-48 object-cover"
+                  />
+                )}
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-lg">{product.name}</h3>
+                  <p className="text-muted-foreground text-sm mt-1 line-clamp-2">{product.description}</p>
+                  <p className="text-lg font-bold mt-2">${(product.price / 100).toFixed(2)}</p>
+                  {product.unit && (
+                    <p className="text-sm text-muted-foreground">per {product.unit}</p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {products.length === 0 && (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground">No products added yet. Add products in the Setup tab to see them here.</p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
 
 
   const renderShop = () => (
