@@ -1171,8 +1171,11 @@ const VendorDuplicate = () => {
                 onClick={() => {
                   setAcceptedSubmission(vendor);
                   setSelectedVendor(vendor);
-                  setSelectedMarketName(vendor.selected_market || '');
-                  setSelectedMarketAddress(vendor.market_address || '');
+                  // Preserve the current market being viewed, don't switch to vendor's default market
+                  if (!selectedMarketName) {
+                    setSelectedMarketName(vendor.selected_market || '');
+                    setSelectedMarketAddress(vendor.market_address || '');
+                  }
                   setMarketNavigationHistory([]); // Reset navigation history
                 }}
               >
