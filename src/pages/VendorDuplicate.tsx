@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -890,6 +890,27 @@ const VendorDuplicate = () => {
     );
   }
 
+  // Reorder markets so the currently selected market appears first
+  const reorderedMarkets = useMemo(() => {
+    if (!acceptedSubmission.selected_markets || !Array.isArray(acceptedSubmission.selected_markets)) {
+      return [];
+    }
+    
+    const markets = [...acceptedSubmission.selected_markets] as string[];
+    const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
+    
+    if (!currentMarket) return markets;
+    
+    // Find the current market and move it to the front
+    const currentIndex = markets.findIndex(m => m === currentMarket);
+    if (currentIndex > 0) {
+      const [market] = markets.splice(currentIndex, 1);
+      markets.unshift(market);
+    }
+    
+    return markets;
+  }, [acceptedSubmission.selected_markets, selectedMarketName, acceptedSubmission.selected_market]);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="flex">
@@ -983,16 +1004,16 @@ const VendorDuplicate = () => {
           </div>
 
           {/* Markets Navigation - Only show if viewing a vendor that sells at multiple markets */}
-          {selectedVendor && acceptedSubmission.selected_markets && Array.isArray(acceptedSubmission.selected_markets) && acceptedSubmission.selected_markets.length > 1 && (
+          {selectedVendor && reorderedMarkets.length > 1 && (
             <div className="mt-4 flex items-center justify-start gap-4">
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 shrink-0"
                 onClick={() => {
-                  if (currentMarketIndex > 0 && acceptedSubmission.selected_markets) {
+                  if (currentMarketIndex > 0) {
                     const newIndex = currentMarketIndex - 1;
-                    const marketName = (acceptedSubmission.selected_markets as string[])[newIndex];
+                    const marketName = reorderedMarkets[newIndex];
                     switchToMarket(marketName, newIndex);
                   }
                 }}
@@ -1006,13 +1027,13 @@ const VendorDuplicate = () => {
                 size="icon"
                 className="h-8 w-8 shrink-0"
                 onClick={() => {
-                  if (acceptedSubmission.selected_markets && Array.isArray(acceptedSubmission.selected_markets) && currentMarketIndex < acceptedSubmission.selected_markets.length - 1) {
+                  if (currentMarketIndex < reorderedMarkets.length - 1) {
                     const newIndex = currentMarketIndex + 1;
-                    const marketName = (acceptedSubmission.selected_markets as string[])[newIndex];
+                    const marketName = reorderedMarkets[newIndex];
                     switchToMarket(marketName, newIndex);
                   }
                 }}
-                disabled={!acceptedSubmission.selected_markets || !Array.isArray(acceptedSubmission.selected_markets) || currentMarketIndex === acceptedSubmission.selected_markets.length - 1}
+                disabled={currentMarketIndex === reorderedMarkets.length - 1}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -1132,7 +1153,10 @@ const VendorDuplicate = () => {
               <Card 
                 key={vendor.id}
                 className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
-                onClick={() => setSelectedVendor(vendor)}
+                onClick={() => {
+                  setSelectedVendor(vendor);
+                  setCurrentMarketIndex(0); // Reset to 0 since current market will be first
+                }}
               >
                 {/* Product Image */}
                 <div className="aspect-video bg-muted relative">
