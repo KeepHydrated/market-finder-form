@@ -1037,17 +1037,38 @@ const VendorDuplicate = () => {
                 className="h-8 w-8 shrink-0"
                 onClick={() => {
                   // Navigate forward through original market list
+                  if (!acceptedSubmission.selected_markets || !Array.isArray(acceptedSubmission.selected_markets)) {
+                    console.log('No selected_markets array found');
+                    return;
+                  }
+                  
                   const allMarkets = acceptedSubmission.selected_markets as string[];
-                  const currentIndex = allMarkets.indexOf(selectedMarketName || acceptedSubmission.selected_market);
-                  if (currentIndex < allMarkets.length - 1) {
+                  console.log('All markets:', allMarkets);
+                  console.log('Current selectedMarketName:', selectedMarketName);
+                  console.log('Fallback market:', acceptedSubmission.selected_market);
+                  
+                  const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
+                  const currentIndex = allMarkets.findIndex(m => m === currentMarket);
+                  
+                  console.log('Current market:', currentMarket);
+                  console.log('Current index:', currentIndex);
+                  
+                  if (currentIndex !== -1 && currentIndex < allMarkets.length - 1) {
                     const nextMarket = allMarkets[currentIndex + 1];
+                    console.log('Next market:', nextMarket);
                     switchToMarket(nextMarket, false);
+                  } else {
+                    console.log('Cannot navigate forward - at end or market not found');
                   }
                 }}
                 disabled={(() => {
+                  if (!acceptedSubmission.selected_markets || !Array.isArray(acceptedSubmission.selected_markets)) {
+                    return true;
+                  }
                   const allMarkets = acceptedSubmission.selected_markets as string[];
-                  const currentIndex = allMarkets.indexOf(selectedMarketName || acceptedSubmission.selected_market);
-                  return currentIndex >= allMarkets.length - 1;
+                  const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
+                  const currentIndex = allMarkets.findIndex(m => m === currentMarket);
+                  return currentIndex === -1 || currentIndex >= allMarkets.length - 1;
                 })()}
               >
                 <ChevronRight className="h-4 w-4" />
