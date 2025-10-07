@@ -93,6 +93,7 @@ const Homepage = () => {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [currentVendorProducts, setCurrentVendorProducts] = useState<any[]>([]);
+  const [marketAddressesMap, setMarketAddressesMap] = useState<Record<string, string>>({});
 
   // Handle category selection from URL and navigate to new page
   useEffect(() => {
@@ -657,7 +658,8 @@ const Homepage = () => {
       // Add vendor to each market they're part of
       marketsToProcess.forEach((marketName: string) => {
         const marketKey = marketName;
-        const marketAddress = submission.market_address || 'Address not available';
+        // Use the actual Google Maps address from the database, fallback to submission address
+        const marketAddress = marketAddressesMap[marketKey] || submission.market_address || 'Address not available';
         
         if (!markets[marketKey]) {
           markets[marketKey] = {
@@ -674,9 +676,35 @@ const Homepage = () => {
     return Object.values(markets);
   };
 
+  // Fetch all market addresses from the database
+  const fetchMarketAddresses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('markets')
+        .select('name, address');
+      
+      if (error) {
+        console.error('Error fetching market addresses:', error);
+        return;
+      }
+      
+      if (data) {
+        const addressMap: Record<string, string> = {};
+        data.forEach(market => {
+          addressMap[market.name] = market.address;
+        });
+        setMarketAddressesMap(addressMap);
+        console.log('📍 Loaded market addresses from database:', addressMap);
+      }
+    } catch (error) {
+      console.error('Error fetching market addresses:', error);
+    }
+  };
+
   useEffect(() => {
     console.log('🚀 Homepage useEffect running...');
     fetchAcceptedSubmissions();
+    fetchMarketAddresses();
     
     // Use IP-based location detection silently
     console.log('🌐 Starting IP location detection...');
