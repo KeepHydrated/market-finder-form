@@ -855,6 +855,68 @@ export default function ShopManager() {
           </div>
         </CardContent>
       </Card>
+
+      <Card className="border-destructive">
+        <CardHeader>
+          <CardTitle className="text-destructive">Danger Zone</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between p-4 border border-destructive rounded-lg">
+            <div>
+              <h3 className="font-medium">Delete Store</h3>
+              <p className="text-sm text-muted-foreground">
+                Permanently delete your store and all associated data
+              </p>
+            </div>
+            <Button 
+              variant="destructive"
+              onClick={async () => {
+                if (!confirm('Are you sure you want to delete your store? This action cannot be undone and will remove all your products, orders, and store information.')) {
+                  return;
+                }
+                
+                if (!user || !shopData) return;
+                
+                try {
+                  const { error } = await supabase
+                    .from('submissions')
+                    .delete()
+                    .eq('id', shopData.id)
+                    .eq('user_id', user.id);
+
+                  if (error) throw error;
+                  
+                  setShopData(null);
+                  setProducts([]);
+                  setSelectedFarmersMarkets([]);
+                  setFormData({
+                    store_name: '',
+                    primary_specialty: '',
+                    website: '',
+                    description: '',
+                  });
+                  
+                  toast({
+                    title: "Store Deleted",
+                    description: "Your store has been permanently deleted",
+                  });
+                  
+                  navigate('/submit?section=setup');
+                } catch (error) {
+                  console.error('Error deleting store:', error);
+                  toast({
+                    title: "Delete Failed",
+                    description: "Failed to delete your store",
+                    variant: "destructive",
+                  });
+                }
+              }}
+            >
+              Delete Store
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 
