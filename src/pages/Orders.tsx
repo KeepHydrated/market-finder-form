@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Package, Calendar, Store, DollarSign } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Package, Calendar, Store, DollarSign, Mail, Phone } from "lucide-react";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useToast } from "@/hooks/use-toast";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
@@ -30,6 +31,14 @@ interface Order {
   status: string;
   created_at: string;
   order_items: OrderItem[];
+  tracking_number?: string;
+  tracking_carrier?: string;
+  tracking_url?: string;
+  estimated_delivery_date?: string;
+  ship_from_city?: string;
+  ship_from_state?: string;
+  ship_to_city?: string;
+  ship_to_state?: string;
 }
 
 const Orders = () => {
@@ -42,6 +51,9 @@ const Orders = () => {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [selectedVendorId, setSelectedVendorId] = useState<string | null>(null);
   const [selectedVendorName, setSelectedVendorName] = useState<string | null>(null);
+  const [showHelpDialog, setShowHelpDialog] = useState(false);
+  const [showReceiptDialog, setShowReceiptDialog] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -64,6 +76,14 @@ const Orders = () => {
           email,
           status,
           created_at,
+          tracking_number,
+          tracking_carrier,
+          tracking_url,
+          estimated_delivery_date,
+          ship_from_city,
+          ship_from_state,
+          ship_to_city,
+          ship_to_state,
           order_items (
             id,
             product_name,
@@ -188,6 +208,48 @@ const Orders = () => {
     setSelectedProduct(product);
     setSelectedVendorId(vendorId);
     setSelectedVendorName(vendorName);
+  };
+
+  const handleTrackPackage = (order: Order) => {
+    if (order.tracking_url) {
+      window.open(order.tracking_url, '_blank');
+    } else if (order.tracking_number && order.tracking_carrier) {
+      // Generate tracking URLs based on carrier
+      let trackingUrl = '';
+      switch (order.tracking_carrier.toLowerCase()) {
+        case 'usps':
+          trackingUrl = `https://tools.usps.com/go/TrackConfirmAction?tLabels=${order.tracking_number}`;
+          break;
+        case 'ups':
+          trackingUrl = `https://www.ups.com/track?tracknum=${order.tracking_number}`;
+          break;
+        case 'fedex':
+          trackingUrl = `https://www.fedex.com/fedextrack/?trknbr=${order.tracking_number}`;
+          break;
+        default:
+          toast({
+            title: "Tracking Number Available",
+            description: `Tracking #: ${order.tracking_number} (${order.tracking_carrier})`,
+          });
+          return;
+      }
+      window.open(trackingUrl, '_blank');
+    } else {
+      toast({
+        title: "Tracking Not Available",
+        description: "Tracking information will be updated once the order ships.",
+      });
+    }
+  };
+
+  const handleHelpWithOrder = (order: Order) => {
+    setSelectedOrder(order);
+    setShowHelpDialog(true);
+  };
+
+  const handleViewReceipt = (order: Order) => {
+    setSelectedOrder(order);
+    setShowReceiptDialog(true);
   };
 
   if (!user) {
@@ -323,22 +385,46 @@ const Orders = () => {
 
               <div className="flex flex-col gap-3">
                 <div>
-                  <h3 className="text-lg font-serif mb-1">Arriving Friday, October 3rd</h3>
-                  <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
-                  <p className="text-xs">
-                    From <span className="font-medium">GLENDALE, AZ</span> To{" "}
-                    <span className="font-medium underline">San Antonio</span>
-                  </p>
+                  {order.estimated_delivery_date ? (
+                    <h3 className="text-lg font-serif mb-1">
+                      Arriving {new Date(order.estimated_delivery_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                    </h3>
+                  ) : (
+                    <h3 className="text-lg font-serif mb-1">Preparing for shipment</h3>
+                  )}
+                  {order.tracking_carrier && (
+                    <p className="text-xs mb-0.5">Estimated arrival from {order.tracking_carrier}</p>
+                  )}
+                  {order.ship_from_city && order.ship_to_city && (
+                    <p className="text-xs">
+                      From <span className="font-medium">{order.ship_from_city}, {order.ship_from_state}</span> To{" "}
+                      <span className="font-medium underline">{order.ship_to_city}</span>
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Button size="sm" className="w-full rounded-full">
+                  <Button 
+                    size="sm" 
+                    className="w-full rounded-full"
+                    onClick={() => handleTrackPackage(order)}
+                  >
                     Track package
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full rounded-full">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full rounded-full"
+                    onClick={() => handleHelpWithOrder(order)}
+                  >
                     Help with order
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full rounded-full">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full rounded-full"
+                    onClick={() => handleViewReceipt(order)}
+                  >
                     View receipt
                   </Button>
                 </div>
@@ -364,6 +450,119 @@ const Orders = () => {
           hideVendorName={false}
         />
       )}
+
+      {/* Help Dialog */}
+      <Dialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Need Help with Your Order?</DialogTitle>
+            <DialogDescription>
+              We're here to assist you with any questions or concerns about your order.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedOrder && (
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold mb-2">Order Information</h4>
+                <p className="text-sm text-muted-foreground">Order ID: {selectedOrder.id}</p>
+                <p className="text-sm text-muted-foreground">Store: {selectedOrder.vendor_name}</p>
+                <p className="text-sm text-muted-foreground">Date: {formatDate(selectedOrder.created_at)}</p>
+              </div>
+              
+              <Separator />
+              
+              <div>
+                <h4 className="font-semibold mb-2">Contact Options</h4>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      window.location.href = `mailto:support@farmersmarket.com?subject=Order ${selectedOrder.id}`;
+                    }}
+                  >
+                    <Mail className="h-4 w-4 mr-2" />
+                    Email Support
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      toast({
+                        title: "Contact Store",
+                        description: "Please contact the store directly for order-specific questions.",
+                      });
+                    }}
+                  >
+                    <Store className="h-4 w-4 mr-2" />
+                    Contact Store
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Receipt Dialog */}
+      <Dialog open={showReceiptDialog} onOpenChange={setShowReceiptDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Order Receipt</DialogTitle>
+            <DialogDescription>
+              Receipt for order #{selectedOrder?.id.slice(0, 8)}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedOrder && (
+            <div className="space-y-4">
+              <div className="text-center py-4 border-b">
+                <h3 className="font-bold text-lg">{selectedOrder.vendor_name}</h3>
+                <p className="text-sm text-muted-foreground">{formatDate(selectedOrder.created_at)}</p>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-semibold text-sm">Items</h4>
+                {selectedOrder.order_items.map((item) => (
+                  <div key={item.id} className="flex justify-between text-sm">
+                    <span>
+                      {item.quantity}x {item.product_name}
+                    </span>
+                    <span>{formatPrice(item.total_price)}</span>
+                  </div>
+                ))}
+              </div>
+
+              <Separator />
+
+              <div className="space-y-1">
+                <div className="flex justify-between text-sm">
+                  <span>Subtotal</span>
+                  <span>{formatPrice(selectedOrder.total_amount)}</span>
+                </div>
+                <div className="flex justify-between font-bold">
+                  <span>Total</span>
+                  <span>{formatPrice(selectedOrder.total_amount)}</span>
+                </div>
+              </div>
+
+              <div className="text-xs text-muted-foreground border-t pt-4">
+                <p>Order ID: {selectedOrder.id}</p>
+                <p>Email: {selectedOrder.email}</p>
+                <p>Status: {selectedOrder.status}</p>
+              </div>
+
+              <Button
+                className="w-full"
+                onClick={() => {
+                  window.print();
+                }}
+              >
+                Print Receipt
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -187,11 +187,19 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          estimated_delivery_date: string | null
           id: string
+          ship_from_city: string | null
+          ship_from_state: string | null
+          ship_to_city: string | null
+          ship_to_state: string | null
           status: string
           stripe_checkout_session_id: string | null
           stripe_payment_intent_id: string | null
           total_amount: number
+          tracking_carrier: string | null
+          tracking_number: string | null
+          tracking_url: string | null
           updated_at: string
           user_id: string | null
           vendor_id: string
@@ -200,11 +208,19 @@ export type Database = {
         Insert: {
           created_at?: string
           email: string
+          estimated_delivery_date?: string | null
           id?: string
+          ship_from_city?: string | null
+          ship_from_state?: string | null
+          ship_to_city?: string | null
+          ship_to_state?: string | null
           status?: string
           stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
           total_amount: number
+          tracking_carrier?: string | null
+          tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
           user_id?: string | null
           vendor_id: string
@@ -213,11 +229,19 @@ export type Database = {
         Update: {
           created_at?: string
           email?: string
+          estimated_delivery_date?: string | null
           id?: string
+          ship_from_city?: string | null
+          ship_from_state?: string | null
+          ship_to_city?: string | null
+          ship_to_state?: string | null
           status?: string
           stripe_checkout_session_id?: string | null
           stripe_payment_intent_id?: string | null
           total_amount?: number
+          tracking_carrier?: string | null
+          tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
           user_id?: string | null
           vendor_id?: string
