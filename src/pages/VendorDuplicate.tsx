@@ -983,8 +983,10 @@ const VendorDuplicate = () => {
                   size="icon"
                   className="h-8 w-8 shrink-0"
                   onClick={() => {
-                    if (currentMarketIndex > 0) {
-                      setCurrentMarketIndex(prev => prev - 1);
+                    if (currentMarketIndex > 0 && acceptedSubmission.selected_markets) {
+                      const newIndex = currentMarketIndex - 1;
+                      const marketName = (acceptedSubmission.selected_markets as string[])[newIndex];
+                      switchToMarket(marketName, newIndex);
                       if (marketsScrollRef.current) {
                         const scrollAmount = marketsScrollRef.current.clientWidth;
                         marketsScrollRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
@@ -1028,7 +1030,9 @@ const VendorDuplicate = () => {
                   className="h-8 w-8 shrink-0"
                   onClick={() => {
                     if (acceptedSubmission.selected_markets && Array.isArray(acceptedSubmission.selected_markets) && currentMarketIndex < acceptedSubmission.selected_markets.length - 1) {
-                      setCurrentMarketIndex(prev => prev + 1);
+                      const newIndex = currentMarketIndex + 1;
+                      const marketName = (acceptedSubmission.selected_markets as string[])[newIndex];
+                      switchToMarket(marketName, newIndex);
                       if (marketsScrollRef.current) {
                         const scrollAmount = marketsScrollRef.current.clientWidth;
                         marketsScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
