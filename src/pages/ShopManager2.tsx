@@ -494,11 +494,6 @@ export default function ShopManager() {
 
   const renderOverviewWithTabs = () => (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Shop Overview</h2>
-        <p className="text-muted-foreground">Manage your shop and preview how it appears to customers</p>
-      </div>
-
       <Tabs defaultValue="analytics" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
