@@ -317,6 +317,27 @@ const VendorDuplicate = () => {
     }
   }, [selectedVendor, user]);
 
+  // Reorder markets so the currently selected market appears first
+  const reorderedMarkets = useMemo(() => {
+    if (!acceptedSubmission?.selected_markets || !Array.isArray(acceptedSubmission.selected_markets)) {
+      return [];
+    }
+    
+    const markets = [...acceptedSubmission.selected_markets] as string[];
+    const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
+    
+    if (!currentMarket) return markets;
+    
+    // Find the current market and move it to the front
+    const currentIndex = markets.findIndex(m => m === currentMarket);
+    if (currentIndex > 0) {
+      const [market] = markets.splice(currentIndex, 1);
+      markets.unshift(market);
+    }
+    
+    return markets;
+  }, [acceptedSubmission?.selected_markets, acceptedSubmission?.selected_market, selectedMarketName]);
+
   const fetchVendorById = async (vendorId: string) => {
     setLoadingData(true);
     try {
@@ -889,27 +910,6 @@ const VendorDuplicate = () => {
       </div>
     );
   }
-
-  // Reorder markets so the currently selected market appears first
-  const reorderedMarkets = useMemo(() => {
-    if (!acceptedSubmission.selected_markets || !Array.isArray(acceptedSubmission.selected_markets)) {
-      return [];
-    }
-    
-    const markets = [...acceptedSubmission.selected_markets] as string[];
-    const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
-    
-    if (!currentMarket) return markets;
-    
-    // Find the current market and move it to the front
-    const currentIndex = markets.findIndex(m => m === currentMarket);
-    if (currentIndex > 0) {
-      const [market] = markets.splice(currentIndex, 1);
-      markets.unshift(market);
-    }
-    
-    return markets;
-  }, [JSON.stringify(acceptedSubmission.selected_markets), selectedMarketName, acceptedSubmission.selected_market]);
 
   return (
     <div className="min-h-screen bg-background">
