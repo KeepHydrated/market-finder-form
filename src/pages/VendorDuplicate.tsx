@@ -884,7 +884,7 @@ const VendorDuplicate = () => {
                 className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors"
                 onClick={() => setSelectedVendor(null)}
               >
-                {acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
+                {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
               </span>
             </div>
             {/* Heart icon */}
