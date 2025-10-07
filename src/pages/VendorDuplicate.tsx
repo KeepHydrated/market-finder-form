@@ -99,6 +99,8 @@ const VendorDuplicate = () => {
   const [cachedMarketCoordinates, setCachedMarketCoordinates] = useState<{lat: number; lng: number} | null>(null);
   const [currentMarketIndex, setCurrentMarketIndex] = useState(0);
   const marketsScrollRef = useRef<HTMLDivElement>(null);
+  const [selectedMarketName, setSelectedMarketName] = useState<string>('');
+  const [selectedMarketAddress, setSelectedMarketAddress] = useState<string>('');
 
   useEffect(() => {
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
@@ -683,8 +685,8 @@ const VendorDuplicate = () => {
   const fetchMarketOpeningHours = async () => {
     console.log('fetchMarketOpeningHours called with acceptedSubmission:', acceptedSubmission);
     
-    const marketQuery = acceptedSubmission?.selected_market || acceptedSubmission?.search_term;
-    console.log('Market query (selected_market || search_term):', marketQuery);
+    const marketQuery = selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term;
+    console.log('Market query (selectedMarketName || selected_market || search_term):', marketQuery);
     
     if (!marketQuery) {
       console.log('No market query found, skipping API call');
@@ -714,11 +716,50 @@ const VendorDuplicate = () => {
           rating: market.rating,
           reviewCount: market.user_ratings_total
         });
+        
+        // Update the selected market address if not already set
+        if (!selectedMarketAddress) {
+          setSelectedMarketAddress(market.address);
+        }
       } else {
         console.log('No market predictions found in response:', response.data);
       }
     } catch (error) {
       console.error('Error fetching market opening hours:', error);
+    }
+  };
+
+  const switchToMarket = async (marketName: string, index: number) => {
+    console.log('Switching to market:', marketName);
+    setCurrentMarketIndex(index);
+    setSelectedMarketName(marketName);
+    
+    // Fetch market details for the selected market
+    try {
+      const response = await supabase.functions.invoke('farmers-market-search', {
+        body: { 
+          query: marketName,
+          location: null 
+        }
+      });
+
+      if (response.data?.predictions && response.data.predictions.length > 0) {
+        const market = response.data.predictions[0];
+        console.log('New market data:', market);
+        
+        setMarketOpeningHours(market.opening_hours);
+        setMarketReviews({
+          rating: market.rating,
+          reviewCount: market.user_ratings_total
+        });
+        setSelectedMarketAddress(market.address);
+        
+        // Reset distance since we changed markets
+        setDistance('');
+        setIsLoadingDistance(false);
+      }
+    } catch (error) {
+      console.error('Error fetching market details:', error);
     }
   };
 
@@ -875,7 +916,7 @@ const VendorDuplicate = () => {
             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div>
               <p className="text-muted-foreground text-base font-normal">
-                {cleanAddress(acceptedSubmission.market_address)}
+                {cleanAddress(selectedMarketAddress || acceptedSubmission.market_address)}
               </p>
               {distance && (
                 <div className="flex items-center gap-1 mt-1">
@@ -953,6 +994,7 @@ const VendorDuplicate = () => {
                     {(acceptedSubmission.selected_markets as string[]).map((market, index) => (
                       <div
                         key={index}
+                        onClick={() => switchToMarket(market, index)}
                         className={cn(
                           "flex-shrink-0 px-3 py-2 rounded-lg border transition-all cursor-pointer",
                           index === currentMarketIndex 
