@@ -102,6 +102,7 @@ const VendorDuplicate = () => {
   const [selectedMarketName, setSelectedMarketName] = useState<string>('');
   const [selectedMarketAddress, setSelectedMarketAddress] = useState<string>('');
   const [actualSelectedMarket, setActualSelectedMarket] = useState<{ name: string; address: string } | null>(null);
+  const [marketNavigationHistory, setMarketNavigationHistory] = useState<string[]>([]);
 
   useEffect(() => {
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
@@ -767,11 +768,20 @@ const VendorDuplicate = () => {
     }
   };
 
-  const switchToMarket = async (marketName: string, index: number) => {
-    console.log('Switching to market:', marketName);
+  const switchToMarket = async (marketName: string, index: number, isBackward = false) => {
+    console.log('Switching to market:', marketName, 'isBackward:', isBackward);
     setCurrentMarketIndex(index);
     setSelectedMarketName(marketName);
     setActualSelectedMarket(null); // Clear the actual selected market to allow new market details to show
+    
+    // Update navigation history
+    if (!isBackward) {
+      // Going forward - add to history
+      setMarketNavigationHistory(prev => [...prev, marketName]);
+    } else {
+      // Going backward - remove last from history
+      setMarketNavigationHistory(prev => prev.slice(0, -1));
+    }
     
     // Fetch market details for the selected market
     try {
@@ -1011,13 +1021,16 @@ const VendorDuplicate = () => {
                 size="icon"
                 className="h-8 w-8 shrink-0"
                 onClick={() => {
-                  if (currentMarketIndex > 0) {
-                    const newIndex = currentMarketIndex - 1;
-                    const marketName = reorderedMarkets[newIndex];
-                    switchToMarket(marketName, newIndex);
+                  // Go back through navigation history
+                  if (marketNavigationHistory.length > 0) {
+                    const previousMarket = marketNavigationHistory[marketNavigationHistory.length - 1];
+                    const previousIndex = reorderedMarkets.indexOf(previousMarket);
+                    if (previousIndex !== -1) {
+                      switchToMarket(previousMarket, previousIndex, true);
+                    }
                   }
                 }}
-                disabled={currentMarketIndex === 0}
+                disabled={marketNavigationHistory.length === 0}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -1030,7 +1043,7 @@ const VendorDuplicate = () => {
                   if (currentMarketIndex < reorderedMarkets.length - 1) {
                     const newIndex = currentMarketIndex + 1;
                     const marketName = reorderedMarkets[newIndex];
-                    switchToMarket(marketName, newIndex);
+                    switchToMarket(marketName, newIndex, false);
                   }
                 }}
                 disabled={currentMarketIndex === reorderedMarkets.length - 1}
@@ -1156,6 +1169,7 @@ const VendorDuplicate = () => {
                 onClick={() => {
                   setSelectedVendor(vendor);
                   setCurrentMarketIndex(0); // Reset to 0 since current market will be first
+                  setMarketNavigationHistory([]); // Reset navigation history
                 }}
               >
                 {/* Product Image */}
