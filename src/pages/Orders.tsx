@@ -283,14 +283,6 @@ const Orders = () => {
                             >
                               {item.product_name}
                             </button>
-                            {item.product_description && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {item.product_description}
-                              </p>
-                            )}
-                            <p className="text-lg font-semibold text-muted-foreground mt-1">
-                              {formatPrice(item.unit_price)}
-                            </p>
                             {item.quantity > 1 && (
                               <p className="text-sm text-muted-foreground">
                                 Quantity: {item.quantity}
