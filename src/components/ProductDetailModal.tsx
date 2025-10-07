@@ -243,7 +243,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
               
               <div className="space-y-3 flex-1">
                 <div>
-                  <span className="text-xl font-bold text-green-600">
+                  <span className="text-xl font-bold text-muted-foreground">
                     ${product.price.toFixed(2)}
                   </span>
                 </div>
