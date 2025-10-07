@@ -101,6 +101,7 @@ const VendorDuplicate = () => {
   const marketsScrollRef = useRef<HTMLDivElement>(null);
   const [selectedMarketName, setSelectedMarketName] = useState<string>('');
   const [selectedMarketAddress, setSelectedMarketAddress] = useState<string>('');
+  const [actualSelectedMarket, setActualSelectedMarket] = useState<{ name: string; address: string } | null>(null);
 
   useEffect(() => {
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
@@ -152,8 +153,13 @@ const VendorDuplicate = () => {
       if (type === 'vendor' && selectedVendor) {
         setAcceptedSubmission(selectedVendor);
         setSelectedVendor(selectedVendor);
+        setActualSelectedMarket(null); // Clear market selection when viewing vendor
       } else if (type === 'market' && selectedMarket) {
-        // For market view, use the first vendor as the market representative
+        // For market view, store the actual market information
+        setActualSelectedMarket({ name: selectedMarket.name, address: selectedMarket.address });
+        setSelectedMarketName(selectedMarket.name);
+        setSelectedMarketAddress(selectedMarket.address);
+        // Use the first vendor as the market representative for fetching hours/reviews
         setAcceptedSubmission(selectedMarket.vendors[0]);
         setSelectedVendor(null); // Start with vendor grid view
       }
@@ -166,13 +172,14 @@ const VendorDuplicate = () => {
 
   // Initialize selectedMarketName when acceptedSubmission loads
   useEffect(() => {
-    if (acceptedSubmission && !selectedMarketName) {
+    // Only initialize from acceptedSubmission if we don't have an actual selected market from navigation
+    if (acceptedSubmission && !selectedMarketName && !actualSelectedMarket) {
       const initialMarket = acceptedSubmission.selected_market || acceptedSubmission.search_term || '';
       const initialAddress = acceptedSubmission.market_address || '';
       setSelectedMarketName(initialMarket);
       setSelectedMarketAddress(initialAddress);
     }
-  }, [acceptedSubmission]);
+  }, [acceptedSubmission, actualSelectedMarket]);
 
   const fetchVendorReviews = async () => {
     if (!acceptedSubmission?.id) {
