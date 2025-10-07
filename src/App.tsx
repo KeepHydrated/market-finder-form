@@ -4,7 +4,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { GlobalHeader } from "@/components/GlobalHeader";
-import { Footer } from "@/components/Footer";
 import { ShoppingCartProvider } from "@/contexts/ShoppingCartContext";
 import { ShoppingCart } from "@/components/shopping/ShoppingCart";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -61,7 +60,6 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
-            <Footer />
           </div>
         </BrowserRouter>
       </ShoppingCartProvider>
