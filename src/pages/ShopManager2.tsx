@@ -608,45 +608,45 @@ export default function ShopManager() {
 
   const renderShop = () => (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Shop Setup</h2>
-        <p className="text-muted-foreground">Configure your farmers market shop details</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Shop Setup</h2>
+          <p className="text-muted-foreground">Configure your farmers market shop details</p>
+        </div>
+        {shopData && (
+          <Button
+            variant="outline"
+            onClick={async () => {
+              if (isEditMode) {
+                if (currentSection === 'shop') {
+                  isSavingRef.current = true;
+                }
+                await handleSubmit();
+                setIsEditMode(false);
+              } else {
+                setOriginalFormData({ ...formData });
+                setIsEditMode(true);
+              }
+            }}
+            disabled={isSubmitting}
+          >
+            {isEditMode ? (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                {isSubmitting ? 'Saving...' : 'Save'}
+              </>
+            ) : (
+              <>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </>
+            )}
+          </Button>
+        )}
       </div>
       
       <Card>
-        <CardHeader className="flex flex-row items-center justify-end pb-4">
-          {shopData && (
-            <Button
-              variant="outline"
-              onClick={async () => {
-                if (isEditMode) {
-                  if (currentSection === 'shop') {
-                    isSavingRef.current = true;
-                  }
-                  await handleSubmit();
-                  setIsEditMode(false);
-                } else {
-                  setOriginalFormData({ ...formData });
-                  setIsEditMode(true);
-                }
-              }}
-              disabled={isSubmitting}
-            >
-              {isEditMode ? (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  {isSubmitting ? 'Saving...' : 'Save'}
-                </>
-              ) : (
-                <>
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit
-                </>
-              )}
-            </Button>
-          )}
-        </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-6">
           <div className="space-y-2">
             <Label>Which farmers markets do you sell at? (Up to 3) *</Label>
             <FarmersMarketSearch 
