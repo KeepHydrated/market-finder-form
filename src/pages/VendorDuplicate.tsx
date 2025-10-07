@@ -833,7 +833,7 @@ const VendorDuplicate = () => {
       <div className="flex">
         {/* Left column - sticky, non-scrolling */}
         <div className="w-96 h-[calc(100vh-4rem)] sticky top-0 bg-green-50 border-r overflow-hidden">
-        <div className="space-y-6 px-4 pt-6 pb-6 h-full flex flex-col justify-start">
+        <div className="space-y-6 px-4 pt-6 pb-0 h-full flex flex-col justify-start">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span 
