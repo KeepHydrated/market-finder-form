@@ -1036,29 +1036,20 @@ const VendorDuplicate = () => {
                 size="icon"
                 className="h-8 w-8 shrink-0"
                 onClick={() => {
-                  // Navigate forward through original market list
                   if (!acceptedSubmission.selected_markets || !Array.isArray(acceptedSubmission.selected_markets)) {
-                    console.log('No selected_markets array found');
                     return;
                   }
                   
                   const allMarkets = acceptedSubmission.selected_markets as string[];
-                  console.log('All markets:', allMarkets);
-                  console.log('Current selectedMarketName:', selectedMarketName);
-                  console.log('Fallback market:', acceptedSubmission.selected_market);
-                  
                   const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
                   const currentIndex = allMarkets.findIndex(m => m === currentMarket);
                   
-                  console.log('Current market:', currentMarket);
-                  console.log('Current index:', currentIndex);
+                  console.log('Forward click - Current market:', currentMarket, 'Index:', currentIndex, 'All markets:', allMarkets);
                   
                   if (currentIndex !== -1 && currentIndex < allMarkets.length - 1) {
                     const nextMarket = allMarkets[currentIndex + 1];
-                    console.log('Next market:', nextMarket);
+                    console.log('Navigating to:', nextMarket);
                     switchToMarket(nextMarket, false);
-                  } else {
-                    console.log('Cannot navigate forward - at end or market not found');
                   }
                 }}
                 disabled={(() => {
@@ -1192,21 +1183,24 @@ const VendorDuplicate = () => {
                 onClick={() => {
                   setAcceptedSubmission(vendor);
                   setSelectedVendor(vendor);
-                  // Find and set the current market if it exists in vendor's markets
+                  // Check if current market exists in vendor's market list
                   if (selectedMarketName && vendor.selected_markets && Array.isArray(vendor.selected_markets)) {
-                    const marketExists = (vendor.selected_markets as string[]).find(m => 
-                      m.toLowerCase().includes(selectedMarketName.toLowerCase()) || 
-                      selectedMarketName.toLowerCase().includes(m.toLowerCase())
-                    );
-                    if (marketExists) {
-                      setSelectedMarketName(marketExists);
+                    const vendorMarkets = vendor.selected_markets as string[];
+                    // Use exact match to find if this vendor sells at the current market
+                    if (vendorMarkets.includes(selectedMarketName)) {
+                      // Keep the current market selected
+                      console.log('Keeping current market:', selectedMarketName);
                     } else {
+                      // Vendor doesn't sell at this market, use their primary market
                       setSelectedMarketName(vendor.selected_market || '');
                       setSelectedMarketAddress(vendor.market_address || '');
+                      console.log('Switching to vendor primary market:', vendor.selected_market);
                     }
-                  } else if (!selectedMarketName) {
+                  } else {
+                    // No current market, use vendor's primary market
                     setSelectedMarketName(vendor.selected_market || '');
                     setSelectedMarketAddress(vendor.market_address || '');
+                    console.log('Using vendor primary market:', vendor.selected_market);
                   }
                   setMarketNavigationHistory([]); // Reset navigation history
                 }}
