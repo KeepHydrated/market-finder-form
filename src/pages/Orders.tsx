@@ -281,11 +281,21 @@ const Orders = () => {
                               onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
                               className="font-medium text-left hover:underline focus:outline-none focus:underline"
                             >
-                              {item.quantity > 1 && (
-                                <span className="text-muted-foreground mr-2">(x {item.quantity})</span>
-                              )}
                               {item.product_name}
                             </button>
+                            {item.product_description && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {item.product_description}
+                              </p>
+                            )}
+                            <p className="text-lg font-semibold text-green-600 mt-1">
+                              {formatPrice(item.unit_price)}
+                            </p>
+                            {item.quantity > 1 && (
+                              <p className="text-sm text-muted-foreground">
+                                Quantity: {item.quantity}
+                              </p>
+                            )}
                           </div>
                         </div>
                         <div className="text-right ml-4">
