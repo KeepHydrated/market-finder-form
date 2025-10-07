@@ -974,76 +974,40 @@ const VendorDuplicate = () => {
             </div>
           </div>
 
-          {/* Markets Carousel - Only show if vendor sells at multiple markets */}
+          {/* Markets Navigation - Only show if vendor sells at multiple markets */}
           {acceptedSubmission.selected_markets && Array.isArray(acceptedSubmission.selected_markets) && acceptedSubmission.selected_markets.length > 1 && (
-            <div className="mt-4 relative">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 shrink-0"
-                  onClick={() => {
-                    if (currentMarketIndex > 0 && acceptedSubmission.selected_markets) {
-                      const newIndex = currentMarketIndex - 1;
-                      const marketName = (acceptedSubmission.selected_markets as string[])[newIndex];
-                      switchToMarket(marketName, newIndex);
-                      if (marketsScrollRef.current) {
-                        const scrollAmount = marketsScrollRef.current.clientWidth;
-                        marketsScrollRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-                      }
-                    }
-                  }}
-                  disabled={currentMarketIndex === 0}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                
-                <div 
-                  ref={marketsScrollRef}
-                  className="flex-1 overflow-x-hidden"
-                >
-                  <div className="flex gap-2 transition-transform duration-300">
-                    {(acceptedSubmission.selected_markets as string[]).map((market, index) => (
-                      <div
-                        key={index}
-                        onClick={() => switchToMarket(market, index)}
-                        className={cn(
-                          "flex-shrink-0 px-3 py-2 rounded-lg border transition-all cursor-pointer",
-                          index === currentMarketIndex 
-                            ? "bg-primary/10 border-primary" 
-                            : "bg-muted/50 border-muted hover:border-muted-foreground/50"
-                        )}
-                        style={{ width: '100%' }}
-                      >
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-3 w-3 text-muted-foreground shrink-0" />
-                          <span className="text-sm font-medium truncate">{market}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+            <div className="mt-4 flex items-center justify-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0"
+                onClick={() => {
+                  if (currentMarketIndex > 0 && acceptedSubmission.selected_markets) {
+                    const newIndex = currentMarketIndex - 1;
+                    const marketName = (acceptedSubmission.selected_markets as string[])[newIndex];
+                    switchToMarket(marketName, newIndex);
+                  }
+                }}
+                disabled={currentMarketIndex === 0}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 shrink-0"
-                  onClick={() => {
-                    if (acceptedSubmission.selected_markets && Array.isArray(acceptedSubmission.selected_markets) && currentMarketIndex < acceptedSubmission.selected_markets.length - 1) {
-                      const newIndex = currentMarketIndex + 1;
-                      const marketName = (acceptedSubmission.selected_markets as string[])[newIndex];
-                      switchToMarket(marketName, newIndex);
-                      if (marketsScrollRef.current) {
-                        const scrollAmount = marketsScrollRef.current.clientWidth;
-                        marketsScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-                      }
-                    }
-                  }}
-                  disabled={!acceptedSubmission.selected_markets || !Array.isArray(acceptedSubmission.selected_markets) || currentMarketIndex === acceptedSubmission.selected_markets.length - 1}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0"
+                onClick={() => {
+                  if (acceptedSubmission.selected_markets && Array.isArray(acceptedSubmission.selected_markets) && currentMarketIndex < acceptedSubmission.selected_markets.length - 1) {
+                    const newIndex = currentMarketIndex + 1;
+                    const marketName = (acceptedSubmission.selected_markets as string[])[newIndex];
+                    switchToMarket(marketName, newIndex);
+                  }
+                }}
+                disabled={!acceptedSubmission.selected_markets || !Array.isArray(acceptedSubmission.selected_markets) || currentMarketIndex === acceptedSubmission.selected_markets.length - 1}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
           )}
         </div>
