@@ -288,7 +288,7 @@ const Orders = () => {
                                 {item.product_description}
                               </p>
                             )}
-                            <p className="text-lg font-semibold text-green-600 mt-1">
+                            <p className="text-lg font-semibold text-muted-foreground mt-1">
                               {formatPrice(item.unit_price)}
                             </p>
                             {item.quantity > 1 && (
