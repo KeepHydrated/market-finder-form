@@ -103,6 +103,7 @@ const VendorDuplicate = () => {
   const [selectedMarketAddress, setSelectedMarketAddress] = useState<string>('');
   const [actualSelectedMarket, setActualSelectedMarket] = useState<{ name: string; address: string } | null>(null);
   const [marketNavigationHistory, setMarketNavigationHistory] = useState<string[]>([]);
+  const [navigationMarketsOrder, setNavigationMarketsOrder] = useState<string[]>([]);
 
   useEffect(() => {
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
@@ -1013,27 +1014,15 @@ const VendorDuplicate = () => {
           </div>
 
           {/* Markets Navigation - Only show if viewing a vendor that sells at multiple markets */}
-          {selectedVendor && acceptedSubmission?.selected_markets && Array.isArray(acceptedSubmission.selected_markets) && acceptedSubmission.selected_markets.length > 1 && (() => {
-            // Create reordered markets with current market first
-            const allMarkets = [...(acceptedSubmission.selected_markets as string[])];
+          {selectedVendor && navigationMarketsOrder.length > 1 && (() => {
             const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
-            const currentIdx = allMarkets.findIndex(m => m === currentMarket);
-            
-            // Move current market to the front
-            if (currentIdx > 0) {
-              const [market] = allMarkets.splice(currentIdx, 1);
-              allMarkets.unshift(market);
-            }
+            const currentPosition = navigationMarketsOrder.indexOf(currentMarket);
             
             console.log('Navigation Debug:', {
-              originalMarkets: acceptedSubmission.selected_markets,
-              reorderedMarkets: allMarkets,
+              navigationMarketsOrder,
               currentMarket,
-              originalIndex: currentIdx
+              currentPosition
             });
-            
-            // Track position in reordered array
-            const currentPosition = allMarkets.indexOf(selectedMarketName || acceptedSubmission.selected_market);
             
             return (
               <div className="mt-4 flex items-center justify-start gap-4">
@@ -1058,13 +1047,13 @@ const VendorDuplicate = () => {
                   size="icon"
                   className="h-8 w-8 shrink-0"
                   onClick={() => {
-                    if (currentPosition < allMarkets.length - 1) {
-                      const nextMarket = allMarkets[currentPosition + 1];
+                    if (currentPosition >= 0 && currentPosition < navigationMarketsOrder.length - 1) {
+                      const nextMarket = navigationMarketsOrder[currentPosition + 1];
                       console.log('Navigating to:', nextMarket);
                       switchToMarket(nextMarket, false);
                     }
                   }}
-                  disabled={currentPosition >= allMarkets.length - 1}
+                  disabled={currentPosition < 0 || currentPosition >= navigationMarketsOrder.length - 1}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -1193,18 +1182,29 @@ const VendorDuplicate = () => {
                     const vendorMarkets = vendor.selected_markets as string[];
                     // Use exact match to find if this vendor sells at the current market
                     if (vendorMarkets.includes(selectedMarketName)) {
-                      // Keep the current market selected
-                      console.log('Keeping current market:', selectedMarketName);
+                      // Keep the current market selected and create navigation order with it first
+                      const reorderedMarkets = [...vendorMarkets];
+                      const currentIdx = reorderedMarkets.indexOf(selectedMarketName);
+                      if (currentIdx > 0) {
+                        const [market] = reorderedMarkets.splice(currentIdx, 1);
+                        reorderedMarkets.unshift(market);
+                      }
+                      setNavigationMarketsOrder(reorderedMarkets);
+                      console.log('Keeping current market:', selectedMarketName, 'Navigation order:', reorderedMarkets);
                     } else {
                       // Vendor doesn't sell at this market, use their primary market
                       setSelectedMarketName(vendor.selected_market || '');
                       setSelectedMarketAddress(vendor.market_address || '');
+                      setNavigationMarketsOrder(vendorMarkets);
                       console.log('Switching to vendor primary market:', vendor.selected_market);
                     }
                   } else {
                     // No current market, use vendor's primary market
                     setSelectedMarketName(vendor.selected_market || '');
                     setSelectedMarketAddress(vendor.market_address || '');
+                    if (vendor.selected_markets && Array.isArray(vendor.selected_markets)) {
+                      setNavigationMarketsOrder(vendor.selected_markets as string[]);
+                    }
                     console.log('Using vendor primary market:', vendor.selected_market);
                   }
                   setMarketNavigationHistory([]); // Reset navigation history
