@@ -1015,6 +1015,18 @@ const VendorDuplicate = () => {
           {/* Markets Navigation - Only show if viewing a vendor that sells at multiple markets */}
           {selectedVendor && acceptedSubmission?.selected_markets && Array.isArray(acceptedSubmission.selected_markets) && acceptedSubmission.selected_markets.length > 1 && (
             <div className="mt-4 flex items-center justify-start gap-4">
+              {(() => {
+                const allMarkets = acceptedSubmission.selected_markets as string[];
+                const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
+                console.log('Navigation Debug:', {
+                  allMarkets,
+                  currentMarket,
+                  selectedMarketName,
+                  fallback: acceptedSubmission.selected_market,
+                  matchIndex: allMarkets.findIndex(m => m === currentMarket)
+                });
+                return null;
+              })()}
               <Button
                 variant="ghost"
                 size="icon"
