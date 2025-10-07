@@ -345,12 +345,12 @@ const Homepage = () => {
               };
               console.log(`✅ Found fresh Google rating for ${market.name}:`, ratings[marketId]);
 
-              // Store/update the rating in the database using insert with ON CONFLICT
+              // Store/update the rating in the database using the ACTUAL Google Maps address
               const { error: insertError } = await supabase
                 .from('markets')
                 .insert({
                   name: market.name,
-                  address: market.address,
+                  address: marketData.address, // Use Google Maps address, not vendor submission address
                   city: 'San Antonio', // Default city
                   state: 'TX', // Default state
                   days: ['Sunday'], // Default days
@@ -367,21 +367,31 @@ const Homepage = () => {
                 const { error: updateError } = await supabase
                   .from('markets')
                   .update({
+                    address: marketData.address, // Update with correct Google Maps address
                     google_rating: marketData.rating,
                     google_rating_count: marketData.user_ratings_total,
                     google_place_id: marketData.place_id,
                     last_rating_update: new Date().toISOString()
                   })
-                  .eq('name', market.name)
-                  .eq('address', market.address);
+                  .eq('name', market.name);
 
                 if (updateError) {
                   console.error(`❌ Error updating rating for ${market.name}:`, updateError);
                 } else {
-                  console.log(`💾 Updated rating for ${market.name} in database`);
+                  console.log(`💾 Updated rating and address for ${market.name} in database`);
+                  // Update the address map immediately
+                  setMarketAddressesMap(prev => ({
+                    ...prev,
+                    [market.name]: marketData.address
+                  }));
                 }
               } else {
-                console.log(`💾 Stored rating for ${market.name} in database`);
+                console.log(`💾 Stored rating and address for ${market.name} in database`);
+                // Update the address map immediately
+                setMarketAddressesMap(prev => ({
+                  ...prev,
+                  [market.name]: marketData.address
+                }));
               }
             } else {
               console.log(`⚠️ No rating data in API response for ${market.name}`);
