@@ -831,9 +831,9 @@ const VendorDuplicate = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="flex">
-        {/* Left column - fixed, non-scrolling */}
-        <div className="w-96 h-screen fixed left-0 top-0 bg-green-50 border-r overflow-hidden z-10">
-        <div className="space-y-6 px-4 pt-6 pb-6 h-full flex flex-col justify-start">
+        {/* Left column - sticky, non-scrolling */}
+        <div className="w-96 h-screen sticky top-0 bg-green-50 border-r">
+        <div className="space-y-6 px-4 pt-6 pb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span 
