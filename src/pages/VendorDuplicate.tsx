@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil } from "lucide-react";
+import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -28,6 +28,7 @@ interface AcceptedSubmission {
   description: string;
   products: any[];
   selected_market: string;
+  selected_markets?: any; // Json type from database, will be string[]
   search_term: string;
   market_address?: string;
   market_days?: string[];
@@ -96,6 +97,8 @@ const VendorDuplicate = () => {
   const [distance, setDistance] = useState<string>('');
   const [isLoadingDistance, setIsLoadingDistance] = useState(false);
   const [cachedMarketCoordinates, setCachedMarketCoordinates] = useState<{lat: number; lng: number} | null>(null);
+  const [currentMarketIndex, setCurrentMarketIndex] = useState(0);
+  const marketsScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
@@ -919,6 +922,74 @@ const VendorDuplicate = () => {
               </span>
             </div>
           </div>
+
+          {/* Markets Carousel - Only show if vendor sells at multiple markets */}
+          {acceptedSubmission.selected_markets && Array.isArray(acceptedSubmission.selected_markets) && acceptedSubmission.selected_markets.length > 1 && (
+            <div className="mt-4 relative">
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => {
+                    if (currentMarketIndex > 0) {
+                      setCurrentMarketIndex(prev => prev - 1);
+                      if (marketsScrollRef.current) {
+                        const scrollAmount = marketsScrollRef.current.clientWidth;
+                        marketsScrollRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                      }
+                    }
+                  }}
+                  disabled={currentMarketIndex === 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                
+                <div 
+                  ref={marketsScrollRef}
+                  className="flex-1 overflow-x-hidden"
+                >
+                  <div className="flex gap-2 transition-transform duration-300">
+                    {(acceptedSubmission.selected_markets as string[]).map((market, index) => (
+                      <div
+                        key={index}
+                        className={cn(
+                          "flex-shrink-0 px-3 py-2 rounded-lg border transition-all cursor-pointer",
+                          index === currentMarketIndex 
+                            ? "bg-primary/10 border-primary" 
+                            : "bg-muted/50 border-muted hover:border-muted-foreground/50"
+                        )}
+                        style={{ width: '100%' }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <span className="text-sm font-medium truncate">{market}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => {
+                    if (acceptedSubmission.selected_markets && Array.isArray(acceptedSubmission.selected_markets) && currentMarketIndex < acceptedSubmission.selected_markets.length - 1) {
+                      setCurrentMarketIndex(prev => prev + 1);
+                      if (marketsScrollRef.current) {
+                        const scrollAmount = marketsScrollRef.current.clientWidth;
+                        marketsScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                      }
+                    }
+                  }}
+                  disabled={!acceptedSubmission.selected_markets || !Array.isArray(acceptedSubmission.selected_markets) || currentMarketIndex === acceptedSubmission.selected_markets.length - 1}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       
