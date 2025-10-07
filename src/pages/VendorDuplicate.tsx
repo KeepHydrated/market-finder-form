@@ -798,22 +798,31 @@ const VendorDuplicate = () => {
         setIsLoadingDistance(false);
         
         // Update browser history to enable proper back button navigation
+        // Preserve vendor view if currently viewing a vendor
+        const navigationState = selectedVendor ? {
+          type: 'vendor' as const,
+          selectedVendor: acceptedSubmission,
+          allVendors,
+          marketCoordinates: cachedMarketCoordinates,
+          marketDistance: distance
+        } : {
+          type: 'market' as const,
+          selectedMarket: {
+            name: marketName,
+            address: market.address,
+            vendors: allVendors.filter(v => 
+              v.selected_market === marketName || 
+              (Array.isArray(v.selected_markets) && v.selected_markets.includes(marketName))
+            )
+          },
+          allVendors,
+          marketCoordinates: cachedMarketCoordinates,
+          marketDistance: distance
+        };
+        
         navigate('/market', {
           replace: false,
-          state: {
-            type: 'market',
-            selectedMarket: {
-              name: marketName,
-              address: market.address,
-              vendors: allVendors.filter(v => 
-                v.selected_market === marketName || 
-                (Array.isArray(v.selected_markets) && v.selected_markets.includes(marketName))
-              )
-            },
-            allVendors,
-            marketCoordinates: cachedMarketCoordinates,
-            marketDistance: distance
-          }
+          state: navigationState
         });
       }
     } catch (error) {
