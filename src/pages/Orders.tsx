@@ -259,7 +259,7 @@ const Orders = () => {
                         <div className="flex items-start gap-3 flex-1">
                           <button
                             onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
-                            className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                           >
                             {item.product_image ? (
                               <img 
