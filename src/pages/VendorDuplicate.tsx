@@ -909,7 +909,7 @@ const VendorDuplicate = () => {
     }
     
     return markets;
-  }, [acceptedSubmission.selected_markets, selectedMarketName, acceptedSubmission.selected_market]);
+  }, [JSON.stringify(acceptedSubmission.selected_markets), selectedMarketName, acceptedSubmission.selected_market]);
 
   return (
     <div className="min-h-screen bg-background">
