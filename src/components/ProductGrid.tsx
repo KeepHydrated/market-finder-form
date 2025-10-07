@@ -143,7 +143,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClic
       </div>
       
       <CardContent className="p-4">
-          <div className="flex items-start justify-between mb-2">
+          <div className="flex items-start justify-between mb-1">
             <h3 className="font-normal text-sm flex-1">{product.name}</h3>
             {(onDeleteProduct || onDuplicateClick || onEditClick) && (
             <DropdownMenu>
