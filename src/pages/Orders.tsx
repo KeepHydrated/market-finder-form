@@ -9,6 +9,17 @@ import { Separator } from "@/components/ui/separator";
 import { Package, Calendar, Store, DollarSign } from "lucide-react";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useToast } from "@/hooks/use-toast";
+import { ProductDetailModal } from "@/components/ProductDetailModal";
+
+interface OrderItem {
+  id: string;
+  product_name: string;
+  product_description: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  product_image: string;
+}
 
 interface Order {
   id: string;
@@ -18,15 +29,7 @@ interface Order {
   email: string;
   status: string;
   created_at: string;
-  order_items: {
-    id: string;
-    product_name: string;
-    product_description: string;
-    quantity: number;
-    unit_price: number;
-    total_price: number;
-    product_image: string;
-  }[];
+  order_items: OrderItem[];
 }
 
 const Orders = () => {
@@ -36,6 +39,9 @@ const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedVendorId, setSelectedVendorId] = useState<string | null>(null);
+  const [selectedVendorName, setSelectedVendorName] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -148,6 +154,20 @@ const Orders = () => {
     }
   };
 
+  const handleProductClick = (item: OrderItem, vendorId: string, vendorName: string) => {
+    const product = {
+      id: parseInt(item.id),
+      name: item.product_name,
+      description: item.product_description || '',
+      price: item.unit_price / 100, // Convert from cents to dollars
+      images: item.product_image ? [item.product_image] : [],
+    };
+    
+    setSelectedProduct(product);
+    setSelectedVendorId(vendorId);
+    setSelectedVendorName(vendorName);
+  };
+
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -237,7 +257,10 @@ const Orders = () => {
                     {order.order_items.map((item) => (
                       <div key={item.id} className="flex justify-between items-start py-2">
                         <div className="flex items-start gap-3 flex-1">
-                          <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          <button
+                            onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
+                            className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                          >
                             {item.product_image ? (
                               <img 
                                 src={item.product_image} 
@@ -252,14 +275,17 @@ const Orders = () => {
                             ) : (
                               <Package className="h-6 w-6 text-green-600" />
                             )}
-                          </div>
+                          </button>
                           <div className="flex-1">
-                            <h5 className="font-medium">
+                            <button
+                              onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
+                              className="font-medium text-left hover:underline focus:outline-none focus:underline"
+                            >
                               {item.quantity > 1 && (
                                 <span className="text-muted-foreground mr-2">(x {item.quantity})</span>
                               )}
                               {item.product_name}
-                            </h5>
+                            </button>
                           </div>
                         </div>
                         <div className="text-right ml-4">
@@ -296,6 +322,23 @@ const Orders = () => {
             </div>
           ))}
         </div>
+      )}
+
+      {/* Product Detail Modal */}
+      {selectedProduct && (
+        <ProductDetailModal
+          product={selectedProduct}
+          products={[selectedProduct]}
+          open={!!selectedProduct}
+          onClose={() => {
+            setSelectedProduct(null);
+            setSelectedVendorId(null);
+            setSelectedVendorName(null);
+          }}
+          vendorId={selectedVendorId || undefined}
+          vendorName={selectedVendorName || undefined}
+          hideVendorName={false}
+        />
       )}
     </div>
   );
