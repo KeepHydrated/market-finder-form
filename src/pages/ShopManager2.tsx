@@ -614,7 +614,39 @@ export default function ShopManager() {
       </div>
       
       <Card>
-        <CardContent className="space-y-6 pt-8">
+        <CardHeader className="flex flex-row items-center justify-end pb-4">
+          {shopData && (
+            <Button
+              variant="outline"
+              onClick={async () => {
+                if (isEditMode) {
+                  if (currentSection === 'shop') {
+                    isSavingRef.current = true;
+                  }
+                  await handleSubmit();
+                  setIsEditMode(false);
+                } else {
+                  setOriginalFormData({ ...formData });
+                  setIsEditMode(true);
+                }
+              }}
+              disabled={isSubmitting}
+            >
+              {isEditMode ? (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  {isSubmitting ? 'Saving...' : 'Save'}
+                </>
+              ) : (
+                <>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </>
+              )}
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label>Which farmers markets do you sell at? (Up to 3) *</Label>
             <FarmersMarketSearch 
@@ -685,37 +717,6 @@ export default function ShopManager() {
           </div>
 
           <div className="pt-6 border-t flex gap-4">
-            {shopData && (
-              <Button
-                variant="outline"
-                onClick={async () => {
-                  if (isEditMode) {
-                    if (currentSection === 'shop') {
-                      isSavingRef.current = true;
-                    }
-                    await handleSubmit();
-                    setIsEditMode(false);
-                  } else {
-                    setOriginalFormData({ ...formData });
-                    setIsEditMode(true);
-                  }
-                }}
-                disabled={isSubmitting}
-              >
-                {isEditMode ? (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    {isSubmitting ? 'Saving...' : 'Save'}
-                  </>
-                ) : (
-                  <>
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit
-                  </>
-                )}
-              </Button>
-            )}
-
             {!shopData && (
               <Button 
                 onClick={() => navigate('/submit?section=products')}
