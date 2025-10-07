@@ -607,122 +607,118 @@ export default function ShopManager() {
 
 
   const renderShop = () => (
-    <div className="space-y-6">
-      <Card>
-        <CardContent className="space-y-6 pt-8">
-          <div className="space-y-2">
-            <Label>Which farmers markets do you sell at? (Up to 3) *</Label>
-            <FarmersMarketSearch 
-              selectedMarkets={selectedFarmersMarkets} 
-              onMarketsChange={setSelectedFarmersMarkets}
-              isEditing={!shopData || isEditMode}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="store_name">Store Name *</Label>
-            <Input
-              id="store_name"
-              value={formData.store_name}
-              onChange={(e) => {
-                const value = e.target.value;
-                const limitedValue = value.length > 20 ? value.slice(0, 20) : value;
-                setFormData(prev => ({ ...prev, store_name: limitedValue }));
-              }}
-              placeholder="Enter your store name"
-              disabled={shopData && !isEditMode}
-              maxLength={20}
-            />
-          </div>
+    <div className="space-y-6 pt-8">
+      <div className="space-y-2">
+        <Label>Which farmers markets do you sell at? (Up to 3) *</Label>
+        <FarmersMarketSearch 
+          selectedMarkets={selectedFarmersMarkets} 
+          onMarketsChange={setSelectedFarmersMarkets}
+          isEditing={!shopData || isEditMode}
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="store_name">Store Name *</Label>
+        <Input
+          id="store_name"
+          value={formData.store_name}
+          onChange={(e) => {
+            const value = e.target.value;
+            const limitedValue = value.length > 20 ? value.slice(0, 20) : value;
+            setFormData(prev => ({ ...prev, store_name: limitedValue }));
+          }}
+          placeholder="Enter your store name"
+          disabled={shopData && !isEditMode}
+          maxLength={20}
+        />
+      </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="specialty">Category *</Label>
-            <Select
-              value={formData.primary_specialty}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, primary_specialty: value }))}
-              disabled={shopData && !isEditMode}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a specialty" />
-              </SelectTrigger>
-              <SelectContent>
-                {SPECIALTY_CATEGORIES.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      <div className="space-y-2">
+        <Label htmlFor="specialty">Category *</Label>
+        <Select
+          value={formData.primary_specialty}
+          onValueChange={(value) => setFormData(prev => ({ ...prev, primary_specialty: value }))}
+          disabled={shopData && !isEditMode}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a specialty" />
+          </SelectTrigger>
+          <SelectContent>
+            {SPECIALTY_CATEGORIES.map((category) => (
+              <SelectItem key={category} value={category}>
+                {category}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="website">Website</Label>
-            <Input
-              id="website"
-              type="url"
-              value={formData.website}
-              onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
-              placeholder="https://example.com"
-              disabled={shopData && !isEditMode}
-            />
-          </div>
+      <div className="space-y-2">
+        <Label htmlFor="website">Website</Label>
+        <Input
+          id="website"
+          type="url"
+          value={formData.website}
+          onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
+          placeholder="https://example.com"
+          disabled={shopData && !isEditMode}
+        />
+      </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Tell us about your shop..."
-              rows={4}
-              disabled={shopData && !isEditMode}
-            />
-          </div>
+      <div className="space-y-2">
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+          placeholder="Tell us about your shop..."
+          rows={4}
+          disabled={shopData && !isEditMode}
+        />
+      </div>
 
-          <div className="pt-6 border-t flex gap-4">
-            {shopData && (
-              <Button
-                variant="outline"
-                onClick={async () => {
-                  if (isEditMode) {
-                    if (currentSection === 'shop') {
-                      isSavingRef.current = true;
-                    }
-                    await handleSubmit();
-                    setIsEditMode(false);
-                  } else {
-                    setOriginalFormData({ ...formData });
-                    setIsEditMode(true);
-                  }
-                }}
-                disabled={isSubmitting}
-              >
-                {isEditMode ? (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    {isSubmitting ? 'Saving...' : 'Save'}
-                  </>
-                ) : (
-                  <>
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit
-                  </>
-                )}
-              </Button>
+      <div className="pt-6 border-t flex gap-4">
+        {shopData && (
+          <Button
+            variant="outline"
+            onClick={async () => {
+              if (isEditMode) {
+                if (currentSection === 'shop') {
+                  isSavingRef.current = true;
+                }
+                await handleSubmit();
+                setIsEditMode(false);
+              } else {
+                setOriginalFormData({ ...formData });
+                setIsEditMode(true);
+              }
+            }}
+            disabled={isSubmitting}
+          >
+            {isEditMode ? (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                {isSubmitting ? 'Saving...' : 'Save'}
+              </>
+            ) : (
+              <>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </>
             )}
+          </Button>
+        )}
 
-            {!shopData && (
-              <Button 
-                onClick={() => navigate('/submit?section=products')}
-                className="flex-1"
-              >
-                Continue to Products
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+        {!shopData && (
+          <Button 
+            onClick={() => navigate('/submit?section=products')}
+            className="flex-1"
+          >
+            Continue to Products
+            <ArrowRight className="h-4 w-4 ml-2" />
+          </Button>
+        )}
+      </div>
     </div>
   );
 
