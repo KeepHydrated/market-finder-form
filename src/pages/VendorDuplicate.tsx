@@ -976,7 +976,7 @@ const VendorDuplicate = () => {
 
           {/* Markets Navigation - Only show if vendor sells at multiple markets */}
           {acceptedSubmission.selected_markets && Array.isArray(acceptedSubmission.selected_markets) && acceptedSubmission.selected_markets.length > 1 && (
-            <div className="mt-4 flex items-center justify-center gap-4">
+            <div className="mt-4 flex items-center justify-start gap-4">
               <Button
                 variant="ghost"
                 size="icon"
