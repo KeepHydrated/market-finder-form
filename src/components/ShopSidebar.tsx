@@ -4,7 +4,8 @@ import {
   Store, 
   Settings, 
   ShoppingBag,
-  TestTube
+  TestTube,
+  Wrench
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -28,6 +29,12 @@ const menuItems = [
     title: "Overview", 
     icon: TestTube, 
     section: "overview",
+    requiresShop: false 
+  },
+  { 
+    title: "Setup", 
+    icon: Wrench, 
+    section: "setup",
     requiresShop: false 
   },
   { 

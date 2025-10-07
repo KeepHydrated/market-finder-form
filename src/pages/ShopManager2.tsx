@@ -479,6 +479,8 @@ export default function ShopManager() {
     switch (currentSection) {
       case 'overview':
         return shopData ? renderOverviewWithTabs() : renderShop();
+      case 'setup':
+        return renderShop();
       case 'products':
         return renderProducts();
       case 'orders':
@@ -498,10 +500,9 @@ export default function ShopManager() {
       </div>
 
       <Tabs defaultValue="analytics" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="preview">Preview</TabsTrigger>
-          <TabsTrigger value="setup">Setup</TabsTrigger>
         </TabsList>
         
         <TabsContent value="analytics" className="space-y-6 mt-6">
@@ -510,10 +511,6 @@ export default function ShopManager() {
         
         <TabsContent value="preview" className="space-y-6 mt-6">
           {renderPreview()}
-        </TabsContent>
-        
-        <TabsContent value="setup" className="space-y-6 mt-6">
-          {renderShop()}
         </TabsContent>
       </Tabs>
     </div>
