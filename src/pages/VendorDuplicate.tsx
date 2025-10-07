@@ -1013,71 +1013,64 @@ const VendorDuplicate = () => {
           </div>
 
           {/* Markets Navigation - Only show if viewing a vendor that sells at multiple markets */}
-          {selectedVendor && acceptedSubmission?.selected_markets && Array.isArray(acceptedSubmission.selected_markets) && acceptedSubmission.selected_markets.length > 1 && (
-            <div className="mt-4 flex items-center justify-start gap-4">
-              {(() => {
-                const allMarkets = acceptedSubmission.selected_markets as string[];
-                const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
-                console.log('Navigation Debug:', {
-                  allMarkets,
-                  currentMarket,
-                  selectedMarketName,
-                  fallback: acceptedSubmission.selected_market,
-                  matchIndex: allMarkets.findIndex(m => m === currentMarket)
-                });
-                return null;
-              })()}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 shrink-0"
-                onClick={() => {
-                  // Go back through navigation history
-                  if (marketNavigationHistory.length > 0) {
-                    const previousMarket = marketNavigationHistory[marketNavigationHistory.length - 1];
-                    switchToMarket(previousMarket, true);
-                  }
-                }}
-                disabled={marketNavigationHistory.length === 0}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
+          {selectedVendor && acceptedSubmission?.selected_markets && Array.isArray(acceptedSubmission.selected_markets) && acceptedSubmission.selected_markets.length > 1 && (() => {
+            // Create reordered markets with current market first
+            const allMarkets = [...(acceptedSubmission.selected_markets as string[])];
+            const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
+            const currentIdx = allMarkets.findIndex(m => m === currentMarket);
+            
+            // Move current market to the front
+            if (currentIdx > 0) {
+              const [market] = allMarkets.splice(currentIdx, 1);
+              allMarkets.unshift(market);
+            }
+            
+            console.log('Navigation Debug:', {
+              originalMarkets: acceptedSubmission.selected_markets,
+              reorderedMarkets: allMarkets,
+              currentMarket,
+              originalIndex: currentIdx
+            });
+            
+            // Track position in reordered array
+            const currentPosition = allMarkets.indexOf(selectedMarketName || acceptedSubmission.selected_market);
+            
+            return (
+              <div className="mt-4 flex items-center justify-start gap-4">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => {
+                    // Go back through navigation history
+                    if (marketNavigationHistory.length > 0) {
+                      const previousMarket = marketNavigationHistory[marketNavigationHistory.length - 1];
+                      switchToMarket(previousMarket, true);
+                    }
+                  }}
+                  disabled={marketNavigationHistory.length === 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 shrink-0"
-                onClick={() => {
-                  if (!acceptedSubmission.selected_markets || !Array.isArray(acceptedSubmission.selected_markets)) {
-                    return;
-                  }
-                  
-                  const allMarkets = acceptedSubmission.selected_markets as string[];
-                  const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
-                  const currentIndex = allMarkets.findIndex(m => m === currentMarket);
-                  
-                  console.log('Forward click - Current market:', currentMarket, 'Index:', currentIndex, 'All markets:', allMarkets);
-                  
-                  if (currentIndex !== -1 && currentIndex < allMarkets.length - 1) {
-                    const nextMarket = allMarkets[currentIndex + 1];
-                    console.log('Navigating to:', nextMarket);
-                    switchToMarket(nextMarket, false);
-                  }
-                }}
-                disabled={(() => {
-                  if (!acceptedSubmission.selected_markets || !Array.isArray(acceptedSubmission.selected_markets)) {
-                    return true;
-                  }
-                  const allMarkets = acceptedSubmission.selected_markets as string[];
-                  const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
-                  const currentIndex = allMarkets.findIndex(m => m === currentMarket);
-                  return currentIndex === -1 || currentIndex >= allMarkets.length - 1;
-                })()}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => {
+                    if (currentPosition < allMarkets.length - 1) {
+                      const nextMarket = allMarkets[currentPosition + 1];
+                      console.log('Navigating to:', nextMarket);
+                      switchToMarket(nextMarket, false);
+                    }
+                  }}
+                  disabled={currentPosition >= allMarkets.length - 1}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            );
+          })()}
         </div>
       </div>
       
