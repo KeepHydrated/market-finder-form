@@ -1,9 +1,19 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Package, Calendar, DollarSign, Mail } from "lucide-react";
+import { Package, Mail } from "lucide-react";
+
+interface OrderItem {
+  id: string;
+  product_name: string;
+  product_description: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  product_image: string;
+}
 
 interface Order {
   id: string;
@@ -11,14 +21,7 @@ interface Order {
   email: string;
   status: string;
   created_at: string;
-  order_items: {
-    id: string;
-    product_name: string;
-    product_description: string;
-    quantity: number;
-    unit_price: number;
-    total_price: number;
-  }[];
+  order_items: OrderItem[];
 }
 
 interface VendorOrdersProps {
@@ -55,7 +58,8 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
             product_description,
             quantity,
             unit_price,
-            total_price
+            total_price,
+            product_image
           )
         `)
         .eq('vendor_id', vendorId)
@@ -75,10 +79,8 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
     });
   };
 
@@ -86,20 +88,6 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
     return `$${(cents / 100).toFixed(2)}`;
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return 'bg-green-500 hover:bg-green-600';
-      case 'pending':
-        return 'bg-yellow-500 hover:bg-yellow-600';
-      case 'cancelled':
-        return 'bg-red-500 hover:bg-red-600';
-      case 'processing':
-        return 'bg-blue-500 hover:bg-blue-600';
-      default:
-        return 'bg-gray-500 hover:bg-gray-600';
-    }
-  };
 
   if (!vendorId) {
     return (
@@ -144,9 +132,9 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Orders</h2>
-        <p className="text-muted-foreground">Manage and track your customer orders</p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Your Orders</h1>
+        <p className="text-muted-foreground">Track and manage your farmer's market orders</p>
       </div>
 
       {orders.length === 0 ? (
@@ -160,73 +148,82 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6 max-w-5xl">
           {orders.map((order) => (
-            <Card key={order.id} className="overflow-hidden">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Package className="h-5 w-5" />
-                      Order #{order.id.slice(-8)}
-                    </CardTitle>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {formatDate(order.created_at)}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Mail className="h-4 w-4" />
-                        {order.email}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4" />
-                        {formatPrice(order.total_amount)}
-                      </div>
-                    </div>
+            <div key={order.id} className="grid md:grid-cols-[1fr,280px] gap-6">
+              <Card className="overflow-hidden">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-2 text-base">
+                    <span className="text-muted-foreground">Order from</span>
+                    <Mail className="h-4 w-4" />
+                    <span className="font-semibold">{order.email}</span>
+                    <span className="text-muted-foreground">on {formatDate(order.created_at)}</span>
                   </div>
-                  <Badge className={`${getStatusColor(order.status)} text-white`}>
-                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                  </Badge>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="pt-0">
-                <Separator className="mb-4" />
+                </CardHeader>
                 
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
-                    Order Items
-                  </h4>
+                <CardContent className="pt-0">
+                  <Separator className="mb-4" />
                   
-                  {order.order_items.map((item) => (
-                    <div key={item.id} className="flex justify-between items-start py-2 border-b border-muted last:border-0">
-                      <div className="flex-1">
-                        <h5 className="font-medium">{item.product_name}</h5>
-                        {item.product_description && (
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {item.product_description}
-                          </p>
-                        )}
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Quantity: {item.quantity} × {formatPrice(item.unit_price)}
-                        </p>
+                  <div className="space-y-3">
+                    {order.order_items.map((item) => (
+                      <div key={item.id} className="flex justify-between items-start py-2">
+                        <div className="flex items-start gap-3 flex-1">
+                          <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            {item.product_image ? (
+                              <img 
+                                src={item.product_image} 
+                                alt={item.product_name}
+                                className="w-full h-full object-cover rounded-lg"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                  e.currentTarget.parentElement!.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-green-600"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>';
+                                }}
+                              />
+                            ) : (
+                              <Package className="h-6 w-6 text-green-600" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h5 className="font-medium">
+                              {item.quantity > 1 && (
+                                <span className="text-muted-foreground mr-2">(x {item.quantity})</span>
+                              )}
+                              {item.product_name}
+                            </h5>
+                          </div>
+                        </div>
+                        <div className="text-right ml-4">
+                          <p className="font-medium">{formatPrice(item.total_price)}</p>
+                        </div>
                       </div>
-                      <div className="text-right ml-4">
-                        <p className="font-medium">{formatPrice(item.total_price)}</p>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="flex flex-col gap-3">
+                <div>
+                  <h3 className="text-lg font-serif mb-1">Arriving Friday, October 3rd</h3>
+                  <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
+                  <p className="text-xs">
+                    From <span className="font-medium">GLENDALE, AZ</span> To{" "}
+                    <span className="font-medium underline">San Antonio</span>
+                  </p>
                 </div>
 
-                <Separator className="my-4" />
-                
-                <div className="flex justify-between items-center font-semibold">
-                  <span>Total Amount</span>
-                  <span className="text-lg">{formatPrice(order.total_amount)}</span>
+                <div className="flex flex-col gap-2">
+                  <Button size="sm" className="w-full rounded-full">
+                    Track package
+                  </Button>
+                  <Button variant="outline" size="sm" className="w-full rounded-full">
+                    Help with order
+                  </Button>
+                  <Button variant="outline" size="sm" className="w-full rounded-full">
+                    View receipt
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}
