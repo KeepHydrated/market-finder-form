@@ -1169,7 +1169,10 @@ const VendorDuplicate = () => {
                 key={vendor.id}
                 className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
                 onClick={() => {
+                  setAcceptedSubmission(vendor);
                   setSelectedVendor(vendor);
+                  setSelectedMarketName(vendor.selected_market || '');
+                  setSelectedMarketAddress(vendor.market_address || '');
                   setMarketNavigationHistory([]); // Reset navigation history
                 }}
               >
