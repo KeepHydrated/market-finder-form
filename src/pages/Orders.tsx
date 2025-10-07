@@ -79,7 +79,29 @@ const Orders = () => {
 
       if (ordersError) throw ordersError;
 
-      setOrders(ordersData || []);
+      // Fetch current store names from submissions
+      if (ordersData && ordersData.length > 0) {
+        const vendorIds = [...new Set(ordersData.map(order => order.vendor_id))];
+        const { data: submissions } = await supabase
+          .from('submissions')
+          .select('id, store_name')
+          .in('id', vendorIds);
+
+        // Create a map of vendor_id to current store_name
+        const storeNameMap = new Map(
+          submissions?.map(sub => [sub.id, sub.store_name]) || []
+        );
+
+        // Update orders with current store names
+        const updatedOrders = ordersData.map(order => ({
+          ...order,
+          vendor_name: storeNameMap.get(order.vendor_id) || order.vendor_name
+        }));
+
+        setOrders(updatedOrders);
+      } else {
+        setOrders(ordersData || []);
+      }
     } catch (error) {
       console.error('Error fetching orders:', error);
       setError('Failed to load orders');
