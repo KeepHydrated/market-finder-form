@@ -198,25 +198,38 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
     e.preventDefault();
     if (!newMessage.trim() || !conversation || !user) return;
 
+    const messageText = newMessage.trim();
+    
+    // Optimistically add message to UI
+    const tempMessage: Message = {
+      id: `temp-${Date.now()}`,
+      sender_id: user.id,
+      message: messageText,
+      created_at: new Date().toISOString(),
+      is_read: false
+    };
+
+    setMessages(prev => [...prev, tempMessage]);
+    setNewMessage('');
+
     const { error } = await supabase
       .from('messages')
       .insert({
         conversation_id: conversation.id,
         sender_id: user.id,
-        message: newMessage.trim()
+        message: messageText
       });
 
     if (error) {
       console.error('Error sending message:', error);
+      // Remove temp message on error
+      setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
       toast({
         title: "Error",
         description: "Failed to send message",
         variant: "destructive"
       });
-      return;
     }
-
-    setNewMessage('');
   };
 
   if (!isOpen) return null;
