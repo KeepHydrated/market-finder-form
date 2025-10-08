@@ -157,37 +157,13 @@ export default function Messages() {
       channelRef.current = null;
     }
 
-    // Reset state
+    // Reset state and use the conversation data from the list (including store_name)
     setMessages([]);
     setNewMessage('');
-    setSelectedConversation(convo);
+    setSelectedConversation(convo); // Use the conversation as-is with its store_name
     setLoadingMessages(true);
 
     try {
-      // Determine the other party (the vendor/seller)
-      const otherPartyId = convo.buyer_id === user!.id ? convo.seller_id : convo.buyer_id;
-      
-      // Fetch the vendor's store name if not already in the conversation
-      let updatedConvo = convo;
-      if (!convo.store_name) {
-        const { data: vendorSubmission } = await supabase
-          .from('submissions')
-          .select('store_name')
-          .eq('user_id', otherPartyId)
-          .eq('status', 'accepted')
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        
-        if (vendorSubmission?.store_name) {
-          updatedConvo = {
-            ...convo,
-            store_name: vendorSubmission.store_name
-          };
-          setSelectedConversation(updatedConvo);
-        }
-      }
-
       // Fetch messages for this specific conversation
       const { data: msgs, error } = await supabase
         .from('messages')
