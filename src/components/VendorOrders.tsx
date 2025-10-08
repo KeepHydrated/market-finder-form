@@ -28,9 +28,10 @@ interface Order {
 
 interface VendorOrdersProps {
   vendorId?: string;
+  vendorName?: string;
 }
 
-export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
+export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -276,6 +277,7 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
         onClose={() => setIsChatOpen(false)}
         order={selectedOrder}
         vendorId={vendorId || ''}
+        vendorName={vendorName}
       />
     </div>
   );

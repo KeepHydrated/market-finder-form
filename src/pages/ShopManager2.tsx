@@ -487,7 +487,7 @@ export default function ShopManager() {
       case 'products':
         return renderProducts();
       case 'orders':
-        return <VendorOrders vendorId={shopData?.id} />;
+        return <VendorOrders vendorId={shopData?.id} vendorName={shopData?.store_name} />;
       case 'account':
         return renderAccount();
       default:
