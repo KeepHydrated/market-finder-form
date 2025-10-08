@@ -48,6 +48,7 @@ export default function Messages() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [orderItems, setOrderItems] = useState<any[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<any>(null);
 
@@ -176,6 +177,7 @@ export default function Messages() {
     // Reset state and use the conversation data from the list (including store_name)
     setMessages([]);
     setNewMessage('');
+    setOrderItems([]);
     setSelectedConversation(convo); // Use the conversation as-is with its store_name
     setLoadingMessages(true);
 
@@ -189,6 +191,18 @@ export default function Messages() {
 
       if (error) throw error;
       setMessages(msgs || []);
+
+      // If conversation has an order_id, fetch order items
+      if (convo.order_id) {
+        const { data: items, error: itemsError } = await supabase
+          .from('order_items')
+          .select('*')
+          .eq('order_id', convo.order_id);
+
+        if (!itemsError && items) {
+          setOrderItems(items);
+        }
+      }
 
       // Mark messages as read
       await supabase
@@ -236,6 +250,7 @@ export default function Messages() {
     }
     setSelectedConversation(null);
     setMessages([]);
+    setOrderItems([]);
     setNewMessage('');
   };
 
@@ -377,6 +392,35 @@ export default function Messages() {
                 </div>
               ) : (
                 <div className="space-y-4">
+                  {/* Order Items - Show at top if available */}
+                  {orderItems.length > 0 && (
+                    <div className="bg-muted/50 rounded-lg p-3 border border-border">
+                      <p className="text-xs font-semibold text-muted-foreground mb-2">Order Items:</p>
+                      <div className="space-y-2">
+                        {orderItems.map((item) => (
+                          <div key={item.id} className="flex items-center gap-3">
+                            {item.product_image && (
+                              <img 
+                                src={item.product_image} 
+                                alt={item.product_name}
+                                className="w-10 h-10 object-cover rounded"
+                              />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">{item.product_name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                Qty: {item.quantity} × ${(item.unit_price / 100).toFixed(2)}
+                              </p>
+                            </div>
+                            <p className="text-sm font-semibold">
+                              ${(item.total_price / 100).toFixed(2)}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
                   {messages.length === 0 && (
                     <div className="flex items-center justify-center py-8">
                       <p className="text-muted-foreground text-center text-sm">

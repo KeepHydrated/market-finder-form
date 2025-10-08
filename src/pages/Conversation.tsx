@@ -23,6 +23,7 @@ interface ConversationDetails {
   id: string;
   buyer_id: string;
   seller_id: string;
+  order_id?: string | null;
   otherParty?: {
     full_name: string;
     avatar_url: string | null;
@@ -39,6 +40,7 @@ export default function Conversation() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [orderItems, setOrderItems] = useState<any[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -108,6 +110,18 @@ export default function Conversation() {
         ...convo,
         otherParty: profile || undefined,
       });
+
+      // If conversation has an order_id, fetch order items
+      if (convo.order_id) {
+        const { data: items, error: itemsError } = await supabase
+          .from('order_items')
+          .select('*')
+          .eq('order_id', convo.order_id);
+
+        if (!itemsError && items) {
+          setOrderItems(items);
+        }
+      }
     } catch (error) {
       console.error('Error fetching conversation:', error);
       toast({
@@ -239,6 +253,35 @@ export default function Conversation() {
 
       <Card className="flex flex-col h-[600px]">
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Order Items - Show at top if available */}
+          {orderItems.length > 0 && (
+            <div className="bg-muted/50 rounded-lg p-4 border border-border mb-4">
+              <p className="text-sm font-semibold text-muted-foreground mb-3">Order Items:</p>
+              <div className="space-y-3">
+                {orderItems.map((item) => (
+                  <div key={item.id} className="flex items-center gap-3">
+                    {item.product_image && (
+                      <img 
+                        src={item.product_image} 
+                        alt={item.product_name}
+                        className="w-12 h-12 object-cover rounded"
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{item.product_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Qty: {item.quantity} × ${(item.unit_price / 100).toFixed(2)}
+                      </p>
+                    </div>
+                    <p className="text-sm font-semibold">
+                      ${(item.total_price / 100).toFixed(2)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
           {messages.map((msg) => (
             <div
               key={msg.id}
