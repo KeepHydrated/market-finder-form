@@ -48,6 +48,7 @@ export default function Messages() {
   const [newMessage, setNewMessage] = useState('');
   const [loadingMessages, setLoadingMessages] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const channelRef = useRef<any>(null);
 
   useEffect(() => {
     if (authLoading) return; // Wait for auth to load
@@ -150,15 +151,24 @@ export default function Messages() {
   };
 
   const openConversation = async (convo: Conversation) => {
+    // Clean up previous subscription
+    if (channelRef.current) {
+      await supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+
+    // Reset state
+    setMessages([]);
+    setNewMessage('');
     setSelectedConversation(convo);
     setLoadingMessages(true);
-    setMessages([]);
 
     try {
       // Determine the other party (the vendor/seller)
       const otherPartyId = convo.buyer_id === user!.id ? convo.seller_id : convo.buyer_id;
       
       // Fetch the vendor's store name if not already in the conversation
+      let updatedConvo = convo;
       if (!convo.store_name) {
         const { data: vendorSubmission } = await supabase
           .from('submissions')
@@ -170,14 +180,15 @@ export default function Messages() {
           .maybeSingle();
         
         if (vendorSubmission?.store_name) {
-          setSelectedConversation({
+          updatedConvo = {
             ...convo,
             store_name: vendorSubmission.store_name
-          });
+          };
+          setSelectedConversation(updatedConvo);
         }
       }
 
-      // Fetch messages
+      // Fetch messages for this specific conversation
       const { data: msgs, error } = await supabase
         .from('messages')
         .select('*')
@@ -195,7 +206,7 @@ export default function Messages() {
         .neq('sender_id', user!.id)
         .eq('is_read', false);
 
-      // Subscribe to new messages
+      // Subscribe to new messages for this conversation
       const channel = supabase
         .channel(`conversation-${convo.id}`)
         .on(
@@ -212,10 +223,7 @@ export default function Messages() {
         )
         .subscribe();
 
-      // Cleanup on dialog close
-      return () => {
-        supabase.removeChannel(channel);
-      };
+      channelRef.current = channel;
     } catch (error) {
       console.error('Error loading messages:', error);
       toast({
@@ -226,6 +234,17 @@ export default function Messages() {
     } finally {
       setLoadingMessages(false);
     }
+  };
+
+  const closeConversation = async () => {
+    // Clean up subscription
+    if (channelRef.current) {
+      await supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+    setSelectedConversation(null);
+    setMessages([]);
+    setNewMessage('');
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -327,7 +346,7 @@ export default function Messages() {
           {/* Backdrop */}
           <div 
             className="fixed inset-0 bg-black/20 z-40"
-            onClick={() => setSelectedConversation(null)}
+            onClick={closeConversation}
           />
           
           {/* Chat Box */}
@@ -343,7 +362,7 @@ export default function Messages() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setSelectedConversation(null)}
+                onClick={closeConversation}
                 className="h-8 w-8 p-0"
               >
                 <X className="h-4 w-4" />
