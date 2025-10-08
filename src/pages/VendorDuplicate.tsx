@@ -1303,7 +1303,67 @@ const VendorDuplicate = () => {
                      </div>
                    </div>
                   
-                  {/* Like Button */}
+                   {/* Message Button - only show for other vendors */}
+                   {(!user || vendor.user_id !== user.id) && (
+                     <Button
+                       variant="secondary"
+                       size="sm"
+                       className="absolute top-2 right-12 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                       onClick={async (e) => {
+                         e.stopPropagation();
+                         if (!user) {
+                           toast({
+                             title: "Authentication required",
+                             description: "Please log in to message vendors",
+                             variant: "destructive",
+                           });
+                           return;
+                         }
+                         
+                         try {
+                           // Check if conversation already exists
+                           const { data: existingConv, error: convError } = await supabase
+                             .from('conversations')
+                             .select('id')
+                             .eq('buyer_id', user.id)
+                             .eq('seller_id', vendor.user_id)
+                             .maybeSingle();
+                           
+                           if (convError) throw convError;
+                           
+                           if (existingConv) {
+                             // Navigate to existing conversation
+                             navigate(`/conversation/${existingConv.id}`);
+                           } else {
+                             // Create new conversation
+                             const { data: newConv, error: createError } = await supabase
+                               .from('conversations')
+                               .insert({
+                                 buyer_id: user.id,
+                                 seller_id: vendor.user_id,
+                               })
+                               .select()
+                               .single();
+                             
+                             if (createError) throw createError;
+                             
+                             navigate(`/conversation/${newConv.id}`);
+                           }
+                         } catch (error) {
+                           console.error('Error creating conversation:', error);
+                           toast({
+                             title: "Error",
+                             description: "Failed to start conversation",
+                             variant: "destructive",
+                           });
+                         }
+                       }}
+                     >
+                       <MessageSquare className="h-4 w-4 text-gray-600" />
+                     </Button>
+                   )}
+                  
+                   {/* Like Button */}
                   <Button
                     variant="secondary"
                     size="sm"
