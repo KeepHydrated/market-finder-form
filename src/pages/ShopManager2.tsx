@@ -885,43 +885,59 @@ export default function ShopManager() {
                 if (!user || !shopData) return;
                 
                 try {
+                  console.log('Starting deletion for shop:', shopData.id);
+                  
                   // Delete related data first to handle foreign key constraints
+                  // Order matters: delete child records before parent records
                   
-                  // 1. Delete reviews
-                  await supabase
-                    .from('reviews')
-                    .delete()
-                    .eq('vendor_id', shopData.id);
-                  
-                  // 2. Delete likes
-                  await supabase
-                    .from('likes')
-                    .delete()
-                    .eq('item_id', shopData.id);
-                  
-                  // 3. Get all conversations for this vendor
-                  const { data: conversations } = await supabase
+                  // 1. Get all conversations for this vendor
+                  const { data: conversations, error: convError } = await supabase
                     .from('conversations')
                     .select('id')
                     .eq('vendor_id', shopData.id);
                   
+                  console.log('Found conversations:', conversations);
+                  
                   if (conversations && conversations.length > 0) {
                     const conversationIds = conversations.map(c => c.id);
                     
-                    // Delete messages in these conversations
-                    await supabase
+                    // Delete messages first
+                    const { error: msgError } = await supabase
                       .from('messages')
                       .delete()
                       .in('conversation_id', conversationIds);
                     
-                    // Delete conversations
-                    await supabase
+                    if (msgError) console.error('Error deleting messages:', msgError);
+                    
+                    // Then delete conversations
+                    const { error: delConvError } = await supabase
                       .from('conversations')
                       .delete()
-                      .eq('vendor_id', shopData.id);
+                      .in('id', conversationIds);
+                    
+                    if (delConvError) {
+                      console.error('Error deleting conversations:', delConvError);
+                      throw delConvError;
+                    }
                   }
                   
-                  // 4. Get all orders for this vendor
+                  // 2. Delete reviews
+                  const { error: reviewError } = await supabase
+                    .from('reviews')
+                    .delete()
+                    .eq('vendor_id', shopData.id);
+                  
+                  if (reviewError) console.error('Error deleting reviews:', reviewError);
+                  
+                  // 3. Delete likes
+                  const { error: likeError } = await supabase
+                    .from('likes')
+                    .delete()
+                    .eq('item_id', shopData.id);
+                  
+                  if (likeError) console.error('Error deleting likes:', likeError);
+                  
+                  // 4. Get all orders
                   const { data: orders } = await supabase
                     .from('orders')
                     .select('id')
@@ -930,33 +946,42 @@ export default function ShopManager() {
                   if (orders && orders.length > 0) {
                     const orderIds = orders.map(o => o.id);
                     
-                    // Delete order items
-                    await supabase
+                    // Delete order items first
+                    const { error: orderItemsError } = await supabase
                       .from('order_items')
                       .delete()
                       .in('order_id', orderIds);
+                    
+                    if (orderItemsError) console.error('Error deleting order items:', orderItemsError);
                   }
                   
                   // 5. Delete commissions
-                  await supabase
+                  const { error: commError } = await supabase
                     .from('commissions')
                     .delete()
                     .eq('vendor_id', shopData.id);
                   
+                  if (commError) console.error('Error deleting commissions:', commError);
+                  
                   // 6. Delete orders
-                  await supabase
+                  const { error: orderError } = await supabase
                     .from('orders')
                     .delete()
                     .eq('vendor_id', shopData.id);
                   
+                  if (orderError) console.error('Error deleting orders:', orderError);
+                  
                   // 7. Finally delete the submission
-                  const { error } = await supabase
+                  const { error: subError } = await supabase
                     .from('submissions')
                     .delete()
                     .eq('id', shopData.id)
                     .eq('user_id', user.id);
 
-                  if (error) throw error;
+                  if (subError) {
+                    console.error('Error deleting submission:', subError);
+                    throw subError;
+                  }
                   
                   setShopData(null);
                   setProducts([]);
