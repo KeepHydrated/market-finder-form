@@ -1108,7 +1108,14 @@ const VendorDuplicate = () => {
                       variant="ghost"
                       size="sm"
                       onClick={async () => {
+                        console.log('🔵 Message button clicked', {
+                          hasUser: !!user,
+                          userId: user?.id,
+                          selectedVendorUserId: selectedVendor.user_id
+                        });
+
                         if (!user) {
+                          console.log('❌ No user authenticated');
                           toast({
                             title: "Authentication required",
                             description: "Please log in to message vendors",
@@ -1118,6 +1125,7 @@ const VendorDuplicate = () => {
                         }
                         
                         try {
+                          console.log('🔍 Checking for existing conversation...');
                           // Check if conversation already exists
                           const { data: existingConv, error: convError } = await supabase
                             .from('conversations')
@@ -1126,12 +1134,16 @@ const VendorDuplicate = () => {
                             .eq('seller_id', selectedVendor.user_id)
                             .maybeSingle();
                           
+                          console.log('📊 Conversation check result:', { existingConv, convError });
+                          
                           if (convError) throw convError;
                           
                           if (existingConv) {
+                            console.log('✅ Found existing conversation, navigating to:', existingConv.id);
                             // Navigate to existing conversation
                             navigate(`/messages/${existingConv.id}`);
                           } else {
+                            console.log('➕ Creating new conversation...');
                             // Create new conversation
                             const { data: newConv, error: createError } = await supabase
                               .from('conversations')
@@ -1142,15 +1154,18 @@ const VendorDuplicate = () => {
                               .select()
                               .single();
                             
+                            console.log('📝 Conversation creation result:', { newConv, createError });
+                            
                             if (createError) throw createError;
                             
+                            console.log('✅ Created new conversation, navigating to:', newConv.id);
                             navigate(`/messages/${newConv.id}`);
                           }
                         } catch (error) {
-                          console.error('Error creating conversation:', error);
+                          console.error('❌ Error in message flow:', error);
                           toast({
                             title: "Error",
-                            description: "Failed to start conversation",
+                            description: "Failed to start conversation. Check console for details.",
                             variant: "destructive",
                           });
                         }
