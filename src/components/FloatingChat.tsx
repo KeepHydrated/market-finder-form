@@ -181,7 +181,18 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50">
+    <>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-black/20 z-40"
+        onClick={onClose}
+      />
+      
+      {/* Chat Box */}
+      <div 
+        className="fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50"
+        onClick={(e) => e.stopPropagation()}
+      >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <h3 className="font-semibold text-foreground">{vendorName}</h3>
@@ -262,6 +273,7 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
           </Button>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   );
 }
