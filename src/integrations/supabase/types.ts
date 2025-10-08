@@ -70,6 +70,7 @@ export type Database = {
           order_id: string | null
           seller_id: string
           updated_at: string
+          vendor_id: string | null
         }
         Insert: {
           buyer_id: string
@@ -79,6 +80,7 @@ export type Database = {
           order_id?: string | null
           seller_id: string
           updated_at?: string
+          vendor_id?: string | null
         }
         Update: {
           buyer_id?: string
@@ -88,6 +90,7 @@ export type Database = {
           order_id?: string | null
           seller_id?: string
           updated_at?: string
+          vendor_id?: string | null
         }
         Relationships: [
           {
@@ -95,6 +98,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
             referencedColumns: ["id"]
           },
         ]

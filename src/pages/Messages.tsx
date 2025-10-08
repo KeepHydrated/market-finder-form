@@ -117,15 +117,27 @@ export default function Messages() {
             .eq('user_id', otherPartyId)
             .maybeSingle();
 
-          // Get store name - use most recent accepted submission
-          const { data: vendorSubmission } = await supabase
-            .from('submissions')
-            .select('store_name')
-            .eq('user_id', otherPartyId)
-            .eq('status', 'accepted')
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
+          // Get store name from the vendor_id if available, otherwise fall back to seller's store
+          let storeName = 'Unknown Store';
+          if (convo.vendor_id) {
+            const { data: vendorSubmission } = await supabase
+              .from('submissions')
+              .select('store_name')
+              .eq('id', convo.vendor_id)
+              .maybeSingle();
+            storeName = vendorSubmission?.store_name || 'Unknown Store';
+          } else {
+            // Fallback: use seller's most recent store
+            const { data: vendorSubmission } = await supabase
+              .from('submissions')
+              .select('store_name')
+              .eq('user_id', otherPartyId)
+              .eq('status', 'accepted')
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            storeName = vendorSubmission?.store_name || 'Unknown Store';
+          }
 
           // Get unread count
           const { count } = await supabase
@@ -139,7 +151,7 @@ export default function Messages() {
             ...convo,
             lastMessage: lastMsg || undefined,
             otherParty: profile || undefined,
-            store_name: vendorSubmission?.store_name || undefined,
+            store_name: storeName,
             unread_count: count || 0,
           };
         })

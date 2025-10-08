@@ -269,6 +269,7 @@ const Orders = () => {
             buyer_id: user.id,
             seller_id: order.vendor_id,
             order_id: order.id,
+            vendor_id: order.vendor_id,
           })
           .select()
           .single();

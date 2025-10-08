@@ -69,13 +69,24 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
       let conversationId = existingConv?.id;
 
       if (!conversationId) {
+        // Get the vendor submission id
+        const { data: vendorSubmission } = await supabase
+          .from('submissions')
+          .select('id')
+          .eq('user_id', vendorId)
+          .eq('status', 'accepted')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
         // Create new conversation
         const { data: newConv, error: createError } = await supabase
           .from('conversations')
           .insert({
             buyer_id: user.id,
             seller_id: vendorId,
-            order_id: null
+            order_id: null,
+            vendor_id: vendorSubmission?.id || null
           })
           .select()
           .single();
