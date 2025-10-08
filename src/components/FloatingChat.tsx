@@ -59,6 +59,13 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
         .maybeSingle();
 
       const vendorSubmissionId = vendorSubmission?.id;
+      
+      console.log('🔍 FloatingChat - Looking for conversation:', {
+        vendorId,
+        vendorName,
+        vendorSubmissionId,
+        userId: user.id
+      });
 
       // Find or create conversation - must match BOTH seller AND vendor_id
       const { data: existingConv, error: findError } = await supabase
@@ -74,6 +81,8 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
         .eq('seller_id', vendorId)
         .eq('vendor_id', vendorSubmissionId)
         .maybeSingle();
+      
+      console.log('🔍 FloatingChat - Existing conversation:', existingConv);
 
       if (findError) {
         console.error('Error finding conversation:', findError);
