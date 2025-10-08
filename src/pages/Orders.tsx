@@ -7,11 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Package, Calendar, Store, DollarSign, Mail, Phone } from "lucide-react";
+import { Package, Calendar, Store, DollarSign, Mail, Phone, Star, Upload, X } from "lucide-react";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useToast } from "@/hooks/use-toast";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
 import { FloatingChat } from "@/components/FloatingChat";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface OrderItem {
   id: string;
@@ -59,14 +62,41 @@ const Orders = () => {
   const [chatVendorId, setChatVendorId] = useState<string | null>(null);
   const [chatVendorName, setChatVendorName] = useState<string | null>(null);
   const [chatOrderItems, setChatOrderItems] = useState<OrderItem[]>([]);
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [reviewOrder, setReviewOrder] = useState<Order | null>(null);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewPhotos, setReviewPhotos] = useState<File[]>([]);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [userReviews, setUserReviews] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (user) {
       fetchOrders();
+      fetchUserReviews();
     } else {
       setLoading(false);
     }
   }, [user]);
+
+  const fetchUserReviews = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('vendor_id')
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      
+      if (data) {
+        setUserReviews(new Set(data.map(review => review.vendor_id)));
+      }
+    } catch (error) {
+      console.error('Error fetching user reviews:', error);
+    }
+  };
 
   const fetchOrders = async () => {
     try {
@@ -267,6 +297,109 @@ const Orders = () => {
     setShowReceiptDialog(true);
   };
 
+  const hasPackageArrived = (order: Order) => {
+    if (!order.estimated_delivery_date) return false;
+    const deliveryDate = new Date(order.estimated_delivery_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    deliveryDate.setHours(0, 0, 0, 0);
+    return deliveryDate <= today;
+  };
+
+  const handleLeaveReview = (order: Order) => {
+    setReviewOrder(order);
+    setReviewRating(0);
+    setReviewComment('');
+    setReviewPhotos([]);
+    setShowReviewDialog(true);
+  };
+
+  const handleReviewPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const totalPhotos = reviewPhotos.length;
+    const remainingSlots = 5 - totalPhotos;
+    const filesToAdd = files.slice(0, remainingSlots);
+    setReviewPhotos(prev => [...prev, ...filesToAdd]);
+  };
+
+  const removeReviewPhoto = (index: number) => {
+    setReviewPhotos(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmitReview = async () => {
+    if (!user || !reviewOrder) return;
+
+    if (reviewRating === 0) {
+      toast({
+        title: "Rating required",
+        description: "Please select a rating before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmittingReview(true);
+
+    try {
+      // Upload photos if any
+      let photoUrls: string[] = [];
+      if (reviewPhotos.length > 0) {
+        const uploadPromises = reviewPhotos.map(async (photo, index) => {
+          const fileExt = photo.name.split('.').pop();
+          const fileName = `${user.id}/${Date.now()}-${index}.${fileExt}`;
+          
+          const { data, error } = await supabase.storage
+            .from('review-photos')
+            .upload(fileName, photo);
+
+          if (error) throw error;
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('review-photos')
+            .getPublicUrl(fileName);
+
+          return publicUrl;
+        });
+
+        photoUrls = await Promise.all(uploadPromises);
+      }
+
+      // Submit review
+      const { error } = await supabase
+        .from('reviews')
+        .insert({
+          user_id: user.id,
+          vendor_id: reviewOrder.vendor_id,
+          rating: reviewRating,
+          comment: reviewComment || null,
+          photos: photoUrls.length > 0 ? photoUrls : null,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Review submitted",
+        description: "Thank you for your feedback!",
+      });
+
+      setUserReviews(prev => new Set([...prev, reviewOrder.vendor_id]));
+      setShowReviewDialog(false);
+      setReviewOrder(null);
+      setReviewRating(0);
+      setReviewComment('');
+      setReviewPhotos([]);
+    } catch (error: any) {
+      console.error('Error submitting review:', error);
+      toast({
+        title: "Failed to submit review",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -419,13 +552,23 @@ const Orders = () => {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Button 
-                    size="sm" 
-                    className="w-full rounded-full"
-                    onClick={() => handleTrackPackage(order)}
-                  >
-                    Track package
-                  </Button>
+                  {hasPackageArrived(order) && !userReviews.has(order.vendor_id) ? (
+                    <Button 
+                      size="sm" 
+                      className="w-full rounded-full"
+                      onClick={() => handleLeaveReview(order)}
+                    >
+                      Leave review
+                    </Button>
+                  ) : (
+                    <Button 
+                      size="sm" 
+                      className="w-full rounded-full"
+                      onClick={() => handleTrackPackage(order)}
+                    >
+                      Track package
+                    </Button>
+                  )}
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -598,6 +741,129 @@ const Orders = () => {
           orderItems={chatOrderItems}
         />
       )}
+
+      {/* Review Dialog */}
+      <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Leave a Review</DialogTitle>
+            <DialogDescription>
+              Share your experience with {reviewOrder?.vendor_name}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {/* Rating */}
+            <div>
+              <Label className="mb-3 block">Rating *</Label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setReviewRating(star)}
+                    className="transition-transform hover:scale-110"
+                  >
+                    <Star
+                      className={`h-8 w-8 ${
+                        star <= reviewRating
+                          ? 'text-yellow-500 fill-current'
+                          : 'text-gray-300'
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Comment */}
+            <div>
+              <Label htmlFor="review-comment" className="mb-2 block">
+                Your Review (Optional)
+              </Label>
+              <Textarea
+                id="review-comment"
+                placeholder="Tell us about your experience..."
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                rows={4}
+                maxLength={500}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {reviewComment.length}/500 characters
+              </p>
+            </div>
+
+            {/* Photos */}
+            <div>
+              <Label className="mb-2 block">Add Photos (Optional)</Label>
+              <div className="space-y-3">
+                {reviewPhotos.length < 5 && (
+                  <div>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleReviewPhotoUpload}
+                      className="hidden"
+                      id="review-photo-upload"
+                    />
+                    <Label
+                      htmlFor="review-photo-upload"
+                      className="flex items-center justify-center gap-2 p-4 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors"
+                    >
+                      <Upload className="h-5 w-5" />
+                      <span>Upload Photos (up to 5)</span>
+                    </Label>
+                  </div>
+                )}
+
+                {reviewPhotos.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2">
+                    {reviewPhotos.map((photo, index) => (
+                      <div key={index} className="relative aspect-square">
+                        <img
+                          src={URL.createObjectURL(photo)}
+                          alt={`Review photo ${index + 1}`}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
+                          onClick={() => removeReviewPhoto(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowReviewDialog(false)}
+                className="flex-1"
+                disabled={isSubmittingReview}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmitReview}
+                className="flex-1"
+                disabled={isSubmittingReview || reviewRating === 0}
+              >
+                {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
