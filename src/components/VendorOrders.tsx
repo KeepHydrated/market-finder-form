@@ -201,12 +201,17 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
                             )}
                           </button>
                           <div className="flex-1">
-                            <h5 className="font-medium">
-                              {item.quantity > 1 && (
-                                <span className="text-muted-foreground mr-2">(x {item.quantity})</span>
-                              )}
-                              {item.product_name}
-                            </h5>
+                            <button
+                              onClick={() => handleProductClick(item)}
+                              className="text-left w-full hover:underline cursor-pointer"
+                            >
+                              <h5 className="font-medium">
+                                {item.quantity > 1 && (
+                                  <span className="text-muted-foreground mr-2">(x {item.quantity})</span>
+                                )}
+                                {item.product_name}
+                              </h5>
+                            </button>
                           </div>
                         </div>
                         <div className="text-right ml-4">
