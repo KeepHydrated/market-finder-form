@@ -159,25 +159,24 @@ export default function Messages() {
                   )}
                 </Avatar>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-semibold truncate">
-                      {convo.otherParty?.full_name || 'Unknown User'}
-                    </h3>
-                    <span className="text-sm text-muted-foreground">
-                      {format(new Date(convo.last_message_at), 'MMM d')}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm text-muted-foreground truncate flex-1">
-                      {convo.lastMessage?.message || 'No messages yet'}
-                    </p>
-                    {convo.unread_count! > 0 && (
-                      <Badge variant="default" className="rounded-full px-2 py-0.5 text-xs">
-                        {convo.unread_count}
-                      </Badge>
-                    )}
-                  </div>
+                <div className="flex-1 min-w-0 flex items-center gap-3">
+                  <h3 className="font-semibold whitespace-nowrap">
+                    {convo.otherParty?.full_name || 'Unknown User'}
+                  </h3>
+                  <p className="text-sm text-muted-foreground truncate flex-1">
+                    {convo.lastMessage?.message || 'No messages yet'}
+                  </p>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-muted-foreground whitespace-nowrap">
+                    {format(new Date(convo.last_message_at), 'MMM d')}
+                  </span>
+                  {convo.unread_count! > 0 && (
+                    <Badge variant="default" className="rounded-full px-2 py-0.5 text-xs">
+                      {convo.unread_count}
+                    </Badge>
+                  )}
                 </div>
               </div>
             </Card>
