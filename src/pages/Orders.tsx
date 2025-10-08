@@ -571,7 +571,7 @@ const Orders = () => {
               </div>
 
               <Button
-                className="w-full"
+                className="w-full print:hidden"
                 onClick={() => {
                   window.print();
                 }}
