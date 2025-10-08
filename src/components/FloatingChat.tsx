@@ -175,16 +175,23 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
   return (
     <div className="fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <h3 className="font-semibold text-foreground">{vendorName}</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onClose}
-          className="h-8 w-8 p-0"
-        >
-          <X className="h-4 w-4" />
-        </Button>
+      <div className="border-b border-border">
+        <div className="flex items-center justify-between p-4">
+          <h3 className="font-semibold text-foreground">{vendorName}</h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="h-8 w-8 p-0"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="px-4 pb-3">
+          <p className="text-sm text-muted-foreground">
+            {vendorName} can help answer questions about their products and availability
+          </p>
+        </div>
       </div>
 
       {/* Messages */}
