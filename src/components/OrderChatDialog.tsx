@@ -185,137 +185,134 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
   if (!open) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col w-[450px] h-[600px] bg-white rounded-2xl shadow-2xl border">
-      {/* Header with vendor name and close button */}
-      <div className="flex items-center justify-between px-6 py-5 border-b shrink-0 rounded-t-2xl bg-white">
-        <h2 className="text-2xl font-bold">{vendorName || 'Store'}</h2>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          className="h-10 w-10 rounded-full hover:bg-muted"
-        >
-          <X className="h-6 w-6" />
-        </Button>
-      </div>
-
-      {/* Collapsible Order Details Section */}
-      <Collapsible open={isOrderOpen} onOpenChange={setIsOrderOpen} className="shrink-0">
-        <div className="px-6 py-4 bg-muted/30">
-          <CollapsibleTrigger className="w-full">
-            <div className="flex items-center justify-between">
-              <span className="text-base font-medium text-muted-foreground">Order Items:</span>
-              {isOrderOpen ? (
-                <ChevronUp className="h-5 w-5 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="h-5 w-5 text-muted-foreground" />
-              )}
-            </div>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div className="mt-4 p-4 bg-white border rounded-xl space-y-3">
-              {order.order_items.map((item) => (
-                <div key={item.id} className="flex items-center gap-3">
-                  <div className="w-14 h-14 bg-muted rounded-lg overflow-hidden flex-shrink-0">
-                    {item.product_image ? (
-                      <img 
-                        src={item.product_image} 
-                        alt={item.product_name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Package className="h-6 w-6 text-muted-foreground" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-base">{item.product_name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Qty: {item.quantity} × {formatPrice(item.unit_price)}
-                    </p>
-                  </div>
-                  <span className="font-bold text-lg">
-                    {formatPrice(item.total_price)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CollapsibleContent>
+    <>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-black/20 z-40"
+        onClick={onClose}
+      />
+      
+      {/* Chat Box */}
+      <div 
+        className="fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <h3 className="font-semibold text-foreground">{vendorName || 'Store'}</h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="h-8 w-8 p-0"
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
-      </Collapsible>
 
-      {/* Messages Section */}
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-        <ScrollArea className="flex-1 px-6 py-4">
-          <div className="space-y-3">
-            {loading ? (
-              <div className="text-center text-muted-foreground py-12">
-                Loading conversation...
+        {/* Messages */}
+        <ScrollArea className="flex-1 p-4">
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-muted-foreground">Loading messages...</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* Order Items - Show at top */}
+              <div className="bg-muted/50 rounded-lg p-3 border border-border">
+                <Collapsible open={isOrderOpen} onOpenChange={setIsOrderOpen}>
+                  <CollapsibleTrigger className="w-full">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-semibold text-muted-foreground">Order Items:</p>
+                      {isOrderOpen ? (
+                        <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="space-y-2 mt-2">
+                      {order.order_items.map((item) => (
+                        <div key={item.id} className="flex items-center gap-3">
+                          {item.product_image && (
+                            <img 
+                              src={item.product_image} 
+                              alt={item.product_name}
+                              className="w-10 h-10 object-cover rounded"
+                            />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{item.product_name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Qty: {item.quantity} × {formatPrice(item.unit_price)}
+                            </p>
+                          </div>
+                          <p className="text-sm font-semibold">
+                            {formatPrice(item.total_price)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
               </div>
-            ) : messages.length === 0 ? (
-              <div className="text-center text-muted-foreground py-12">
-                No messages yet. Start the conversation!
-              </div>
-            ) : (
-              messages.map((msg) => (
+              
+              {messages.length === 0 && (
+                <div className="flex items-center justify-center py-8">
+                  <p className="text-muted-foreground text-center text-sm">
+                    Start the conversation!
+                  </p>
+                </div>
+              )}
+              
+              {/* User messages */}
+              {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex ${
-                    msg.sender_id === currentUserId ? 'justify-end' : 'justify-start'
-                  }`}
+                  className={`flex ${msg.sender_id === currentUserId ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[75%] rounded-3xl px-5 py-3 shadow-sm ${
+                    className={`max-w-[80%] rounded-lg px-4 py-2 ${
                       msg.sender_id === currentUserId
-                        ? 'bg-[#4CAF50] text-white'
+                        ? 'bg-primary text-primary-foreground'
                         : 'bg-muted text-foreground'
                     }`}
                   >
-                    <p className="text-base break-words leading-relaxed">{msg.message}</p>
-                    <span className={`text-xs mt-1.5 block ${
-                      msg.sender_id === currentUserId ? 'text-white/90' : 'text-muted-foreground'
-                    }`}>
+                    <p className="text-sm">{msg.message}</p>
+                    <p className="text-xs opacity-70 mt-1">
                       {new Date(msg.created_at).toLocaleTimeString([], {
                         hour: '2-digit',
-                        minute: '2-digit',
+                        minute: '2-digit'
                       })}
-                    </span>
+                    </p>
                   </div>
                 </div>
-              ))
-            )}
-            <div ref={scrollRef} />
-          </div>
+              ))}
+              <div ref={scrollRef} />
+            </div>
+          )}
         </ScrollArea>
 
-        {/* Message Input */}
-        <div className="px-6 py-5 border-t shrink-0">
-          <div className="flex gap-3 items-center">
+        {/* Input */}
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          handleSendMessage();
+        }} className="p-4 border-t border-border">
+          <div className="flex gap-2">
             <Input
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
               placeholder="Type a message..."
+              className="flex-1"
               disabled={!conversationId}
-              className="flex-1 h-12 rounded-full bg-muted border-none px-5 text-base placeholder:text-muted-foreground"
             />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!newMessage.trim() || !conversationId}
-              size="icon"
-              className="rounded-full bg-[#4CAF50] hover:bg-[#45a049] h-14 w-14 flex-shrink-0"
-            >
-              <Send className="h-5 w-5" />
+            <Button type="submit" size="sm" disabled={!newMessage.trim() || !conversationId}>
+              <Send className="h-4 w-4" />
             </Button>
           </div>
-        </div>
+        </form>
       </div>
-    </div>
+    </>
   );
 };
