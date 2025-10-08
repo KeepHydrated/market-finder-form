@@ -17,6 +17,7 @@ interface Conversation {
   seller_id: string;
   order_id: string | null;
   last_message_at: string;
+  vendor_id?: string | null;
   lastMessage?: {
     message: string;
     sender_id: string;
@@ -347,9 +348,17 @@ export default function Messages() {
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border">
-              <h3 className="font-semibold text-foreground">
+              <button
+                onClick={() => {
+                  if (selectedConversation?.vendor_id) {
+                    navigate(`/vendor?id=${selectedConversation.vendor_id}`);
+                    closeConversation();
+                  }
+                }}
+                className="font-semibold text-foreground hover:text-primary transition-colors cursor-pointer"
+              >
                 {selectedConversation.store_name || 'Unknown Store'}
-              </h3>
+              </button>
               <Button
                 variant="ghost"
                 size="sm"
