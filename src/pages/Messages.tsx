@@ -22,6 +22,7 @@ interface Conversation {
     full_name: string;
     avatar_url: string | null;
   };
+  store_name?: string;
   unread_count?: number;
 }
 
@@ -95,6 +96,14 @@ export default function Messages() {
             .eq('user_id', otherPartyId)
             .maybeSingle();
 
+          // Get store name if the other party is a vendor
+          const { data: vendorSubmission } = await supabase
+            .from('submissions')
+            .select('store_name')
+            .eq('user_id', otherPartyId)
+            .eq('status', 'accepted')
+            .maybeSingle();
+
           // Get unread count
           const { count } = await supabase
             .from('messages')
@@ -107,6 +116,7 @@ export default function Messages() {
             ...convo,
             lastMessage: lastMsg || undefined,
             otherParty: profile || undefined,
+            store_name: vendorSubmission?.store_name || undefined,
             unread_count: count || 0,
           };
         })
@@ -161,7 +171,7 @@ export default function Messages() {
 
                 <div className="flex-1 min-w-0 flex items-center gap-3">
                   <h3 className="font-semibold whitespace-nowrap">
-                    {convo.otherParty?.full_name || 'Unknown User'}
+                    {convo.store_name || convo.otherParty?.full_name || 'Unknown User'}
                   </h3>
                   <p className="text-sm text-muted-foreground truncate flex-1">
                     {convo.lastMessage?.message || 'No messages yet'}
