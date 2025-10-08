@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Package, Mail } from "lucide-react";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
 import { OrderChatDialog } from "@/components/OrderChatDialog";
@@ -39,6 +40,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [showReceiptDialog, setShowReceiptDialog] = useState(false);
 
   useEffect(() => {
     if (vendorId) {
@@ -110,6 +112,11 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
   const handleMessageBuyer = (order: Order) => {
     setSelectedOrder(order);
     setIsChatOpen(true);
+  };
+
+  const handleViewReceipt = (order: Order) => {
+    setSelectedOrder(order);
+    setShowReceiptDialog(true);
   };
 
   if (!vendorId) {
@@ -254,7 +261,12 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                   >
                     Message buyer
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full rounded-full">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full rounded-full"
+                    onClick={() => handleViewReceipt(order)}
+                  >
                     View receipt
                   </Button>
                 </div>
@@ -279,6 +291,70 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
         vendorId={vendorId || ''}
         vendorName={vendorName}
       />
+
+      {/* Receipt Dialog */}
+      <Dialog open={showReceiptDialog} onOpenChange={setShowReceiptDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Order Receipt</DialogTitle>
+          </DialogHeader>
+          {selectedOrder && (
+            <div className="space-y-4">
+              <div className="py-4 border-b flex justify-between items-center">
+                <h3 className="font-bold text-lg">{vendorName || 'Store'}</h3>
+                <p className="text-sm text-muted-foreground">{formatDate(selectedOrder.created_at)}</p>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="font-semibold text-sm">Items</h4>
+                {selectedOrder.order_items.map((item) => (
+                  <div key={item.id} className="flex gap-4">
+                    <div className="w-32 h-32 flex-shrink-0 bg-muted rounded-lg overflow-hidden">
+                      {item.product_image ? (
+                        <img 
+                          src={item.product_image} 
+                          alt={item.product_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Package className="h-8 w-8 text-muted-foreground" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 flex flex-col justify-center">
+                      <h5 className="font-medium mb-1">{item.product_name}</h5>
+                      <p className="text-lg font-semibold text-primary mb-2">{formatPrice(item.total_price)}</p>
+                      {item.product_description && (
+                        <p className="text-sm text-muted-foreground line-clamp-2">{item.product_description}</p>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">Qty: {item.quantity} × {formatPrice(item.unit_price)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Separator />
+
+              <div className="space-y-1">
+                <div className="flex justify-between font-bold">
+                  <span>Total</span>
+                  <span>{formatPrice(selectedOrder.total_amount)}</span>
+                </div>
+              </div>
+
+              <Button
+                className="w-full print:hidden"
+                onClick={() => {
+                  window.print();
+                }}
+              >
+                Print Receipt
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
