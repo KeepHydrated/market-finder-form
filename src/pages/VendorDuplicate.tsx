@@ -1130,7 +1130,7 @@ const VendorDuplicate = () => {
                           
                           if (existingConv) {
                             // Navigate to existing conversation
-                            navigate(`/conversation/${existingConv.id}`);
+                            navigate(`/messages/${existingConv.id}`);
                           } else {
                             // Create new conversation
                             const { data: newConv, error: createError } = await supabase
@@ -1144,7 +1144,7 @@ const VendorDuplicate = () => {
                             
                             if (createError) throw createError;
                             
-                            navigate(`/conversation/${newConv.id}`);
+                            navigate(`/messages/${newConv.id}`);
                           }
                         } catch (error) {
                           console.error('Error creating conversation:', error);
@@ -1331,9 +1331,9 @@ const VendorDuplicate = () => {
                            
                            if (convError) throw convError;
                            
-                           if (existingConv) {
-                             // Navigate to existing conversation
-                             navigate(`/conversation/${existingConv.id}`);
+                            if (existingConv) {
+                              // Navigate to existing conversation
+                              navigate(`/messages/${existingConv.id}`);
                            } else {
                              // Create new conversation
                              const { data: newConv, error: createError } = await supabase
@@ -1345,9 +1345,9 @@ const VendorDuplicate = () => {
                                .select()
                                .single();
                              
-                             if (createError) throw createError;
-                             
-                             navigate(`/conversation/${newConv.id}`);
+                              if (createError) throw createError;
+                              
+                              navigate(`/messages/${newConv.id}`);
                            }
                          } catch (error) {
                            console.error('Error creating conversation:', error);
