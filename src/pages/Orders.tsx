@@ -521,7 +521,7 @@ const Orders = () => {
 
       {/* Receipt Dialog */}
       <Dialog open={showReceiptDialog} onOpenChange={setShowReceiptDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Order Receipt</DialogTitle>
             <DialogDescription>
@@ -535,14 +535,31 @@ const Orders = () => {
                 <p className="text-sm text-muted-foreground">{formatDate(selectedOrder.created_at)}</p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <h4 className="font-semibold text-sm">Items</h4>
                 {selectedOrder.order_items.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <span>
-                      {item.quantity}x {item.product_name}
-                    </span>
-                    <span>{formatPrice(item.total_price)}</span>
+                  <div key={item.id} className="flex gap-4">
+                    <div className="w-32 h-32 flex-shrink-0 bg-muted rounded-lg overflow-hidden">
+                      {item.product_image ? (
+                        <img 
+                          src={item.product_image} 
+                          alt={item.product_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Package className="h-8 w-8 text-muted-foreground" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 flex flex-col justify-center">
+                      <h5 className="font-medium mb-1">{item.product_name}</h5>
+                      <p className="text-lg font-semibold text-primary mb-2">{formatPrice(item.total_price)}</p>
+                      {item.product_description && (
+                        <p className="text-sm text-muted-foreground line-clamp-2">{item.product_description}</p>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">Qty: {item.quantity} × {formatPrice(item.unit_price)}</p>
+                    </div>
                   </div>
                 ))}
               </div>
