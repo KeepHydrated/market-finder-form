@@ -238,7 +238,7 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
                     Track package
                   </Button>
                   <Button variant="outline" size="sm" className="w-full rounded-full">
-                    Help with order
+                    Message buyer
                   </Button>
                   <Button variant="outline" size="sm" className="w-full rounded-full">
                     View receipt
