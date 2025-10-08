@@ -94,7 +94,7 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
                 <SidebarMenuItem key={item.section}>
                   <SidebarMenuButton asChild className={getNavClasses(isActive(item.section), item.section)}>
                     <NavLink 
-                      to={`/submit?section=${item.section}`}
+                      to={`/my-shop?section=${item.section}`}
                     >
                       <item.icon className="h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
