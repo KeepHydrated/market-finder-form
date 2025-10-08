@@ -1273,32 +1273,6 @@ const VendorDuplicate = () => {
                      </div>
                    </div>
                   
-                   {/* Message Button - TEMPORARILY showing for all vendors for testing */}
-                   {(
-                     <Button
-                       variant="secondary"
-                       size="sm"
-                       className="absolute top-2 right-12 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         if (!user) {
-                           toast({
-                             title: "Authentication required",
-                             description: "Please log in to message vendors",
-                             variant: "destructive",
-                           });
-                           return;
-                         }
-                         
-                         setChatVendorId(vendor.id);  // Use submission ID, not user_id
-                         setChatVendorName(vendor.store_name);
-                         setIsChatOpen(true);
-                       }}
-                     >
-                       <MessageSquare className="h-4 w-4 text-gray-600" />
-                     </Button>
-                   )}
-                  
                    {/* Like Button */}
                   <Button
                     variant="secondary"
