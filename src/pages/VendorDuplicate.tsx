@@ -1102,17 +1102,8 @@ const VendorDuplicate = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {/* Message button - only show for other vendors */}
-                  {(() => {
-                    console.log('🔍 Message button debug:', {
-                      hasSelectedVendor: !!selectedVendor,
-                      selectedVendorUserId: selectedVendor?.user_id,
-                      hasUser: !!user,
-                      userId: user?.id,
-                      shouldShow: selectedVendor && (!user || selectedVendor.user_id !== user.id)
-                    });
-                    return selectedVendor && (!user || selectedVendor.user_id !== user.id);
-                  })() && (
+                  {/* Message button - TEMPORARILY showing for all vendors for testing */}
+                  {selectedVendor && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -1312,8 +1303,8 @@ const VendorDuplicate = () => {
                      </div>
                    </div>
                   
-                   {/* Message Button - only show for other vendors */}
-                   {(!user || vendor.user_id !== user.id) && (
+                   {/* Message Button - TEMPORARILY showing for all vendors for testing */}
+                   {(
                      <Button
                        variant="secondary"
                        size="sm"
