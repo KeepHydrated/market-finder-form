@@ -887,7 +887,19 @@ export default function ShopManager() {
                 try {
                   // Delete related data first to handle foreign key constraints
                   
-                  // 1. Get all conversations for this vendor
+                  // 1. Delete reviews
+                  await supabase
+                    .from('reviews')
+                    .delete()
+                    .eq('vendor_id', shopData.id);
+                  
+                  // 2. Delete likes
+                  await supabase
+                    .from('likes')
+                    .delete()
+                    .eq('item_id', shopData.id);
+                  
+                  // 3. Get all conversations for this vendor
                   const { data: conversations } = await supabase
                     .from('conversations')
                     .select('id')
@@ -909,7 +921,7 @@ export default function ShopManager() {
                       .eq('vendor_id', shopData.id);
                   }
                   
-                  // 2. Get all orders for this vendor
+                  // 4. Get all orders for this vendor
                   const { data: orders } = await supabase
                     .from('orders')
                     .select('id')
@@ -925,19 +937,19 @@ export default function ShopManager() {
                       .in('order_id', orderIds);
                   }
                   
-                  // 3. Delete commissions
+                  // 5. Delete commissions
                   await supabase
                     .from('commissions')
                     .delete()
                     .eq('vendor_id', shopData.id);
                   
-                  // 4. Delete orders
+                  // 6. Delete orders
                   await supabase
                     .from('orders')
                     .delete()
                     .eq('vendor_id', shopData.id);
                   
-                  // 5. Finally delete the submission
+                  // 7. Finally delete the submission
                   const { error } = await supabase
                     .from('submissions')
                     .delete()
