@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut, Package, Settings, MessageSquare, Store } from 'lucide-react';
+import { LogOut, Package, Settings, MessageSquare } from 'lucide-react';
 
 interface UserMenuProps {
   user: any;
@@ -39,10 +39,6 @@ export function UserMenu({ user, profile }: UserMenuProps) {
 
   const handleMessagesClick = () => {
     navigate('/messages');
-  };
-
-  const handleSampleStoreClick = () => {
-    navigate('/profile/98a4dcd8-ee9d-4786-98ec-303aecba4cd3');
   };
 
   const getInitials = (name?: string) => {
@@ -100,10 +96,6 @@ export function UserMenu({ user, profile }: UserMenuProps) {
         <DropdownMenuItem onClick={handleMessagesClick}>
           <MessageSquare className="mr-2 h-4 w-4" />
           <span>Messages</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleSampleStoreClick}>
-          <Store className="mr-2 h-4 w-4" />
-          <span>Sample Store</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
