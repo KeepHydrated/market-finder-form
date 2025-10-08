@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight } from "lucide-react";
+import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,6 +22,7 @@ import { getGoogleMapsDistance, calculateDistance, getCoordinatesForAddress } fr
 
 interface AcceptedSubmission {
   id: string;
+  user_id: string;
   store_name: string;
   primary_specialty: string;
   website: string;
@@ -1100,28 +1101,89 @@ const VendorDuplicate = () => {
                     </span>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={async () => {
-                    if (selectedVendor) {
-                      await toggleLike(selectedVendor.id, 'vendor');
-                    }
-                  }}
-                  className={cn(
-                    "transition-colors",
-                    selectedVendor && isLiked(selectedVendor.id, 'vendor')
-                      ? "text-red-500 hover:text-red-600"
-                      : "text-muted-foreground hover:text-foreground"
+                <div className="flex items-center gap-2">
+                  {/* Message button - only show for other vendors */}
+                  {selectedVendor && user && selectedVendor.user_id !== user.id && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async () => {
+                        if (!user) {
+                          toast({
+                            title: "Authentication required",
+                            description: "Please log in to message vendors",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        
+                        try {
+                          // Check if conversation already exists
+                          const { data: existingConv, error: convError } = await supabase
+                            .from('conversations')
+                            .select('id')
+                            .eq('buyer_id', user.id)
+                            .eq('seller_id', selectedVendor.user_id)
+                            .maybeSingle();
+                          
+                          if (convError) throw convError;
+                          
+                          if (existingConv) {
+                            // Navigate to existing conversation
+                            navigate(`/conversation/${existingConv.id}`);
+                          } else {
+                            // Create new conversation
+                            const { data: newConv, error: createError } = await supabase
+                              .from('conversations')
+                              .insert({
+                                buyer_id: user.id,
+                                seller_id: selectedVendor.user_id,
+                              })
+                              .select()
+                              .single();
+                            
+                            if (createError) throw createError;
+                            
+                            navigate(`/conversation/${newConv.id}`);
+                          }
+                        } catch (error) {
+                          console.error('Error creating conversation:', error);
+                          toast({
+                            title: "Error",
+                            description: "Failed to start conversation",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <MessageSquare className="h-6 w-6" />
+                    </Button>
                   )}
-                >
-                  <Heart 
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={async () => {
+                      if (selectedVendor) {
+                        await toggleLike(selectedVendor.id, 'vendor');
+                      }
+                    }}
                     className={cn(
-                      "h-6 w-6 transition-colors",
-                      selectedVendor && isLiked(selectedVendor.id, 'vendor') && "fill-current"
-                    )} 
-                  />
-                </Button>
+                      "transition-colors",
+                      selectedVendor && isLiked(selectedVendor.id, 'vendor')
+                        ? "text-red-500 hover:text-red-600"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Heart 
+                      className={cn(
+                        "h-6 w-6 transition-colors",
+                        selectedVendor && isLiked(selectedVendor.id, 'vendor') && "fill-current"
+                      )} 
+                    />
+                  </Button>
+                </div>
               </div>
 
                {/* Category badges */}
