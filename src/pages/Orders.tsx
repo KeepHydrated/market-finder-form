@@ -564,10 +564,6 @@ const Orders = () => {
               <Separator />
 
               <div className="space-y-1">
-                <div className="flex justify-between text-sm">
-                  <span>Subtotal</span>
-                  <span>{formatPrice(selectedOrder.total_amount)}</span>
-                </div>
                 <div className="flex justify-between font-bold">
                   <span>Total</span>
                   <span>{formatPrice(selectedOrder.total_amount)}</span>
