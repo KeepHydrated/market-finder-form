@@ -110,15 +110,15 @@ export default function ShopManager() {
 
   useEffect(() => {
     // Auto-navigate based on shop data existence
-    if (!isSavingRef.current) {
+    if (!isSavingRef.current && !loadingShop) {
       const newSection = shopData ? currentSection : 'overview';
       if (newSection !== currentSection) {
-        navigate(`/submit?section=${newSection}`, { replace: true });
+        navigate(`/my-shop?section=${newSection}`, { replace: true });
       }
-    } else {
+    } else if (isSavingRef.current) {
       isSavingRef.current = false;
     }
-  }, [shopData, navigate, currentSection]);
+  }, [shopData, navigate, loadingShop]);
 
   const fetchShopData = async () => {
     if (!user) return;
