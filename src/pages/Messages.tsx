@@ -157,18 +157,6 @@ export default function Messages() {
               onClick={() => navigate(`/messages/${convo.id}`)}
             >
               <div className="flex items-start gap-4">
-                <Avatar className="w-12 h-12">
-                  {convo.otherParty?.avatar_url ? (
-                    <img src={convo.otherParty.avatar_url} alt={convo.otherParty.full_name} />
-                  ) : (
-                    <div className="w-full h-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-lg font-semibold">
-                        {convo.otherParty?.full_name?.[0] || '?'}
-                      </span>
-                    </div>
-                  )}
-                </Avatar>
-
                 <div className="flex-1 min-w-0 flex items-center gap-3">
                   <h3 className="font-semibold whitespace-nowrap">
                     {convo.store_name || 'Unknown Store'}
