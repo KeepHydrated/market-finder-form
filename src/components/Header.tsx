@@ -90,7 +90,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
                 <DropdownMenuItem>
-                  <Link to="/homepage" className="w-full font-semibold">
+                  <Link to="/category" className="w-full font-semibold">
                     All Categories
                   </Link>
                 </DropdownMenuItem>

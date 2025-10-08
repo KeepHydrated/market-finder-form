@@ -62,23 +62,27 @@ const CategoryProducts = () => {
   
   const category = searchParams.get('category');
 
-  // Fetch all vendors nationwide for the selected category
+  // Fetch all vendors nationwide for the selected category (or all categories)
   useEffect(() => {
     const fetchNationwideVendors = async () => {
-      if (!category) return;
-      
       setLoading(true);
       
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from('submissions')
           .select('*')
-          .eq('status', 'accepted')
-          .eq('primary_specialty', category);
+          .eq('status', 'accepted');
+        
+        // Only filter by category if one is specified
+        if (category) {
+          query = query.eq('primary_specialty', category);
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
 
-        console.log(`Found ${data?.length || 0} vendors nationwide for category: ${category}`);
+        console.log(`Found ${data?.length || 0} vendors nationwide${category ? ` for category: ${category}` : ' (all categories)'}`);
         setVendors(data || []);
       } catch (error) {
         console.error('Error fetching vendors:', error);
@@ -200,7 +204,7 @@ const CategoryProducts = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           {/* Category Title */}
-          <h1 className="text-2xl font-bold capitalize">{category}</h1>
+          <h1 className="text-2xl font-bold capitalize">{category || 'All Categories'}</h1>
           
           {/* Sort Dropdown */}
           <DropdownMenu>
