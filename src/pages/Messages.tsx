@@ -351,7 +351,7 @@ export default function Messages() {
               <button
                 onClick={() => {
                   if (selectedConversation?.vendor_id) {
-                    navigate(`/vendor?id=${selectedConversation.vendor_id}`);
+                    navigate(`/market?id=${selectedConversation.vendor_id}`);
                     closeConversation();
                   }
                 }}
