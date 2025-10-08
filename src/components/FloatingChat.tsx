@@ -24,14 +24,24 @@ interface ConversationDetails {
   seller_name: string;
 }
 
+interface OrderItem {
+  id: string;
+  product_name: string;
+  product_image: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+}
+
 interface FloatingChatProps {
   isOpen: boolean;
   onClose: () => void;
   vendorId: string;  // This is actually the submission/store ID
   vendorName: string;
+  orderItems?: OrderItem[];
 }
 
-export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: FloatingChatProps) {
+export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems }: FloatingChatProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [conversation, setConversation] = useState<ConversationDetails | null>(null);
@@ -245,14 +255,45 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
           </div>
         ) : (
           <div className="space-y-4">
-            {/* Welcome message */}
-            <div className="flex justify-center">
-              <div className="max-w-[80%]">
-                <p className="text-sm text-center text-muted-foreground">
-                  {vendorName} can help answer questions about their products and availability
-                </p>
+            {/* Order Items - Show at top if available */}
+            {orderItems && orderItems.length > 0 && (
+              <div className="bg-muted/50 rounded-lg p-3 border border-border">
+                <p className="text-xs font-semibold text-muted-foreground mb-2">Order Items:</p>
+                <div className="space-y-2">
+                  {orderItems.map((item) => (
+                    <div key={item.id} className="flex items-center gap-3">
+                      {item.product_image && (
+                        <img 
+                          src={item.product_image} 
+                          alt={item.product_name}
+                          className="w-10 h-10 object-cover rounded"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{item.product_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Qty: {item.quantity} × ${(item.unit_price / 100).toFixed(2)}
+                        </p>
+                      </div>
+                      <p className="text-sm font-semibold">
+                        ${(item.total_price / 100).toFixed(2)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Welcome message */}
+            {!orderItems && (
+              <div className="flex justify-center">
+                <div className="max-w-[80%]">
+                  <p className="text-sm text-center text-muted-foreground">
+                    {vendorName} can help answer questions about their products and availability
+                  </p>
+                </div>
+              </div>
+            )}
             
             {messages.length === 0 && (
               <div className="flex items-center justify-center py-8">
