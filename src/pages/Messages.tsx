@@ -153,6 +153,26 @@ export default function Messages() {
     setMessages([]);
 
     try {
+      // Determine the other party (the vendor/seller)
+      const otherPartyId = convo.buyer_id === user!.id ? convo.seller_id : convo.buyer_id;
+      
+      // Fetch the vendor's store name if not already in the conversation
+      if (!convo.store_name) {
+        const { data: vendorSubmission } = await supabase
+          .from('submissions')
+          .select('store_name')
+          .eq('user_id', otherPartyId)
+          .eq('status', 'accepted')
+          .maybeSingle();
+        
+        if (vendorSubmission?.store_name) {
+          setSelectedConversation({
+            ...convo,
+            store_name: vendorSubmission.store_name
+          });
+        }
+      }
+
       // Fetch messages
       const { data: msgs, error } = await supabase
         .from('messages')
