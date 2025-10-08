@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Package, Mail } from "lucide-react";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
+import { OrderChatDialog } from "@/components/OrderChatDialog";
 
 interface OrderItem {
   id: string;
@@ -35,6 +36,8 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
   const [error, setError] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     if (vendorId) {
@@ -101,6 +104,11 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
     };
     setSelectedProduct(product);
     setIsModalOpen(true);
+  };
+
+  const handleMessageBuyer = (order: Order) => {
+    setSelectedOrder(order);
+    setIsChatOpen(true);
   };
 
   if (!vendorId) {
@@ -237,7 +245,12 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
                   <Button size="sm" className="w-full rounded-full">
                     Track package
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full rounded-full">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full rounded-full"
+                    onClick={() => handleMessageBuyer(order)}
+                  >
                     Message buyer
                   </Button>
                   <Button variant="outline" size="sm" className="w-full rounded-full">
@@ -256,6 +269,13 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         hideVendorName={true}
+      />
+
+      <OrderChatDialog
+        open={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        order={selectedOrder}
+        vendorId={vendorId || ''}
       />
     </div>
   );
