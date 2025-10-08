@@ -246,12 +246,13 @@ const Orders = () => {
     if (!user) return;
 
     try {
-      // Check if conversation already exists
+      // Check if conversation already exists for this specific vendor
       const { data: existingConvo, error: convoError } = await supabase
         .from('conversations')
         .select('id')
         .eq('buyer_id', user.id)
         .eq('seller_id', order.vendor_id)
+        .eq('vendor_id', order.vendor_id)
         .maybeSingle();
 
       if (convoError && convoError.code !== 'PGRST116') {

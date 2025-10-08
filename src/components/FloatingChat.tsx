@@ -48,16 +48,31 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
     const initConversation = async () => {
       setLoading(true);
       
-      // Find or create conversation
+      // Get the vendor submission id first
+      const { data: vendorSubmission } = await supabase
+        .from('submissions')
+        .select('id')
+        .eq('user_id', vendorId)
+        .eq('status', 'accepted')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const vendorSubmissionId = vendorSubmission?.id;
+
+      // Find or create conversation - must match BOTH seller AND vendor_id
       const { data: existingConv, error: findError } = await supabase
         .from('conversations')
         .select(`
           id,
           buyer_id,
           seller_id,
-          order_id
+          order_id,
+          vendor_id
         `)
-        .or(`and(buyer_id.eq.${user.id},seller_id.eq.${vendorId}),and(buyer_id.eq.${vendorId},seller_id.eq.${user.id})`)
+        .eq('buyer_id', user.id)
+        .eq('seller_id', vendorId)
+        .eq('vendor_id', vendorSubmissionId)
         .maybeSingle();
 
       if (findError) {
@@ -69,16 +84,6 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
       let conversationId = existingConv?.id;
 
       if (!conversationId) {
-        // Get the vendor submission id
-        const { data: vendorSubmission } = await supabase
-          .from('submissions')
-          .select('id')
-          .eq('user_id', vendorId)
-          .eq('status', 'accepted')
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
         // Create new conversation
         const { data: newConv, error: createError } = await supabase
           .from('conversations')
@@ -86,7 +91,7 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
             buyer_id: user.id,
             seller_id: vendorId,
             order_id: null,
-            vendor_id: vendorSubmission?.id || null
+            vendor_id: vendorSubmissionId || null
           })
           .select()
           .single();
