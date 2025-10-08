@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Package, Mail } from "lucide-react";
+import { ProductDetailModal } from "@/components/ProductDetailModal";
 
 interface OrderItem {
   id: string;
@@ -32,6 +33,8 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (vendorId) {
@@ -88,6 +91,17 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
     return `$${(cents / 100).toFixed(2)}`;
   };
 
+  const handleProductClick = (item: OrderItem) => {
+    const product = {
+      id: Math.random(), // Temporary ID for modal
+      name: item.product_name,
+      description: item.product_description || '',
+      price: item.unit_price / 100, // Convert from cents to dollars
+      images: item.product_image ? [item.product_image] : [],
+    };
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
 
   if (!vendorId) {
     return (
@@ -168,7 +182,10 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
                     {order.order_items.map((item) => (
                       <div key={item.id} className="flex justify-between items-start py-2">
                         <div className="flex items-start gap-3 flex-1">
-                          <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          <button
+                            onClick={() => handleProductClick(item)}
+                            className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                          >
                             {item.product_image ? (
                               <img 
                                 src={item.product_image} 
@@ -182,7 +199,7 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
                             ) : (
                               <Package className="h-6 w-6 text-green-600" />
                             )}
-                          </div>
+                          </button>
                           <div className="flex-1">
                             <h5 className="font-medium">
                               {item.quantity > 1 && (
@@ -227,6 +244,14 @@ export const VendorOrders = ({ vendorId }: VendorOrdersProps) => {
           ))}
         </div>
       )}
+
+      <ProductDetailModal
+        product={selectedProduct}
+        products={selectedProduct ? [selectedProduct] : []}
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        hideVendorName={true}
+      />
     </div>
   );
 };
