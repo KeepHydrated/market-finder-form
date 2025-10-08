@@ -197,8 +197,8 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
           <div className="space-y-4">
             {/* Welcome message */}
             <div className="flex justify-center">
-              <div className="max-w-[80%] rounded-lg px-4 py-2 bg-muted text-foreground">
-                <p className="text-sm text-center">
+              <div className="max-w-[80%]">
+                <p className="text-sm text-center text-muted-foreground">
                   {vendorName} can help answer questions about their products and availability
                 </p>
               </div>
