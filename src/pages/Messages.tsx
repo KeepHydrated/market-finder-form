@@ -93,9 +93,12 @@ export default function Messages() {
 
       if (error) throw error;
 
+      // Remove duplicates and fetch details
+      const uniqueConvos = Array.from(new Map(convos?.map(c => [c.id, c])).values());
+
       // Fetch last message and other party details for each conversation
       const conversationsWithDetails = await Promise.all(
-        (convos || []).map(async (convo) => {
+        (uniqueConvos || []).map(async (convo) => {
           const otherPartyId = convo.buyer_id === user.id ? convo.seller_id : convo.buyer_id;
 
           // Get last message
@@ -114,7 +117,7 @@ export default function Messages() {
             .eq('user_id', otherPartyId)
             .maybeSingle();
 
-          // Get store name if the other party is a vendor
+          // Get store name - use most recent accepted submission
           const { data: vendorSubmission } = await supabase
             .from('submissions')
             .select('store_name')
