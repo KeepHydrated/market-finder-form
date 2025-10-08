@@ -171,7 +171,7 @@ export default function Messages() {
 
                 <div className="flex-1 min-w-0 flex items-center gap-3">
                   <h3 className="font-semibold whitespace-nowrap">
-                    {convo.store_name || convo.otherParty?.full_name || 'Unknown User'}
+                    {convo.store_name || 'Unknown Store'}
                   </h3>
                   <p className="text-sm text-muted-foreground truncate flex-1">
                     {convo.lastMessage?.message || 'No messages yet'}
