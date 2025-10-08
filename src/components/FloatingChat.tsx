@@ -175,23 +175,16 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
   return (
     <div className="fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50">
       {/* Header */}
-      <div className="border-b border-border">
-        <div className="flex items-center justify-between p-4">
-          <h3 className="font-semibold text-foreground">{vendorName}</h3>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="h-8 w-8 p-0"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-        <div className="px-4 pb-3">
-          <p className="text-sm text-muted-foreground">
-            {vendorName} can help answer questions about their products and availability
-          </p>
-        </div>
+      <div className="flex items-center justify-between p-4 border-b border-border">
+        <h3 className="font-semibold text-foreground">{vendorName}</h3>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onClose}
+          className="h-8 w-8 p-0"
+        >
+          <X className="h-4 w-4" />
+        </Button>
       </div>
 
       {/* Messages */}
@@ -200,14 +193,26 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
           <div className="flex items-center justify-center h-full">
             <p className="text-muted-foreground">Loading messages...</p>
           </div>
-        ) : messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-muted-foreground text-center">
-              No messages yet.<br />Start the conversation!
-            </p>
-          </div>
         ) : (
           <div className="space-y-4">
+            {/* Welcome message */}
+            <div className="flex justify-start">
+              <div className="max-w-[80%] rounded-lg px-4 py-2 bg-muted text-foreground">
+                <p className="text-sm">
+                  {vendorName} can help answer questions about their products and availability
+                </p>
+              </div>
+            </div>
+            
+            {messages.length === 0 && (
+              <div className="flex items-center justify-center py-8">
+                <p className="text-muted-foreground text-center text-sm">
+                  Start the conversation!
+                </p>
+              </div>
+            )}
+            
+            {/* User messages */}
             {messages.map((msg) => (
               <div
                 key={msg.id}
