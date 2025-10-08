@@ -17,6 +17,7 @@ import { ShopSidebar } from '@/components/ShopSidebar';
 import { VendorOrders } from '@/components/VendorOrders';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -95,6 +96,7 @@ export default function ShopManager() {
 
   const [products, setProducts] = useState<any[]>([]);
   const [selectedFarmersMarkets, setSelectedFarmersMarkets] = useState<any[]>([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -858,11 +860,28 @@ export default function ShopManager() {
             </div>
             <Button 
               variant="destructive"
+              onClick={() => setShowDeleteDialog(true)}
+            >
+              Delete Store
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your store and remove all your products, orders, and store information from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={async () => {
-                if (!confirm('Are you sure you want to delete your store? This action cannot be undone and will remove all your products, orders, and store information.')) {
-                  return;
-                }
-                
                 if (!user || !shopData) return;
                 
                 try {
@@ -942,6 +961,7 @@ export default function ShopManager() {
                     description: "Your store has been permanently deleted",
                   });
                   
+                  setShowDeleteDialog(false);
                   navigate('/submit?section=setup');
                 } catch (error) {
                   console.error('Error deleting store:', error);
@@ -954,10 +974,10 @@ export default function ShopManager() {
               }}
             >
               Delete Store
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 
