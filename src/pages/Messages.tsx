@@ -1,12 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/ui/card';
-import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, X, Send } from 'lucide-react';
 import { format } from 'date-fns';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
 
 interface Conversation {
   id: string;
@@ -26,11 +30,25 @@ interface Conversation {
   unread_count?: number;
 }
 
+interface Message {
+  id: string;
+  sender_id: string;
+  message: string;
+  created_at: string;
+  is_read: boolean;
+}
+
 export default function Messages() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { toast } = useToast();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (authLoading) return; // Wait for auth to load
@@ -130,6 +148,102 @@ export default function Messages() {
     }
   };
 
+  const openConversation = async (convo: Conversation) => {
+    setSelectedConversation(convo);
+    setLoadingMessages(true);
+    setMessages([]);
+
+    try {
+      // Fetch messages
+      const { data: msgs, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', convo.id)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setMessages(msgs || []);
+
+      // Mark messages as read
+      await supabase
+        .from('messages')
+        .update({ is_read: true })
+        .eq('conversation_id', convo.id)
+        .neq('sender_id', user!.id)
+        .eq('is_read', false);
+
+      // Subscribe to new messages
+      const channel = supabase
+        .channel(`conversation-${convo.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+            filter: `conversation_id=eq.${convo.id}`,
+          },
+          (payload) => {
+            setMessages((prev) => [...prev, payload.new as Message]);
+          }
+        )
+        .subscribe();
+
+      // Cleanup on dialog close
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    } catch (error) {
+      console.error('Error loading messages:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load messages',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !selectedConversation || !user) return;
+
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: selectedConversation.id,
+          sender_id: user.id,
+          message: newMessage.trim(),
+        });
+
+      if (error) throw error;
+
+      // Update conversation's last_message_at
+      await supabase
+        .from('conversations')
+        .update({ last_message_at: new Date().toISOString() })
+        .eq('id', selectedConversation.id);
+
+      setNewMessage('');
+      fetchConversations(); // Refresh conversation list
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to send message',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -154,7 +268,7 @@ export default function Messages() {
             <Card
               key={convo.id}
               className="p-4 hover:bg-accent cursor-pointer transition-colors"
-              onClick={() => navigate(`/messages/${convo.id}`)}
+              onClick={() => openConversation(convo)}
             >
               <div className="flex items-start gap-4">
                 <div className="flex-1 min-w-0 flex items-center gap-3">
@@ -181,6 +295,70 @@ export default function Messages() {
           ))}
         </div>
       )}
+
+      {/* Chat Dialog */}
+      <Dialog open={!!selectedConversation} onOpenChange={(open) => !open && setSelectedConversation(null)}>
+        <DialogContent className="sm:max-w-[600px] h-[600px] flex flex-col p-0">
+          <DialogHeader className="p-4 border-b">
+            <DialogTitle>
+              {selectedConversation?.store_name || 'Unknown Store'}
+            </DialogTitle>
+          </DialogHeader>
+
+          <ScrollArea className="flex-1 p-4">
+            {loadingMessages ? (
+              <div className="flex items-center justify-center h-full">
+                <p className="text-muted-foreground">Loading messages...</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {messages.length === 0 && (
+                  <div className="flex items-center justify-center py-8">
+                    <p className="text-muted-foreground text-center text-sm">
+                      Start the conversation!
+                    </p>
+                  </div>
+                )}
+                
+                {messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                        msg.sender_id === user?.id
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-foreground'
+                      }`}
+                    >
+                      <p className="text-sm">{msg.message}</p>
+                      <p className="text-xs opacity-70 mt-1">
+                        {format(new Date(msg.created_at), 'h:mm a')}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
+          </ScrollArea>
+
+          <form onSubmit={handleSendMessage} className="p-4 border-t">
+            <div className="flex gap-2">
+              <Input
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type a message..."
+                className="flex-1"
+              />
+              <Button type="submit" size="sm" disabled={!newMessage.trim()}>
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
