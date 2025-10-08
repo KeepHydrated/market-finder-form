@@ -97,6 +97,7 @@ export default function ShopManager() {
   const [products, setProducts] = useState<any[]>([]);
   const [selectedFarmersMarkets, setSelectedFarmersMarkets] = useState<any[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -881,97 +882,117 @@ export default function ShopManager() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isDeleting}
               onClick={async () => {
-                if (!user || !shopData) return;
+                if (!user || !shopData || isDeleting) return;
+                
+                setIsDeleting(true);
                 
                 try {
                   console.log('Starting deletion for shop:', shopData.id);
                   
-                  // Delete related data first to handle foreign key constraints
-                  // Order matters: delete child records before parent records
-                  
-                  // 1. Get all conversations for this vendor
-                  const { data: conversations, error: convError } = await supabase
+                  // Step 1: Get and delete all conversations and their messages
+                  const { data: conversations } = await supabase
                     .from('conversations')
                     .select('id')
                     .eq('vendor_id', shopData.id);
                   
-                  console.log('Found conversations:', conversations);
+                  console.log('Found conversations:', conversations?.length || 0);
                   
                   if (conversations && conversations.length > 0) {
                     const conversationIds = conversations.map(c => c.id);
                     
-                    // Delete messages first
+                    // Delete messages
                     const { error: msgError } = await supabase
                       .from('messages')
                       .delete()
                       .in('conversation_id', conversationIds);
                     
-                    if (msgError) console.error('Error deleting messages:', msgError);
+                    if (msgError) {
+                      console.error('Error deleting messages:', msgError);
+                      throw new Error('Failed to delete messages');
+                    }
                     
-                    // Then delete conversations
-                    const { error: delConvError } = await supabase
+                    // Delete conversations by ID (not vendor_id to avoid FK issues)
+                    const { error: convError } = await supabase
                       .from('conversations')
                       .delete()
                       .in('id', conversationIds);
                     
-                    if (delConvError) {
-                      console.error('Error deleting conversations:', delConvError);
-                      throw delConvError;
+                    if (convError) {
+                      console.error('Error deleting conversations:', convError);
+                      throw new Error('Failed to delete conversations');
                     }
+                    
+                    console.log('Deleted conversations and messages');
                   }
                   
-                  // 2. Delete reviews
+                  // Step 2: Delete reviews
                   const { error: reviewError } = await supabase
                     .from('reviews')
                     .delete()
                     .eq('vendor_id', shopData.id);
                   
-                  if (reviewError) console.error('Error deleting reviews:', reviewError);
+                  if (reviewError) {
+                    console.error('Error deleting reviews:', reviewError);
+                  }
                   
-                  // 3. Delete likes
+                  // Step 3: Delete likes
                   const { error: likeError } = await supabase
                     .from('likes')
                     .delete()
                     .eq('item_id', shopData.id);
                   
-                  if (likeError) console.error('Error deleting likes:', likeError);
+                  if (likeError) {
+                    console.error('Error deleting likes:', likeError);
+                  }
                   
-                  // 4. Get all orders
+                  // Step 4: Get and delete orders
                   const { data: orders } = await supabase
                     .from('orders')
                     .select('id')
                     .eq('vendor_id', shopData.id);
                   
+                  console.log('Found orders:', orders?.length || 0);
+                  
                   if (orders && orders.length > 0) {
                     const orderIds = orders.map(o => o.id);
                     
-                    // Delete order items first
+                    // Delete order items
                     const { error: orderItemsError } = await supabase
                       .from('order_items')
                       .delete()
                       .in('order_id', orderIds);
                     
-                    if (orderItemsError) console.error('Error deleting order items:', orderItemsError);
+                    if (orderItemsError) {
+                      console.error('Error deleting order items:', orderItemsError);
+                    }
+                    
+                    // Delete commissions
+                    const { error: commError } = await supabase
+                      .from('commissions')
+                      .delete()
+                      .eq('vendor_id', shopData.id);
+                    
+                    if (commError) {
+                      console.error('Error deleting commissions:', commError);
+                    }
+                    
+                    // Delete orders
+                    const { error: orderError } = await supabase
+                      .from('orders')
+                      .delete()
+                      .in('id', orderIds);
+                    
+                    if (orderError) {
+                      console.error('Error deleting orders:', orderError);
+                    }
+                    
+                    console.log('Deleted orders and related data');
                   }
                   
-                  // 5. Delete commissions
-                  const { error: commError } = await supabase
-                    .from('commissions')
-                    .delete()
-                    .eq('vendor_id', shopData.id);
-                  
-                  if (commError) console.error('Error deleting commissions:', commError);
-                  
-                  // 6. Delete orders
-                  const { error: orderError } = await supabase
-                    .from('orders')
-                    .delete()
-                    .eq('vendor_id', shopData.id);
-                  
-                  if (orderError) console.error('Error deleting orders:', orderError);
-                  
-                  // 7. Finally delete the submission
+                  // Step 5: Finally delete the submission
+                  console.log('Attempting to delete submission');
                   const { error: subError } = await supabase
                     .from('submissions')
                     .delete()
@@ -980,8 +1001,10 @@ export default function ShopManager() {
 
                   if (subError) {
                     console.error('Error deleting submission:', subError);
-                    throw subError;
+                    throw new Error('Failed to delete store: ' + subError.message);
                   }
+                  
+                  console.log('Successfully deleted submission');
                   
                   setShopData(null);
                   setProducts([]);
@@ -1004,13 +1027,15 @@ export default function ShopManager() {
                   console.error('Error deleting store:', error);
                   toast({
                     title: "Delete Failed",
-                    description: "Failed to delete your store",
+                    description: error instanceof Error ? error.message : "Failed to delete your store",
                     variant: "destructive",
                   });
+                } finally {
+                  setIsDeleting(false);
                 }
               }}
             >
-              Delete Store
+              {isDeleting ? 'Deleting...' : 'Delete Store'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
