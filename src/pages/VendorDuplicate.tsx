@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
+import { FloatingChat } from "@/components/FloatingChat";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -98,6 +99,9 @@ const VendorDuplicate = () => {
   const [distance, setDistance] = useState<string>('');
   const [isLoadingDistance, setIsLoadingDistance] = useState(false);
   const [cachedMarketCoordinates, setCachedMarketCoordinates] = useState<{lat: number; lng: number} | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatVendorId, setChatVendorId] = useState<string>('');
+  const [chatVendorName, setChatVendorName] = useState<string>('');
   const [currentMarketIndex, setCurrentMarketIndex] = useState(0);
   const marketsScrollRef = useRef<HTMLDivElement>(null);
   const [selectedMarketName, setSelectedMarketName] = useState<string>('');
@@ -1107,15 +1111,8 @@ const VendorDuplicate = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={async () => {
-                        console.log('🔵 Message button clicked', {
-                          hasUser: !!user,
-                          userId: user?.id,
-                          selectedVendorUserId: selectedVendor.user_id
-                        });
-
+                      onClick={() => {
                         if (!user) {
-                          console.log('❌ No user authenticated');
                           toast({
                             title: "Authentication required",
                             description: "Please log in to message vendors",
@@ -1124,51 +1121,9 @@ const VendorDuplicate = () => {
                           return;
                         }
                         
-                        try {
-                          console.log('🔍 Checking for existing conversation...');
-                          // Check if conversation already exists
-                          const { data: existingConv, error: convError } = await supabase
-                            .from('conversations')
-                            .select('id')
-                            .eq('buyer_id', user.id)
-                            .eq('seller_id', selectedVendor.user_id)
-                            .maybeSingle();
-                          
-                          console.log('📊 Conversation check result:', { existingConv, convError });
-                          
-                          if (convError) throw convError;
-                          
-                          if (existingConv) {
-                            console.log('✅ Found existing conversation, navigating to:', existingConv.id);
-                            // Navigate to existing conversation
-                            navigate(`/messages/${existingConv.id}`);
-                          } else {
-                            console.log('➕ Creating new conversation...');
-                            // Create new conversation
-                            const { data: newConv, error: createError } = await supabase
-                              .from('conversations')
-                              .insert({
-                                buyer_id: user.id,
-                                seller_id: selectedVendor.user_id,
-                              })
-                              .select()
-                              .single();
-                            
-                            console.log('📝 Conversation creation result:', { newConv, createError });
-                            
-                            if (createError) throw createError;
-                            
-                            console.log('✅ Created new conversation, navigating to:', newConv.id);
-                            navigate(`/messages/${newConv.id}`);
-                          }
-                        } catch (error) {
-                          console.error('❌ Error in message flow:', error);
-                          toast({
-                            title: "Error",
-                            description: "Failed to start conversation. Check console for details.",
-                            variant: "destructive",
-                          });
-                        }
+                        setChatVendorId(selectedVendor.user_id);
+                        setChatVendorName(selectedVendor.store_name);
+                        setIsChatOpen(true);
                       }}
                       className="text-muted-foreground hover:text-foreground transition-colors"
                     >
@@ -1324,7 +1279,7 @@ const VendorDuplicate = () => {
                        variant="secondary"
                        size="sm"
                        className="absolute top-2 right-12 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
-                       onClick={async (e) => {
+                       onClick={(e) => {
                          e.stopPropagation();
                          if (!user) {
                            toast({
@@ -1335,43 +1290,9 @@ const VendorDuplicate = () => {
                            return;
                          }
                          
-                         try {
-                           // Check if conversation already exists
-                           const { data: existingConv, error: convError } = await supabase
-                             .from('conversations')
-                             .select('id')
-                             .eq('buyer_id', user.id)
-                             .eq('seller_id', vendor.user_id)
-                             .maybeSingle();
-                           
-                           if (convError) throw convError;
-                           
-                            if (existingConv) {
-                              // Navigate to existing conversation
-                              navigate(`/messages/${existingConv.id}`);
-                           } else {
-                             // Create new conversation
-                             const { data: newConv, error: createError } = await supabase
-                               .from('conversations')
-                               .insert({
-                                 buyer_id: user.id,
-                                 seller_id: vendor.user_id,
-                               })
-                               .select()
-                               .single();
-                             
-                              if (createError) throw createError;
-                              
-                              navigate(`/messages/${newConv.id}`);
-                           }
-                         } catch (error) {
-                           console.error('Error creating conversation:', error);
-                           toast({
-                             title: "Error",
-                             description: "Failed to start conversation",
-                             variant: "destructive",
-                           });
-                         }
+                         setChatVendorId(vendor.user_id);
+                         setChatVendorName(vendor.store_name);
+                         setIsChatOpen(true);
                        }}
                      >
                        <MessageSquare className="h-4 w-4 text-gray-600" />
@@ -1745,6 +1666,14 @@ const VendorDuplicate = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Floating Chat */}
+      <FloatingChat
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        vendorId={chatVendorId}
+        vendorName={chatVendorName}
+      />
     </div>
     </div>
   );
