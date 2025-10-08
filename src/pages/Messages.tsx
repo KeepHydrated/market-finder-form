@@ -262,10 +262,12 @@ export default function Messages() {
   };
 
   useEffect(() => {
-    if (messages.length > 0) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length > 0 && selectedConversation) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     }
-  }, [messages]);
+  }, [messages, selectedConversation]);
 
   if (loading) {
     return (
