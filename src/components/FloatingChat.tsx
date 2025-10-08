@@ -43,6 +43,8 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
   useEffect(() => {
     if (!isOpen || !user || !vendorId) return;
 
+    let channel: any = null;
+
     const initConversation = async () => {
       setLoading(true);
       
@@ -115,7 +117,7 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
       }
 
       // Subscribe to new messages
-      const channel = supabase
+      channel = supabase
         .channel(`conversation-${conversationId}`)
         .on(
           'postgres_changes',
@@ -126,19 +128,25 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
             filter: `conversation_id=eq.${conversationId}`
           },
           (payload) => {
+            console.log('New message received:', payload);
             setMessages(prev => [...prev, payload.new as Message]);
           }
         )
-        .subscribe();
+        .subscribe((status) => {
+          console.log('Realtime subscription status:', status);
+        });
 
       setLoading(false);
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
     };
 
     initConversation();
+
+    return () => {
+      if (channel) {
+        console.log('Cleaning up realtime subscription');
+        supabase.removeChannel(channel);
+      }
+    };
   }, [isOpen, user, vendorId, vendorName, toast]);
 
   useEffect(() => {
