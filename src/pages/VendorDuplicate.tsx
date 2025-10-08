@@ -1121,7 +1121,7 @@ const VendorDuplicate = () => {
                           return;
                         }
                         
-                        setChatVendorId(selectedVendor.user_id);
+                        setChatVendorId(selectedVendor.id);  // Use submission ID, not user_id
                         setChatVendorName(selectedVendor.store_name);
                         setIsChatOpen(true);
                       }}
@@ -1290,7 +1290,7 @@ const VendorDuplicate = () => {
                            return;
                          }
                          
-                         setChatVendorId(vendor.user_id);
+                         setChatVendorId(vendor.id);  // Use submission ID, not user_id
                          setChatVendorName(vendor.store_name);
                          setIsChatOpen(true);
                        }}

@@ -27,7 +27,7 @@ interface ConversationDetails {
 interface FloatingChatProps {
   isOpen: boolean;
   onClose: () => void;
-  vendorId: string;
+  vendorId: string;  // This is actually the submission/store ID
   vendorName: string;
 }
 
@@ -48,26 +48,32 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
     const initConversation = async () => {
       setLoading(true);
       
-      // Get the vendor submission id first
+      // vendorId is actually the submission ID in this context
+      const vendorSubmissionId = vendorId;
+      
+      // Get the user_id from the submission
       const { data: vendorSubmission } = await supabase
         .from('submissions')
-        .select('id')
-        .eq('user_id', vendorId)
-        .eq('status', 'accepted')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .select('user_id, id')
+        .eq('id', vendorSubmissionId)
+        .single();
+      
+      if (!vendorSubmission) {
+        console.error('Vendor submission not found');
+        setLoading(false);
+        return;
+      }
 
-      const vendorSubmissionId = vendorSubmission?.id;
+      const sellerId = vendorSubmission.user_id;
       
       console.log('🔍 FloatingChat - Looking for conversation:', {
-        vendorId,
-        vendorName,
         vendorSubmissionId,
+        sellerId,
+        vendorName,
         userId: user.id
       });
 
-      // Find or create conversation - must match BOTH seller AND vendor_id
+      // Find or create conversation - must match buyer, seller AND vendor_id
       const { data: existingConv, error: findError } = await supabase
         .from('conversations')
         .select(`
@@ -78,7 +84,7 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
           vendor_id
         `)
         .eq('buyer_id', user.id)
-        .eq('seller_id', vendorId)
+        .eq('seller_id', sellerId)
         .eq('vendor_id', vendorSubmissionId)
         .maybeSingle();
       
@@ -98,9 +104,9 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
           .from('conversations')
           .insert({
             buyer_id: user.id,
-            seller_id: vendorId,
+            seller_id: sellerId,
             order_id: null,
-            vendor_id: vendorSubmissionId || null
+            vendor_id: vendorSubmissionId
           })
           .select()
           .single();
@@ -122,7 +128,7 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName }: Floating
       setConversation({
         id: conversationId,
         buyer_id: existingConv?.buyer_id || user.id,
-        seller_id: existingConv?.seller_id || vendorId,
+        seller_id: existingConv?.seller_id || sellerId,
         order_id: existingConv?.order_id || null,
         buyer_name: '',
         seller_name: vendorName
