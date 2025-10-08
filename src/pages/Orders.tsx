@@ -524,9 +524,6 @@ const Orders = () => {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Order Receipt</DialogTitle>
-            <DialogDescription>
-              Receipt for order #{selectedOrder?.id.slice(0, 8)}
-            </DialogDescription>
           </DialogHeader>
           {selectedOrder && (
             <div className="space-y-4">
