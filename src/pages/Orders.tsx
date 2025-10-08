@@ -570,12 +570,6 @@ const Orders = () => {
                 </div>
               </div>
 
-              <div className="text-xs text-muted-foreground border-t pt-4">
-                <p>Order ID: {selectedOrder.id}</p>
-                <p>Email: {selectedOrder.email}</p>
-                <p>Status: {selectedOrder.status}</p>
-              </div>
-
               <Button
                 className="w-full"
                 onClick={() => {
