@@ -32,7 +32,7 @@ interface ConversationDetails {
 export default function Conversation() {
   const { conversationId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [conversation, setConversation] = useState<ConversationDetails | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -42,6 +42,8 @@ export default function Conversation() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (authLoading) return; // Wait for auth to load
+    
     if (!user || !conversationId) {
       navigate('/auth');
       return;
@@ -71,7 +73,7 @@ export default function Conversation() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [conversationId, user, navigate]);
+  }, [conversationId, user, navigate, authLoading]);
 
   useEffect(() => {
     scrollToBottom();

@@ -27,11 +27,13 @@ interface Conversation {
 
 export default function Messages() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (authLoading) return; // Wait for auth to load
+    
     if (!user) {
       navigate('/auth');
       return;
@@ -58,7 +60,7 @@ export default function Messages() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, navigate]);
+  }, [user, navigate, authLoading]);
 
   const fetchConversations = async () => {
     if (!user) return;
