@@ -185,38 +185,38 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] h-[650px] flex flex-col p-0 gap-0 [&>button]:hidden">
+      <DialogContent className="sm:max-w-[700px] h-[700px] flex flex-col p-0 gap-0 [&>button]:hidden">
         {/* Header with vendor name and close button */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="text-xl font-bold">{vendorName || 'Store'}</h2>
+        <div className="flex items-center justify-between px-6 py-5 border-b shrink-0">
+          <h2 className="text-2xl font-bold">{vendorName || 'Store'}</h2>
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-8 w-8"
+            className="h-10 w-10 rounded-full hover:bg-muted"
           >
-            <X className="h-5 w-5" />
+            <X className="h-6 w-6" />
           </Button>
         </div>
 
         {/* Collapsible Order Details Section */}
-        <Collapsible open={isOrderOpen} onOpenChange={setIsOrderOpen}>
-          <div className="px-6 pt-4">
+        <Collapsible open={isOrderOpen} onOpenChange={setIsOrderOpen} className="shrink-0">
+          <div className="px-6 py-4 bg-muted/30">
             <CollapsibleTrigger className="w-full">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-muted-foreground">Order Items:</span>
+                <span className="text-base font-medium text-muted-foreground">Order Items:</span>
                 {isOrderOpen ? (
-                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
                 ) : (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
                 )}
               </div>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <div className="mt-3 p-4 border rounded-lg space-y-3">
+              <div className="mt-4 p-4 bg-white border rounded-xl space-y-3">
                 {order.order_items.map((item) => (
                   <div key={item.id} className="flex items-center gap-3">
-                    <div className="w-16 h-16 bg-muted rounded overflow-hidden flex-shrink-0">
+                    <div className="w-14 h-14 bg-muted rounded-lg overflow-hidden flex-shrink-0">
                       {item.product_image ? (
                         <img 
                           src={item.product_image} 
@@ -230,12 +230,12 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium">{item.product_name}</p>
+                      <p className="font-semibold text-base">{item.product_name}</p>
                       <p className="text-sm text-muted-foreground">
                         Qty: {item.quantity} × {formatPrice(item.unit_price)}
                       </p>
                     </div>
-                    <span className="font-semibold">
+                    <span className="font-bold text-lg">
                       {formatPrice(item.total_price)}
                     </span>
                   </div>
@@ -246,15 +246,15 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
         </Collapsible>
 
         {/* Messages Section */}
-        <div className="flex-1 flex flex-col min-h-0 px-6 pt-4">
-          <ScrollArea className="flex-1">
-            <div className="space-y-3 pb-4">
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <ScrollArea className="flex-1 px-6 py-4">
+            <div className="space-y-3">
               {loading ? (
-                <div className="text-center text-muted-foreground py-8">
+                <div className="text-center text-muted-foreground py-12">
                   Loading conversation...
                 </div>
               ) : messages.length === 0 ? (
-                <div className="text-center text-muted-foreground py-8">
+                <div className="text-center text-muted-foreground py-12">
                   No messages yet. Start the conversation!
                 </div>
               ) : (
@@ -266,15 +266,15 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
                     }`}
                   >
                     <div
-                      className={`max-w-[70%] rounded-2xl px-4 py-3 ${
+                      className={`max-w-[75%] rounded-3xl px-5 py-3 shadow-sm ${
                         msg.sender_id === currentUserId
                           ? 'bg-[#4CAF50] text-white'
-                          : 'bg-muted'
+                          : 'bg-muted text-foreground'
                       }`}
                     >
-                      <p className="text-sm break-words">{msg.message}</p>
-                      <span className={`text-xs mt-1 block ${
-                        msg.sender_id === currentUserId ? 'text-white/80' : 'text-muted-foreground'
+                      <p className="text-base break-words leading-relaxed">{msg.message}</p>
+                      <span className={`text-xs mt-1.5 block ${
+                        msg.sender_id === currentUserId ? 'text-white/90' : 'text-muted-foreground'
                       }`}>
                         {new Date(msg.created_at).toLocaleTimeString([], {
                           hour: '2-digit',
@@ -290,7 +290,7 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
           </ScrollArea>
 
           {/* Message Input */}
-          <div className="py-4 border-t mt-auto">
+          <div className="px-6 py-5 border-t shrink-0">
             <div className="flex gap-3 items-center">
               <Input
                 value={newMessage}
@@ -303,13 +303,13 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
                 }}
                 placeholder="Type a message..."
                 disabled={!conversationId}
-                className="flex-1 rounded-full bg-muted border-none"
+                className="flex-1 h-12 rounded-full bg-muted border-none px-5 text-base placeholder:text-muted-foreground"
               />
               <Button
                 onClick={handleSendMessage}
                 disabled={!newMessage.trim() || !conversationId}
                 size="icon"
-                className="rounded-full bg-[#4CAF50] hover:bg-[#45a049] h-12 w-12"
+                className="rounded-full bg-[#4CAF50] hover:bg-[#45a049] h-14 w-14 flex-shrink-0"
               >
                 <Send className="h-5 w-5" />
               </Button>
