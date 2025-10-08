@@ -527,7 +527,7 @@ const Orders = () => {
           </DialogHeader>
           {selectedOrder && (
             <div className="space-y-4">
-              <div className="py-4 border-b">
+              <div className="py-4 border-b flex justify-between items-center">
                 <h3 className="font-bold text-lg">{selectedOrder.vendor_name}</h3>
                 <p className="text-sm text-muted-foreground">{formatDate(selectedOrder.created_at)}</p>
               </div>
