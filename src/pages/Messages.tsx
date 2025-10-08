@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, X, Send } from 'lucide-react';
 import { format } from 'date-fns';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -296,69 +295,92 @@ export default function Messages() {
         </div>
       )}
 
-      {/* Chat Dialog */}
-      <Dialog open={!!selectedConversation} onOpenChange={(open) => !open && setSelectedConversation(null)}>
-        <DialogContent className="sm:max-w-[600px] h-[600px] flex flex-col p-0">
-          <DialogHeader className="p-4 border-b">
-            <DialogTitle>
-              {selectedConversation?.store_name || 'Unknown Store'}
-            </DialogTitle>
-          </DialogHeader>
-
-          <ScrollArea className="flex-1 p-4">
-            {loadingMessages ? (
-              <div className="flex items-center justify-center h-full">
-                <p className="text-muted-foreground">Loading messages...</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {messages.length === 0 && (
-                  <div className="flex items-center justify-center py-8">
-                    <p className="text-muted-foreground text-center text-sm">
-                      Start the conversation!
-                    </p>
-                  </div>
-                )}
-                
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                        msg.sender_id === user?.id
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted text-foreground'
-                      }`}
-                    >
-                      <p className="text-sm">{msg.message}</p>
-                      <p className="text-xs opacity-70 mt-1">
-                        {format(new Date(msg.created_at), 'h:mm a')}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-            )}
-          </ScrollArea>
-
-          <form onSubmit={handleSendMessage} className="p-4 border-t">
-            <div className="flex gap-2">
-              <Input
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type a message..."
-                className="flex-1"
-              />
-              <Button type="submit" size="sm" disabled={!newMessage.trim()}>
-                <Send className="h-4 w-4" />
+      {/* Floating Chat Box */}
+      {selectedConversation && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/20 z-40"
+            onClick={() => setSelectedConversation(null)}
+          />
+          
+          {/* Chat Box */}
+          <div 
+            className="fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h3 className="font-semibold text-foreground">
+                {selectedConversation.store_name || 'Unknown Store'}
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedConversation(null)}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
               </Button>
             </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+
+            {/* Messages */}
+            <ScrollArea className="flex-1 p-4">
+              {loadingMessages ? (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-muted-foreground">Loading messages...</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {messages.length === 0 && (
+                    <div className="flex items-center justify-center py-8">
+                      <p className="text-muted-foreground text-center text-sm">
+                        Start the conversation!
+                      </p>
+                    </div>
+                  )}
+                  
+                  {messages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`flex ${msg.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                          msg.sender_id === user?.id
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted text-foreground'
+                        }`}
+                      >
+                        <p className="text-sm">{msg.message}</p>
+                        <p className="text-xs opacity-70 mt-1">
+                          {format(new Date(msg.created_at), 'h:mm a')}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+              )}
+            </ScrollArea>
+
+            {/* Input */}
+            <form onSubmit={handleSendMessage} className="p-4 border-t border-border">
+              <div className="flex gap-2">
+                <Input
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type a message..."
+                  className="flex-1"
+                />
+                <Button type="submit" size="sm" disabled={!newMessage.trim()}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </form>
+          </div>
+        </>
+      )}
     </div>
   );
 }
