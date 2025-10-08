@@ -866,6 +866,59 @@ export default function ShopManager() {
                 if (!user || !shopData) return;
                 
                 try {
+                  // Delete related data first to handle foreign key constraints
+                  
+                  // 1. Get all conversations for this vendor
+                  const { data: conversations } = await supabase
+                    .from('conversations')
+                    .select('id')
+                    .eq('vendor_id', shopData.id);
+                  
+                  if (conversations && conversations.length > 0) {
+                    const conversationIds = conversations.map(c => c.id);
+                    
+                    // Delete messages in these conversations
+                    await supabase
+                      .from('messages')
+                      .delete()
+                      .in('conversation_id', conversationIds);
+                    
+                    // Delete conversations
+                    await supabase
+                      .from('conversations')
+                      .delete()
+                      .eq('vendor_id', shopData.id);
+                  }
+                  
+                  // 2. Get all orders for this vendor
+                  const { data: orders } = await supabase
+                    .from('orders')
+                    .select('id')
+                    .eq('vendor_id', shopData.id);
+                  
+                  if (orders && orders.length > 0) {
+                    const orderIds = orders.map(o => o.id);
+                    
+                    // Delete order items
+                    await supabase
+                      .from('order_items')
+                      .delete()
+                      .in('order_id', orderIds);
+                  }
+                  
+                  // 3. Delete commissions
+                  await supabase
+                    .from('commissions')
+                    .delete()
+                    .eq('vendor_id', shopData.id);
+                  
+                  // 4. Delete orders
+                  await supabase
+                    .from('orders')
+                    .delete()
+                    .eq('vendor_id', shopData.id);
+                  
+                  // 5. Finally delete the submission
                   const { error } = await supabase
                     .from('submissions')
                     .delete()
