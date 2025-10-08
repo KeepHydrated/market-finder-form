@@ -119,6 +119,8 @@ export default function Messages() {
             .select('store_name')
             .eq('user_id', otherPartyId)
             .eq('status', 'accepted')
+            .order('created_at', { ascending: false })
+            .limit(1)
             .maybeSingle();
 
           // Get unread count
@@ -163,6 +165,8 @@ export default function Messages() {
           .select('store_name')
           .eq('user_id', otherPartyId)
           .eq('status', 'accepted')
+          .order('created_at', { ascending: false })
+          .limit(1)
           .maybeSingle();
         
         if (vendorSubmission?.store_name) {
