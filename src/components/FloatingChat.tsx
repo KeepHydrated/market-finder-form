@@ -209,6 +209,19 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Prevent body scroll on iPad when chat is open
+  useEffect(() => {
+    if (isOpen && isTablet) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, isTablet]);
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !conversation || !user) return;
