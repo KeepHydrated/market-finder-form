@@ -404,9 +404,19 @@ const Likes = () => {
     // Match by either product ID or product name (for backwards compatibility)
     const likedProducts = allProducts.filter(product => 
       likedProductIds.includes(product.likeId) || likedProductIds.includes(product.nameLikeId)
-    );
+    ).map(product => {
+      // Determine which like ID format is actually in the database
+      const actualLikeId = likedProductIds.includes(product.likeId) 
+        ? product.likeId 
+        : product.nameLikeId;
+      
+      return {
+        ...product,
+        actualLikeId // Store the actual like ID that's in the database
+      };
+    });
     
-    console.log('📦 Matched liked products:', likedProducts.map(p => ({ name: p.name, likeId: p.likeId })));
+    console.log('📦 Matched liked products:', likedProducts.map(p => ({ name: p.name, actualLikeId: p.actualLikeId })));
 
     if (likedProducts.length === 0) {
       return (
@@ -457,13 +467,13 @@ const Likes = () => {
                 className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
                 onClick={async (e) => {
                   e.stopPropagation();
-                  await toggleLike(product.likeId, 'product');
+                  await toggleLike(product.actualLikeId, 'product');
                 }}
               >
                 <Heart 
                   className={cn(
                     "h-4 w-4 transition-colors",
-                    isLiked(product.likeId, 'product')
+                    isLiked(product.actualLikeId, 'product')
                       ? "text-red-500 fill-current" 
                       : "text-gray-600"
                   )} 
