@@ -71,12 +71,41 @@ const Likes = () => {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [currentVendorProducts, setCurrentVendorProducts] = useState<any[]>([]);
   const [currentVendorInfo, setCurrentVendorInfo] = useState<{id: string; name: string} | null>(null);
+  const [marketAddressesMap, setMarketAddressesMap] = useState<Record<string, string>>({});
 
   const tabs = [
     { id: "vendors" as TabType, title: "Vendors", icon: Store },
     { id: "markets" as TabType, title: "Markets", icon: MapPin },
     { id: "products" as TabType, title: "Products", icon: Package },
   ];
+
+  // Fetch market addresses from database
+  const fetchMarketAddresses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('markets')
+        .select('name, address');
+      
+      if (error) {
+        console.error('Error fetching market addresses:', error);
+        return;
+      }
+      
+      if (data) {
+        const addressMap: Record<string, string> = {};
+        data.forEach(market => {
+          addressMap[market.name] = market.address;
+        });
+        setMarketAddressesMap(addressMap);
+      }
+    } catch (error) {
+      console.error('Error fetching market addresses:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMarketAddresses();
+  }, []);
 
   useEffect(() => {
     if (user && (activeTab === "markets" || activeTab === "vendors" || activeTab === "products")) {
@@ -309,7 +338,8 @@ const Likes = () => {
 
     acceptedSubmissions.forEach(submission => {
       const marketKey = submission.selected_market || submission.search_term || 'Unknown Market';
-      const marketAddress = submission.market_address || 'Address not available';
+      // Use the actual Google Maps address from the database, fallback to submission address
+      const marketAddress = marketAddressesMap[marketKey] || submission.market_address || 'Address not available';
       const marketId = `${marketKey}-${marketAddress}`.replace(/\s+/g, '-').toLowerCase();
       
       // Only include markets that are liked
