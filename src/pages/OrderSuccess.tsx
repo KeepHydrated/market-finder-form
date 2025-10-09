@@ -33,11 +33,18 @@ export default function OrderSuccess() {
       }
 
       try {
-        // First update the order status based on Stripe session
+        // Verify payment and update order status
+        const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-payment', {
+          body: { session_id: sessionId }
+        });
+
+        if (verifyError) throw verifyError;
+        
+        console.log('Payment verified:', verifyData);
+
+        // Fetch the updated order details
         const { data: orderData, error: orderError } = await supabase
           .from('orders')
-          .update({ status: 'completed' })
-          .eq('stripe_checkout_session_id', sessionId)
           .select(`
             *,
             order_items (
@@ -47,6 +54,7 @@ export default function OrderSuccess() {
               total_price
             )
           `)
+          .eq('stripe_checkout_session_id', sessionId)
           .single();
 
         if (orderError) {

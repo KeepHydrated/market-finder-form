@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Package, Mail } from "lucide-react";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
 import { OrderChatDialog } from "@/components/OrderChatDialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface OrderItem {
   id: string;
@@ -33,6 +34,7 @@ interface VendorOrdersProps {
 }
 
 export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
+  const { toast } = useToast();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -241,6 +243,21 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
 
               <div className="flex flex-col gap-3">
                 <div>
+                  {/* Order Status Badge */}
+                  <div className="mb-3">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                      order.status === 'paid' ? 'bg-green-100 text-green-800' :
+                      order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                      order.status === 'delivered' ? 'bg-purple-100 text-purple-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {order.status === 'paid' && '✓ Paid'}
+                      {order.status === 'shipped' && '📦 Shipped'}
+                      {order.status === 'delivered' && '✓ Delivered'}
+                      {order.status === 'pending' && '⏳ Pending Payment'}
+                    </span>
+                  </div>
+
                   <h3 className="text-lg font-serif mb-1">Arriving Friday, October 3rd</h3>
                   <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
                   <p className="text-xs">
@@ -250,7 +267,60 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Button size="sm" className="w-full rounded-full">
+                  {/* Status Update Buttons */}
+                  {order.status === 'paid' && (
+                    <Button 
+                      size="sm" 
+                      className="w-full rounded-full"
+                      onClick={async () => {
+                        const { error } = await supabase
+                          .from('orders')
+                          .update({ status: 'shipped' })
+                          .eq('id', order.id);
+                        
+                        if (!error) {
+                          toast({ title: "Order marked as shipped" });
+                          fetchOrders();
+                        } else {
+                          toast({ 
+                            title: "Error", 
+                            description: error.message,
+                            variant: "destructive" 
+                          });
+                        }
+                      }}
+                    >
+                      📦 Mark as Shipped
+                    </Button>
+                  )}
+                  
+                  {order.status === 'shipped' && (
+                    <Button 
+                      size="sm" 
+                      className="w-full rounded-full"
+                      onClick={async () => {
+                        const { error } = await supabase
+                          .from('orders')
+                          .update({ status: 'delivered' })
+                          .eq('id', order.id);
+                        
+                        if (!error) {
+                          toast({ title: "Order marked as delivered" });
+                          fetchOrders();
+                        } else {
+                          toast({ 
+                            title: "Error", 
+                            description: error.message,
+                            variant: "destructive" 
+                          });
+                        }
+                      }}
+                    >
+                      ✓ Mark as Delivered
+                    </Button>
+                  )}
+
+                  <Button size="sm" variant="outline" className="w-full rounded-full">
                     Track package
                   </Button>
                   <Button 
