@@ -125,20 +125,6 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         onKeyDown={handleKeyDown}
       >
         {/* Product Navigation Arrows - Positioned absolutely relative to DialogContent */}
-        {hasPrevious && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              goToPreviousProduct();
-            }}
-            className="absolute -left-16 top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white hover:bg-gray-100 border border-gray-200 shadow-lg rounded-full z-[70] hidden md:flex items-center justify-center"
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </Button>
-        )}
-        
         {hasNext && (
           <Button
             variant="secondary"
@@ -146,6 +132,20 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
             onClick={(e) => {
               e.stopPropagation();
               goToNextProduct();
+            }}
+            className="absolute -left-16 top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white hover:bg-gray-100 border border-gray-200 shadow-lg rounded-full z-[70] hidden md:flex items-center justify-center"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+        )}
+        
+        {hasPrevious && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              goToPreviousProduct();
             }}
             className="absolute -right-16 top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white hover:bg-gray-100 border border-gray-200 shadow-lg rounded-full z-[70] hidden md:flex items-center justify-center"
           >
