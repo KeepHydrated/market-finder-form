@@ -495,24 +495,31 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...products].reverse().map((product) => (
-          <ProductCard 
-            key={product.id} 
-            product={product} 
-            onProductClick={handleProductClick}
-            onDeleteProduct={onDeleteProduct}
-            onDuplicateClick={onDuplicateProduct ? handleDuplicateClick : undefined}
-            onEditClick={onEditProduct ? handleEditClick : undefined}
-            vendorId={vendorId}
-            vendorName={vendorName}
-            hideVendorName={hideVendorName}
-          />
-        ))}
+        {[...products].reverse().map((product, index) => {
+          // Ensure product has an ID - use existing ID or fallback to index
+          const productWithId = {
+            ...product,
+            id: product.id || index
+          };
+          return (
+            <ProductCard 
+              key={productWithId.id} 
+              product={productWithId} 
+              onProductClick={handleProductClick}
+              onDeleteProduct={onDeleteProduct}
+              onDuplicateClick={onDuplicateProduct ? handleDuplicateClick : undefined}
+              onEditClick={onEditProduct ? handleEditClick : undefined}
+              vendorId={vendorId}
+              vendorName={vendorName}
+              hideVendorName={hideVendorName}
+            />
+          );
+        })}
       </div>
       
       <ProductDetailModal
         product={selectedProduct}
-        products={[...products].reverse()}
+        products={[...products].reverse().map((p, idx) => ({ ...p, id: p.id || idx }))}
         open={isModalOpen}
         onClose={handleCloseModal}
         onProductChange={setSelectedProduct}

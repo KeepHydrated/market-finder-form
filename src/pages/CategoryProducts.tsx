@@ -164,7 +164,7 @@ const CategoryProducts = () => {
   };
 
   const handleLike = (productId: number, vendorId: string) => {
-    toggleLike(`${productId}`, 'product');
+    toggleLike(`${vendorId}-${productId}`, 'product');
   };
 
   const sortOptions = [
@@ -273,7 +273,7 @@ const CategoryProducts = () => {
                     >
                       <Heart 
                         className={`h-4 w-4 transition-colors ${
-                          isLiked(`${product.id}`, 'product') 
+                          isLiked(`${product.vendorId}-${product.id}`, 'product') 
                             ? 'text-red-500 fill-current' 
                             : 'text-gray-600'
                         }`} 

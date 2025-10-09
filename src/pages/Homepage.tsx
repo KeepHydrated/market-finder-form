@@ -1578,7 +1578,12 @@ const Homepage = () => {
                             id: product.id || index
                           };
                           setSelectedProduct(productWithId);
-                          setCurrentVendorProducts(vendor.products || []);
+                          // Ensure all vendor products have IDs
+                          const productsWithIds = (vendor.products || []).map((p: any, idx: number) => ({
+                            ...p,
+                            id: p.id || idx
+                          }));
+                          setCurrentVendorProducts(productsWithIds);
                           setIsProductModalOpen(true);
                         }
                       }}

@@ -378,13 +378,16 @@ const Likes = () => {
     const allProducts: any[] = [];
     acceptedSubmissions.forEach(vendor => {
       if (vendor.products && Array.isArray(vendor.products)) {
-        vendor.products.forEach((product: any) => {
+        vendor.products.forEach((product: any, index: number) => {
+          // Use product.id if it exists, otherwise fall back to index
+          const productId = product.id || index;
           allProducts.push({
             ...product,
+            id: productId, // Ensure the product has an id field
             vendorName: vendor.store_name,
             vendorId: vendor.id,
             // Create the same ID format used in ProductDetailModal
-            likeId: `${vendor.id}-${product.id}`
+            likeId: `${vendor.id}-${productId}`
           });
         });
       }
