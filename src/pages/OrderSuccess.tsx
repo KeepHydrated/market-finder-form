@@ -233,6 +233,10 @@ export default function OrderSuccess() {
           size: letter;
         }
         @media print {
+          html, body {
+            height: auto !important;
+            overflow: hidden !important;
+          }
           .no-print {
             display: none !important;
           }
@@ -245,6 +249,15 @@ export default function OrderSuccess() {
           [role="banner"],
           [role="navigation"] {
             display: none !important;
+          }
+          /* Prevent page breaks */
+          * {
+            page-break-inside: avoid !important;
+            page-break-after: avoid !important;
+          }
+          .min-h-screen {
+            min-height: auto !important;
+            height: auto !important;
           }
           /* Reduce font sizes for print */
           h2 {
@@ -287,6 +300,12 @@ export default function OrderSuccess() {
           }
           .text-2xl {
             font-size: 1.25rem !important;
+          }
+          .pt-8 {
+            padding-top: 0.5rem !important;
+          }
+          .mb-8 {
+            margin-bottom: 0.5rem !important;
           }
         }
       `}</style>
