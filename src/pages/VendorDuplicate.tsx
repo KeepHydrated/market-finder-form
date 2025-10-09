@@ -955,15 +955,13 @@ const VendorDuplicate = () => {
               <Sidebar className="bg-green-50 border-r flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16" collapsible="icon">
                 <div className="h-full overflow-y-auto">
                   <div className="space-y-6 px-4 pt-6 pb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span 
-                className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors"
-                onClick={() => setSelectedVendor(null)}
-              >
-                {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
-              </span>
-            </div>
+          <div className="flex items-center justify-between gap-2">
+            <span 
+              className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors flex-1 min-w-0"
+              onClick={() => setSelectedVendor(null)}
+            >
+              {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
+            </span>
             {/* Heart icon */}
             <Button
               variant="ghost"
@@ -974,7 +972,7 @@ const VendorDuplicate = () => {
                 }
               }}
               className={cn(
-                "transition-colors",
+                "transition-colors flex-shrink-0",
                 acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor')
                   ? "text-red-500 hover:text-red-600"
                   : "text-muted-foreground hover:text-foreground"
