@@ -954,7 +954,7 @@ const VendorDuplicate = () => {
             <div className="flex w-full">
               <Sidebar className="bg-green-50 border-r flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16" collapsible="icon">
                 <div className="h-full overflow-y-auto">
-                  <div className="space-y-6 px-4 py-8">
+                  <div className="space-y-6 px-4 pt-6 pb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span 
