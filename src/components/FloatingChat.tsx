@@ -279,7 +279,7 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
             ? "fixed right-0 w-[67%] bg-card border-l border-border shadow-2xl flex flex-col z-50"
             : "fixed top-0 right-0 w-[67%] h-full bg-card border-l border-border shadow-2xl flex flex-col z-50"
         }
-        style={isTablet ? { top: '170px', height: 'calc(100vh - 170px)' } : undefined}
+        style={isTablet ? { top: '190px', height: 'calc(100vh - 190px)' } : undefined}
         onClick={(e) => e.stopPropagation()}
       >
       {/* Header - Hidden on iPad */}
