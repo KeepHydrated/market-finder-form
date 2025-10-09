@@ -119,37 +119,39 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   };
 
   return (
-    <>
-      {/* Product Navigation Arrows - Positioned outside dialog */}
-      {hasPrevious && (
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={goToPreviousProduct}
-          className="fixed left-[calc(50vw-400px)] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white hover:bg-gray-100 border border-gray-200 shadow-lg rounded-full z-[60] hidden md:flex items-center justify-center"
-          style={{ pointerEvents: open ? 'auto' : 'none', opacity: open ? 1 : 0 }}
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </Button>
-      )}
-      
-      {hasNext && (
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={goToNextProduct}
-          className="fixed right-[calc(50vw-400px)] top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white hover:bg-gray-100 border border-gray-200 shadow-lg rounded-full z-[60] hidden md:flex items-center justify-center"
-          style={{ pointerEvents: open ? 'auto' : 'none', opacity: open ? 1 : 0 }}
-        >
-          <ChevronRight className="h-6 w-6" />
-        </Button>
-      )}
-
-      <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent 
-          className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white"
-          onKeyDown={handleKeyDown}
-        >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent 
+        className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible"
+        onKeyDown={handleKeyDown}
+      >
+        {/* Product Navigation Arrows - Positioned absolutely relative to DialogContent */}
+        {hasPrevious && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              goToPreviousProduct();
+            }}
+            className="absolute -left-16 top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white hover:bg-gray-100 border border-gray-200 shadow-lg rounded-full z-[70] hidden md:flex items-center justify-center"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+        )}
+        
+        {hasNext && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              goToNextProduct();
+            }}
+            className="absolute -right-16 top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white hover:bg-gray-100 border border-gray-200 shadow-lg rounded-full z-[70] hidden md:flex items-center justify-center"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </Button>
+        )}
           <DialogTitle className="sr-only">{product.name}</DialogTitle>
           <DialogDescription className="sr-only">{product.description}</DialogDescription>
         
@@ -285,6 +287,5 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
           </div>
       </DialogContent>
     </Dialog>
-    </>
   );
 };
