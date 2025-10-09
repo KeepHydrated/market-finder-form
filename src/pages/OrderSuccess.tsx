@@ -228,12 +228,16 @@ export default function OrderSuccess() {
       </div>
 
       <style>{`
+        @page {
+          margin: 0;
+        }
         @media print {
           .no-print {
             display: none !important;
           }
           body {
             background: white;
+            margin: 1cm;
           }
           /* Hide all headers, navigation, and other page elements */
           header,
