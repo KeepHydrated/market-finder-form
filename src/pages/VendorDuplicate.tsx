@@ -1009,7 +1009,7 @@ const VendorDuplicate = () => {
 
           <div className="flex items-start gap-2">
             <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <div className="text-muted-foreground text-base font-normal whitespace-pre-line">
+            <div className="text-muted-foreground text-base font-normal">
               {marketOpeningHours?.open_now !== undefined && (
                 <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
                   marketOpeningHours.open_now 
@@ -1019,10 +1019,22 @@ const VendorDuplicate = () => {
                   {marketOpeningHours.open_now ? 'Open Now' : 'Currently Closed'}
                 </div>
               )}
-              <div>
-                {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => (
-                  <div key={index}>{line}</div>
-                ))}
+              <div className="space-y-2">
+                {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => {
+                  // Split day and time for iPad view
+                  const parts = line.split(':');
+                  if (parts.length >= 2) {
+                    const day = parts[0].trim();
+                    const time = parts.slice(1).join(':').trim();
+                    return (
+                      <div key={index} className="space-y-0">
+                        <div className="font-medium">{day}:</div>
+                        <div>{time}</div>
+                      </div>
+                    );
+                  }
+                  return <div key={index}>{line}</div>;
+                })}
               </div>
             </div>
           </div>
