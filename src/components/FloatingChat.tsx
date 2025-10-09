@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Message {
   id: string;
@@ -44,6 +45,7 @@ interface FloatingChatProps {
 export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems }: FloatingChatProps) {
   const { user } = useAuth();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [conversation, setConversation] = useState<ConversationDetails | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -242,9 +244,13 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
         onClick={onClose}
       />
       
-      {/* Chat Box */}
+      {/* Chat Box - Side panel on tablet/desktop, floating on mobile */}
       <div 
-        className="fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50"
+        className={
+          isMobile 
+            ? "fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50"
+            : "fixed top-0 right-0 w-[45%] h-full bg-card border-l border-border shadow-2xl flex flex-col z-50"
+        }
         onClick={(e) => e.stopPropagation()}
       >
       {/* Header */}
