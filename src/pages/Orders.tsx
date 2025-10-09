@@ -69,6 +69,9 @@ const Orders = () => {
   const [reviewPhotos, setReviewPhotos] = useState<File[]>([]);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [userReviews, setUserReviews] = useState<Set<string>>(new Set());
+  const [productReviews, setProductReviews] = useState<Set<string>>(new Set());
+  const [reviewType, setReviewType] = useState<'vendor' | 'product'>('vendor');
+  const [reviewProduct, setReviewProduct] = useState<OrderItem | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -85,13 +88,23 @@ const Orders = () => {
     try {
       const { data, error } = await supabase
         .from('reviews')
-        .select('vendor_id')
+        .select('vendor_id, product_id')
         .eq('user_id', user.id);
       
       if (error) throw error;
       
       if (data) {
-        setUserReviews(new Set(data.map(review => review.vendor_id)));
+        // Track general vendor reviews (where product_id is null)
+        const reviewedVendors = new Set(
+          data.filter(review => !review.product_id).map(review => review.vendor_id)
+        );
+        setUserReviews(reviewedVendors);
+
+        // Track product reviews (where product_id is not null)
+        const reviewedProducts = new Set(
+          data.filter(review => review.product_id).map(review => review.product_id!)
+        );
+        setProductReviews(reviewedProducts);
       }
     } catch (error) {
       console.error('Error fetching user reviews:', error);
@@ -306,8 +319,10 @@ const Orders = () => {
     return deliveryDate <= today;
   };
 
-  const handleLeaveReview = (order: Order) => {
+  const handleLeaveReview = (order: Order, type: 'vendor' | 'product' = 'vendor', product?: OrderItem) => {
     setReviewOrder(order);
+    setReviewType(type);
+    setReviewProduct(product || null);
     setReviewRating(0);
     setReviewComment('');
     setReviewPhotos([]);
@@ -364,16 +379,25 @@ const Orders = () => {
         photoUrls = await Promise.all(uploadPromises);
       }
 
+      // Prepare review data with product info if it's a product review
+      const reviewData: any = {
+        user_id: user.id,
+        vendor_id: reviewOrder.vendor_id,
+        rating: reviewRating,
+        comment: reviewComment || null,
+        photos: photoUrls.length > 0 ? photoUrls : null,
+      };
+
+      if (reviewType === 'product' && reviewProduct) {
+        reviewData.product_id = reviewProduct.id;
+        reviewData.product_name = reviewProduct.product_name;
+        reviewData.product_image = reviewProduct.product_image;
+      }
+
       // Submit review
       const { error } = await supabase
         .from('reviews')
-        .insert({
-          user_id: user.id,
-          vendor_id: reviewOrder.vendor_id,
-          rating: reviewRating,
-          comment: reviewComment || null,
-          photos: photoUrls.length > 0 ? photoUrls : null,
-        });
+        .insert(reviewData);
 
       if (error) throw error;
 
@@ -382,7 +406,12 @@ const Orders = () => {
         description: "Thank you for your feedback!",
       });
 
-      setUserReviews(prev => new Set([...prev, reviewOrder.vendor_id]));
+      // Update local state
+      if (reviewType === 'product' && reviewProduct) {
+        setProductReviews(prev => new Set([...prev, reviewProduct.id]));
+      } else {
+        setUserReviews(prev => new Set([...prev, reviewOrder.vendor_id]));
+      }
       setShowReviewDialog(false);
       setReviewOrder(null);
       setReviewRating(0);
@@ -522,8 +551,19 @@ const Orders = () => {
                             )}
                           </div>
                         </div>
-                        <div className="text-right ml-4">
+                        <div className="flex items-center gap-2 ml-4">
                           <p className="font-medium">{formatPrice(item.total_price)}</p>
+                          {hasPackageArrived(order) && !productReviews.has(item.id) && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleLeaveReview(order, 'product', item)}
+                              className="whitespace-nowrap"
+                            >
+                              <Star className="h-3 w-3 mr-1" />
+                              Review
+                            </Button>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -556,9 +596,10 @@ const Orders = () => {
                     <Button 
                       size="sm" 
                       className="w-full rounded-full"
-                      onClick={() => handleLeaveReview(order)}
+                      onClick={() => handleLeaveReview(order, 'vendor')}
                     >
-                      Leave review
+                      <Star className="h-4 w-4 mr-1" />
+                      Review Store
                     </Button>
                   ) : (
                     <Button 
@@ -746,9 +787,14 @@ const Orders = () => {
       <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Leave a Review</DialogTitle>
+            <DialogTitle>
+              {reviewType === 'vendor' ? 'Review Store' : 'Review Product'}
+            </DialogTitle>
             <DialogDescription>
-              Share your experience with {reviewOrder?.vendor_name}
+              {reviewType === 'vendor' 
+                ? `Share your experience with ${reviewOrder?.vendor_name}`
+                : `Review ${reviewProduct?.product_name}`
+              }
             </DialogDescription>
           </DialogHeader>
 

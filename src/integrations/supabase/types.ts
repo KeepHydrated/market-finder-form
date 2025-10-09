@@ -413,6 +413,9 @@ export type Database = {
           created_at: string
           id: string
           photos: string[] | null
+          product_id: string | null
+          product_image: string | null
+          product_name: string | null
           rating: number | null
           updated_at: string
           user_id: string
@@ -423,6 +426,9 @@ export type Database = {
           created_at?: string
           id?: string
           photos?: string[] | null
+          product_id?: string | null
+          product_image?: string | null
+          product_name?: string | null
           rating?: number | null
           updated_at?: string
           user_id: string
@@ -433,6 +439,9 @@ export type Database = {
           created_at?: string
           id?: string
           photos?: string[] | null
+          product_id?: string | null
+          product_image?: string | null
+          product_name?: string | null
           rating?: number | null
           updated_at?: string
           user_id?: string
