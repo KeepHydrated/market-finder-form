@@ -512,7 +512,7 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
       
       <ProductDetailModal
         product={selectedProduct}
-        products={products}
+        products={[...products].reverse()}
         open={isModalOpen}
         onClose={handleCloseModal}
         onProductChange={setSelectedProduct}
