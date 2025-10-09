@@ -1549,15 +1549,17 @@ const Homepage = () => {
           <div className="flex justify-center">
             {(() => {
               // Extract all products from all vendors
-              const allProducts = filteredSubmissions.flatMap(submission => 
-                (submission.products || []).map(product => ({
+              const allProducts = filteredSubmissions.flatMap(submission => {
+                const products = submission.products || [];
+                return products.map((product, productIndex) => ({
                   ...product,
+                  id: product.id || productIndex, // Use product's existing ID or index within vendor
                   vendorId: submission.id,
                   vendorName: submission.store_name,
                   vendorSpecialty: submission.primary_specialty,
                   vendorDistance: undefined
-                }))
-              );
+                }));
+              });
 
               return allProducts.length === 0 ? (
                 <div className="text-center">

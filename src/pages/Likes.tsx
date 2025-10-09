@@ -374,6 +374,8 @@ const Likes = () => {
       .filter(like => like.item_type === 'product')
       .map(like => like.item_id);
     
+    console.log('📦 Liked product IDs from database:', likedProductIds);
+    
     // Get all products from all vendors and filter by liked IDs
     const allProducts: any[] = [];
     acceptedSubmissions.forEach(vendor => {
@@ -381,21 +383,30 @@ const Likes = () => {
         vendor.products.forEach((product: any, index: number) => {
           // Use product.id if it exists, otherwise fall back to index
           const productId = product.id || index;
+          const likeId = `${vendor.id}-${productId}`;
+          // Also create a name-based like ID for backwards compatibility with old likes
+          const nameLikeId = `${vendor.id}-${product.name}`;
           allProducts.push({
             ...product,
             id: productId, // Ensure the product has an id field
             vendorName: vendor.store_name,
             vendorId: vendor.id,
             // Create the same ID format used in ProductDetailModal
-            likeId: `${vendor.id}-${productId}`
+            likeId,
+            nameLikeId
           });
         });
       }
     });
     
+    console.log('📦 All products with like IDs:', allProducts.map(p => ({ name: p.name, likeId: p.likeId, nameLikeId: p.nameLikeId })));
+    
+    // Match by either product ID or product name (for backwards compatibility)
     const likedProducts = allProducts.filter(product => 
-      likedProductIds.includes(product.likeId)
+      likedProductIds.includes(product.likeId) || likedProductIds.includes(product.nameLikeId)
     );
+    
+    console.log('📦 Matched liked products:', likedProducts.map(p => ({ name: p.name, likeId: p.likeId })));
 
     if (likedProducts.length === 0) {
       return (
