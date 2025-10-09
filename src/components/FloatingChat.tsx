@@ -276,8 +276,8 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
           isMobile 
             ? "fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50"
             : isTablet
-            ? "fixed right-0 w-[65%] bg-card border-l border-border shadow-2xl flex flex-col z-50"
-            : "fixed top-0 right-0 w-[65%] h-full bg-card border-l border-border shadow-2xl flex flex-col z-50"
+            ? "fixed right-0 w-[70%] bg-card border-l border-border shadow-2xl flex flex-col z-50"
+            : "fixed top-0 right-0 w-[70%] h-full bg-card border-l border-border shadow-2xl flex flex-col z-50"
         }
         style={isTablet ? { top: '200px', height: 'calc(100vh - 200px)' } : undefined}
         onClick={(e) => e.stopPropagation()}
