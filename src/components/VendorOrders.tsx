@@ -43,6 +43,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showReceiptDialog, setShowReceiptDialog] = useState(false);
+  const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (vendorId) {
@@ -121,6 +122,13 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
     setShowReceiptDialog(true);
   };
 
+  const toggleFlip = (orderId: string) => {
+    setFlippedCards(prev => ({
+      ...prev,
+      [orderId]: !prev[orderId]
+    }));
+  };
+
   if (!vendorId) {
     return (
       <Card className="text-center py-12">
@@ -181,9 +189,13 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
         </Card>
       ) : (
         <div className="space-y-6 max-w-5xl">
-          {orders.map((order) => (
+          {orders.map((order) => {
+            const isFlipped = flippedCards[order.id] || false;
+            
+            return (
             <div key={order.id} className="grid md:grid-cols-[1fr,280px] gap-6">
-              <Card className="overflow-hidden">
+              {/* Desktop view - always show both cards */}
+              <Card className="overflow-hidden hidden md:block">
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-2 text-base">
                     <span className="text-muted-foreground">Order from</span>
@@ -241,7 +253,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                 </CardContent>
               </Card>
 
-              <div className="flex flex-col gap-3">
+              <div className="flex-col gap-3 hidden md:flex">
                 <div>
                   {/* Order Status Badge */}
                   <div className="mb-3">
@@ -341,8 +353,205 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                   </Button>
                 </div>
               </div>
+
+              {/* Tablet/Mobile flip card view */}
+              <div className="md:hidden relative h-[500px] perspective-1000">
+                <div 
+                  className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
+                    isFlipped ? 'rotate-y-180' : ''
+                  }`}
+                  style={{ 
+                    transformStyle: 'preserve-3d',
+                    transition: 'transform 0.6s'
+                  }}
+                >
+                  {/* Front - Order Details */}
+                  <Card 
+                    className={`absolute inset-0 overflow-hidden backface-hidden cursor-pointer ${
+                      isFlipped ? 'pointer-events-none' : ''
+                    }`}
+                    onClick={() => toggleFlip(order.id)}
+                    style={{ 
+                      backfaceVisibility: 'hidden',
+                      WebkitBackfaceVisibility: 'hidden'
+                    }}
+                  >
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center gap-2 text-base">
+                        <span className="text-muted-foreground">Order from</span>
+                        <Mail className="h-4 w-4" />
+                        <span className="font-semibold">{order.email}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{formatDate(order.created_at)}</p>
+                    </CardHeader>
+                    
+                    <CardContent className="pt-0">
+                      <Separator className="mb-4" />
+                      
+                      <div className="space-y-3">
+                        {order.order_items.map((item) => (
+                          <div key={item.id} className="flex justify-between items-start py-2">
+                            <div className="flex items-start gap-3 flex-1">
+                              <div className="w-24 h-24 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                {item.product_image ? (
+                                  <img 
+                                    src={item.product_image} 
+                                    alt={item.product_name}
+                                    className="w-full h-full object-cover rounded-lg"
+                                  />
+                                ) : (
+                                  <Package className="h-6 w-6 text-green-600" />
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <h5 className="font-medium">
+                                  {item.quantity > 1 && (
+                                    <span className="text-muted-foreground mr-2">(x {item.quantity})</span>
+                                  )}
+                                  {item.product_name}
+                                </h5>
+                              </div>
+                            </div>
+                            <div className="text-right ml-4">
+                              <p className="font-medium">{formatPrice(item.total_price)}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-center text-sm text-muted-foreground mt-6">Tap to see actions →</p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Back - Actions */}
+                  <Card 
+                    className={`absolute inset-0 overflow-hidden cursor-pointer ${
+                      !isFlipped ? 'pointer-events-none' : ''
+                    }`}
+                    onClick={() => toggleFlip(order.id)}
+                    style={{ 
+                      backfaceVisibility: 'hidden',
+                      WebkitBackfaceVisibility: 'hidden',
+                      transform: 'rotateY(180deg)'
+                    }}
+                  >
+                    <CardContent className="p-6 flex flex-col h-full">
+                      <div className="mb-3">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                          order.status === 'paid' ? 'bg-green-100 text-green-800' :
+                          order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                          order.status === 'delivered' ? 'bg-purple-100 text-purple-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {order.status === 'paid' && '✓ Paid'}
+                          {order.status === 'shipped' && '📦 Shipped'}
+                          {order.status === 'delivered' && '✓ Delivered'}
+                          {order.status === 'pending' && '⏳ Pending Payment'}
+                        </span>
+                      </div>
+
+                      <h3 className="text-lg font-serif mb-1">Arriving Friday, October 3rd</h3>
+                      <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
+                      <p className="text-xs mb-6">
+                        From <span className="font-medium">GLENDALE, AZ</span> To{" "}
+                        <span className="font-medium underline">San Antonio</span>
+                      </p>
+
+                      <div className="flex flex-col gap-2 flex-1">
+                        {order.status === 'paid' && (
+                          <Button 
+                            size="sm" 
+                            className="w-full rounded-full"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              supabase
+                                .from('orders')
+                                .update({ status: 'shipped' })
+                                .eq('id', order.id)
+                                .then(({ error }) => {
+                                  if (!error) {
+                                    toast({ title: "Order marked as shipped" });
+                                    fetchOrders();
+                                  } else {
+                                    toast({ 
+                                      title: "Error", 
+                                      description: error.message,
+                                      variant: "destructive" 
+                                    });
+                                  }
+                                });
+                            }}
+                          >
+                            📦 Mark as Shipped
+                          </Button>
+                        )}
+                        
+                        {order.status === 'shipped' && (
+                          <Button 
+                            size="sm" 
+                            className="w-full rounded-full"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              supabase
+                                .from('orders')
+                                .update({ status: 'delivered' })
+                                .eq('id', order.id)
+                                .then(({ error }) => {
+                                  if (!error) {
+                                    toast({ title: "Order marked as delivered" });
+                                    fetchOrders();
+                                  } else {
+                                    toast({ 
+                                      title: "Error", 
+                                      description: error.message,
+                                      variant: "destructive" 
+                                    });
+                                  }
+                                });
+                            }}
+                          >
+                            ✓ Mark as Delivered
+                          </Button>
+                        )}
+
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="w-full rounded-full"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Track package
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full rounded-full"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMessageBuyer(order);
+                          }}
+                        >
+                          Message buyer
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full rounded-full"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewReceipt(order);
+                          }}
+                        >
+                          View receipt
+                        </Button>
+                        <p className="text-center text-sm text-muted-foreground mt-auto pt-4">← Tap to see order</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
