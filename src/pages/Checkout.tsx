@@ -8,11 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { ShoppingCart, MapPin, Star, HelpCircle, CreditCard, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast as sonnerToast } from 'sonner';
 import { ProductDetailModal } from '@/components/ProductDetailModal';
-import { CustomCheckout } from '@/components/shopping/CustomCheckout';
 
 interface PaymentMethod {
   id: string;
@@ -68,7 +68,8 @@ export default function Checkout() {
   const [vendorData, setVendorData] = useState<VendorData | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Calculate totals
   const subtotal = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
@@ -205,9 +206,63 @@ export default function Checkout() {
     setIsProductModalOpen(true);
   };
 
-  const handlePaymentSuccess = () => {
-    clearCart();
-    navigate('/order-success');
+  const handleCompletePayment = async () => {
+    if (!user || !selectedAddress || !selectedPaymentMethod) return;
+    
+    setIsProcessing(true);
+    try {
+      // Get address details
+      const address = addresses.find(a => a.id === selectedAddress);
+      if (!address) throw new Error('Address not found');
+
+      // Create order in database
+      const orderData = {
+        user_id: user.id,
+        email: user.email || '',
+        vendor_id: firstVendor.vendor_id,
+        vendor_name: firstVendor.vendor_name,
+        total_amount: total,
+        status: 'paid',
+        ship_to_city: address.city,
+        ship_to_state: address.state,
+        stripe_checkout_session_id: `manual_${Date.now()}`,
+      };
+
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert(orderData)
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      // Create order items
+      const orderItems = items.map(item => ({
+        order_id: order.id,
+        product_name: item.product_name,
+        product_description: item.product_description,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        total_price: item.unit_price * item.quantity,
+        product_image: item.product_image,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      sonnerToast.success('Order placed successfully!');
+      clearCart();
+      navigate('/order-success');
+    } catch (error) {
+      console.error('Error creating order:', error);
+      sonnerToast.error('Failed to place order. Please try again.');
+    } finally {
+      setIsProcessing(false);
+      setShowConfirmDialog(false);
+    }
   };
 
   if (items.length === 0) {
@@ -519,7 +574,7 @@ export default function Checkout() {
                   <Button 
                     className="w-full" 
                     size="lg"
-                    onClick={() => setShowPaymentForm(true)}
+                    onClick={() => setShowConfirmDialog(true)}
                     disabled={!selectedAddress || !selectedPaymentMethod || selectedPaymentMethod === 'new'}
                   >
                     Proceed to Payment
@@ -536,20 +591,23 @@ export default function Checkout() {
         </div>
       </div>
 
-      {/* Payment Form Modal */}
-      {showPaymentForm && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-2xl">
-            <CustomCheckout
-              items={items}
-              onSuccess={handlePaymentSuccess}
-              onCancel={() => setShowPaymentForm(false)}
-              selectedPaymentMethodId={selectedPaymentMethod}
-              showCancelButton={true}
-            />
-          </div>
-        </div>
-      )}
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Complete Payment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to complete this payment of {formatPrice(total)}?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isProcessing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCompletePayment} disabled={isProcessing}>
+              {isProcessing ? 'Processing...' : 'Confirm Payment'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Product Detail Modal */}
       {selectedProduct && vendorData && (
