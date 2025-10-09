@@ -13,6 +13,8 @@ interface Order {
   created_at: string;
   order_items: {
     product_name: string;
+    product_description?: string;
+    product_image?: string;
     quantity: number;
     unit_price: number;
     total_price: number;
@@ -53,6 +55,8 @@ export default function OrderSuccess() {
               *,
               order_items (
                 product_name,
+                product_description,
+                product_image,
                 quantity,
                 unit_price,
                 total_price
@@ -74,6 +78,8 @@ export default function OrderSuccess() {
               *,
               order_items (
                 product_name,
+                product_description,
+                product_image,
                 quantity,
                 unit_price,
                 total_price
@@ -136,8 +142,8 @@ export default function OrderSuccess() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
-      <div className="max-w-2xl mx-auto pt-8">
+    <div className="min-h-screen bg-background p-4">
+      <div className="max-w-4xl mx-auto pt-8">
         <div className="text-center mb-8">
           <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-green-600 mb-2">Order Successful!</h1>
@@ -147,63 +153,64 @@ export default function OrderSuccess() {
         </div>
 
         {order && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Receipt className="h-5 w-5" />
-                Order Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="font-medium text-muted-foreground">Order ID</p>
-                  <p className="font-mono">{order.id.slice(0, 8)}...</p>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">Vendor</p>
-                  <p>{order.vendor_name}</p>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">Email</p>
-                  <p>{order.email}</p>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">Order Date</p>
-                  <p>{new Date(order.created_at).toLocaleDateString()}</p>
-                </div>
-              </div>
+          <div className="bg-card border rounded-lg p-8">
+            {/* Header with vendor name and date */}
+            <div className="flex items-center justify-between mb-6 pb-6 border-b">
+              <h2 className="text-2xl font-bold">{order.vendor_name}</h2>
+              <p className="text-muted-foreground">
+                {new Date(order.created_at).toLocaleDateString('en-US', { 
+                  month: 'short', 
+                  day: 'numeric', 
+                  year: 'numeric' 
+                })}
+              </p>
+            </div>
 
-              <div className="border-t pt-4">
-                <h3 className="font-semibold mb-3">Items Ordered</h3>
-                <div className="space-y-2">
-                  {order.order_items.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center py-2 border-b last:border-b-0">
-                      <div className="flex-1">
-                        <p className="font-medium">{item.product_name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Qty: {item.quantity} × {formatPrice(item.unit_price)}
-                        </p>
-                      </div>
-                      <p className="font-semibold">{formatPrice(item.total_price)}</p>
+            {/* Items section */}
+            <div className="mb-6">
+              <h3 className="text-xl font-bold mb-4">Items</h3>
+              <div className="space-y-6">
+                {order.order_items.map((item, index) => (
+                  <div key={index} className="flex gap-4 pb-6 border-b last:border-b-0">
+                    {/* Product image */}
+                    <div className="w-32 h-32 flex-shrink-0 bg-muted rounded-lg overflow-hidden">
+                      {item.product_image ? (
+                        <img 
+                          src={item.product_image} 
+                          alt={item.product_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          No image
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
-
-                <div className="flex justify-between items-center pt-4 border-t font-bold text-lg">
-                  <span>Total</span>
-                  <span>{formatPrice(order.total_amount)}</span>
-                </div>
+                    
+                    {/* Product details */}
+                    <div className="flex-1">
+                      <h4 className="text-lg font-semibold mb-1">{item.product_name}</h4>
+                      <p className="text-2xl font-bold text-green-600 mb-2">
+                        {formatPrice(item.unit_price)}
+                      </p>
+                      {item.product_description && (
+                        <p className="text-muted-foreground mb-2">{item.product_description}</p>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        Qty: {item.quantity} × {formatPrice(item.unit_price)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
+            </div>
 
-              <div className="bg-green-50 p-4 rounded-lg">
-                <p className="text-sm text-green-800">
-                  <strong>What's Next?</strong> You'll receive an email confirmation shortly. 
-                  Please coordinate with the vendor for pickup or delivery arrangements.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Total */}
+            <div className="flex justify-between items-center pt-6 border-t">
+              <span className="text-2xl font-bold">Total</span>
+              <span className="text-2xl font-bold">{formatPrice(order.total_amount)}</span>
+            </div>
+          </div>
         )}
 
         <div className="text-center mt-8">
