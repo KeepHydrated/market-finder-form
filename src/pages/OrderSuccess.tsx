@@ -235,6 +235,17 @@ export default function OrderSuccess() {
           body {
             background: white;
           }
+          /* Hide all headers, navigation, and other page elements */
+          header,
+          nav,
+          [role="banner"],
+          [role="navigation"] {
+            display: none !important;
+          }
+          /* Ensure the receipt takes full width */
+          .max-w-4xl {
+            max-width: 100% !important;
+          }
         }
       `}</style>
     </div>
