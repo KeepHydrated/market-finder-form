@@ -1578,8 +1578,7 @@ const Homepage = () => {
                             id: product.id || index
                           };
                           setSelectedProduct(productWithId);
-                          // Reverse products for correct arrow navigation on /market page
-                          setCurrentVendorProducts([...(vendor.products || [])].reverse());
+                          setCurrentVendorProducts(vendor.products || []);
                           setIsProductModalOpen(true);
                         }
                       }}
