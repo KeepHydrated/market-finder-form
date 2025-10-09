@@ -255,21 +255,6 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
 
               <div className="flex-col gap-3 hidden lg:flex">
                 <div>
-                  {/* Order Status Badge */}
-                  <div className="mb-3">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                      order.status === 'paid' ? 'bg-green-100 text-green-800' :
-                      order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                      order.status === 'delivered' ? 'bg-purple-100 text-purple-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {order.status === 'paid' && '✓ Paid'}
-                      {order.status === 'shipped' && '📦 Shipped'}
-                      {order.status === 'delivered' && '✓ Delivered'}
-                      {order.status === 'pending' && '⏳ Pending Payment'}
-                    </span>
-                  </div>
-
                   <h3 className="text-lg font-serif mb-1">Arriving Friday, October 3rd</h3>
                   <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
                   <p className="text-xs">
@@ -435,20 +420,6 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                     }}
                   >
                     <CardContent className="p-6 flex flex-col h-full">
-                      <div className="mb-3">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                          order.status === 'paid' ? 'bg-green-100 text-green-800' :
-                          order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                          order.status === 'delivered' ? 'bg-purple-100 text-purple-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {order.status === 'paid' && '✓ Paid'}
-                          {order.status === 'shipped' && '📦 Shipped'}
-                          {order.status === 'delivered' && '✓ Delivered'}
-                          {order.status === 'pending' && '⏳ Pending Payment'}
-                        </span>
-                      </div>
-
                       <h3 className="text-lg font-serif mb-1">Arriving Friday, October 3rd</h3>
                       <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
                       <p className="text-xs mb-6">
