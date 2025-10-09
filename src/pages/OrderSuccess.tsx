@@ -229,7 +229,8 @@ export default function OrderSuccess() {
 
       <style>{`
         @page {
-          margin: 0;
+          margin: 0.5cm;
+          size: letter;
         }
         @media print {
           .no-print {
@@ -237,7 +238,6 @@ export default function OrderSuccess() {
           }
           body {
             background: white;
-            margin: 1cm;
           }
           /* Hide all headers, navigation, and other page elements */
           header,
@@ -246,9 +246,47 @@ export default function OrderSuccess() {
           [role="navigation"] {
             display: none !important;
           }
-          /* Ensure the receipt takes full width */
-          .max-w-4xl {
-            max-width: 100% !important;
+          /* Reduce font sizes for print */
+          h2 {
+            font-size: 1.25rem !important;
+          }
+          h3 {
+            font-size: 1.1rem !important;
+          }
+          h4 {
+            font-size: 1rem !important;
+          }
+          /* Reduce spacing */
+          .bg-card {
+            padding: 1rem !important;
+          }
+          /* Make images smaller */
+          img {
+            max-width: 80px !important;
+            max-height: 80px !important;
+          }
+          .w-32 {
+            width: 80px !important;
+            height: 80px !important;
+          }
+          /* Reduce spacing between items */
+          .space-y-6 > * + * {
+            margin-top: 0.75rem !important;
+          }
+          .pb-6 {
+            padding-bottom: 0.5rem !important;
+          }
+          .mb-6 {
+            margin-bottom: 0.75rem !important;
+          }
+          .mb-4 {
+            margin-bottom: 0.5rem !important;
+          }
+          .pt-6 {
+            padding-top: 0.75rem !important;
+          }
+          .text-2xl {
+            font-size: 1.25rem !important;
           }
         }
       `}</style>
