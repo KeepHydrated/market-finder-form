@@ -370,11 +370,17 @@ const Likes = () => {
       );
     }
 
-    const likedProductIds = likes
-      .filter(like => like.item_type === 'product')
-      .map(like => like.item_id);
+    // Get liked products with their timestamps (likes are already ordered by created_at DESC)
+    const productLikes = likes.filter(like => like.item_type === 'product');
+    const likedProductIds = productLikes.map(like => like.item_id);
     
     console.log('📦 Liked product IDs from database:', likedProductIds);
+    
+    // Create a map of like ID to order index (for sorting by recency)
+    const likeOrderMap = new Map<string, number>();
+    productLikes.forEach((like, index) => {
+      likeOrderMap.set(like.item_id, index);
+    });
     
     // Get all products from all vendors and filter by liked IDs
     const allProducts: any[] = [];
@@ -414,6 +420,11 @@ const Likes = () => {
         ...product,
         actualLikeId // Store the actual like ID that's in the database
       };
+    }).sort((a, b) => {
+      // Sort by the order in which they were liked (most recent first)
+      const orderA = likeOrderMap.get(a.actualLikeId) ?? 999999;
+      const orderB = likeOrderMap.get(b.actualLikeId) ?? 999999;
+      return orderA - orderB;
     });
     
     console.log('📦 Matched liked products:', likedProducts.map(p => ({ name: p.name, actualLikeId: p.actualLikeId })));
