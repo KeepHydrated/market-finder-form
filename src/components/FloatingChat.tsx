@@ -269,18 +269,20 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
         style={isTablet ? { top: '140px', height: 'calc(100vh - 140px)' } : undefined}
         onClick={(e) => e.stopPropagation()}
       >
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <h3 className="font-semibold text-foreground">{vendorName}</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onClose}
-          className="h-8 w-8 p-0"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
+      {/* Header - Hidden on iPad */}
+      {!isTablet && (
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <h3 className="font-semibold text-foreground">{vendorName}</h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="h-8 w-8 p-0"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
 
       {/* Messages */}
       <ScrollArea className="flex-1 p-4">
