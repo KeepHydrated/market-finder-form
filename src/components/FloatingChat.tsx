@@ -249,7 +249,10 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
         className={
           isMobile 
             ? "fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50"
-            : "fixed top-0 right-0 w-[45%] h-full bg-card border-l border-border shadow-2xl flex flex-col z-50"
+            : "fixed right-0 w-[45%] bg-card border-l border-border shadow-2xl flex flex-col z-50"
+        }
+        style={
+          !isMobile ? { top: '80px', height: 'calc(100vh - 80px)' } : undefined
         }
         onClick={(e) => e.stopPropagation()}
       >
