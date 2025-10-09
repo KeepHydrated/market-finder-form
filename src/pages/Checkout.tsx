@@ -255,7 +255,7 @@ export default function Checkout() {
 
       sonnerToast.success('Order placed successfully!');
       clearCart();
-      navigate('/order-success');
+      navigate(`/order-success?order_id=${order.id}`);
     } catch (error) {
       console.error('Error creating order:', error);
       sonnerToast.error('Failed to place order. Please try again.');

@@ -22,44 +22,74 @@ interface Order {
 export default function OrderSuccess() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
+  const orderId = searchParams.get('order_id');
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
-      if (!sessionId) {
+      if (!sessionId && !orderId) {
         setLoading(false);
         return;
       }
 
       try {
-        // Verify payment and update order status
-        const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-payment', {
-          body: { session_id: sessionId }
-        });
+        let orderData;
 
-        if (verifyError) throw verifyError;
-        
-        console.log('Payment verified:', verifyData);
+        if (sessionId) {
+          // Verify payment and update order status for Stripe payments
+          const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-payment', {
+            body: { session_id: sessionId }
+          });
 
-        // Fetch the updated order details
-        const { data: orderData, error: orderError } = await supabase
-          .from('orders')
-          .select(`
-            *,
-            order_items (
-              product_name,
-              quantity,
-              unit_price,
-              total_price
-            )
-          `)
-          .eq('stripe_checkout_session_id', sessionId)
-          .single();
+          if (verifyError) throw verifyError;
+          
+          console.log('Payment verified:', verifyData);
 
-        if (orderError) {
-          console.error('Error fetching order:', orderError);
-        } else {
+          // Fetch the updated order details
+          const { data, error: orderError } = await supabase
+            .from('orders')
+            .select(`
+              *,
+              order_items (
+                product_name,
+                quantity,
+                unit_price,
+                total_price
+              )
+            `)
+            .eq('stripe_checkout_session_id', sessionId)
+            .single();
+
+          if (orderError) {
+            console.error('Error fetching order:', orderError);
+          } else {
+            orderData = data;
+          }
+        } else if (orderId) {
+          // Fetch order details for manual payments
+          const { data, error: orderError } = await supabase
+            .from('orders')
+            .select(`
+              *,
+              order_items (
+                product_name,
+                quantity,
+                unit_price,
+                total_price
+              )
+            `)
+            .eq('id', orderId)
+            .single();
+
+          if (orderError) {
+            console.error('Error fetching order:', orderError);
+          } else {
+            orderData = data;
+          }
+        }
+
+        if (orderData) {
           setOrder(orderData);
         }
       } catch (error) {
@@ -70,7 +100,7 @@ export default function OrderSuccess() {
     };
 
     fetchOrderDetails();
-  }, [sessionId]);
+  }, [sessionId, orderId]);
 
   const formatPrice = (cents: number) => {
     return `$${(cents / 100).toFixed(2)}`;
@@ -87,7 +117,7 @@ export default function OrderSuccess() {
     );
   }
 
-  if (!sessionId) {
+  if (!sessionId && !orderId) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
         <Card className="w-full max-w-md">
