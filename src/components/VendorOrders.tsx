@@ -193,9 +193,9 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
             const isFlipped = flippedCards[order.id] || false;
             
             return (
-            <div key={order.id} className="grid md:grid-cols-[1fr,280px] gap-6">
+            <div key={order.id} className="grid lg:grid-cols-[1fr,280px] gap-6">
               {/* Desktop view - always show both cards */}
-              <Card className="overflow-hidden hidden md:block">
+              <Card className="overflow-hidden hidden lg:block">
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-2 text-base">
                     <span className="text-muted-foreground">Order from</span>
@@ -253,7 +253,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                 </CardContent>
               </Card>
 
-              <div className="flex-col gap-3 hidden md:flex">
+              <div className="flex-col gap-3 hidden lg:flex">
                 <div>
                   {/* Order Status Badge */}
                   <div className="mb-3">
@@ -355,7 +355,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
               </div>
 
               {/* Tablet/Mobile flip card view */}
-              <div className="md:hidden relative h-[500px] perspective-1000">
+              <div className="lg:hidden relative h-[500px] perspective-1000">
                 <div 
                   className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
                     isFlipped ? 'rotate-y-180' : ''
