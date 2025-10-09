@@ -57,6 +57,9 @@ interface Review {
   comment: string;
   created_at: string;
   photos?: string[];
+  product_id?: string;
+  product_name?: string;
+  product_image?: string;
   profiles?: {
     full_name: string | null;
     avatar_url: string | null;
@@ -1408,6 +1411,23 @@ const VendorDuplicate = () => {
                               </span>
                             </div>
                           </div>
+                          
+                          {/* Product Info - Show if this is a product review */}
+                          {review.product_id && review.product_name && (
+                            <div className="flex items-center gap-3 p-2 bg-muted rounded-md">
+                              {review.product_image && (
+                                <img 
+                                  src={review.product_image} 
+                                  alt={review.product_name}
+                                  className="w-12 h-12 object-cover rounded"
+                                />
+                              )}
+                              <div>
+                                <p className="text-xs text-muted-foreground">Reviewed product:</p>
+                                <p className="text-sm font-medium">{review.product_name}</p>
+                              </div>
+                            </div>
+                          )}
                           
                           {/* Rating - Only show if rating exists */}
                           {review.rating && review.rating > 0 && (
