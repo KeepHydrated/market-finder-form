@@ -513,11 +513,43 @@ export default function Checkout() {
                     <span className="text-xl font-bold">{formatPrice(total)}</span>
                   </div>
                 </div>
+
+                {/* Checkout Button */}
+                <div className="pt-4 border-t">
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                    onClick={() => setShowPaymentForm(true)}
+                    disabled={!selectedAddress || !selectedPaymentMethod || selectedPaymentMethod === 'new'}
+                  >
+                    Proceed to Payment
+                  </Button>
+                  {(!selectedAddress || !selectedPaymentMethod || selectedPaymentMethod === 'new') && (
+                    <p className="text-xs text-muted-foreground text-center mt-2">
+                      Please select a shipping address and payment method
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
+
+      {/* Payment Form Modal */}
+      {showPaymentForm && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-2xl">
+            <CustomCheckout
+              items={items}
+              onSuccess={handlePaymentSuccess}
+              onCancel={() => setShowPaymentForm(false)}
+              selectedPaymentMethodId={selectedPaymentMethod}
+              showCancelButton={true}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Product Detail Modal */}
       {selectedProduct && vendorData && (
