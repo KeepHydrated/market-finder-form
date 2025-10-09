@@ -952,8 +952,8 @@ const VendorDuplicate = () => {
         <SidebarProvider>
           <div className="min-h-screen bg-background w-full">
             <div className="flex w-full">
-              <Sidebar className="h-screen bg-green-50 border-r" collapsible="icon">
-                <SidebarContent className="space-y-6 px-4 pt-8 pb-6 overflow-y-auto">
+              <Sidebar className="bg-green-50 border-r" collapsible="icon">
+                <SidebarContent className="space-y-6 px-4 pt-8 pb-6 overflow-y-auto min-h-screen">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span 
