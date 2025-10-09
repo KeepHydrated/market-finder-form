@@ -200,7 +200,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         <div className="flex items-start gap-3 flex-1">
                           <button
                             onClick={() => handleProductClick(item)}
-                            className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden cursor-pointer"
+                            className="w-24 h-24 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden cursor-pointer"
                           >
                             {item.product_image ? (
                               <img 
