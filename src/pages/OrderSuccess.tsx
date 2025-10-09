@@ -144,7 +144,7 @@ export default function OrderSuccess() {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-4xl mx-auto pt-8">
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 no-print">
           <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-green-600 mb-2">Order Successful!</h1>
           <p className="text-muted-foreground">
@@ -153,7 +153,7 @@ export default function OrderSuccess() {
         </div>
 
         {order && (
-          <div className="bg-card border rounded-lg p-8">
+          <div className="bg-card border rounded-lg p-8 mb-8">
             {/* Header with vendor name and date */}
             <div className="flex items-center justify-between mb-6 pb-6 border-b">
               <h2 className="text-2xl font-bold">{order.vendor_name}</h2>
@@ -213,7 +213,7 @@ export default function OrderSuccess() {
           </div>
         )}
 
-        <div className="flex justify-center gap-4 mt-8">
+        <div className="flex justify-center gap-4 no-print">
           <Button variant="outline" onClick={() => window.print()}>
             <Printer className="h-4 w-4 mr-2" />
             Print Receipt
@@ -226,6 +226,17 @@ export default function OrderSuccess() {
           </Button>
         </div>
       </div>
+
+      <style>{`
+        @media print {
+          .no-print {
+            display: none !important;
+          }
+          body {
+            background: white;
+          }
+        }
+      `}</style>
     </div>
   );
 }
