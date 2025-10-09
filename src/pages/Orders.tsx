@@ -114,6 +114,7 @@ const Orders = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
+      // Fetch all orders - RLS policy handles showing both buyer orders and vendor orders
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select(`
@@ -132,6 +133,7 @@ const Orders = () => {
           ship_from_state,
           ship_to_city,
           ship_to_state,
+          user_id,
           order_items (
             id,
             product_name,
@@ -142,7 +144,6 @@ const Orders = () => {
             product_image
           )
         `)
-        .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
 
       if (ordersError) throw ordersError;
