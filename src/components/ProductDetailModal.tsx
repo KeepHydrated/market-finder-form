@@ -121,7 +121,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent 
-        className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible"
+        className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible"
         onKeyDown={handleKeyDown}
       >
         {/* Product Navigation Arrows - Positioned absolutely relative to DialogContent */}
@@ -133,7 +133,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
               e.stopPropagation();
               goToPreviousProduct();
             }}
-            className="absolute -left-16 top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white hover:bg-gray-100 border border-gray-200 shadow-lg rounded-full z-[70] hidden md:flex items-center justify-center"
+            className="absolute -left-12 top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white hover:bg-gray-100 border border-gray-200 shadow-lg rounded-full z-[70] hidden md:flex items-center justify-center"
           >
             <ChevronLeft className="h-6 w-6" />
           </Button>
@@ -147,7 +147,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
               e.stopPropagation();
               goToNextProduct();
             }}
-            className="absolute -right-16 top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white hover:bg-gray-100 border border-gray-200 shadow-lg rounded-full z-[70] hidden md:flex items-center justify-center"
+            className="absolute -right-12 top-1/2 -translate-y-1/2 h-12 w-12 p-0 bg-white hover:bg-gray-100 border border-gray-200 shadow-lg rounded-full z-[70] hidden md:flex items-center justify-center"
           >
             <ChevronRight className="h-6 w-6" />
           </Button>
