@@ -1461,6 +1461,24 @@ const VendorDuplicate = () => {
                               ))}
                             </div>
                           )}
+
+                          {/* Edit button for user's own reviews */}
+                          {user && review.user_id === user.id && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setNewReview({ rating: review.rating, comment: review.comment });
+                                setEditingReviewId(review.id);
+                                setExistingReviewPhotos(review.photos || []);
+                                setShowReviewForm(true);
+                              }}
+                              className="w-full mt-3"
+                            >
+                              <Pencil className="h-3 w-3 mr-2" />
+                              Edit This Review
+                            </Button>
+                          )}
                         </div>
                       </Card>
                     ))}
