@@ -1578,7 +1578,7 @@ const Homepage = () => {
                             id: product.id || index
                           };
                           setSelectedProduct(productWithId);
-                          setCurrentVendorProducts([...(vendor.products || [])].reverse());
+                          setCurrentVendorProducts(vendor.products || []);
                           setIsProductModalOpen(true);
                         }
                       }}
