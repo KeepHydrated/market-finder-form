@@ -115,6 +115,19 @@ const VendorDuplicate = () => {
   const [marketNavigationHistory, setMarketNavigationHistory] = useState<string[]>([]);
   const [navigationMarketsOrder, setNavigationMarketsOrder] = useState<string[]>([]);
   const isMobile = useIsMobile();
+  const [isTablet, setIsTablet] = useState(false);
+
+  // Check if viewport is tablet (768px - 1024px)
+  useEffect(() => {
+    const checkTablet = () => {
+      const width = window.innerWidth;
+      setIsTablet(width >= 768 && width <= 1024);
+    };
+    
+    checkTablet();
+    window.addEventListener('resize', checkTablet);
+    return () => window.removeEventListener('resize', checkTablet);
+  }, []);
 
   useEffect(() => {
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
@@ -933,13 +946,14 @@ const VendorDuplicate = () => {
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen bg-background w-full">
-        <div className="flex w-full">
-          {/* Left column - collapsible sidebar on iPad/desktop */}
-          {!isMobile && (
-            <Sidebar className="h-screen bg-green-50 border-r" collapsible="icon">
-              <SidebarContent className="space-y-6 px-4 pt-6 pb-6">
+    <>
+      {isTablet ? (
+        // iPad view with collapsible sidebar
+        <SidebarProvider>
+          <div className="min-h-screen bg-background w-full">
+            <div className="flex w-full">
+              <Sidebar className="h-screen bg-green-50 border-r" collapsible="icon">
+                <SidebarContent className="space-y-6 px-4 pt-6 pb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span 
@@ -1074,153 +1088,16 @@ const VendorDuplicate = () => {
               </div>
             );
           })()}
-              </SidebarContent>
-            </Sidebar>
-          )}
-          
-          {/* Mobile view - no collapsible sidebar */}
-          {isMobile && (
-            <div className="w-96 h-screen sticky top-0 bg-green-50 border-r">
-              <div className="space-y-6 px-4 pt-6 pb-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span 
-                      className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors"
-                      onClick={() => setSelectedVendor(null)}
-                    >
-                      {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
-                    </span>
-                  </div>
-                  {/* Heart icon */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={async () => {
-                      if (acceptedSubmission) {
-                        await toggleLike(acceptedSubmission.id, 'vendor');
-                      }
-                    }}
-                    className={cn(
-                      "transition-colors",
-                      acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor')
-                        ? "text-red-500 hover:text-red-600"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    <Heart 
-                      className={cn(
-                        "h-5 w-5 transition-colors",
-                        acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') && "fill-current"
-                      )} 
-                    />
-                  </Button>
+                </SidebarContent>
+              </Sidebar>
+              
+              {/* Main content - right column, scrollable */}
+              <div className="flex-1 overflow-y-auto h-screen">
+                <div className="sticky top-0 z-10 bg-background border-b p-4">
+                  <SidebarTrigger />
                 </div>
-
-                <div className="flex items-start gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="text-muted-foreground text-base font-normal">
-                      {cleanAddress(selectedMarketAddress || acceptedSubmission.market_address)}
-                    </p>
-                    {distance && (
-                      <div className="flex items-center gap-1 mt-1">
-                        <Navigation className="h-3 w-3 text-muted-foreground" />
-                        <p className="text-muted-foreground text-sm">{distance}</p>
-                      </div>
-                    )}
-                    {isLoadingDistance && (
-                      <p className="text-muted-foreground text-sm mt-1">Calculating distance...</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-                  <div className="text-muted-foreground text-base font-normal whitespace-pre-line">
-                    {marketOpeningHours?.open_now !== undefined && (
-                      <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
-                        marketOpeningHours.open_now 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {marketOpeningHours.open_now ? 'Open Now' : 'Currently Closed'}
-                      </div>
-                    )}
-                    <div>
-                      {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => (
-                        <div key={index}>{line}</div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Google Reviews Section */}
-                <div className="flex items-start gap-2">
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                    <span className="text-foreground font-semibold text-lg">
-                      {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
-                       acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
-                    </span>
-                    <span className="text-muted-foreground text-sm">
-                      ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0}) Google reviews
-                    </span>
-                  </div>
-                </div>
-
-                {/* Markets Navigation - Only show if viewing a vendor that sells at multiple markets */}
-                {selectedVendor && navigationMarketsOrder.length > 1 && (() => {
-                  const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
-                  const currentPosition = navigationMarketsOrder.indexOf(currentMarket);
-                  
-                  return (
-                    <div className="mt-4 flex items-center justify-start gap-4">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 shrink-0"
-                        onClick={() => {
-                          // Go backwards in navigation order
-                          if (currentPosition > 0) {
-                            const previousMarket = navigationMarketsOrder[currentPosition - 1];
-                            switchToMarket(previousMarket, false);
-                          }
-                        }}
-                        disabled={currentPosition <= 0}
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
-
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 shrink-0"
-                        onClick={() => {
-                          if (currentPosition >= 0 && currentPosition < navigationMarketsOrder.length - 1) {
-                            const nextMarket = navigationMarketsOrder[currentPosition + 1];
-                            switchToMarket(nextMarket, false);
-                          }
-                        }}
-                        disabled={currentPosition < 0 || currentPosition >= navigationMarketsOrder.length - 1}
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
-          )}
-        
-        {/* Main content - right column, scrollable */}
-        <div className="flex-1 overflow-y-auto h-screen">
-          {!isMobile && (
-            <div className="sticky top-0 z-10 bg-background border-b p-4">
-              <SidebarTrigger />
-            </div>
-          )}
-          <div className="container mx-auto px-4 py-6">
-        {selectedVendor ? (
+                <div className="container mx-auto px-4 py-6">
+                  {selectedVendor ? (
           // Show selected vendor details
           <div className="space-y-6">
 
@@ -1459,10 +1336,379 @@ const VendorDuplicate = () => {
             ))}
           </div>
         )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+        </SidebarProvider>
+      ) : (
+        // Desktop and Mobile view - original non-collapsible layout  
+        <div className="min-h-screen bg-background">
+          <div className="flex">
+            {/* Left column - sticky, non-scrolling */}
+            <div className="w-96 h-screen sticky top-0 bg-green-50 border-r">
+              <div className="space-y-6 px-4 pt-6 pb-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span 
+                      className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors"
+                      onClick={() => setSelectedVendor(null)}
+                    >
+                      {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={async () => {
+                      if (acceptedSubmission) {
+                        await toggleLike(acceptedSubmission.id, 'vendor');
+                      }
+                    }}
+                    className={cn(
+                      "transition-colors",
+                      acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor')
+                        ? "text-red-500 hover:text-red-600"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Heart 
+                      className={cn(
+                        "h-5 w-5 transition-colors",
+                        acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') && "fill-current"
+                      )} 
+                    />
+                  </Button>
+                </div>
+
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                  <div>
+                    <p className="text-muted-foreground text-base font-normal">
+                      {cleanAddress(selectedMarketAddress || acceptedSubmission.market_address)}
+                    </p>
+                    {distance && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <Navigation className="h-3 w-3 text-muted-foreground" />
+                        <p className="text-muted-foreground text-sm">{distance}</p>
+                      </div>
+                    )}
+                    {isLoadingDistance && (
+                      <p className="text-muted-foreground text-sm mt-1">Calculating distance...</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
+                  <div className="text-muted-foreground text-base font-normal whitespace-pre-line">
+                    {marketOpeningHours?.open_now !== undefined && (
+                      <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
+                        marketOpeningHours.open_now 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {marketOpeningHours.open_now ? 'Open Now' : 'Currently Closed'}
+                      </div>
+                    )}
+                    <div>
+                      {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => (
+                        <div key={index}>{line}</div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2">
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                    <span className="text-foreground font-semibold text-lg">
+                      {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
+                       acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
+                    </span>
+                    <span className="text-muted-foreground text-sm">
+                      ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0}) Google reviews
+                    </span>
+                  </div>
+                </div>
+
+                {selectedVendor && navigationMarketsOrder.length > 1 && (() => {
+                  const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
+                  const currentPosition = navigationMarketsOrder.indexOf(currentMarket);
+                  
+                  return (
+                    <div className="mt-4 flex items-center justify-start gap-4">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                        onClick={() => {
+                          if (currentPosition > 0) {
+                            const previousMarket = navigationMarketsOrder[currentPosition - 1];
+                            switchToMarket(previousMarket, false);
+                          }
+                        }}
+                        disabled={currentPosition <= 0}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                        onClick={() => {
+                          if (currentPosition >= 0 && currentPosition < navigationMarketsOrder.length - 1) {
+                            const nextMarket = navigationMarketsOrder[currentPosition + 1];
+                            switchToMarket(nextMarket, false);
+                          }
+                        }}
+                        disabled={currentPosition < 0 || currentPosition >= navigationMarketsOrder.length - 1}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+            
+            {/* Main content - right column, scrollable */}
+            <div className="flex-1 overflow-y-auto h-screen">
+              <div className="container mx-auto px-4 py-6">
+                {selectedVendor ? (
+                  // Show selected vendor details
+                  <div className="space-y-6">
+                    {/* Vendor Details */}
+                    <div className="mb-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <h1 className="text-2xl font-bold text-foreground">{selectedVendor.store_name}</h1>
+                          <div 
+                            className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
+                            onClick={() => setIsReviewModalOpen(true)}
+                          >
+                            <div className="flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star 
+                                  key={star}
+                                  className={`h-4 w-4 fill-current ${
+                                    vendorReviews?.rating && star <= vendorReviews.rating
+                                      ? 'text-yellow-500' 
+                                      : 'text-gray-300'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-foreground font-medium">
+                              {vendorReviews?.rating ? Number(vendorReviews.rating).toFixed(1) : 'No rating'}
+                            </span>
+                            <span className="text-muted-foreground">
+                              ({vendorReviews?.reviewCount ?? 0})
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {selectedVendor && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                if (!user) {
+                                  toast({
+                                    title: "Authentication required",
+                                    description: "Please log in to message vendors",
+                                    variant: "destructive",
+                                  });
+                                  return;
+                                }
+                                
+                                setChatVendorId(selectedVendor.id);
+                                setChatVendorName(selectedVendor.store_name);
+                                setIsChatOpen(true);
+                              }}
+                              className="text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                              <MessageSquare className="h-6 w-6" />
+                            </Button>
+                          )}
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={async () => {
+                              if (selectedVendor) {
+                                await toggleLike(selectedVendor.id, 'vendor');
+                              }
+                            }}
+                            className={cn(
+                              "transition-colors",
+                              selectedVendor && isLiked(selectedVendor.id, 'vendor')
+                                ? "text-red-500 hover:text-red-600"
+                                : "text-muted-foreground hover:text-foreground"
+                            )}
+                          >
+                            <Heart 
+                              className={cn(
+                                "h-6 w-6 transition-colors",
+                                selectedVendor && isLiked(selectedVendor.id, 'vendor') && "fill-current"
+                              )} 
+                            />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 mb-4">
+                        {selectedVendor.primary_specialty && (
+                          <Badge variant="secondary">{selectedVendor.primary_specialty}</Badge>
+                        )}
+                      </div>
+                      
+                      <p className="text-muted-foreground mb-4">
+                        {selectedVendor.description || "Quality produce from local farmers."}
+                      </p>
+
+                      {selectedVendor.website && (
+                        <div className="mb-4">
+                          <a 
+                            href={selectedVendor.website} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
+                            {selectedVendor.website}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-6">
+                      {selectedVendor.products && selectedVendor.products.length > 0 ? (
+                        <ProductGrid 
+                          products={selectedVendor.products} 
+                          vendorId={selectedVendor.id}
+                          vendorName={selectedVendor.store_name}
+                          hideVendorName={true}
+                          initialProductId={searchParams.get('product') || undefined}
+                        />
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                          No products available yet.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  // Show vendor cards grid
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {allVendors.map((vendor) => (
+                      <Card 
+                        key={vendor.id}
+                        className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
+                        onClick={() => {
+                          setAcceptedSubmission(vendor);
+                          setSelectedVendor(vendor);
+                          if (selectedMarketName && vendor.selected_markets && Array.isArray(vendor.selected_markets)) {
+                            const vendorMarkets = vendor.selected_markets as string[];
+                            if (vendorMarkets.includes(selectedMarketName)) {
+                              const reorderedMarkets = [...vendorMarkets];
+                              const currentIdx = reorderedMarkets.indexOf(selectedMarketName);
+                              if (currentIdx > 0) {
+                                const [market] = reorderedMarkets.splice(currentIdx, 1);
+                                reorderedMarkets.unshift(market);
+                              }
+                              setNavigationMarketsOrder(reorderedMarkets);
+                            } else {
+                              setSelectedMarketName(vendor.selected_market || '');
+                              setSelectedMarketAddress(vendor.market_address || '');
+                              setNavigationMarketsOrder(vendorMarkets);
+                            }
+                          } else {
+                            setSelectedMarketName(vendor.selected_market || '');
+                            setSelectedMarketAddress(vendor.market_address || '');
+                            if (vendor.selected_markets && Array.isArray(vendor.selected_markets)) {
+                              setNavigationMarketsOrder(vendor.selected_markets as string[]);
+                            }
+                          }
+                          setMarketNavigationHistory([]);
+                        }}
+                      >
+                        <div className="aspect-video bg-muted relative">
+                          {vendor.products && vendor.products.length > 0 && vendor.products[0].images && vendor.products[0].images.length > 0 ? (
+                            <img 
+                              src={vendor.products[0].images[0]} 
+                              alt={vendor.products[0].name || 'Product'} 
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                              No Image Available
+                            </div>
+                          )}
+                          
+                          <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                            <div className="flex items-center gap-1">
+                              <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                              <span className="text-xs font-medium">
+                                {vendorRatings[vendor.id]?.totalReviews > 0 
+                                  ? vendorRatings[vendor.id].averageRating.toFixed(1)
+                                  : '0.0'
+                                }
+                              </span>
+                              <span className="text-xs text-gray-600">
+                                ({vendorRatings[vendor.id]?.totalReviews || 0})
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              await toggleLike(vendor.id, 'vendor');
+                            }}
+                          >
+                            <Heart 
+                              className={cn(
+                                "h-4 w-4 transition-colors",
+                                isLiked(vendor.id, 'vendor') 
+                                  ? "text-red-500 fill-current" 
+                                  : "text-gray-600"
+                              )} 
+                            />
+                          </Button>
+                        </div>
+                        
+                        <div className="p-4 space-y-3">
+                          <h3 className="text-lg font-semibold text-foreground text-left">
+                            {vendor.store_name}
+                          </h3>
+                          
+                          {vendor.primary_specialty && (
+                            <Badge variant="secondary" className="text-xs">
+                              {vendor.primary_specialty}
+                            </Badge>
+                          )}
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Chat */}
+      <FloatingChat
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        vendorId={chatVendorId}
+        vendorName={chatVendorName}
+      />
 
       {/* Review Modal */}
       <Dialog open={isReviewModalOpen} onOpenChange={(open) => {
@@ -1793,15 +2039,7 @@ const VendorDuplicate = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Floating Chat */}
-      <FloatingChat
-        isOpen={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
-        vendorId={chatVendorId}
-        vendorName={chatVendorName}
-      />
-    </SidebarProvider>
+    </>
   );
 };
 
