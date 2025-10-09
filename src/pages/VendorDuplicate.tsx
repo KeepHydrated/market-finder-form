@@ -951,8 +951,8 @@ const VendorDuplicate = () => {
         // iPad view with collapsible sidebar
         <SidebarProvider>
           <div className="min-h-screen bg-background w-full">
-            <div className="flex w-full h-screen">
-              <Sidebar className="bg-green-50 border-r flex-shrink-0" collapsible="icon">
+            <div className="flex w-full">
+              <Sidebar className="bg-green-50 border-r flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16" collapsible="icon">
                 <div className="h-full overflow-y-auto">
                   <div className="space-y-6 px-4 py-8">
           <div className="flex items-center justify-between">
