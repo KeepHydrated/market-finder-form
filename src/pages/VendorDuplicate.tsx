@@ -1356,38 +1356,6 @@ const VendorDuplicate = () => {
               </DialogHeader>
 
               <div className="space-y-4">
-                {/* Add Review Button */}
-                <Button 
-                  onClick={() => {
-                    if (hasUserReviewed && user) {
-                      // Load existing review
-                      const userReview = reviews.find(r => r.user_id === user.id);
-                      if (userReview) {
-                        setNewReview({ rating: userReview.rating, comment: userReview.comment });
-                        setEditingReviewId(userReview.id);
-                        setExistingReviewPhotos(userReview.photos || []);
-                      }
-                    } else {
-                      // Reset for new review
-                      setNewReview({ rating: 0, comment: '' });
-                      setEditingReviewId(null);
-                      setExistingReviewPhotos([]);
-                      setSelectedPhotos([]);
-                    }
-                    setShowReviewForm(true);
-                  }}
-                  className="w-full"
-                  variant="outline"
-                  disabled={!user}
-                >
-                  {hasUserReviewed ? (
-                    <Pencil className="h-4 w-4 mr-2" />
-                  ) : (
-                    <Plus className="h-4 w-4 mr-2" />
-                  )}
-                  {hasUserReviewed ? 'Edit Your Review' : 'Write a Review'}
-                </Button>
-
                 {/* Reviews List */}
                 {reviews.length > 0 ? (
                   <div className="space-y-4 max-h-96 overflow-y-auto">
