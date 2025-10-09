@@ -82,7 +82,7 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
     <Sidebar
       collapsible="icon"
     >
-      <SidebarContent className="pt-48">
+      <SidebarContent className="pt-44">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
