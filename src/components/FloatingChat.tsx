@@ -46,11 +46,24 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
   const { user } = useAuth();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const [isTablet, setIsTablet] = useState(false);
   const [conversation, setConversation] = useState<ConversationDetails | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Detect tablet (iPad) - between 768px and 1024px
+  useEffect(() => {
+    const checkTablet = () => {
+      const width = window.innerWidth;
+      setIsTablet(width >= 768 && width <= 1024);
+    };
+    
+    checkTablet();
+    window.addEventListener('resize', checkTablet);
+    return () => window.removeEventListener('resize', checkTablet);
+  }, []);
 
   useEffect(() => {
     if (!isOpen || !user || !vendorId) return;
@@ -249,8 +262,11 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
         className={
           isMobile 
             ? "fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50"
+            : isTablet
+            ? "fixed right-0 w-[45%] bg-card border-l border-border shadow-2xl flex flex-col z-50"
             : "fixed top-0 right-0 w-[45%] h-full bg-card border-l border-border shadow-2xl flex flex-col z-50"
         }
+        style={isTablet ? { top: '140px', height: 'calc(100vh - 140px)' } : undefined}
         onClick={(e) => e.stopPropagation()}
       >
       {/* Header */}
