@@ -1612,16 +1612,16 @@ const Homepage = () => {
                           className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
                           onClick={async (e) => {
                             e.stopPropagation();
-                            await toggleLike(`${product.vendorId}-${product.name}`, 'product');
+                            await toggleLike(`${product.vendorId}-${product.id}`, 'product');
                           }}
                         >
                           <Heart 
                             className={cn(
                               "h-4 w-4 transition-colors",
-                              isLiked(`${product.vendorId}-${product.name}`, 'product')
+                              isLiked(`${product.vendorId}-${product.id}`, 'product')
                                 ? "text-red-500 fill-current" 
                                 : "text-gray-600"
-                            )} 
+                            )}
                           />
                         </Button>
                       </div>
