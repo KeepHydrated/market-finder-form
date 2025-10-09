@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, ArrowLeft, Receipt } from 'lucide-react';
+import { CheckCircle, ArrowLeft, Printer } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Order {
@@ -213,7 +213,11 @@ export default function OrderSuccess() {
           </div>
         )}
 
-        <div className="text-center mt-8">
+        <div className="flex justify-center gap-4 mt-8">
+          <Button variant="outline" onClick={() => window.print()}>
+            <Printer className="h-4 w-4 mr-2" />
+            Print Receipt
+          </Button>
           <Button asChild>
             <Link to="/homepage">
               <ArrowLeft className="h-4 w-4 mr-2" />
