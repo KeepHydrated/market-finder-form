@@ -332,7 +332,7 @@ const CategoryProducts = () => {
               price: p.price,
               images: p.images,
               description: p.description
-            })).reverse(); // Reverse so navigation goes from newer to older
+            }));
             console.log('📦 Products passed to modal:', mappedProducts.map(p => p.name));
             return mappedProducts;
           })()}
