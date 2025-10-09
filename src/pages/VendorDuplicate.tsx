@@ -1108,9 +1108,6 @@ const VendorDuplicate = () => {
               {/* Main content - right column, scrollable */}
               <div className="flex-1 overflow-y-auto h-screen">
                 <div className="container mx-auto px-4 py-6">
-                  <div className="mb-4">
-                    <SidebarTrigger />
-                  </div>
                   {selectedVendor ? (
           // Show selected vendor details
           <div className="space-y-6">
