@@ -429,7 +429,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       transform: 'rotateY(180deg)'
                     }}
                   >
-                    <CardContent className="p-3 flex flex-col">
+                    <CardContent className="p-3 pb-2 flex flex-col">
                       <div className="flex items-center justify-between mb-1">
                         <h3 className="text-base font-serif">Arriving Friday, October 3rd</h3>
                         <Button 
