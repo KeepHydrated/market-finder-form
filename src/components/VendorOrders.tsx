@@ -344,7 +344,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
               </div>
 
               {/* Tablet/Mobile flip card view */}
-              <div className="lg:hidden relative h-[340px] perspective-1000">
+              <div className="lg:hidden relative h-[280px] perspective-1000">
                 <div 
                   className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
                     isFlipped ? 'rotate-y-180' : ''
