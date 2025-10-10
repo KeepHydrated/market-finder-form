@@ -942,6 +942,7 @@ const Homepage = () => {
         .from('submissions')
         .select('*')
         .eq('status', 'accepted')
+        .or('vacation_mode.is.null,vacation_mode.eq.false') // Only show vendors not in vacation mode
         .order('created_at', { ascending: false });
 
       console.log('Raw data from database:', data);
