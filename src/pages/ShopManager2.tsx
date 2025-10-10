@@ -1174,11 +1174,11 @@ export default function ShopManager() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background -m-8">
+      <div className="min-h-screen flex w-full bg-background">
         <ShopSidebar hasShopData={!!shopData} />
         
-        <main className="flex-1 overflow-hidden">
-          <div className="p-6 pt-8">
+        <main className="flex-1">
+          <div className="p-6 pt-8 pr-12">
             {renderContent()}
           </div>
         </main>
