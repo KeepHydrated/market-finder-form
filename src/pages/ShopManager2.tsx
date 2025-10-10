@@ -496,7 +496,7 @@ export default function ShopManager() {
   };
 
   const renderOverviewWithTabs = () => (
-    <div className="space-y-6 ml-20 max-w-4xl">
+    <div className="space-y-6 ml-24 max-w-4xl">
       {renderTest()}
     </div>
   );
