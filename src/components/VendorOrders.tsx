@@ -429,7 +429,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       transform: 'rotateY(180deg)'
                     }}
                   >
-                    <CardContent className="p-4 flex flex-col h-full">
+                    <CardContent className="p-4 flex flex-col">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-base font-serif">Arriving Friday, October 3rd</h3>
                         <Button 
@@ -446,7 +446,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         <span className="font-medium underline">San Antonio</span>
                       </p>
 
-                      <div className="flex flex-col gap-1.5 flex-1">
+                      <div className="flex flex-col gap-1.5">
                         {order.status === 'paid' && (
                           <Button 
                             size="sm" 
