@@ -610,7 +610,7 @@ export default function ShopManager() {
 
 
   const renderShop = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 ml-32 mr-8 max-w-4xl py-4">
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold mb-2">Shop Setup</h2>
@@ -736,7 +736,7 @@ export default function ShopManager() {
   );
 
   const renderProducts = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 ml-32 mr-8 max-w-4xl py-4">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold mb-2">Products</h2>
@@ -791,7 +791,7 @@ export default function ShopManager() {
   );
 
   const renderAccount = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 ml-32 mr-8 max-w-4xl py-4">
       <div>
         <h2 className="text-2xl font-bold mb-2">Account Settings</h2>
         <p className="text-muted-foreground">Manage your shop settings and preferences</p>
