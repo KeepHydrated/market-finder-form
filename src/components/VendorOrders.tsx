@@ -344,7 +344,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
               </div>
 
               {/* Tablet/Mobile flip card view */}
-              <div className="lg:hidden relative h-[380px] perspective-1000">
+              <div className="lg:hidden relative h-[340px] perspective-1000">
                 <div 
                   className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
                     isFlipped ? 'rotate-y-180' : ''
@@ -429,8 +429,8 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       transform: 'rotateY(180deg)'
                     }}
                   >
-                    <CardContent className="p-4 flex flex-col">
-                      <div className="flex items-center justify-between mb-2">
+                    <CardContent className="p-3 flex flex-col">
+                      <div className="flex items-center justify-between mb-1">
                         <h3 className="text-base font-serif">Arriving Friday, October 3rd</h3>
                         <Button 
                           variant="ghost" 
@@ -441,12 +441,12 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         </Button>
                       </div>
                       <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
-                      <p className="text-xs mb-3">
+                      <p className="text-xs mb-2">
                         From <span className="font-medium">GLENDALE, AZ</span> To{" "}
                         <span className="font-medium underline">San Antonio</span>
                       </p>
 
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col gap-1">
                         {order.status === 'paid' && (
                           <Button 
                             size="sm" 
