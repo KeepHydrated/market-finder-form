@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { CartButton } from "@/components/shopping/CartButton";
-import { ArrowLeft, Heart, Store, ChevronDown, Search, DollarSign } from "lucide-react";
+import { ArrowLeft, Heart, Store, ChevronDown, Search, DollarSign, Home } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -173,6 +173,11 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
           </div>
           
           <div className="flex items-center space-x-4 h-16">
+            <Link to="/homepage">
+              <Button variant="ghost" size="sm">
+                <Home className="h-5 w-5" />
+              </Button>
+            </Link>
             <Link to="/likes">
               <Button variant="ghost" size="sm">
                 <Heart className="h-5 w-5" />
