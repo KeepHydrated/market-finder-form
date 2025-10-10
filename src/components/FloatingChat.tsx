@@ -45,25 +45,11 @@ interface FloatingChatProps {
 export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems }: FloatingChatProps) {
   const { user } = useAuth();
   const { toast } = useToast();
-  const isMobile = useIsMobile();
-  const [isTablet, setIsTablet] = useState(false);
   const [conversation, setConversation] = useState<ConversationDetails | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Detect tablet (iPad) - between 768px and 1024px
-  useEffect(() => {
-    const checkTablet = () => {
-      const width = window.innerWidth;
-      setIsTablet(width >= 768 && width <= 1024);
-    };
-    
-    checkTablet();
-    window.addEventListener('resize', checkTablet);
-    return () => window.removeEventListener('resize', checkTablet);
-  }, []);
 
   useEffect(() => {
     if (!isOpen || !user || !vendorId) return;
@@ -209,19 +195,6 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Prevent body scroll on iPad when chat is open
-  useEffect(() => {
-    if (isOpen && isTablet) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen, isTablet]);
-
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !conversation || !user) return;
@@ -257,20 +230,12 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
         onClick={onClose}
       />
       
-      {/* Chat Box - Side panel on tablet/desktop, floating on mobile */}
+      {/* Chat Box */}
       <div 
-        className={
-          isMobile 
-            ? "fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50"
-            : isTablet
-            ? "fixed right-0 w-[67%] bg-card border-l border-border shadow-2xl flex flex-col z-50"
-            : "fixed top-0 right-0 w-[67%] h-full bg-card border-l border-border shadow-2xl flex flex-col z-50"
-        }
-        style={isTablet ? { top: '190px', height: 'calc(100vh - 190px)' } : undefined}
+        className="fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50"
         onClick={(e) => e.stopPropagation()}
       >
-      {/* Header - Hidden on iPad */}
-      {!isTablet && (
+        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h3 className="font-semibold text-foreground">{vendorName}</h3>
           <Button
@@ -282,7 +247,6 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
             <X className="h-4 w-4" />
           </Button>
         </div>
-      )}
 
       {/* Messages */}
       <ScrollArea className="flex-1 p-4">
