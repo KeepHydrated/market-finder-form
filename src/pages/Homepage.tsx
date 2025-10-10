@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,13 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Heart, Star, Filter, RotateCcw, MapPin } from "lucide-react";
+import { Heart, Star, Filter, RotateCcw, MapPin, Search, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -984,6 +990,103 @@ const Homepage = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6">
+        
+        {/* Mobile Search and Category - Only visible on mobile */}
+        <div className="w-full flex md:hidden items-center space-x-4 mb-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                Category
+                <ChevronDown className="h-4 w-4 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
+              <DropdownMenuItem>
+                <Link to="/category" className="w-full font-semibold">
+                  All
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/category?category=Fresh Flowers & Plants" className="w-full">
+                  Fresh Flowers & Plants
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/category?category=Bakery" className="w-full">
+                  Bakery
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/category?category=Dairy" className="w-full">
+                  Dairy
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/category?category=Rancher" className="w-full">
+                  Rancher
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/category?category=Beverages" className="w-full">
+                  Beverages
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/category?category=Seasonings & Spices" className="w-full">
+                  Seasonings & Spices
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/category?category=Pets" className="w-full">
+                  Pets
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/category?category=Home Goods" className="w-full">
+                  Home Goods
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/category?category=Farmers" className="w-full">
+                  Farmers
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/category?category=Ready to Eat" className="w-full">
+                  Ready to Eat
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/category?category=Packaged Goods & Snacks" className="w-full">
+                  Packaged Goods & Snacks
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/category?category=Artisan" className="w-full">
+                  Artisan
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <div className="flex-1 max-w-md">
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (searchQuery.trim()) {
+                navigate(`/homepage?search=${encodeURIComponent(searchQuery.trim())}`);
+              }
+            }} className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                type="text"
+                placeholder="Search vendors, products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-background/50 border-border"
+              />
+            </form>
+          </div>
+        </div>
         
         {/* View Toggle and Filter Button */}
         <div className="flex justify-between items-center mb-6">

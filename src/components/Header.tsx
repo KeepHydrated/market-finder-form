@@ -202,8 +202,8 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             )}
           </div>
           
-          {/* Second row on md (iPad), hidden on lg+ */}
-          <div className="w-full flex items-center space-x-4 pb-3 lg:hidden">
+          {/* Second row on md (iPad), hidden on mobile and lg+ */}
+          <div className="w-full hidden md:flex lg:hidden items-center space-x-4 pb-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                  <Button variant="ghost" size="sm">
