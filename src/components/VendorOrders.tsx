@@ -173,7 +173,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
   return (
     <div className="space-y-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Track and manage your farmer's market orders</h1>
+        <h2 className="text-2xl font-bold mb-2">Track and manage your farmer's market orders</h2>
       </div>
 
       {orders.length === 0 ? (
