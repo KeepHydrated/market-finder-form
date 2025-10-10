@@ -344,7 +344,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
               </div>
 
               {/* Tablet/Mobile flip card view */}
-              <div className="lg:hidden relative h-fit perspective-1000">
+              <div className="lg:hidden relative h-[380px] perspective-1000">
                 <div 
                   className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
                     isFlipped ? 'rotate-y-180' : ''
@@ -429,7 +429,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       transform: 'rotateY(180deg)'
                     }}
                   >
-                    <CardContent className="p-4 flex flex-col">
+                    <CardContent className="p-4 flex flex-col h-full">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-base font-serif">Arriving Friday, October 3rd</h3>
                         <Button 
