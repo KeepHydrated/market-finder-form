@@ -1094,7 +1094,7 @@ export default function ShopManager() {
         </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle>Recent Orders</CardTitle>
@@ -1178,8 +1178,8 @@ export default function ShopManager() {
         <div className="min-h-screen flex w-full bg-background">
           <ShopSidebar hasShopData={!!shopData} />
           
-          <main className="flex-1">
-            <div className="p-6 pt-8">
+          <main className="flex-1 overflow-hidden">
+            <div className="p-6 pt-8 max-w-[1600px] mx-auto">
               {renderContent()}
             </div>
           </main>
