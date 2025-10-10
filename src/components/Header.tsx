@@ -172,7 +172,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             </form>
           </div>
           
-          <div className="flex items-center space-x-4 h-16">
+          <div className="flex items-center justify-center space-x-4 h-16 flex-1">
             <Link to="/likes">
               <Button variant="ghost" size="sm">
                 <Heart className="h-5 w-5" />
