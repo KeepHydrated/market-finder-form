@@ -4,8 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Switch } from "@/components/ui/switch";
-import { Package, Mail } from "lucide-react";
+import { Package, Mail, ArrowLeftRight } from "lucide-react";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
 import { OrderChatDialog } from "@/components/OrderChatDialog";
 import { useToast } from "@/hooks/use-toast";
@@ -204,7 +203,9 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       <span className="font-semibold">{order.email}</span>
                       <span className="text-muted-foreground">on {formatDate(order.created_at)}</span>
                     </div>
-                    <Switch />
+                    <Button variant="ghost" size="icon">
+                      <ArrowLeftRight className="h-5 w-5" />
+                    </Button>
                   </div>
                 </CardHeader>
                 
@@ -371,7 +372,13 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                           <Mail className="h-4 w-4" />
                           <span className="font-semibold">{order.email}</span>
                         </div>
-                        <Switch onClick={(e) => e.stopPropagation()} />
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ArrowLeftRight className="h-5 w-5" />
+                        </Button>
                       </div>
                       <p className="text-sm text-muted-foreground">{formatDate(order.created_at)}</p>
                     </CardHeader>
