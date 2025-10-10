@@ -617,8 +617,7 @@ export default function ShopManager() {
     <div className="space-y-6 ml-52 mr-8 max-w-3xl pt-[40px] pb-4">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Shop Setup</h2>
-          <p className="text-muted-foreground">Configure your farmers market shop details</p>
+          <h2 className="text-2xl font-bold mb-2">Configure your farmers market shop details</h2>
         </div>
         {shopData && (
           <Button
