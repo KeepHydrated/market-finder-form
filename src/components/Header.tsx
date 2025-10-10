@@ -181,7 +181,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             <CartButton />
             <Link to="/homepage">
               <Button variant="ghost" size="sm">
-                <Home className="h-5 w-5" />
+                <Home className="h-6 w-6" strokeWidth={2.5} />
               </Button>
             </Link>
             {user && (
