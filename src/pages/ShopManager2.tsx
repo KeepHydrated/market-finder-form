@@ -1094,7 +1094,7 @@ export default function ShopManager() {
         </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Recent Orders</CardTitle>
@@ -1173,29 +1173,27 @@ export default function ShopManager() {
   }
 
   return (
-    <div className="fixed inset-0 m-0 p-0">
-      <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-background">
-          <ShopSidebar hasShopData={!!shopData} />
-          
-          <main className="flex-1 overflow-hidden">
-            <div className="p-6 pt-8 max-w-[1600px] mx-auto">
-              {renderContent()}
-            </div>
-          </main>
-        </div>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <ShopSidebar hasShopData={!!shopData} />
+        
+        <main className="flex-1">
+          <div className="p-6 pt-8 pr-12">
+            {renderContent()}
+          </div>
+        </main>
+      </div>
 
-        {/* Product Form Modal */}
-        {showAddProduct && (
-          <AddProductForm
-            open={showAddProduct}
-            onClose={() => {
-              setShowAddProduct(false);
-            }}
-            onProductAdded={handleAddProduct}
-          />
-        )}
-      </SidebarProvider>
-    </div>
+      {/* Product Form Modal */}
+      {showAddProduct && (
+        <AddProductForm
+          open={showAddProduct}
+          onClose={() => {
+            setShowAddProduct(false);
+          }}
+          onProductAdded={handleAddProduct}
+        />
+      )}
+    </SidebarProvider>
   );
 }
