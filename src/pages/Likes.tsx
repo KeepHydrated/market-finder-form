@@ -478,10 +478,14 @@ const Likes = () => {
             key={index}
             className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200"
             onClick={() => {
-              // Set up the product modal data
+              // Set up the product modal data - only pass liked products from this vendor
               const vendor = acceptedSubmissions.find(v => v.id === product.vendorId);
               if (vendor && vendor.products) {
-                setCurrentVendorProducts(vendor.products);
+                // Filter to only liked products from this vendor
+                const likedProductsFromVendor = likedProducts.filter(
+                  p => p.vendorId === product.vendorId
+                );
+                setCurrentVendorProducts(likedProductsFromVendor);
                 setCurrentVendorInfo({ id: vendor.id, name: vendor.store_name });
                 setSelectedProduct(product);
                 setIsProductModalOpen(true);
