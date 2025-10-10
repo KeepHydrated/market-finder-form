@@ -178,12 +178,12 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 <Heart className="h-5 w-5" />
               </Button>
             </Link>
+            <CartButton />
             <Link to="/homepage">
               <Button variant="ghost" size="sm">
                 <Home className="h-5 w-5" />
               </Button>
             </Link>
-            <CartButton />
             {user && (
               <Link to="/my-shop">
                 <Button variant="ghost" size="sm">
