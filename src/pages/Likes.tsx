@@ -485,6 +485,11 @@ const Likes = () => {
                 const likedProductsFromVendor = likedProducts.filter(
                   p => p.vendorId === product.vendorId
                 );
+                
+                console.log('🎯 LIKES - Clicked product:', product.name, 'ID:', product.id);
+                console.log('🎯 LIKES - Liked products from this vendor:', likedProductsFromVendor.map(p => ({ name: p.name, id: p.id })));
+                console.log('🎯 LIKES - Setting products for navigation');
+                
                 setCurrentVendorProducts(likedProductsFromVendor);
                 setCurrentVendorInfo({ id: vendor.id, name: vendor.store_name });
                 setSelectedProduct(product);
