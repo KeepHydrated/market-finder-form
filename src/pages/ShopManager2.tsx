@@ -791,7 +791,7 @@ export default function ShopManager() {
   );
 
   const renderAccount = () => (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-2">Account Settings</h2>
         <p className="text-muted-foreground">Manage your shop settings and preferences</p>
@@ -1178,7 +1178,7 @@ export default function ShopManager() {
         <ShopSidebar hasShopData={!!shopData} />
         
         <main className="flex-1 w-full max-w-none">
-          <div className="py-6 px-6 w-full max-w-none">
+          <div className="py-6 px-6 w-full max-w-none mx-0">
             {renderContent()}
           </div>
         </main>
