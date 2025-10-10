@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { Package, Mail } from "lucide-react";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
 import { OrderChatDialog } from "@/components/OrderChatDialog";
@@ -196,11 +197,14 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
               {/* Desktop view - always show both cards */}
               <Card className="overflow-hidden hidden lg:block">
                 <CardHeader className="pb-4">
-                  <div className="flex items-center gap-2 text-base">
-                    <span className="text-muted-foreground">Order from</span>
-                    <Mail className="h-4 w-4" />
-                    <span className="font-semibold">{order.email}</span>
-                    <span className="text-muted-foreground">on {formatDate(order.created_at)}</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-base">
+                      <span className="text-muted-foreground">Order from</span>
+                      <Mail className="h-4 w-4" />
+                      <span className="font-semibold">{order.email}</span>
+                      <span className="text-muted-foreground">on {formatDate(order.created_at)}</span>
+                    </div>
+                    <Switch />
                   </div>
                 </CardHeader>
                 
@@ -361,10 +365,13 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                     }}
                   >
                     <CardHeader className="pb-4">
-                      <div className="flex items-center gap-2 text-base">
-                        <span className="text-muted-foreground">Order from</span>
-                        <Mail className="h-4 w-4" />
-                        <span className="font-semibold">{order.email}</span>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 text-base">
+                          <span className="text-muted-foreground">Order from</span>
+                          <Mail className="h-4 w-4" />
+                          <span className="font-semibold">{order.email}</span>
+                        </div>
+                        <Switch onClick={(e) => e.stopPropagation()} />
                       </div>
                       <p className="text-sm text-muted-foreground">{formatDate(order.created_at)}</p>
                     </CardHeader>
