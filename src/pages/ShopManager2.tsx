@@ -1173,27 +1173,29 @@ export default function ShopManager() {
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        <ShopSidebar hasShopData={!!shopData} />
-        
-        <main className="flex-1">
-          <div className="p-6 pt-8">
-            {renderContent()}
-          </div>
-        </main>
-      </div>
+    <div className="fixed inset-0 m-0 p-0">
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          <ShopSidebar hasShopData={!!shopData} />
+          
+          <main className="flex-1">
+            <div className="p-6 pt-8">
+              {renderContent()}
+            </div>
+          </main>
+        </div>
 
-      {/* Product Form Modal */}
-      {showAddProduct && (
-        <AddProductForm
-          open={showAddProduct}
-          onClose={() => {
-            setShowAddProduct(false);
-          }}
-          onProductAdded={handleAddProduct}
-        />
-      )}
-    </SidebarProvider>
+        {/* Product Form Modal */}
+        {showAddProduct && (
+          <AddProductForm
+            open={showAddProduct}
+            onClose={() => {
+              setShowAddProduct(false);
+            }}
+            onProductAdded={handleAddProduct}
+          />
+        )}
+      </SidebarProvider>
+    </div>
   );
 }
