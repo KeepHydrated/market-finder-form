@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,9 +9,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { LogOut, Package, Settings, MessageSquare } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface UserMenuProps {
   user: any;
@@ -20,9 +27,12 @@ interface UserMenuProps {
 
 export function UserMenu({ user, profile }: UserMenuProps) {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const [sheetOpen, setSheetOpen] = useState(false);
   
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    setSheetOpen(false);
   };
 
   const handleProfileClick = () => {
@@ -31,14 +41,17 @@ export function UserMenu({ user, profile }: UserMenuProps) {
 
   const handleOrdersClick = () => {
     navigate('/orders');
+    setSheetOpen(false);
   };
 
   const handleAccountClick = () => {
     navigate('/account');
+    setSheetOpen(false);
   };
 
   const handleMessagesClick = () => {
     navigate('/messages');
+    setSheetOpen(false);
   };
 
   const getInitials = (name?: string) => {
@@ -56,6 +69,86 @@ export function UserMenu({ user, profile }: UserMenuProps) {
     return null;
   }
 
+  // Mobile version - Sheet sidebar
+  if (isMobile) {
+    return (
+      <>
+        <Button 
+          variant="ghost" 
+          className="relative h-10 w-10 rounded-full"
+          onClick={() => setSheetOpen(true)}
+        >
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={profile?.avatar_url} alt="Avatar" />
+            <AvatarFallback>{getInitials(profile?.full_name)}</AvatarFallback>
+          </Avatar>
+        </Button>
+
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+          <SheetContent side="right" className="w-80">
+            <SheetHeader>
+              <SheetTitle className="sr-only">User Menu</SheetTitle>
+            </SheetHeader>
+            
+            <div className="flex flex-col h-full">
+              {/* Profile Section */}
+              <button
+                onClick={handleProfileClick}
+                className="w-full p-4 text-left hover:bg-muted/50 rounded-lg transition-colors mb-4"
+              >
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={profile?.avatar_url} alt="Avatar" />
+                    <AvatarFallback>{getInitials(profile?.full_name)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-base font-medium leading-none">
+                      {profile?.full_name || 'User'}
+                    </p>
+                    <p className="text-sm leading-none text-muted-foreground">
+                      {user?.email}
+                    </p>
+                  </div>
+                </div>
+              </button>
+
+              {/* Menu Items */}
+              <div className="flex-1 space-y-2">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-base h-12"
+                  onClick={handleOrdersClick}
+                >
+                  <Package className="mr-3 h-5 w-5" />
+                  <span>My Orders</span>
+                </Button>
+                
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-base h-12"
+                  onClick={handleMessagesClick}
+                >
+                  <MessageSquare className="mr-3 h-5 w-5" />
+                  <span>Messages</span>
+                </Button>
+                
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-base h-12"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="mr-3 h-5 w-5" />
+                  <span>Log out</span>
+                </Button>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </>
+    );
+  }
+
+  // Desktop version - Dropdown
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
