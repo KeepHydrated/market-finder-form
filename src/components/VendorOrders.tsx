@@ -344,7 +344,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
               </div>
 
               {/* Tablet/Mobile flip card view */}
-              <div className="lg:hidden relative h-[500px] perspective-1000">
+              <div className="lg:hidden relative h-[320px] perspective-1000">
                 <div 
                   className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
                     isFlipped ? 'rotate-y-180' : ''
@@ -364,8 +364,8 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       WebkitBackfaceVisibility: 'hidden'
                     }}
                   >
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center justify-between mb-2">
+                    <CardHeader className="pb-2 pt-3">
+                      <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2 text-base">
                           <span className="text-muted-foreground">Order from</span>
                           <Mail className="h-4 w-4" />
@@ -379,29 +379,29 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                           <ArrowLeftRight className="h-5 w-5" />
                         </Button>
                       </div>
-                      <p className="text-sm text-muted-foreground">{formatDate(order.created_at)}</p>
+                      <p className="text-xs text-muted-foreground">{formatDate(order.created_at)}</p>
                     </CardHeader>
                     
-                    <CardContent className="pt-0 pb-4">
-                      <Separator className="mb-2" />
+                    <CardContent className="pt-0 pb-2">
+                      <Separator className="mb-1" />
                       
-                      <div className="space-y-1">
+                      <div className="space-y-0.5">
                         {order.order_items.map((item) => (
-                          <div key={item.id} className="flex justify-between items-start py-1">
-                            <div className="flex items-start gap-2 flex-1">
-                              <div className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          <div key={item.id} className="flex justify-between items-center py-0.5">
+                            <div className="flex items-center gap-2 flex-1">
+                              <div className="w-12 h-12 bg-green-100 rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">
                                 {item.product_image ? (
                                   <img 
                                     src={item.product_image} 
                                     alt={item.product_name}
-                                    className="w-full h-full object-cover rounded-lg"
+                                    className="w-full h-full object-cover rounded-md"
                                   />
                                 ) : (
-                                  <Package className="h-6 w-6 text-green-600" />
+                                  <Package className="h-4 w-4 text-green-600" />
                                 )}
                               </div>
-                              <div className="flex-1">
-                                <h5 className="font-medium">
+                              <div className="flex-1 min-w-0">
+                                <h5 className="font-medium text-sm truncate">
                                   {item.quantity > 1 && (
                                     <span className="text-muted-foreground mr-2">(x {item.quantity})</span>
                                   )}
@@ -409,8 +409,8 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                                 </h5>
                               </div>
                             </div>
-                            <div className="text-right ml-4">
-                              <p className="font-medium">{formatPrice(item.total_price)}</p>
+                            <div className="text-right ml-2">
+                              <p className="font-medium text-sm">{formatPrice(item.total_price)}</p>
                             </div>
                           </div>
                         ))}
@@ -429,9 +429,9 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       transform: 'rotateY(180deg)'
                     }}
                   >
-                    <CardContent className="p-4 flex flex-col h-full">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-base font-serif">Arriving Friday, October 3rd</h3>
+                    <CardContent className="p-3 flex flex-col h-full">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="text-sm font-serif">Arriving Friday, October 3rd</h3>
                         <Button 
                           variant="ghost" 
                           size="icon"
@@ -441,12 +441,12 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         </Button>
                       </div>
                       <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
-                      <p className="text-xs mb-3">
+                      <p className="text-xs mb-2">
                         From <span className="font-medium">GLENDALE, AZ</span> To{" "}
                         <span className="font-medium underline">San Antonio</span>
                       </p>
 
-                      <div className="flex flex-col gap-1.5 flex-1">
+                      <div className="flex flex-col gap-1 flex-1">
                         {order.status === 'paid' && (
                           <Button 
                             size="sm" 
