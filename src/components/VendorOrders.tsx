@@ -415,7 +415,6 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                           </div>
                         ))}
                       </div>
-                      <p className="text-center text-sm text-muted-foreground mt-6">Tap to see actions →</p>
                     </CardContent>
                   </Card>
 
