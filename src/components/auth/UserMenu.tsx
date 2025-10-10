@@ -15,6 +15,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { LogOut, Package, Settings, MessageSquare, Store } from 'lucide-react';
@@ -119,6 +120,7 @@ export function UserMenu({ user, profile }: UserMenuProps) {
 
               {/* Menu Items */}
               <div className="flex-1 space-y-2">
+                {/* My Shop Section */}
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-base h-12"
@@ -128,6 +130,9 @@ export function UserMenu({ user, profile }: UserMenuProps) {
                   <span>My Shop</span>
                 </Button>
 
+                <Separator className="my-2" />
+
+                {/* Other Menu Items */}
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-base h-12"
