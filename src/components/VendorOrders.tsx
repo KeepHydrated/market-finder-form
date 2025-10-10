@@ -268,7 +268,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  {/* Status Update Buttons */}
+                  {/* Status Update Button */}
                   {order.status === 'paid' && (
                     <Button 
                       size="sm" 
@@ -321,9 +321,11 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                     </Button>
                   )}
 
-                  <Button size="sm" variant="outline" className="w-full rounded-full">
-                    Track package
-                  </Button>
+                  {order.status === 'delivered' && (
+                    <Button size="sm" variant="outline" className="w-full rounded-full">
+                      Track package
+                    </Button>
+                  )}
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -503,14 +505,16 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                           </Button>
                         )}
 
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="w-full rounded-full"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          Track package
-                        </Button>
+                        {order.status === 'delivered' && (
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="w-full rounded-full"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Track package
+                          </Button>
+                        )}
                         <Button 
                           variant="outline" 
                           size="sm" 
