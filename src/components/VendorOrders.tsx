@@ -382,14 +382,14 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       <p className="text-sm text-muted-foreground">{formatDate(order.created_at)}</p>
                     </CardHeader>
                     
-                    <CardContent className="pt-0">
-                      <Separator className="mb-4" />
+                    <CardContent className="pt-0 pb-4">
+                      <Separator className="mb-2" />
                       
-                      <div className="space-y-3">
+                      <div className="space-y-1">
                         {order.order_items.map((item) => (
-                          <div key={item.id} className="flex justify-between items-start py-2">
-                            <div className="flex items-start gap-3 flex-1">
-                              <div className="w-24 h-24 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          <div key={item.id} className="flex justify-between items-start py-1">
+                            <div className="flex items-start gap-2 flex-1">
+                              <div className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                                 {item.product_image ? (
                                   <img 
                                     src={item.product_image} 
@@ -429,9 +429,9 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       transform: 'rotateY(180deg)'
                     }}
                   >
-                    <CardContent className="p-6 flex flex-col h-full">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-serif">Arriving Friday, October 3rd</h3>
+                    <CardContent className="p-4 flex flex-col h-full">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-base font-serif">Arriving Friday, October 3rd</h3>
                         <Button 
                           variant="ghost" 
                           size="icon"
@@ -441,12 +441,12 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         </Button>
                       </div>
                       <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
-                      <p className="text-xs mb-6">
+                      <p className="text-xs mb-3">
                         From <span className="font-medium">GLENDALE, AZ</span> To{" "}
                         <span className="font-medium underline">San Antonio</span>
                       </p>
 
-                      <div className="flex flex-col gap-2 flex-1">
+                      <div className="flex flex-col gap-1.5 flex-1">
                         {order.status === 'paid' && (
                           <Button 
                             size="sm" 
