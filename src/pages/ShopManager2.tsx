@@ -791,13 +791,13 @@ export default function ShopManager() {
   );
 
   const renderAccount = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-4xl">
       <div>
         <h2 className="text-2xl font-bold mb-2">Account Settings</h2>
         <p className="text-muted-foreground">Manage your shop settings and preferences</p>
       </div>
 
-      <Card>
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Store Settings</CardTitle>
         </CardHeader>
@@ -847,7 +847,7 @@ export default function ShopManager() {
         </CardContent>
       </Card>
 
-      <Card className="border-destructive">
+      <Card className="border-destructive w-full">
         <CardHeader>
           <CardTitle className="text-destructive">Danger Zone</CardTitle>
         </CardHeader>
