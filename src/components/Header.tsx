@@ -173,14 +173,14 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
           </div>
           
           <div className="flex items-center space-x-4 h-16">
-            <Link to="/homepage">
-              <Button variant="ghost" size="sm">
-                <Home className="h-5 w-5" />
-              </Button>
-            </Link>
             <Link to="/likes">
               <Button variant="ghost" size="sm">
                 <Heart className="h-5 w-5" />
+              </Button>
+            </Link>
+            <Link to="/homepage">
+              <Button variant="ghost" size="sm">
+                <Home className="h-5 w-5" />
               </Button>
             </Link>
             <CartButton />
