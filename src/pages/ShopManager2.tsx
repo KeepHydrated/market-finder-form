@@ -1094,7 +1094,7 @@ export default function ShopManager() {
         </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle>Recent Orders</CardTitle>
@@ -1177,8 +1177,8 @@ export default function ShopManager() {
       <div className="min-h-screen flex w-full bg-background">
         <ShopSidebar hasShopData={!!shopData} />
         
-        <main className="flex-1 w-full">
-          <div className="py-6 px-4 w-full">
+        <main className="flex-1 w-full max-w-none">
+          <div className="py-6 px-6 w-full max-w-none">
             {renderContent()}
           </div>
         </main>
