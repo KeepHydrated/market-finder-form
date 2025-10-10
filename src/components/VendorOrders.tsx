@@ -382,7 +382,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       <p className="text-sm text-muted-foreground">{formatDate(order.created_at)}</p>
                     </CardHeader>
                     
-                    <CardContent className="pt-0 pb-2">
+                    <CardContent className="pt-0 pb-0">
                       <Separator className="mb-2" />
                       
                       <div className="space-y-1">
