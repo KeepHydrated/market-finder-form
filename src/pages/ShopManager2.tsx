@@ -1044,7 +1044,7 @@ export default function ShopManager() {
   );
 
   const renderTest = () => (
-    <div className="space-y-6 ml-10">
+    <div className="space-y-6 ml-16">
       <div>
         <h2 className="text-2xl font-bold mb-2">Overview</h2>
         <p className="text-muted-foreground">Performance metrics for your shop</p>
