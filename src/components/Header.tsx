@@ -185,7 +185,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             </Link>
             <CartButton />
             {user && (
-              <Link to="/my-shop" className="hidden md:block">
+              <Link to="/my-shop">
                 <Button variant="ghost" size="sm">
                   <Store className="h-5 w-5" />
                 </Button>
