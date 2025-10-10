@@ -364,16 +364,16 @@ const Homepage = () => {
                 console.error(`❌ Error storing rating for ${market.name}:`, insertError);
                 
                 // Try updating existing record if insert failed
+                // Use place_id as the primary identifier to avoid updating multiple records
                 const { error: updateError } = await supabase
                   .from('markets')
                   .update({
                     address: marketData.address, // Update with correct Google Maps address
                     google_rating: marketData.rating,
                     google_rating_count: marketData.user_ratings_total,
-                    google_place_id: marketData.place_id,
                     last_rating_update: new Date().toISOString()
                   })
-                  .eq('name', market.name);
+                  .eq('google_place_id', marketData.place_id);
 
                 if (updateError) {
                   console.error(`❌ Error updating rating for ${market.name}:`, updateError);
