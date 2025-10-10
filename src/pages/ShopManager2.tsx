@@ -496,7 +496,7 @@ export default function ShopManager() {
   };
 
   const renderOverviewWithTabs = () => (
-    <div className="space-y-6 ml-24 max-w-4xl">
+    <div className="space-y-6 ml-24 mr-8 max-w-4xl py-4">
       {renderTest()}
     </div>
   );
@@ -1178,9 +1178,7 @@ export default function ShopManager() {
         <ShopSidebar hasShopData={!!shopData} />
         
         <main className="flex-1 w-full">
-          <div className="py-4 px-4 w-full">
-            {renderContent()}
-          </div>
+          {renderContent()}
         </main>
       </div>
 
