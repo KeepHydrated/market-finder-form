@@ -356,11 +356,10 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                 >
                   {/* Front - Order Details */}
                   <Card 
-                    className={`absolute inset-0 overflow-hidden backface-hidden cursor-pointer ${
+                    className={`absolute inset-0 overflow-hidden backface-hidden ${
                       isFlipped ? 'pointer-events-none' : ''
                     }`}
-                    onClick={() => toggleFlip(order.id)}
-                    style={{ 
+                    style={{
                       backfaceVisibility: 'hidden',
                       WebkitBackfaceVisibility: 'hidden'
                     }}
@@ -375,7 +374,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         <Button 
                           variant="ghost" 
                           size="icon"
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={() => toggleFlip(order.id)}
                         >
                           <ArrowLeftRight className="h-5 w-5" />
                         </Button>
@@ -422,18 +421,26 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
 
                   {/* Back - Actions */}
                   <Card 
-                    className={`absolute inset-0 overflow-hidden cursor-pointer ${
+                    className={`absolute inset-0 overflow-hidden ${
                       !isFlipped ? 'pointer-events-none' : ''
                     }`}
-                    onClick={() => toggleFlip(order.id)}
-                    style={{ 
+                    style={{
                       backfaceVisibility: 'hidden',
                       WebkitBackfaceVisibility: 'hidden',
                       transform: 'rotateY(180deg)'
                     }}
                   >
                     <CardContent className="p-6 flex flex-col h-full">
-                      <h3 className="text-lg font-serif mb-1">Arriving Friday, October 3rd</h3>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-serif">Arriving Friday, October 3rd</h3>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => toggleFlip(order.id)}
+                        >
+                          <ArrowLeftRight className="h-5 w-5" />
+                        </Button>
+                      </div>
                       <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
                       <p className="text-xs mb-6">
                         From <span className="font-medium">GLENDALE, AZ</span> To{" "}
@@ -527,7 +534,6 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         >
                           View receipt
                         </Button>
-                        <p className="text-center text-sm text-muted-foreground mt-auto pt-4">← Tap to see order</p>
                       </div>
                     </CardContent>
                   </Card>
