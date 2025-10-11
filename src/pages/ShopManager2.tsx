@@ -492,6 +492,12 @@ export default function ShopManager() {
             <VendorOrders vendorId={shopData?.id} vendorName={shopData?.store_name} />
           </div>
         );
+      case 'orders2':
+        return (
+          <div className="space-y-6 ml-52 mr-8 max-w-3xl pt-[40px] pb-4">
+            <VendorOrders vendorId={shopData?.id} vendorName={shopData?.store_name} />
+          </div>
+        );
       case 'account':
         return renderAccount();
       default:

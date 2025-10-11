@@ -50,6 +50,12 @@ const menuItems = [
     requiresShop: true 
   },
   { 
+    title: "Orders", 
+    icon: ShoppingBag, 
+    section: "orders2",
+    requiresShop: true 
+  },
+  { 
     title: "Account", 
     icon: Settings, 
     section: "account",
