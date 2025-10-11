@@ -1162,17 +1162,7 @@ export default function ShopManager() {
   if (!user) {
     return (
       <div className="container mx-auto px-6 py-8">
-        <Card className="max-w-md mx-auto">
-          <CardHeader>
-            <CardTitle className="text-center">Create Your Shop</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-center text-muted-foreground mb-6">
-              Sign in to create and manage your farmers market shop.
-            </p>
-            <AuthForm />
-          </CardContent>
-        </Card>
+        <AuthForm />
       </div>
     );
   }
