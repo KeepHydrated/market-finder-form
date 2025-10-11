@@ -1102,13 +1102,13 @@ export default function ShopManager() {
           <CardContent className="space-y-4">
             {analytics.recentOrders.length > 0 ? (
               analytics.recentOrders.map((order: any) => (
-                <div key={order.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div key={order.id} className="flex items-start justify-between p-4 border rounded-lg">
                   <div>
-                    <p className="font-medium">Order #{order.id.slice(-8)}</p>
+                    <p className="font-semibold text-lg mb-1">Order #{order.id.slice(-8)}</p>
                     <p className="text-sm text-muted-foreground">{order.email}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">${(order.total_amount / 100).toFixed(2)}</p>
+                    <p className="font-semibold text-lg mb-1">${(order.total_amount / 100).toFixed(2)}</p>
                     <p className="text-sm capitalize">{order.status}</p>
                   </div>
                 </div>
