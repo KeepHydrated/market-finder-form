@@ -342,16 +342,6 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
 
               {/* Tablet/Mobile flip card view */}
               <div className="lg:hidden relative h-[240px] perspective-1000">
-                {/* Fixed Flip Button */}
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={() => toggleFlip(order.id)}
-                  className="absolute top-4 right-4 z-10"
-                >
-                  <ArrowLeftRight className="h-5 w-5" />
-                </Button>
-
                 <div 
                   className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
                     isFlipped ? 'rotate-y-180' : ''
@@ -372,10 +362,19 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                     }}
                   >
                     <CardHeader className="pb-4">
-                      <div className="flex items-center gap-2 text-base mb-2">
-                        <span className="text-muted-foreground">Order from</span>
-                        <Mail className="h-4 w-4" />
-                        <span className="font-semibold">{order.email}</span>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 text-base">
+                          <span className="text-muted-foreground">Order from</span>
+                          <Mail className="h-4 w-4" />
+                          <span className="font-semibold">{order.email}</span>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => toggleFlip(order.id)}
+                        >
+                          <ArrowLeftRight className="h-5 w-5" />
+                        </Button>
                       </div>
                       <p className="text-sm text-muted-foreground">{formatDate(order.created_at)}</p>
                     </CardHeader>
@@ -428,7 +427,16 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                     }}
                   >
                     <CardContent className="p-3 pb-2 flex flex-col">
-                      <h3 className="text-base font-serif mb-1">Arriving Friday, October 3rd</h3>
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="text-base font-serif">Arriving Friday, October 3rd</h3>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => toggleFlip(order.id)}
+                        >
+                          <ArrowLeftRight className="h-5 w-5" />
+                        </Button>
+                      </div>
                       <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
                       <p className="text-xs mb-2">
                         From <span className="font-medium">GLENDALE, AZ</span> To{" "}
