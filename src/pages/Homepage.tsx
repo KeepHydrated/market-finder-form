@@ -99,6 +99,8 @@ const Homepage = () => {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [currentVendorProducts, setCurrentVendorProducts] = useState<any[]>([]);
+  const [currentVendorId, setCurrentVendorId] = useState<string | undefined>(undefined);
+  const [currentVendorName, setCurrentVendorName] = useState<string | undefined>(undefined);
   const [marketAddressesMap, setMarketAddressesMap] = useState<Record<string, string>>({});
 
   // Handle category selection from URL and navigate to new page
@@ -1684,6 +1686,9 @@ const Homepage = () => {
                             id: product.id || index
                           };
                           setSelectedProduct(productWithId);
+                          // Store vendor info separately
+                          setCurrentVendorId(product.vendorId);
+                          setCurrentVendorName(product.vendorName);
                           // Ensure all vendor products have IDs
                           const productsWithIds = (vendor.products || []).map((p: any, idx: number) => ({
                             ...p,
@@ -1782,10 +1787,12 @@ const Homepage = () => {
             setIsProductModalOpen(false);
             setSelectedProduct(null);
             setCurrentVendorProducts([]);
+            setCurrentVendorId(undefined);
+            setCurrentVendorName(undefined);
           }}
           onProductChange={setSelectedProduct}
-          vendorId={selectedProduct?.vendorId}
-          vendorName={selectedProduct?.vendorName}
+          vendorId={currentVendorId}
+          vendorName={currentVendorName}
         />
       </div>
     </div>

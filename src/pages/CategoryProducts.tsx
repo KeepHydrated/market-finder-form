@@ -331,7 +331,9 @@ const CategoryProducts = () => {
               name: p.name,
               price: p.price,
               images: p.images,
-              description: p.description
+              description: p.description,
+              vendorId: p.vendorId,
+              vendorName: p.vendorName
             }));
             console.log('📦 Products passed to modal:', mappedProducts.map(p => p.name));
             return mappedProducts;
