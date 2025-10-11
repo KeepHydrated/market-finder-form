@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Save, Plus, Trash2, ArrowRight } from 'lucide-react';
+import { Edit, Save, Plus, Trash2, ArrowRight, Package } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { ProductGrid } from '@/components/ProductGrid';
@@ -1094,30 +1094,33 @@ export default function ShopManager() {
         </Card>
       </div>
 
-      <div className="grid gap-x-3 gap-y-6 md:grid-cols-1">
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Orders</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {analytics.recentOrders.length > 0 ? (
-              analytics.recentOrders.map((order: any) => (
-                <div key={order.id} className="flex items-start justify-between p-4 border rounded-lg">
-                  <div>
-                    <p className="font-semibold text-lg mb-1">Order #{order.id.slice(-8)}</p>
-                    <p className="text-sm text-muted-foreground">{order.email}</p>
+      <div>
+        <h3 className="text-xl font-bold mb-4">Recent Orders</h3>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {analytics.recentOrders.length > 0 ? (
+            analytics.recentOrders.map((order: any) => (
+              <Card key={order.id} className="overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="aspect-square bg-muted flex items-center justify-center">
+                    <Package className="h-16 w-16 text-muted-foreground" />
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-lg mb-1">${(order.total_amount / 100).toFixed(2)}</p>
-                    <p className="text-sm capitalize">{order.status}</p>
+                  <div className="p-4">
+                    <h4 className="font-semibold mb-1">Order #{order.id.slice(-8)}</h4>
+                    <p className="text-sm text-muted-foreground mb-2">{order.email}</p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-lg font-semibold">${(order.total_amount / 100).toFixed(2)}</p>
+                      <Badge variant={order.status === 'delivered' ? 'default' : order.status === 'paid' ? 'secondary' : 'outline'}>
+                        {order.status}
+                      </Badge>
+                    </div>
                   </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-4 text-muted-foreground">No orders yet</div>
-            )}
-          </CardContent>
-        </Card>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12 text-muted-foreground">No orders yet</div>
+          )}
+        </div>
       </div>
 
       <div className="grid gap-x-3 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
