@@ -34,7 +34,6 @@ export default function ShippingAddressesSection() {
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [formData, setFormData] = useState({
     address_line_1: '',
-    address_line_2: '',
     city: '',
     state: '',
     postal_code: '',
@@ -76,7 +75,6 @@ export default function ShippingAddressesSection() {
     setEditingAddress(null);
     setFormData({
       address_line_1: '',
-      address_line_2: '',
       city: '',
       state: '',
       postal_code: '',
@@ -91,7 +89,6 @@ export default function ShippingAddressesSection() {
     setEditingAddress(address);
     setFormData({
       address_line_1: address.address_line_1,
-      address_line_2: address.address_line_2 || '',
       city: address.city,
       state: address.state,
       postal_code: address.postal_code,
@@ -278,7 +275,6 @@ export default function ShippingAddressesSection() {
                         </div>
                         <div className="text-muted-foreground text-sm space-y-1">
                           <p>{address.address_line_1}</p>
-                          {address.address_line_2 && <p>{address.address_line_2}</p>}
                           <p>
                             {address.city}, {address.state} {address.postal_code}
                           </p>
@@ -330,21 +326,12 @@ export default function ShippingAddressesSection() {
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
-                <Label htmlFor="address_line_1">Address Line 1 *</Label>
+                <Label htmlFor="address_line_1">Address *</Label>
                 <Input
                   id="address_line_1"
                   value={formData.address_line_1}
                   onChange={(e) => setFormData({ ...formData, address_line_1: e.target.value })}
-                  placeholder="123 Main St"
-                />
-              </div>
-              <div className="col-span-2">
-                <Label htmlFor="address_line_2">Address Line 2</Label>
-                <Input
-                  id="address_line_2"
-                  value={formData.address_line_2}
-                  onChange={(e) => setFormData({ ...formData, address_line_2: e.target.value })}
-                  placeholder="Apt 4B"
+                  placeholder="123 Main St, Apt 4B"
                 />
               </div>
               <div>
