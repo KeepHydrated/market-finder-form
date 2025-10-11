@@ -46,12 +46,6 @@ const menuItems = [
   { 
     title: "Orders", 
     icon: ShoppingBag, 
-    section: "orders",
-    requiresShop: true 
-  },
-  { 
-    title: "Orders", 
-    icon: ShoppingBag, 
     section: "orders2",
     requiresShop: true 
   },
