@@ -426,7 +426,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       transform: 'rotateY(180deg)'
                     }}
                   >
-                    <CardContent className="p-3 pb-2 flex flex-col">
+                    <CardHeader className="pb-3">
                       <div className="flex items-center justify-between mb-1">
                         <h3 className="text-base font-serif">Arriving Friday, October 3rd</h3>
                         <Button 
@@ -438,12 +438,13 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         </Button>
                       </div>
                       <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
-                      <p className="text-xs mb-2">
+                      <p className="text-xs">
                         From <span className="font-medium">GLENDALE, AZ</span> To{" "}
                         <span className="font-medium underline">San Antonio</span>
                       </p>
+                    </CardHeader>
 
-                      <div className="flex flex-col gap-1">
+                    <CardContent className="pt-0 flex flex-col gap-1">
                         {order.status === 'paid' && (
                           <Button 
                             size="sm" 
@@ -532,11 +533,10 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         >
                           View receipt
                         </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
-              </div>
             </div>
             );
           })}
