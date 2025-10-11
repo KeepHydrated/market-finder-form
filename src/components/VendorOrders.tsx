@@ -196,16 +196,11 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
               {/* Desktop view - always show both cards */}
               <Card className="overflow-hidden hidden lg:block">
                 <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-base">
-                      <span className="text-muted-foreground">Order from</span>
-                      <Mail className="h-4 w-4" />
-                      <span className="font-semibold">{order.email}</span>
-                      <span className="text-muted-foreground">on {formatDate(order.created_at)}</span>
-                    </div>
-                    <Button variant="ghost" size="icon">
-                      <ArrowLeftRight className="h-5 w-5" />
-                    </Button>
+                  <div className="flex items-center gap-2 text-base">
+                    <span className="text-muted-foreground">Order from</span>
+                    <Mail className="h-4 w-4" />
+                    <span className="font-semibold">{order.email}</span>
+                    <span className="text-muted-foreground">on {formatDate(order.created_at)}</span>
                   </div>
                 </CardHeader>
                 
