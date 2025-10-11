@@ -349,11 +349,19 @@ export default function AccountSettings() {
     if (!user) return;
 
     try {
+      // Prepare data, converting empty strings to null for nullable fields
+      const addressData = {
+        ...addressForm,
+        full_name: addressForm.full_name.trim() || null,
+        address_line_2: addressForm.address_line_2.trim() || null,
+        phone: addressForm.phone.trim() || null,
+      };
+
       if (editingAddress) {
         // Update existing address
         const { error } = await supabase
           .from('user_addresses' as any)
-          .update(addressForm)
+          .update(addressData)
           .eq('id', editingAddress.id);
 
         if (error) throw error;
@@ -363,7 +371,7 @@ export default function AccountSettings() {
           .from('user_addresses' as any)
           .insert({
             user_id: user.id,
-            ...addressForm
+            ...addressData
           });
 
         if (error) throw error;
