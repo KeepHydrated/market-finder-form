@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Pencil, Trash2, Plus, Star } from 'lucide-react';
@@ -32,6 +33,8 @@ export default function ShippingAddressesSection() {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     address_line_1: '',
     city: '',
@@ -216,14 +219,19 @@ export default function ShippingAddressesSection() {
     }
   };
 
-  const handleDeleteAddress = async (addressId: string) => {
-    if (!confirm('Are you sure you want to delete this address?')) return;
+  const handleDeleteClick = (addressId: string) => {
+    setAddressToDelete(addressId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!addressToDelete) return;
 
     try {
       const { error } = await supabase
         .from('user_addresses')
         .delete()
-        .eq('id', addressId);
+        .eq('id', addressToDelete);
 
       if (error) throw error;
 
@@ -240,6 +248,9 @@ export default function ShippingAddressesSection() {
         description: 'Failed to delete address',
         variant: 'destructive',
       });
+    } finally {
+      setDeleteDialogOpen(false);
+      setAddressToDelete(null);
     }
   };
 
@@ -324,7 +335,7 @@ export default function ShippingAddressesSection() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleDeleteAddress(address.id)}
+                          onClick={() => handleDeleteClick(address.id)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -429,6 +440,21 @@ export default function ShippingAddressesSection() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this address?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the address from your saved addresses.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
