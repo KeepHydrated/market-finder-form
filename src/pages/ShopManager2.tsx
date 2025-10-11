@@ -1098,25 +1098,42 @@ export default function ShopManager() {
         <h3 className="text-xl font-bold mb-4">Recent Orders</h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {analytics.recentOrders.length > 0 ? (
-            analytics.recentOrders.map((order: any) => (
-              <Card key={order.id} className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="aspect-square bg-muted flex items-center justify-center">
-                    <Package className="h-16 w-16 text-muted-foreground" />
-                  </div>
-                  <div className="p-4">
-                    <h4 className="font-semibold mb-1">Order #{order.id.slice(-8)}</h4>
-                    <p className="text-sm text-muted-foreground mb-2">{order.email}</p>
-                    <div className="flex items-center justify-between">
-                      <p className="text-lg font-semibold">${(order.total_amount / 100).toFixed(2)}</p>
-                      <Badge variant={order.status === 'delivered' ? 'default' : order.status === 'paid' ? 'secondary' : 'outline'}>
-                        {order.status}
-                      </Badge>
+            analytics.recentOrders.map((order: any) => {
+              const firstItem = order.order_items?.[0];
+              return (
+                <Card key={order.id} className="overflow-hidden group cursor-pointer hover:shadow-lg transition-shadow">
+                  <CardContent className="p-0">
+                    <div className="aspect-square bg-muted overflow-hidden">
+                      {firstItem?.product_image ? (
+                        <img 
+                          src={firstItem.product_image} 
+                          alt={firstItem.product_name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Package className="h-16 w-16 text-muted-foreground" />
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+                    <div className="p-4">
+                      <h4 className="font-semibold mb-1 truncate">
+                        {firstItem?.product_name || `Order #${order.id.slice(-8)}`}
+                      </h4>
+                      <p className="text-lg font-semibold text-muted-foreground mb-2">
+                        ${(order.total_amount / 100).toFixed(2)}
+                      </p>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground truncate">{order.email}</span>
+                        <Badge variant={order.status === 'delivered' ? 'default' : order.status === 'paid' ? 'secondary' : 'outline'}>
+                          {order.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })
           ) : (
             <div className="col-span-full text-center py-12 text-muted-foreground">No orders yet</div>
           )}
