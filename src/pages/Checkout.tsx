@@ -341,7 +341,7 @@ export default function Checkout() {
                             <div className="flex items-start gap-2">
                               <MapPin className="w-4 h-4 mt-0.5 text-muted-foreground flex-shrink-0" />
                               <span className="text-sm">
-                                {address.full_name}, {address.address_line_1}
+                                {address.full_name && `${address.full_name}, `}{address.address_line_1}
                                 {address.address_line_2 && `, ${address.address_line_2}`}, {address.city}, {address.postal_code}, {address.country}
                               </span>
                             </div>
