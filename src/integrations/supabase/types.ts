@@ -536,7 +536,7 @@ export type Database = {
           city: string
           country: string
           created_at: string
-          full_name: string
+          full_name: string | null
           id: string
           is_default: boolean
           phone: string | null
@@ -552,7 +552,7 @@ export type Database = {
           city: string
           country?: string
           created_at?: string
-          full_name: string
+          full_name?: string | null
           id?: string
           is_default?: boolean
           phone?: string | null
@@ -568,7 +568,7 @@ export type Database = {
           city?: string
           country?: string
           created_at?: string
-          full_name?: string
+          full_name?: string | null
           id?: string
           is_default?: boolean
           phone?: string | null

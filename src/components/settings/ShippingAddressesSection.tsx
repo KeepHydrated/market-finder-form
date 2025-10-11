@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface Address {
   id: string;
-  full_name: string;
+  full_name?: string;
   address_line_1: string;
   address_line_2?: string;
   city: string;
@@ -33,7 +33,6 @@ export default function ShippingAddressesSection() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [formData, setFormData] = useState({
-    full_name: '',
     address_line_1: '',
     address_line_2: '',
     city: '',
@@ -76,7 +75,6 @@ export default function ShippingAddressesSection() {
   const handleAddAddress = () => {
     setEditingAddress(null);
     setFormData({
-      full_name: '',
       address_line_1: '',
       address_line_2: '',
       city: '',
@@ -92,7 +90,6 @@ export default function ShippingAddressesSection() {
   const handleEditAddress = (address: Address) => {
     setEditingAddress(address);
     setFormData({
-      full_name: address.full_name,
       address_line_1: address.address_line_1,
       address_line_2: address.address_line_2 || '',
       city: address.city,
@@ -109,7 +106,7 @@ export default function ShippingAddressesSection() {
     if (!user) return;
 
     // Basic validation
-    if (!formData.full_name || !formData.address_line_1 || !formData.city || 
+    if (!formData.address_line_1 || !formData.city || 
         !formData.state || !formData.postal_code) {
       toast({
         title: 'Missing Fields',
@@ -269,7 +266,6 @@ export default function ShippingAddressesSection() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold">{address.full_name}</h3>
                           <Badge variant={address.type === 'shipping' ? 'default' : 'secondary'}>
                             {address.type}
                           </Badge>
@@ -334,15 +330,6 @@ export default function ShippingAddressesSection() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <Label htmlFor="full_name">Full Name *</Label>
-                <Input
-                  id="full_name"
-                  value={formData.full_name}
-                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                  placeholder="John Doe"
-                />
-              </div>
               <div className="col-span-2">
                 <Label htmlFor="address_line_1">Address Line 1 *</Label>
                 <Input
