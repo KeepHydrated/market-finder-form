@@ -323,7 +323,6 @@ export default function ShippingAddressesSection() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingAddress ? 'Edit Address' : 'Add New Address'}</DialogTitle>
             <DialogDescription>
               {editingAddress ? 'Update your address details' : 'Add a new shipping or billing address'}
             </DialogDescription>
