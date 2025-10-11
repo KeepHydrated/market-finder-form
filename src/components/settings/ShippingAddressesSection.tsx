@@ -413,6 +413,7 @@ export default function ShippingAddressesSection() {
                   <SelectContent>
                     <SelectItem value="shipping">Shipping</SelectItem>
                     <SelectItem value="billing">Billing</SelectItem>
+                    <SelectItem value="both">Both</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
