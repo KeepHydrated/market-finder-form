@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import type { CarouselApi } from '@/components/ui/carousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -87,6 +88,11 @@ export default function ShopManager() {
     avgItemsPerOrder: 0
   });
 
+  // Carousel state
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [slideCount, setSlideCount] = useState(0);
+
   // Form state
   const [formData, setFormData] = useState({
     store_name: '',
@@ -111,6 +117,17 @@ export default function ShopManager() {
       fetchAnalytics();
     }
   }, [shopData]);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+
+    setSlideCount(carouselApi.scrollSnapList().length);
+    setCurrentSlide(carouselApi.selectedScrollSnap());
+
+    carouselApi.on('select', () => {
+      setCurrentSlide(carouselApi.selectedScrollSnap());
+    });
+  }, [carouselApi]);
 
   useEffect(() => {
     // Auto-navigate based on shop data existence
@@ -1098,56 +1115,73 @@ export default function ShopManager() {
       <div>
         <h3 className="text-xl font-bold mb-4">Recent Orders</h3>
         {analytics.recentOrders.length > 0 ? (
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="w-full"
-          >
-            <CarouselContent className="-ml-4">
-              {analytics.recentOrders.map((order: any) => {
-                const firstItem = order.order_items?.[0];
-                return (
-                  <CarouselItem key={order.id} className="pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
-                    <Card className="overflow-hidden group cursor-pointer hover:shadow-lg transition-shadow">
-                      <CardContent className="p-0">
-                        <div className="aspect-square bg-muted overflow-hidden">
-                          {firstItem?.product_image ? (
-                            <img 
-                              src={firstItem.product_image} 
-                              alt={firstItem.product_name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Package className="h-16 w-16 text-muted-foreground" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="p-4">
-                          <h4 className="font-semibold mb-1 truncate">
-                            {firstItem?.product_name || `Order #${order.id.slice(-8)}`}
-                          </h4>
-                          <p className="text-lg font-semibold text-muted-foreground mb-2">
-                            ${(order.total_amount / 100).toFixed(2)}
-                          </p>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground truncate">{order.email}</span>
-                            <Badge variant={order.status === 'delivered' ? 'default' : order.status === 'paid' ? 'secondary' : 'outline'}>
-                              {order.status}
-                            </Badge>
+          <div className="space-y-4">
+            <Carousel
+              setApi={setCarouselApi}
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-4">
+                {analytics.recentOrders.map((order: any) => {
+                  const firstItem = order.order_items?.[0];
+                  return (
+                    <CarouselItem key={order.id} className="pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
+                      <Card className="overflow-hidden group cursor-pointer hover:shadow-lg transition-shadow">
+                        <CardContent className="p-0">
+                          <div className="aspect-square bg-muted overflow-hidden">
+                            {firstItem?.product_image ? (
+                              <img 
+                                src={firstItem.product_image} 
+                                alt={firstItem.product_name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Package className="h-16 w-16 text-muted-foreground" />
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </CarouselItem>
-                );
-              })}
-            </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
-          </Carousel>
+                          <div className="p-4">
+                            <h4 className="font-semibold mb-1 truncate">
+                              {firstItem?.product_name || `Order #${order.id.slice(-8)}`}
+                            </h4>
+                            <p className="text-lg font-semibold text-muted-foreground mb-2">
+                              ${(order.total_amount / 100).toFixed(2)}
+                            </p>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground truncate">{order.email}</span>
+                              <Badge variant={order.status === 'delivered' ? 'default' : order.status === 'paid' ? 'secondary' : 'outline'}>
+                                {order.status}
+                              </Badge>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
+            </Carousel>
+            
+            {/* Dot indicators */}
+            <div className="flex justify-center gap-2">
+              {Array.from({ length: slideCount }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => carouselApi?.scrollTo(index)}
+                  className={`h-2 rounded-full transition-all ${
+                    index === currentSlide 
+                      ? 'w-8 bg-primary' 
+                      : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
         ) : (
           <div className="text-center py-12 text-muted-foreground">No orders yet</div>
         )}
