@@ -207,6 +207,12 @@ export default function Checkout() {
   const handleCompletePayment = async () => {
     if (!user || !selectedAddress || !selectedPaymentMethod) return;
     
+    // Prevent empty orders
+    if (items.length === 0) {
+      sonnerToast.error('Your cart is empty. Please add items before checking out.');
+      return;
+    }
+    
     setIsProcessing(true);
     try {
       // Get address details
@@ -249,7 +255,10 @@ export default function Checkout() {
         .from('order_items')
         .insert(orderItems);
 
-      if (itemsError) throw itemsError;
+      if (itemsError) {
+        console.error('Error inserting order items:', itemsError);
+        throw itemsError;
+      }
 
       sonnerToast.success('Order placed successfully!');
       clearCart();
