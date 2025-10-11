@@ -1094,7 +1094,7 @@ export default function ShopManager() {
         </Card>
       </div>
 
-      <div className="grid gap-x-3 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-x-3 gap-y-6 md:grid-cols-1">
         <Card>
           <CardHeader>
             <CardTitle>Recent Orders</CardTitle>
@@ -1118,7 +1118,9 @@ export default function ShopManager() {
             )}
           </CardContent>
         </Card>
+      </div>
 
+      <div className="grid gap-x-3 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle>Top Selling Products</CardTitle>
