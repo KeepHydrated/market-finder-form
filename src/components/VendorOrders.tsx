@@ -192,7 +192,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
             const isFlipped = flippedCards[order.id] || false;
             
             return (
-            <div key={order.id} className="grid lg:grid-cols-[1fr,280px] gap-6">
+            <div key={order.id} className="grid lg:grid-cols-[1.5fr,280px] gap-6">
               {/* Desktop view - always show both cards */}
               <Card className="overflow-hidden hidden lg:block">
                 <CardHeader className="pb-4">
