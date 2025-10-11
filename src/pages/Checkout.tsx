@@ -19,14 +19,12 @@ interface PaymentMethod {
   user_id: string;
   payment_type: string;
   card_brand?: string;
-  last_4_digits?: string;
-  exp_month?: string;
-  exp_year?: string;
-  bank_name?: string;
-  account_holder_name?: string;
-  account_number_last_4?: string;
+  card_last_four?: string;
+  card_exp_month?: number;
+  card_exp_year?: number;
+  cardholder_name?: string;
   paypal_email?: string;
-  paypal_account_name?: string;
+  apple_pay_email?: string;
   is_default: boolean;
 }
 
@@ -413,21 +411,13 @@ export default function Checkout() {
                           <Label htmlFor={method.id} className="flex items-center gap-3 cursor-pointer flex-1">
                             <CreditCard className="w-5 h-5 text-muted-foreground" />
                             <div>
-                              {method.payment_type === 'credit-debit' && (
+                              {method.payment_type === 'card' && (
                                 <>
                                   <p className="font-medium capitalize">
-                                    {method.card_brand} •••• {method.last_4_digits}
+                                    {method.card_brand} •••• {method.card_last_four}
                                   </p>
                                   <p className="text-xs text-muted-foreground">
-                                    Expires {method.exp_month}/{method.exp_year}
-                                  </p>
-                                </>
-                              )}
-                              {method.payment_type === 'bank' && (
-                                <>
-                                  <p className="font-medium">{method.bank_name}</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {method.account_holder_name} •••• {method.account_number_last_4}
+                                    Expires {method.card_exp_month}/{method.card_exp_year}
                                   </p>
                                 </>
                               )}
@@ -436,6 +426,14 @@ export default function Checkout() {
                                   <p className="font-medium">PayPal</p>
                                   <p className="text-xs text-muted-foreground">
                                     {method.paypal_email}
+                                  </p>
+                                </>
+                              )}
+                              {method.payment_type === 'apple_pay' && (
+                                <>
+                                  <p className="font-medium">Apple Pay</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {method.apple_pay_email}
                                   </p>
                                 </>
                               )}
