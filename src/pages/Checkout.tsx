@@ -33,7 +33,7 @@ interface PaymentMethod {
 interface Address {
   id: string;
   user_id: string;
-  type: 'billing' | 'shipping';
+  type: 'billing' | 'shipping' | 'both';
   is_default: boolean;
   full_name: string;
   address_line_1: string;
@@ -108,7 +108,7 @@ export default function Checkout() {
           .from('user_addresses')
           .select('*')
           .eq('user_id', user.id)
-          .eq('type', 'shipping')
+          .in('type', ['shipping', 'both'])
           .order('is_default', { ascending: false });
 
         if (error) throw error;
