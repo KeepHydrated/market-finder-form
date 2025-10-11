@@ -6,6 +6,7 @@ import { CartButton } from "@/components/shopping/CartButton";
 import { ArrowLeft, Heart, Store, ChevronDown, Search, DollarSign, Home } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,16 +26,18 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
   const navigate = useNavigate();
   const [hasAnySubmission, setHasAnySubmission] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [newOrdersCount, setNewOrdersCount] = useState(0);
 
   useEffect(() => {
     const checkAnySubmission = async () => {
       if (!user) {
         setHasAnySubmission(false);
+        setNewOrdersCount(0);
         return;
       }
 
       try {
-        const { data, error } = await supabase
+        const { data: submission, error } = await supabase
           .from('submissions')
           .select('id, status')
           .eq('user_id', user.id)
@@ -42,14 +45,61 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
           .limit(1)
           .maybeSingle();
 
-        setHasAnySubmission(!!data);
+        setHasAnySubmission(!!submission);
+
+        // If there's a submission, check for new orders
+        if (submission) {
+          const { count } = await supabase
+            .from('orders')
+            .select('*', { count: 'exact', head: true })
+            .eq('vendor_id', submission.id)
+            .eq('status', 'paid');
+          
+          setNewOrdersCount(count || 0);
+        }
       } catch (error) {
         console.error('Error checking submission status:', error);
         setHasAnySubmission(false);
+        setNewOrdersCount(0);
       }
     };
 
     checkAnySubmission();
+
+    // Set up realtime subscription for new orders
+    if (user) {
+      const channel = supabase
+        .channel('order-notifications')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'orders',
+          },
+          () => {
+            // Refresh count when a new order is inserted
+            checkAnySubmission();
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'orders',
+          },
+          () => {
+            // Refresh count when an order status changes
+            checkAnySubmission();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
   }, [user]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -185,9 +235,17 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
               </Button>
             </Link>
             {user && (
-              <Link to="/my-shop">
-                <Button variant="ghost" size="sm">
+              <Link to="/my-shop?section=orders2">
+                <Button variant="ghost" size="sm" className="relative">
                   <Store className="h-5 w-5" />
+                  {newOrdersCount > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs rounded-full"
+                    >
+                      {newOrdersCount > 9 ? '9+' : newOrdersCount}
+                    </Badge>
+                  )}
                 </Button>
               </Link>
             )}
