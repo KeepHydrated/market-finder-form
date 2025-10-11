@@ -27,6 +27,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
   const [hasAnySubmission, setHasAnySubmission] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [newOrdersCount, setNewOrdersCount] = useState(0);
+  const isOnOrdersPage = location.pathname === '/my-shop' && location.search.includes('section=orders2');
 
   useEffect(() => {
     const checkAnySubmission = async () => {
@@ -49,12 +50,22 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
 
         // If there's a submission, check for new orders
         if (submission) {
-          const { count } = await supabase
+          // Get the last viewed timestamp from localStorage
+          const lastViewedKey = `orders_last_viewed_${submission.id}`;
+          const lastViewed = localStorage.getItem(lastViewedKey);
+          
+          const query = supabase
             .from('orders')
             .select('*', { count: 'exact', head: true })
             .eq('vendor_id', submission.id)
             .eq('status', 'paid');
           
+          // Only count orders created after last viewed time
+          if (lastViewed) {
+            query.gt('created_at', lastViewed);
+          }
+          
+          const { count } = await query;
           setNewOrdersCount(count || 0);
         }
       } catch (error) {
@@ -65,6 +76,26 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
     };
 
     checkAnySubmission();
+
+    // Clear notification when on orders page
+    if (isOnOrdersPage && user) {
+      const getSubmissionAndMarkViewed = async () => {
+        const { data: submission } = await supabase
+          .from('submissions')
+          .select('id')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        if (submission) {
+          const lastViewedKey = `orders_last_viewed_${submission.id}`;
+          localStorage.setItem(lastViewedKey, new Date().toISOString());
+          setNewOrdersCount(0);
+        }
+      };
+      getSubmissionAndMarkViewed();
+    }
 
     // Set up realtime subscription for new orders
     if (user) {
@@ -100,7 +131,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
         supabase.removeChannel(channel);
       };
     }
-  }, [user]);
+  }, [user, isOnOrdersPage]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
