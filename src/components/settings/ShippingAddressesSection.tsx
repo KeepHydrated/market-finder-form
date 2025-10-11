@@ -114,6 +114,28 @@ export default function ShippingAddressesSection() {
     }
 
     try {
+      // Check for duplicate address (only when adding new)
+      if (!editingAddress) {
+        const { data: existingAddress } = await supabase
+          .from('user_addresses')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('address_line_1', formData.address_line_1)
+          .eq('city', formData.city)
+          .eq('state', formData.state)
+          .eq('postal_code', formData.postal_code)
+          .maybeSingle();
+
+        if (existingAddress) {
+          toast({
+            title: 'Duplicate Address',
+            description: 'This address already exists in your saved addresses',
+            variant: 'destructive',
+          });
+          return;
+        }
+      }
+
       if (editingAddress) {
         // Update existing address
         const { error } = await supabase
