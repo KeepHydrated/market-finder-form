@@ -488,7 +488,7 @@ export default function ShopManager() {
         return renderProducts();
       case 'orders2':
         return (
-          <div className="space-y-6 ml-52 mr-8 max-w-3xl pt-[40px] pb-4">
+          <div className="space-y-6 ml-52 mr-8 max-w-6xl pt-[40px] pb-4">
             <VendorOrders vendorId={shopData?.id} vendorName={shopData?.store_name} />
           </div>
         );
