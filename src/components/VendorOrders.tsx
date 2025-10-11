@@ -187,7 +187,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-6 max-w-5xl">
+        <div className="space-y-6 max-w-7xl">
           {orders.map((order) => {
             const isFlipped = flippedCards[order.id] || false;
             
