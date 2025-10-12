@@ -1114,7 +1114,7 @@ const VendorDuplicate = () => {
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
-                  <h1 className="text-2xl font-bold text-foreground">{selectedVendor.store_name}</h1>
+                  <h1 className="text-xl font-bold text-foreground">{selectedVendor.store_name}</h1>
                   <div 
                     className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
                     onClick={() => setIsReviewModalOpen(true)}
@@ -1492,7 +1492,7 @@ const VendorDuplicate = () => {
                     <div className="mb-6">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-4">
-                          <h1 className="text-2xl font-bold text-foreground">{selectedVendor.store_name}</h1>
+                          <h1 className="text-xl font-bold text-foreground">{selectedVendor.store_name}</h1>
                           <div 
                             className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
                             onClick={() => setIsReviewModalOpen(true)}
