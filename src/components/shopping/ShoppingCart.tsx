@@ -130,7 +130,7 @@ export function ShoppingCart() {
                         </button>
                       </div>
 
-                      <div className="space-y-6">
+                      <div className="space-y-8">
                         {vendorItems.map((item) => (
                           <div key={item.id} className="flex flex-col gap-3">
                             <div className="flex items-start gap-3">
