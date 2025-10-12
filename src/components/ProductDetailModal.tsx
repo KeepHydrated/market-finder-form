@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,7 +32,9 @@ interface ProductDetailModalProps {
 
 export const ProductDetailModal = ({ product, products = [], open, onClose, onProductChange, vendorId, vendorName, hideVendorName = false }: ProductDetailModalProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { addItem } = useShoppingCart();
+  const [showVendorConflict, setShowVendorConflict] = useState(false);
+  const [pendingCartItem, setPendingCartItem] = useState<any>(null);
+  const { addItem, clearCart, items, getCurrentVendorId } = useShoppingCart();
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
   const navigate = useNavigate();
@@ -107,20 +110,61 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
       product_image: product.images?.[0], // Use first image if available
     };
 
-    addItem({ ...cartItem, quantity: 1 });
+    const success = addItem({ ...cartItem, quantity: 1 });
 
-    toast({
-      title: "Added to Cart",
-      description: `${product.name} added to your cart`,
-    });
+    if (!success) {
+      // Show confirmation dialog if adding from different vendor
+      const currentVendor = items[0]?.vendor_name;
+      setPendingCartItem(cartItem);
+      setShowVendorConflict(true);
+    } else {
+      toast({
+        title: "Added to Cart",
+        description: `${product.name} added to your cart`,
+      });
+    }
+  };
 
-    // Optionally close modal after adding to cart
-    // onClose();
+  const handleConfirmClearCart = () => {
+    clearCart();
+    if (pendingCartItem) {
+      addItem({ ...pendingCartItem, quantity: 1 });
+      toast({
+        title: "Added to Cart",
+        description: `${pendingCartItem.product_name} added to your cart`,
+      });
+    }
+    setShowVendorConflict(false);
+    setPendingCartItem(null);
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent 
+    <>
+      <AlertDialog open={showVendorConflict} onOpenChange={setShowVendorConflict}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Different Vendor</AlertDialogTitle>
+            <AlertDialogDescription>
+              You already have items from {items[0]?.vendor_name} in your cart. 
+              You can only order from one vendor at a time. Would you like to clear your cart and add this item from {pendingCartItem?.vendor_name}?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setShowVendorConflict(false);
+              setPendingCartItem(null);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmClearCart}>
+              Clear Cart & Add Item
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogContent
         className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible"
         onKeyDown={handleKeyDown}
       >
@@ -285,7 +329,8 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
               )}
             </div>
           </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

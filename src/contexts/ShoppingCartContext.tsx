@@ -13,13 +13,14 @@ export interface CartItem {
 
 interface ShoppingCartContextType {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void;
+  addItem: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => boolean;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
   getVendorItems: (vendorId: string) => CartItem[];
+  getCurrentVendorId: () => string | null;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
 }
@@ -47,7 +48,12 @@ export function ShoppingCartProvider({ children }: { children: React.ReactNode }
     localStorage.setItem('shopping_cart', JSON.stringify(items));
   }, [items]);
 
-  const addItem = (newItem: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
+  const addItem = (newItem: Omit<CartItem, 'quantity'> & { quantity?: number }): boolean => {
+    // Check if cart has items from a different vendor
+    if (items.length > 0 && items[0].vendor_id !== newItem.vendor_id) {
+      return false; // Return false to indicate item wasn't added due to vendor mismatch
+    }
+
     setItems(currentItems => {
       const existingItem = currentItems.find(item => item.id === newItem.id);
       
@@ -63,6 +69,8 @@ export function ShoppingCartProvider({ children }: { children: React.ReactNode }
         return [...currentItems, { ...newItem, quantity: newItem.quantity || 1 }];
       }
     });
+    
+    return true; // Return true to indicate item was successfully added
   };
 
   const removeItem = (id: string) => {
@@ -98,6 +106,10 @@ export function ShoppingCartProvider({ children }: { children: React.ReactNode }
     return items.filter(item => item.vendor_id === vendorId);
   };
 
+  const getCurrentVendorId = () => {
+    return items.length > 0 ? items[0].vendor_id : null;
+  };
+
   const value: ShoppingCartContextType = {
     items,
     addItem,
@@ -107,6 +119,7 @@ export function ShoppingCartProvider({ children }: { children: React.ReactNode }
     getTotalItems,
     getTotalPrice,
     getVendorItems,
+    getCurrentVendorId,
     isOpen,
     setIsOpen,
   };
