@@ -161,15 +161,6 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 My Local Farmers Markets
               </h1>
             </Link>
-            {/* Mobile search icon - only visible on mobile */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="md:hidden"
-              onClick={() => navigate('/homepage')}
-            >
-              <Search className="h-5 w-5" />
-            </Button>
             {/* Category dropdown - hidden on md, shown on lg+ */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
