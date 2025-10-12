@@ -268,12 +268,12 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                   </p>
                 </div>
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-row gap-2">
                   {/* Status Update Button */}
                   {order.status === 'paid' && (
                     <Button 
                       size="sm" 
-                      className="w-full rounded-full"
+                      className="flex-1 rounded-full"
                       onClick={async () => {
                         const { error } = await supabase
                           .from('orders')
@@ -299,7 +299,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                   {order.status === 'shipped' && (
                     <Button 
                       size="sm" 
-                      className="w-full rounded-full"
+                      className="flex-1 rounded-full"
                       onClick={async () => {
                         const { error } = await supabase
                           .from('orders')
@@ -323,14 +323,14 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                   )}
 
                   {order.status === 'delivered' && (
-                    <Button size="sm" variant="outline" className="w-full rounded-full">
+                    <Button size="sm" variant="outline" className="flex-1 rounded-full">
                       Track package
                     </Button>
                   )}
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full rounded-full"
+                    className="flex-1 rounded-full"
                     onClick={() => handleMessageBuyer(order)}
                   >
                     Message buyer
@@ -338,7 +338,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full rounded-full"
+                    className="flex-1 rounded-full"
                     onClick={() => handleViewReceipt(order)}
                   >
                     View receipt
@@ -450,11 +450,11 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       </p>
                     </CardHeader>
 
-                    <CardContent className="pt-0 flex flex-col gap-1">
+                    <CardContent className="pt-0 flex flex-row gap-1">
                         {order.status === 'paid' && (
                           <Button 
                             size="sm" 
-                            className="w-full rounded-full"
+                            className="flex-1 rounded-full"
                             onClick={(e) => {
                               e.stopPropagation();
                               supabase
@@ -482,7 +482,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         {order.status === 'shipped' && (
                           <Button 
                             size="sm" 
-                            className="w-full rounded-full"
+                            className="flex-1 rounded-full"
                             onClick={(e) => {
                               e.stopPropagation();
                               supabase
@@ -511,7 +511,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                           <Button 
                             size="sm" 
                             variant="outline" 
-                            className="w-full rounded-full"
+                            className="flex-1 rounded-full"
                             onClick={(e) => e.stopPropagation()}
                           >
                             Track package
@@ -520,7 +520,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="w-full rounded-full"
+                          className="flex-1 rounded-full"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleMessageBuyer(order);
@@ -531,7 +531,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="w-full rounded-full"
+                          className="flex-1 rounded-full"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleViewReceipt(order);
