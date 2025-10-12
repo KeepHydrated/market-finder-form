@@ -1051,9 +1051,8 @@ export default function ShopManager() {
 
   const renderTest = () => (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div>
         <h2 className="text-2xl font-bold">Stats</h2>
-        <Button variant="ghost" className="text-sm">View all</Button>
       </div>
 
       <Card>
