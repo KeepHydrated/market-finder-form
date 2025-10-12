@@ -1127,7 +1127,7 @@ const VendorDuplicate = () => {
                             vendorReviews?.rating && star <= vendorReviews.rating
                               ? 'text-yellow-500' 
                               : 'text-gray-300'
-                          }`}
+                          } ${star > 1 ? 'hidden md:block' : ''}`}
                         />
                       ))}
                     </div>
@@ -1505,7 +1505,7 @@ const VendorDuplicate = () => {
                                     vendorReviews?.rating && star <= vendorReviews.rating
                                       ? 'text-yellow-500' 
                                       : 'text-gray-300'
-                                  }`}
+                                  } ${star > 1 ? 'hidden md:block' : ''}`}
                                 />
                               ))}
                             </div>
