@@ -162,16 +162,6 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
               </h1>
             </Link>
             
-            {/* Mobile search icon - only on small screens */}
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => navigate('/homepage')}
-              className="md:hidden"
-            >
-              <Search className="h-5 w-5" />
-            </Button>
-            
             {/* Category dropdown - hidden on md, shown on lg+ */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
