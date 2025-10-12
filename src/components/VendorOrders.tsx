@@ -176,7 +176,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
   return (
     <div className="space-y-6">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">Your Market's Orders</h2>
+        <h2 className="hidden sm:block text-2xl font-bold mb-2">Your Market's Orders</h2>
       </div>
 
       {orders.length === 0 ? (

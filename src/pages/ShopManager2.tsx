@@ -623,7 +623,7 @@ export default function ShopManager() {
     <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-3xl pt-[80px] sm:pt-[40px] pb-4">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Shop Details</h2>
+          <h2 className="hidden sm:block text-2xl font-bold mb-2">Shop Details</h2>
         </div>
         {shopData && (
           <Button
@@ -748,7 +748,7 @@ export default function ShopManager() {
     <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-3xl pt-[80px] sm:pt-[40px] pb-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Product Listings</h2>
+          <h2 className="hidden sm:block text-2xl font-bold mb-2">Product Listings</h2>
         </div>
 
         <div className="flex items-center gap-2">
@@ -801,7 +801,7 @@ export default function ShopManager() {
   const renderAccount = () => (
     <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-3xl pt-[80px] sm:pt-[40px] pb-4">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Shop Settings And Preferences</h2>
+        <h2 className="hidden sm:block text-2xl font-bold mb-2">Shop Settings And Preferences</h2>
       </div>
 
       <Card className="w-full">
