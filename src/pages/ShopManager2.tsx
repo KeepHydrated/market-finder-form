@@ -1104,7 +1104,7 @@ export default function ShopManager() {
                 return (
                   <Card key={order.id} className="overflow-hidden w-64 flex-shrink-0">
                     <CardContent className="p-0">
-                      <div className="relative aspect-square bg-muted overflow-hidden">
+                      <div className="aspect-square bg-muted overflow-hidden">
                         {firstItem?.product_image ? (
                           <img 
                             src={firstItem.product_image} 
@@ -1116,15 +1116,12 @@ export default function ShopManager() {
                             <Package className="h-16 w-16 text-muted-foreground" />
                           </div>
                         )}
-                        <button className="absolute top-3 right-3 w-10 h-10 rounded-full bg-background shadow-md flex items-center justify-center hover:bg-accent transition-colors">
-                          <Heart className="w-5 h-5" />
-                        </button>
                       </div>
                       <div className="p-4">
-                        <h4 className="font-medium mb-1">
+                        <h4 className="text-base font-normal mb-1">
                           {firstItem?.product_name || `Order #${order.id.slice(-8)}`}
                         </h4>
-                        <p className="text-muted-foreground">
+                        <p className="text-base text-muted-foreground">
                           ${(order.total_amount / 100).toFixed(2)}
                         </p>
                       </div>
