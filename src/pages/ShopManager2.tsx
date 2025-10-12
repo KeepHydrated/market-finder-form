@@ -1183,31 +1183,6 @@ export default function ShopManager() {
         )}
       </div>
 
-      <div className="grid gap-x-3 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Selling Products</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {analytics.topProducts.length > 0 ? (
-              analytics.topProducts.map((product: any, index: number) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{product.name}</p>
-                    <p className="text-sm text-muted-foreground">Product</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">{product.count} sold</p>
-                    <p className="text-sm text-muted-foreground">${(product.price / 100).toFixed(2)} each</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-4 text-muted-foreground">No sales data yet</div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 
