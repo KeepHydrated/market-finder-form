@@ -894,7 +894,7 @@ const Likes = () => {
 
         <main className="flex-1">
           {/* Mobile Navigation - Only visible on mobile */}
-          <div className="md:hidden bg-card border-b">
+          <div className="md:hidden bg-card border-b sticky top-0 z-50">
             <div className="container mx-auto px-4 py-4">
               <div className="flex justify-around gap-2">
                 {tabs.map((tab) => (
