@@ -1199,7 +1199,7 @@ const Homepage = () => {
                              day === 'Fri' ? 'Friday' :
                              day === 'Sat' ? 'Saturday' : 'Sunday'}
                           </h5>
-                          <div className="flex items-center justify-center gap-3">
+                          <div className="flex items-center justify-start gap-3">
                             <div className="flex items-center gap-1">
                               <Select 
                                 value={dayTimeSelections[day]?.startTime || '08:00'}
