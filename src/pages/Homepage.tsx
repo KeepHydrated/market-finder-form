@@ -1175,7 +1175,7 @@ const Homepage = () => {
                           variant={selectedDays.includes(day) ? "default" : "outline"}
                           onClick={() => toggleDay(day)}
                           className={cn(
-                            "h-12 w-full md:flex-1 md:min-w-[70px]",
+                            "h-12 w-16",
                             selectedDays.includes(day) && "bg-primary text-primary-foreground hover:bg-primary/90"
                           )}
                         >
