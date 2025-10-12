@@ -450,7 +450,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       </p>
                     </CardHeader>
 
-                    <CardContent className="pt-4 flex flex-row gap-1">
+                    <CardContent className="pt-4 flex flex-row flex-wrap gap-1">
                         {order.status === 'paid' && (
                           <Button 
                             size="sm" 
@@ -531,7 +531,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="flex-1 rounded-full"
+                          className="w-full rounded-full"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleViewReceipt(order);
