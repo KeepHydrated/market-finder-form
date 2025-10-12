@@ -103,6 +103,14 @@ const Homepage = () => {
   const [currentVendorName, setCurrentVendorName] = useState<string | undefined>(undefined);
   const [marketAddressesMap, setMarketAddressesMap] = useState<Record<string, string>>({});
 
+  // Sync search query with URL parameter
+  useEffect(() => {
+    const searchParam = searchParams.get('search');
+    if (searchParam) {
+      setSearchQuery(searchParam);
+    }
+  }, [searchParams]);
+
   // Handle category selection from URL and navigate to new page
   useEffect(() => {
     const categoryParam = searchParams.get('category');
