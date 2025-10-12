@@ -1167,7 +1167,7 @@ const Homepage = () => {
                 </div>
                 <TabsContent value="times" className="px-8 pb-8 pt-8">
                   <div className="space-y-4">
-                    <div className="grid grid-cols-7 gap-2">
+                    <div className="flex flex-col gap-2">
                       {DAYS.map((day) => (
                         <Button
                           key={day}
@@ -1178,7 +1178,7 @@ const Homepage = () => {
                             toggleDay(day);
                           }}
                           className={cn(
-                            "h-12",
+                            "h-12 w-full",
                             selectedDays.includes(day) && "bg-primary text-primary-foreground hover:bg-primary/90"
                           )}
                         >
