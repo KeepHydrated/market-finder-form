@@ -1160,7 +1160,7 @@ const Homepage = () => {
             <DialogContent className="w-[800px] max-w-none p-0 bg-background border shadow-lg">
               <Tabs defaultValue="times" className="w-full">
                 <div className="pt-8 px-8">
-                  <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
+                  <TabsList className="flex flex-col md:grid w-full md:grid-cols-2 rounded-none border-b">
                     <TabsTrigger value="times">Times</TabsTrigger>
                     <TabsTrigger value="categories">Categories</TabsTrigger>
                   </TabsList>
