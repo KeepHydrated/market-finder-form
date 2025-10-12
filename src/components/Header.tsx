@@ -253,42 +253,62 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             </form>
           </div>
           
-          <div className="flex items-center justify-center md:justify-end space-x-4 md:space-x-8 h-16">
-            <Link to="/likes">
-              <Button variant="ghost" size="sm">
-                <Heart className="h-5 w-5" />
-              </Button>
-            </Link>
-            <CartButton />
+          {/* Mobile navigation - centered home icon */}
+          <div className="flex items-center justify-between md:justify-end w-full md:w-auto space-x-4 md:space-x-8 h-16">
+            {/* Left icons on mobile */}
+            <div className="flex items-center space-x-4 md:hidden">
+              <Link to="/likes">
+                <Button variant="ghost" size="sm">
+                  <Heart className="h-5 w-5" />
+                </Button>
+              </Link>
+              <CartButton />
+            </div>
+            
+            {/* Center home icon on mobile */}
             <Link to="/homepage" className="md:hidden">
               <Button variant="ghost" size="sm">
                 <Home className="h-6 w-6" strokeWidth={2.5} />
               </Button>
             </Link>
-            {user && (
-              <Link to="/my-shop?section=overview">
-                <Button variant="ghost" size="sm" className="relative">
-                  <Store className="h-5 w-5" />
-                  {newOrdersCount > 0 && (
-                    <Badge 
-                      variant="destructive" 
-                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs rounded-full"
-                    >
-                      {newOrdersCount > 9 ? '9+' : newOrdersCount}
-                    </Badge>
-                  )}
+            
+            {/* Right icons on mobile */}
+            <div className="flex items-center space-x-4">
+              {/* Desktop likes and cart */}
+              <Link to="/likes" className="hidden md:block">
+                <Button variant="ghost" size="sm">
+                  <Heart className="h-5 w-5" />
                 </Button>
               </Link>
-            )}
-            {user ? (
-              <UserMenu user={user} profile={profile} />
-            ) : (
-              <Link to="/auth">
-                <Button variant="default" size="sm">
-                  Log In
-                </Button>
-              </Link>
-            )}
+              <div className="hidden md:block">
+                <CartButton />
+              </div>
+              
+              {user && (
+                <Link to="/my-shop?section=overview">
+                  <Button variant="ghost" size="sm" className="relative">
+                    <Store className="h-5 w-5" />
+                    {newOrdersCount > 0 && (
+                      <Badge 
+                        variant="destructive" 
+                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs rounded-full"
+                      >
+                        {newOrdersCount > 9 ? '9+' : newOrdersCount}
+                      </Badge>
+                    )}
+                  </Button>
+                </Link>
+              )}
+              {user ? (
+                <UserMenu user={user} profile={profile} />
+              ) : (
+                <Link to="/auth">
+                  <Button variant="default" size="sm">
+                    Log In
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
           
           {/* Second row on md (iPad), hidden on mobile and lg+ */}
