@@ -268,7 +268,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                   </p>
                 </div>
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 mt-6">
                   {/* Status Update Button */}
                   {order.status === 'paid' && (
                     <Button 
@@ -450,7 +450,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                       </p>
                     </CardHeader>
 
-                    <CardContent className="pt-0 flex flex-row gap-1">
+                    <CardContent className="pt-4 flex flex-row gap-1">
                         {order.status === 'paid' && (
                           <Button 
                             size="sm" 
