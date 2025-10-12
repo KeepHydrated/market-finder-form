@@ -529,7 +529,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
                     variant={isSelected ? "default" : "outline"}
                     size="sm"
                     onClick={() => handleDayToggle(day)}
-                    className="w-12 px-1 py-2"
+                    className="w-10 px-0 py-2"
                   >
                     {shortDay}
                   </Button>
