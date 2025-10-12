@@ -44,6 +44,8 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showReceiptDialog, setShowReceiptDialog] = useState(false);
   const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10;
 
   useEffect(() => {
     if (vendorId) {
@@ -80,6 +82,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
       if (ordersError) throw ordersError;
 
       setOrders(ordersData || []);
+      setCurrentPage(1); // Reset to first page when fetching new orders
     } catch (error) {
       console.error('Error fetching vendor orders:', error);
       setError('Failed to load orders');
@@ -187,9 +190,12 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-6 max-w-7xl">
-          {orders.map((order) => {
-            const isFlipped = flippedCards[order.id] || false;
+        <>
+          <div className="space-y-6 max-w-7xl">
+            {orders
+              .slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage)
+              .map((order) => {
+              const isFlipped = flippedCards[order.id] || false;
             
             return (
             <div key={order.id} className="grid lg:grid-cols-[2fr,280px] gap-6">
@@ -540,7 +546,31 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
             </div>
             );
           })}
-        </div>
+          </div>
+
+          {/* Pagination Controls */}
+          {orders.length > ordersPerPage && (
+            <div className="flex items-center justify-center gap-2 mt-8">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground px-4">
+                Page {currentPage} of {Math.ceil(orders.length / ordersPerPage)}
+              </span>
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage(prev => Math.min(Math.ceil(orders.length / ordersPerPage), prev + 1))}
+                disabled={currentPage === Math.ceil(orders.length / ordersPerPage)}
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
       <ProductDetailModal
