@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Heart, Star, Filter, RotateCcw, MapPin, Search, ChevronDown } from "lucide-react";
+import { Heart, Star, Filter, RotateCcw, MapPin, Search, ChevronDown, Store, Package } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -1114,7 +1114,8 @@ const Homepage = () => {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              Vendors
+              <Store className="h-5 w-5 md:hidden" />
+              <span className="hidden md:inline">Vendors</span>
             </button>
             <button
               onClick={() => {
@@ -1128,7 +1129,8 @@ const Homepage = () => {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              Markets
+              <MapPin className="h-5 w-5 md:hidden" />
+              <span className="hidden md:inline">Markets</span>
             </button>
             <button
               onClick={() => {
@@ -1142,7 +1144,8 @@ const Homepage = () => {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              Products
+              <Package className="h-5 w-5 md:hidden" />
+              <span className="hidden md:inline">Products</span>
             </button>
           </div>
           
