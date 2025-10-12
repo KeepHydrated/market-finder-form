@@ -1053,7 +1053,7 @@ export default function ShopManager() {
   const renderTest = () => (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Stats</h2>
+        <h2 className="hidden sm:block text-2xl font-bold">Stats</h2>
       </div>
 
       <Card>
