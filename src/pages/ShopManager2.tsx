@@ -800,7 +800,7 @@ export default function ShopManager() {
   const renderAccount = () => (
     <div className="space-y-6 ml-52 mr-8 max-w-3xl pt-[40px] pb-4">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Manage your shop settings and preferences</h2>
+        <h2 className="text-2xl font-bold mb-2">Shop Settings And Preferences</h2>
       </div>
 
       <Card className="w-full">
