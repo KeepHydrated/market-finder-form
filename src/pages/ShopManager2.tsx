@@ -22,7 +22,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Star } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, addDays, differenceInHours, isPast } from 'date-fns';
 
 interface ShopData {
   id: string;
@@ -1125,6 +1125,10 @@ export default function ShopManager() {
             <div className="flex gap-4 w-max">
               {analytics.recentOrders.map((order: any) => {
                 const firstItem = order.order_items?.[0];
+                const shipByDate = addDays(new Date(order.created_at), 2); // 2 days to ship
+                const hoursRemaining = differenceInHours(shipByDate, new Date());
+                const isOverdue = isPast(shipByDate);
+                
                 return (
                   <Card key={order.id} className="overflow-hidden w-64 flex-shrink-0">
                     <CardContent className="p-0">
@@ -1141,13 +1145,27 @@ export default function ShopManager() {
                           </div>
                         )}
                       </div>
-                      <div className="p-4">
-                        <h4 className="text-base font-normal mb-1">
+                      <div className="p-4 space-y-2">
+                        <h4 className="text-base font-normal">
                           {firstItem?.product_name || `Order #${order.id.slice(-8)}`}
                         </h4>
                         <p className="text-base text-muted-foreground">
                           ${(order.total_amount / 100).toFixed(2)}
                         </p>
+                        <div className={`text-xs px-2 py-1 rounded-md w-fit ${
+                          isOverdue 
+                            ? 'bg-destructive/10 text-destructive' 
+                            : hoursRemaining < 24 
+                              ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-500'
+                              : 'bg-muted text-muted-foreground'
+                        }`}>
+                          {isOverdue 
+                            ? 'Ship ASAP' 
+                            : hoursRemaining < 24 
+                              ? `Ship in ${hoursRemaining}h`
+                              : `Ship by ${formatDistanceToNow(shipByDate, { addSuffix: true })}`
+                          }
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
