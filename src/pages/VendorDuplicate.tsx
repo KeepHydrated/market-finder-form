@@ -1105,7 +1105,7 @@ const VendorDuplicate = () => {
               
               {/* Main content - right column, scrollable */}
               <div className="flex-1 overflow-y-auto h-screen">
-                <div className="container mx-auto px-4 py-6 md:max-w-4xl">
+                <div className="container mx-auto px-4 py-6 md:max-w-2xl">
                   {selectedVendor ? (
           // Show selected vendor details
           <div className="space-y-6">
@@ -1484,7 +1484,7 @@ const VendorDuplicate = () => {
             
             {/* Main content - right column, scrollable - FULL WIDTH ON MOBILE */}
             <div className="flex-1 w-full overflow-y-auto md:h-screen">
-              <div className="container mx-auto px-4 py-6 md:max-w-4xl">
+              <div className="container mx-auto px-4 py-6 md:max-w-2xl">
                 {selectedVendor ? (
                   // Show selected vendor details
                   <div className="space-y-6">
