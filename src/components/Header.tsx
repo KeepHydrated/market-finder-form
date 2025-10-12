@@ -145,13 +145,13 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap justify-between items-center lg:h-16">
           {/* First row on all screens */}
-          <div className="flex items-center space-x-4 h-16">
+          <div className="flex items-center space-x-2 h-16">
             {showBackButton && onBackClick && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onBackClick}
-                className="mr-4"
+                className="mr-2"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
@@ -161,6 +161,17 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 My Local Farmers Markets
               </h1>
             </Link>
+            
+            {/* Mobile search icon - only on small screens */}
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/homepage')}
+              className="md:hidden"
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+            
             {/* Category dropdown - hidden on md, shown on lg+ */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

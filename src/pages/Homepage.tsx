@@ -1071,13 +1071,24 @@ const Homepage = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           
+          {/* Search - icon only on mobile, full bar on tablet+ */}
           <div className="flex-1 max-w-md">
+            {/* Mobile: Search Icon only */}
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="md:hidden"
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+            
+            {/* Tablet and Desktop: Full search bar */}
             <form onSubmit={(e) => {
               e.preventDefault();
               if (searchQuery.trim()) {
                 navigate(`/homepage?search=${encodeURIComponent(searchQuery.trim())}`);
               }
-            }} className="relative">
+            }} className="relative hidden md:block">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 type="text"
