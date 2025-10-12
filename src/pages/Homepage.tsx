@@ -1161,8 +1161,8 @@ const Homepage = () => {
               <Tabs defaultValue="times" className="w-full">
                 <div className="pt-8 px-8">
                   <TabsList className="flex flex-col gap-2 md:grid w-full md:grid-cols-2 md:gap-0 rounded-none md:border-b">
-                    <TabsTrigger value="times">Times</TabsTrigger>
-                    <TabsTrigger value="categories">Categories</TabsTrigger>
+                    <TabsTrigger value="times" className="py-4">Times</TabsTrigger>
+                    <TabsTrigger value="categories" className="py-4">Categories</TabsTrigger>
                   </TabsList>
                 </div>
                 <TabsContent value="times" className="px-8 pb-8 pt-8">
