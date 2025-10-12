@@ -266,7 +266,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
               </Button>
             </Link>
             {user && (
-              <Link to="/my-shop?section=orders2">
+              <Link to="/my-shop?section=overview">
                 <Button variant="ghost" size="sm" className="relative">
                   <Store className="h-5 w-5" />
                   {newOrdersCount > 0 && (
