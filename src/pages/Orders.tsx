@@ -474,7 +474,7 @@ const Orders = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Your Orders</h1>
-        <p className="text-muted-foreground">Track and manage your farmer's market orders</p>
+        <p className="text-muted-foreground">Your Market's Orders</p>
       </div>
 
       {orders.length === 0 ? (
