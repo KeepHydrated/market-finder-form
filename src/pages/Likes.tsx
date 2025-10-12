@@ -896,23 +896,19 @@ const Likes = () => {
           {/* Mobile Navigation - Only visible on mobile */}
           <div className="md:hidden bg-card border-b">
             <div className="container mx-auto px-4 py-4">
-              <div className="space-y-2">
+              <div className="flex justify-around gap-2">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-colors",
+                      "flex items-center justify-center p-3 rounded-lg transition-colors",
                       activeTab === tab.id
                         ? "bg-primary/10 text-primary"
-                        : "hover:bg-muted text-foreground"
+                        : "hover:bg-muted text-muted-foreground"
                     )}
                   >
-                    <tab.icon className={cn(
-                      "h-5 w-5",
-                      activeTab === tab.id ? "text-primary" : "text-muted-foreground"
-                    )} />
-                    <span className="text-base font-medium">{tab.title}</span>
+                    <tab.icon className="h-6 w-6" />
                   </button>
                 ))}
               </div>
