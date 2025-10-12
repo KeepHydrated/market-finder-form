@@ -1124,12 +1124,6 @@ export default function ShopManager() {
                         <p className="text-lg font-semibold text-muted-foreground mb-2">
                           ${(order.total_amount / 100).toFixed(2)}
                         </p>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground truncate">{order.email}</span>
-                          <Badge variant={order.status === 'delivered' ? 'default' : order.status === 'paid' ? 'secondary' : 'outline'}>
-                            {order.status}
-                          </Badge>
-                        </div>
                       </div>
                     </CardContent>
                   </Card>
