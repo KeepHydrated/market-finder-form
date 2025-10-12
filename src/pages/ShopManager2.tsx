@@ -1073,7 +1073,7 @@ export default function ShopManager() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 divide-x-0 md:divide-x divide-border">
             <div className="space-y-1">
               <p className="text-sm font-medium">Total Views</p>
-              <p className="text-4xl font-bold">3</p>
+              <p className="text-2xl font-bold">3</p>
               <p className="text-xs text-muted-foreground">--% YoY</p>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
                 <span className="inline-block w-3 h-3 rounded-full border border-muted-foreground"></span>
@@ -1083,7 +1083,7 @@ export default function ShopManager() {
 
             <div className="space-y-1 md:pl-6">
               <p className="text-sm font-medium">Visits</p>
-              <p className="text-4xl font-bold">2</p>
+              <p className="text-2xl font-bold">2</p>
               <p className="text-xs text-muted-foreground">--% YoY</p>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
                 <span className="inline-block w-3 h-3 rounded-full border border-muted-foreground"></span>
@@ -1093,7 +1093,7 @@ export default function ShopManager() {
 
             <div className="space-y-1 md:pl-6">
               <p className="text-sm font-medium">Orders</p>
-              <p className="text-4xl font-bold">{analytics.totalOrders}</p>
+              <p className="text-2xl font-bold">{analytics.totalOrders}</p>
               <p className="text-xs text-muted-foreground">--% YoY</p>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
                 <span className="inline-block w-3 h-3 rounded-full border border-muted-foreground"></span>
@@ -1105,7 +1105,7 @@ export default function ShopManager() {
 
             <div className="space-y-1 md:pl-6">
               <p className="text-sm font-medium">Revenue</p>
-              <p className="text-4xl font-bold">${analytics.revenue.toFixed(2)}</p>
+              <p className="text-2xl font-bold">${analytics.revenue.toFixed(2)}</p>
               <p className="text-xs text-muted-foreground">--% YoY</p>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
                 <span className="inline-block w-3 h-3 rounded-full border border-muted-foreground"></span>
