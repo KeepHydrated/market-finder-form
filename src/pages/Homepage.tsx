@@ -1189,7 +1189,10 @@ const Homepage = () => {
                     
                     {/* Time selectors for each selected day */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                      {selectedDays.map((day) => (
+                      {[...selectedDays].sort((a, b) => {
+                        const dayOrder = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                        return dayOrder.indexOf(a) - dayOrder.indexOf(b);
+                      }).map((day) => (
                         <div key={day} className="space-y-3 border-t pt-4">
                           <h5 className="font-semibold text-lg mb-2 text-center">
                             {day === 'Mon' ? 'Monday' : 
