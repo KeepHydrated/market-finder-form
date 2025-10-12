@@ -1128,6 +1128,7 @@ export default function ShopManager() {
                 const shipByDate = addDays(new Date(order.created_at), 2); // 2 days to ship
                 const hoursRemaining = differenceInHours(shipByDate, new Date());
                 const isOverdue = isPast(shipByDate);
+                const isShipped = order.status === 'shipped' || order.status === 'delivered';
                 
                 return (
                   <Card key={order.id} className="overflow-hidden w-64 flex-shrink-0">
@@ -1153,17 +1154,21 @@ export default function ShopManager() {
                           ${(order.total_amount / 100).toFixed(2)}
                         </p>
                         <div className={`text-xs px-2 py-1 rounded-md w-fit ${
-                          isOverdue 
-                            ? 'bg-destructive/10 text-destructive' 
-                            : hoursRemaining < 24 
-                              ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-500'
-                              : 'bg-muted text-muted-foreground'
+                          isShipped
+                            ? 'bg-green-500/10 text-green-600 dark:text-green-500'
+                            : isOverdue 
+                              ? 'bg-destructive/10 text-destructive' 
+                              : hoursRemaining < 24 
+                                ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-500'
+                                : 'bg-muted text-muted-foreground'
                         }`}>
-                          {isOverdue 
-                            ? 'Ship ASAP' 
-                            : hoursRemaining < 24 
-                              ? `Ship in ${hoursRemaining}h`
-                              : `Ship by ${formatDistanceToNow(shipByDate, { addSuffix: true })}`
+                          {isShipped
+                            ? 'Shipped'
+                            : isOverdue 
+                              ? 'Ship ASAP' 
+                              : hoursRemaining < 24 
+                                ? `Ship in ${hoursRemaining}h`
+                                : `Ship by ${formatDistanceToNow(shipByDate, { addSuffix: true })}`
                           }
                         </div>
                       </div>
