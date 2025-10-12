@@ -1191,7 +1191,7 @@ const Homepage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                       {selectedDays.map((day) => (
                         <div key={day} className="space-y-3 border-t pt-4">
-                          <h5 className="font-medium capitalize">
+                          <h5 className="font-semibold text-lg mb-2">
                             {day === 'Mon' ? 'Monday' : 
                              day === 'Tue' ? 'Tuesday' :
                              day === 'Wed' ? 'Wednesday' :
