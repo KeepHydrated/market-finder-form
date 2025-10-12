@@ -22,6 +22,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Star } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
 interface ShopData {
   id: string;
@@ -83,7 +84,9 @@ export default function ShopManager() {
     recentOrders: [],
     topProducts: [],
     orderSuccessRate: 0,
-    avgItemsPerOrder: 0
+    avgItemsPerOrder: 0,
+    lastOrderTime: null as Date | null,
+    lastRevenueTime: null as Date | null
   });
 
   // Form state
@@ -247,7 +250,9 @@ export default function ShopManager() {
         recentOrders,
         topProducts,
         orderSuccessRate,
-        avgItemsPerOrder
+        avgItemsPerOrder,
+        lastOrderTime: orders && orders.length > 0 ? new Date(orders[0].created_at) : null,
+        lastRevenueTime: orders && orders.length > 0 ? new Date(orders[0].created_at) : null
       });
     } catch (error) {
       console.error('Error fetching analytics:', error);
@@ -1093,7 +1098,9 @@ export default function ShopManager() {
               <p className="text-xs text-muted-foreground">--% YoY</p>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
                 <span className="inline-block w-3 h-3 rounded-full border border-muted-foreground"></span>
-                Just now
+                {analytics.lastOrderTime 
+                  ? formatDistanceToNow(analytics.lastOrderTime, { addSuffix: true })
+                  : 'No data yet'}
               </p>
             </div>
 
@@ -1103,7 +1110,9 @@ export default function ShopManager() {
               <p className="text-xs text-muted-foreground">--% YoY</p>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
                 <span className="inline-block w-3 h-3 rounded-full border border-muted-foreground"></span>
-                Just now
+                {analytics.lastRevenueTime 
+                  ? formatDistanceToNow(analytics.lastRevenueTime, { addSuffix: true })
+                  : 'No data yet'}
               </p>
             </div>
           </div>
