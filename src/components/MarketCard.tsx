@@ -28,6 +28,7 @@ export const MarketCard = ({ id, name, address, days, hours, rating, ratingCount
         <div className="absolute top-3 left-3 z-10">
           <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5">
             <div className="flex gap-0.5">
+              {/* Show 1 star on mobile, 5 stars on desktop */}
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star 
                   key={star}
@@ -35,7 +36,7 @@ export const MarketCard = ({ id, name, address, days, hours, rating, ratingCount
                     star <= rating 
                       ? 'text-yellow-400' 
                       : 'text-gray-300'
-                  }`}
+                  } ${star > 1 ? 'hidden md:block' : ''}`}
                 />
               ))}
             </div>
