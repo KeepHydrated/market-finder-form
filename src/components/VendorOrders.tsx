@@ -292,7 +292,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         }
                       }}
                     >
-                      📦 Mark as Shipped
+                      Mark as Shipped
                     </Button>
                   )}
                   
@@ -475,7 +475,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                                 });
                             }}
                           >
-                            📦 Mark as Shipped
+                            Mark as Shipped
                           </Button>
                         )}
                         
