@@ -1157,15 +1157,15 @@ const Homepage = () => {
                 <span className="hidden md:inline">Filter search results</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="w-[800px] max-w-none p-0 bg-background border shadow-lg">
-              <Tabs defaultValue="times" className="w-full">
-                <div className="pt-8 px-8 flex justify-center">
+            <DialogContent className="w-[800px] max-w-none p-0 bg-background border shadow-lg max-h-[80vh] flex flex-col">
+              <Tabs defaultValue="times" className="w-full flex flex-col overflow-hidden">
+                <div className="pt-8 px-8 flex justify-center flex-shrink-0">
                   <TabsList className="inline-flex gap-1 rounded-none md:border-b p-1">
                     <TabsTrigger value="times" className="py-4 px-6">Times</TabsTrigger>
                     <TabsTrigger value="categories" className="py-4 px-6">Categories</TabsTrigger>
                   </TabsList>
                 </div>
-                <TabsContent value="times" className="px-8 pb-8 pt-8">
+                <TabsContent value="times" className="px-8 pb-8 pt-8 overflow-y-auto">
                   <div className="space-y-4">
                     <div className="flex flex-col gap-2 max-w-xs mx-auto">
                       {DAYS.map((day) => (
@@ -1265,7 +1265,7 @@ const Homepage = () => {
                     </div>
                   </div>
                 </TabsContent>
-                <TabsContent value="categories" className="px-8 pb-8 pt-8">
+                <TabsContent value="categories" className="px-8 pb-8 pt-8 overflow-y-auto">
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-2">
                       {SPECIALTY_CATEGORIES.map((category) => (
