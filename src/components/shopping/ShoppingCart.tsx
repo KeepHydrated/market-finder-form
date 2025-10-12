@@ -74,7 +74,7 @@ export function ShoppingCart() {
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetContent className="w-full sm:max-w-lg">
+      <SheetContent className="w-full sm:max-w-lg" side="right">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5" />
@@ -132,56 +132,60 @@ export function ShoppingCart() {
 
                       <div className="space-y-3">
                         {vendorItems.map((item) => (
-                          <div key={item.id} className="flex items-center gap-3">
-                            {item.product_image && (
-                              <button
-                                onClick={() => handleProductClick(item)}
-                                className="flex-shrink-0 hover:opacity-80 transition-opacity"
-                              >
-                                <img
-                                  src={item.product_image}
-                                  alt={item.product_name}
-                                  className="w-16 h-16 rounded-lg object-cover cursor-pointer"
-                                />
-                              </button>
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <button
-                                onClick={() => handleProductClick(item)}
-                                className="text-left w-full hover:text-primary transition-colors"
-                              >
-                                <p className="font-medium truncate">{item.product_name}</p>
-                              </button>
-                              <p className="text-sm font-medium">
-                                {formatPrice(item.unit_price)}
-                              </p>
+                          <div key={item.id} className="flex flex-col gap-3">
+                            <div className="flex items-start gap-3">
+                              {item.product_image && (
+                                <button
+                                  onClick={() => handleProductClick(item)}
+                                  className="flex-shrink-0 hover:opacity-80 transition-opacity"
+                                >
+                                  <img
+                                    src={item.product_image}
+                                    alt={item.product_name}
+                                    className="w-16 h-16 rounded-lg object-cover cursor-pointer"
+                                  />
+                                </button>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <button
+                                  onClick={() => handleProductClick(item)}
+                                  className="text-left w-full hover:text-primary transition-colors"
+                                >
+                                  <p className="font-medium line-clamp-2">{item.product_name}</p>
+                                </button>
+                                <p className="text-sm font-medium mt-1">
+                                  {formatPrice(item.unit_price)}
+                                </p>
+                              </div>
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                >
+                                  <Minus className="h-3 w-3" />
+                                </Button>
+                                <span className="w-8 text-center">{item.quantity}</span>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                >
+                                  <Plus className="h-3 w-3" />
+                                </Button>
+                              </div>
+
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                onClick={() => removeItem(item.id)}
                               >
-                                <Minus className="h-3 w-3" />
-                              </Button>
-                              <span className="w-8 text-center">{item.quantity}</span>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              >
-                                <Plus className="h-3 w-3" />
+                                <Trash2 className="h-3 w-3" />
                               </Button>
                             </div>
-
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => removeItem(item.id)}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
                           </div>
                         ))}
                       </div>
