@@ -1121,8 +1121,8 @@ export default function ShopManager() {
       <div>
         <h3 className="text-xl font-bold mb-4">Recent Orders</h3>
         {analytics.recentOrders.length > 0 ? (
-          <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-            <div className="flex gap-4 w-max">
+          <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+            <div className="flex gap-4 w-max px-4">
               {analytics.recentOrders.map((order: any) => {
                 const firstItem = order.order_items?.[0];
                 const shipByDate = addDays(new Date(order.created_at), 2); // 2 days to ship
