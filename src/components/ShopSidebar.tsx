@@ -81,7 +81,7 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
   return (
     <Sidebar
       collapsible="icon"
-      className={collapsed ? "w-16" : "w-48"}
+      className={`${collapsed ? "w-16" : "w-48"} hidden sm:block`}
     >
       <SidebarContent className="pt-24 md:pt-40 lg:pt-24">
         <SidebarGroup>

@@ -14,6 +14,7 @@ import { ProductGrid } from '@/components/ProductGrid';
 import { AddProductForm } from '@/components/AddProductForm';
 import { FarmersMarketSearch } from '@/components/FarmersMarketSearch';
 import { ShopSidebar } from '@/components/ShopSidebar';
+import { ShopMobileNav } from '@/components/ShopMobileNav';
 import { VendorOrders } from '@/components/VendorOrders';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -493,7 +494,7 @@ export default function ShopManager() {
         return renderProducts();
       case 'orders2':
         return (
-          <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-6xl pt-[40px] pb-4">
+          <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-6xl pt-[280px] sm:pt-[40px] pb-4">
             <VendorOrders vendorId={shopData?.id} vendorName={shopData?.store_name} />
           </div>
         );
@@ -505,7 +506,7 @@ export default function ShopManager() {
   };
 
   const renderOverviewWithTabs = () => (
-    <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-7xl pt-[40px] pb-4">
+    <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-7xl pt-[280px] sm:pt-[40px] pb-4">
       {renderTest()}
     </div>
   );
@@ -619,7 +620,7 @@ export default function ShopManager() {
 
 
   const renderShop = () => (
-    <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-3xl pt-[40px] pb-4">
+    <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-3xl pt-[280px] sm:pt-[40px] pb-4">
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold mb-2">Shop Details</h2>
@@ -744,7 +745,7 @@ export default function ShopManager() {
   );
 
   const renderProducts = () => (
-    <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-3xl pt-[40px] pb-4">
+    <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-3xl pt-[280px] sm:pt-[40px] pb-4">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold mb-2">Product Listings</h2>
@@ -798,7 +799,7 @@ export default function ShopManager() {
   );
 
   const renderAccount = () => (
-    <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-3xl pt-[40px] pb-4">
+    <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-3xl pt-[280px] sm:pt-[40px] pb-4">
       <div>
         <h2 className="text-2xl font-bold mb-2">Shop Settings And Preferences</h2>
       </div>
@@ -1206,6 +1207,7 @@ export default function ShopManager() {
     <SidebarProvider>
       <div className="min-h-screen flex w-screen bg-background overflow-x-hidden">
         <ShopSidebar hasShopData={!!shopData} />
+        <ShopMobileNav hasShopData={!!shopData} />
         
         <main className="flex-1 w-full">
           {renderContent()}
