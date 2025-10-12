@@ -165,7 +165,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent
-        className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible"
+        className="max-w-[90vw] sm:max-w-[600px] max-h-[70vh] sm:max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible"
         onKeyDown={handleKeyDown}
       >
         {/* Product Navigation Arrows - Positioned absolutely relative to DialogContent */}
@@ -224,10 +224,10 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         </Button>
         
 
-        <div className="flex flex-col sm:flex-row w-full bg-white min-h-[400px] relative">
+        <div className="flex flex-col sm:flex-row w-full bg-white min-h-[300px] sm:min-h-[400px] relative">
           {/* Left side - Images */}
           <div className="w-full sm:w-1/2 relative bg-gray-50">
-            <div className="h-[400px] bg-muted relative group">
+            <div className="h-[250px] sm:h-[400px] bg-muted relative group">
                 {product.images.length > 0 ? (
                   <>
                     <img
