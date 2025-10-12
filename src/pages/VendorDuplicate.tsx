@@ -1353,9 +1353,9 @@ const VendorDuplicate = () => {
       ) : (
         // Desktop and Mobile view - original non-collapsible layout  
         <div className="min-h-screen bg-background">
-          <div className="flex">
-            {/* Left column - sticky, non-scrolling - HIDDEN ON MOBILE */}
-            <div className="hidden md:block w-96 h-screen sticky top-0 bg-green-50 border-r">
+          <div className="flex flex-col md:flex-row">
+            {/* Left column/Top section - sticky on desktop, at top on mobile */}
+            <div className="w-full md:w-96 md:h-screen md:sticky md:top-0 bg-green-50 border-b md:border-b-0 md:border-r">
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -1483,7 +1483,7 @@ const VendorDuplicate = () => {
             </div>
             
             {/* Main content - right column, scrollable - FULL WIDTH ON MOBILE */}
-            <div className="flex-1 w-full overflow-y-auto h-screen">
+            <div className="flex-1 w-full overflow-y-auto md:h-screen">
               <div className="container mx-auto px-4 py-6">
                 {selectedVendor ? (
                   // Show selected vendor details
