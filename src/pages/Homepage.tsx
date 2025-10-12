@@ -993,7 +993,7 @@ const Homepage = () => {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6">
         
-        {/* Mobile Search and Category - Only visible on mobile */}
+        {/* Mobile Category - Only visible on mobile */}
         <div className="w-full flex md:hidden items-center space-x-4 mb-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -1070,25 +1070,6 @@ const Homepage = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          
-          {/* Search - Tablet and Desktop only */}
-          <div className="flex-1 max-w-md">
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              if (searchQuery.trim()) {
-                navigate(`/homepage?search=${encodeURIComponent(searchQuery.trim())}`);
-              }
-            }} className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Search vendors, products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-background/50 border-border"
-              />
-            </form>
-          </div>
         </div>
         
         {/* View Toggle and Filter Button */}
