@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Save, Plus, Trash2, ArrowRight, Package } from 'lucide-react';
+import { Edit, Save, Plus, Trash2, ArrowRight, Package, Heart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { ProductGrid } from '@/components/ProductGrid';
@@ -1102,26 +1102,29 @@ export default function ShopManager() {
               {analytics.recentOrders.map((order: any) => {
                 const firstItem = order.order_items?.[0];
                 return (
-                  <Card key={order.id} className="overflow-hidden group cursor-pointer hover:shadow-lg transition-shadow w-64 flex-shrink-0">
+                  <Card key={order.id} className="overflow-hidden w-64 flex-shrink-0">
                     <CardContent className="p-0">
-                      <div className="aspect-square bg-muted overflow-hidden">
+                      <div className="relative aspect-square bg-muted overflow-hidden">
                         {firstItem?.product_image ? (
                           <img 
                             src={firstItem.product_image} 
                             alt={firstItem.product_name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-cover"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <Package className="h-16 w-16 text-muted-foreground" />
                           </div>
                         )}
+                        <button className="absolute top-3 right-3 w-10 h-10 rounded-full bg-background shadow-md flex items-center justify-center hover:bg-accent transition-colors">
+                          <Heart className="w-5 h-5" />
+                        </button>
                       </div>
                       <div className="p-4">
-                        <h4 className="font-semibold mb-1 truncate">
+                        <h4 className="font-medium mb-1">
                           {firstItem?.product_name || `Order #${order.id.slice(-8)}`}
                         </h4>
-                        <p className="text-lg font-semibold text-muted-foreground mb-2">
+                        <p className="text-muted-foreground">
                           ${(order.total_amount / 100).toFixed(2)}
                         </p>
                       </div>
