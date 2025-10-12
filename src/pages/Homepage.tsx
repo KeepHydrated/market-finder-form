@@ -1071,18 +1071,8 @@ const Homepage = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           
-          {/* Search - icon only on mobile, full bar on tablet+ */}
+          {/* Search - Tablet and Desktop only */}
           <div className="flex-1 max-w-md">
-            {/* Mobile: Search Icon only */}
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="md:hidden"
-            >
-              <Search className="h-5 w-5" />
-            </Button>
-            
-            {/* Tablet and Desktop: Full search bar */}
             <form onSubmit={(e) => {
               e.preventDefault();
               if (searchQuery.trim()) {
