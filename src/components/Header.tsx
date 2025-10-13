@@ -182,7 +182,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             )}
             <Link to="/" className="hover:opacity-80 transition-opacity">
               <h1 className="text-2xl font-bold cursor-pointer hidden md:block">
-                My Local Farmers Markets
+                From Farmers Markets
               </h1>
             </Link>
             
