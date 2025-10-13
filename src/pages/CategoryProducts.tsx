@@ -63,28 +63,38 @@ const CategoryProducts = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   
   const category = searchParams.get('category');
+  const searchTerm = searchParams.get('q');
 
   // Fetch all vendors nationwide for the selected category (or all categories)
   useEffect(() => {
-    const fetchNationwideVendors = async () => {
+    const fetchVendors = async () => {
       setLoading(true);
       
       try {
-        let query = supabase
+        let dbQuery = supabase
           .from('submissions')
           .select('*')
           .eq('status', 'accepted');
         
         // Only filter by category if one is specified
         if (category) {
-          query = query.eq('primary_specialty', category);
+          dbQuery = dbQuery.eq('primary_specialty', category);
         }
 
-        const { data, error } = await query;
+        const { data, error } = await dbQuery;
 
         if (error) throw error;
 
-        console.log(`Found ${data?.length || 0} vendors nationwide${category ? ` for category: ${category}` : ' (all categories)'}`);
+        const logMessage = category 
+          ? `Found ${data?.length || 0} vendors nationwide for category: ${category}`
+          : `Found ${data?.length || 0} vendors nationwide (all categories)`;
+        
+        if (searchTerm) {
+          console.log(`${logMessage}, searching for: "${searchTerm}"`);
+        } else {
+          console.log(logMessage);
+        }
+        
         setVendors(data || []);
       } catch (error) {
         console.error('Error fetching vendors:', error);
@@ -98,10 +108,10 @@ const CategoryProducts = () => {
       }
     };
 
-    fetchNationwideVendors();
-  }, [category, toast]);
+    fetchVendors();
+  }, [category, searchTerm, toast]);
 
-  // Get all products from all vendors with sorting
+  // Get all products from all vendors
   const allProducts = vendors.flatMap(vendor => {
     let products: Product[] = [];
     
@@ -127,8 +137,20 @@ const CategoryProducts = () => {
       }));
   });
 
+  // Filter by search term if provided
+  const searchFilteredProducts = searchTerm
+    ? allProducts.filter(product => {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+          product.name.toLowerCase().includes(searchLower) ||
+          product.description?.toLowerCase().includes(searchLower) ||
+          product.vendorName.toLowerCase().includes(searchLower)
+        );
+      })
+    : allProducts;
+
   // Sort products based on selected option
-  const sortedProducts = [...allProducts].sort((a, b) => {
+  const sortedProducts = [...searchFilteredProducts].sort((a, b) => {
     switch (sortBy) {
       case 'lowest-price':
         return a.price - b.price;
@@ -300,8 +322,14 @@ const CategoryProducts = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-end mb-8">
-          {/* Category Title */}
-          <h1 className="hidden md:block text-xl font-bold capitalize mr-auto">{category || 'All'}</h1>
+          {/* Category/Search Title */}
+          {searchTerm ? (
+            <h1 className="hidden md:block text-xl font-bold mr-auto">
+              {category || 'All'} | {searchTerm}
+            </h1>
+          ) : (
+            <h1 className="hidden md:block text-xl font-bold capitalize mr-auto">{category || 'All'}</h1>
+          )}
           
           {/* Sort Dropdown */}
           <DropdownMenu>
@@ -330,10 +358,13 @@ const CategoryProducts = () => {
         {sortedProducts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-lg text-muted-foreground mb-4">
-              No products available for purchase in this category yet.
+              {searchTerm 
+                ? `No products found for "${searchTerm}"${category ? ` in ${category}` : ''}`
+                : `No products available for purchase${category ? ` in ${category}` : ''} yet.`
+              }
             </p>
-            <Button onClick={() => navigate('/')}>
-              Browse Other Categories
+            <Button onClick={() => navigate('/homepage')}>
+              Browse All Products
             </Button>
           </div>
         ) : (

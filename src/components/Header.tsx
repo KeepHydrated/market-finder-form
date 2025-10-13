@@ -142,8 +142,8 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
     if (searchQuery.trim()) {
       // If on a category page, include the category in the search
       const searchUrl = currentCategory 
-        ? `/search?q=${encodeURIComponent(searchQuery.trim())}&category=${encodeURIComponent(currentCategory)}`
-        : `/search?q=${encodeURIComponent(searchQuery.trim())}`;
+        ? `/category?q=${encodeURIComponent(searchQuery.trim())}&category=${encodeURIComponent(currentCategory)}`
+        : `/category?q=${encodeURIComponent(searchQuery.trim())}`;
       navigate(searchUrl);
     }
   };
