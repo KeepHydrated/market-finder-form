@@ -1270,7 +1270,7 @@ const Homepage = () => {
                 </TabsContent>
                 <TabsContent value="categories" className="px-8 pb-8 pt-8 overflow-y-auto">
                   <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-w-xs md:max-w-none mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-w-xs md:max-w-full mx-auto">
                       {SPECIALTY_CATEGORIES.map((category) => (
                         <Button
                           key={category}
