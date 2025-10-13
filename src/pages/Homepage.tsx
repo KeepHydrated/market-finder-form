@@ -1188,7 +1188,11 @@ const Homepage = () => {
                           description: "All filters have been reset"
                         });
                       }}
-                      className="text-foreground hover:bg-muted"
+                      className={cn(
+                        selectedDays.length > 0 || selectedCategories.length > 0 || Object.keys(dayTimeSelections).length > 0
+                          ? "text-foreground hover:bg-muted"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
                     >
                       <RotateCcw className="h-4 w-4 mr-2" />
                       Reset
