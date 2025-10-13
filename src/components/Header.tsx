@@ -29,9 +29,9 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
   const [newOrdersCount, setNewOrdersCount] = useState(0);
   const isOnOrdersPage = location.pathname === '/my-shop' && location.search.includes('section=orders2');
   
-  // Get current category if on category page
+  // Get current category if on search page
   const searchParams = new URLSearchParams(location.search);
-  const currentCategory = location.pathname === '/category' ? (searchParams.get('category') || 'All') : null;
+  const currentCategory = location.pathname === '/search' ? (searchParams.get('category') || 'All') : null;
   const currentSearchTerm = searchParams.get('q');
   
   // Helper function to build category URLs with preserved search term
@@ -39,7 +39,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
     const params = new URLSearchParams();
     if (category) params.set('category', category);
     if (currentSearchTerm) params.set('q', currentSearchTerm);
-    return `/category${params.toString() ? `?${params.toString()}` : ''}`;
+    return `/search${params.toString() ? `?${params.toString()}` : ''}`;
   };
 
   useEffect(() => {
@@ -156,10 +156,10 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // If on a category page, include the category in the search
+      // If on a search page, include the category in the search
       const searchUrl = currentCategory 
-        ? `/category?q=${encodeURIComponent(searchQuery.trim())}&category=${encodeURIComponent(currentCategory)}`
-        : `/category?q=${encodeURIComponent(searchQuery.trim())}`;
+        ? `/search?q=${encodeURIComponent(searchQuery.trim())}&category=${encodeURIComponent(currentCategory)}`
+        : `/search?q=${encodeURIComponent(searchQuery.trim())}`;
       navigate(searchUrl);
     }
   };

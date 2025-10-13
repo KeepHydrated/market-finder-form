@@ -45,7 +45,7 @@ const App = () => (
                 <Route path="/" element={<Navigate to="/homepage" replace />} />
                 <Route path="/homepage" element={<Homepage />} />
                 <Route path="/auth" element={<Auth />} />
-                <Route path="/category" element={<CategoryProducts />} />
+                <Route path="/search" element={<CategoryProducts />} />
                 <Route path="/market" element={<VendorDuplicate />} />
                 <Route path="/likes" element={<Likes />} />
                 <Route path="/orders" element={<Orders />} />

@@ -117,7 +117,7 @@ const Homepage = () => {
     
     if (categoryParam) {
       // Navigate to the new CategoryProducts page
-      navigate(`/category?category=${encodeURIComponent(categoryParam)}`);
+      navigate(`/search?category=${encodeURIComponent(categoryParam)}`);
     }
   }, [searchParams, navigate]);
 
@@ -1010,67 +1010,67 @@ const Homepage = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
               <DropdownMenuItem>
-                <Link to="/category" className="w-full font-semibold">
+                <Link to="/search" className="w-full font-semibold">
                   All
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/category?category=Fresh Flowers & Plants" className="w-full">
+                <Link to="/search?category=Fresh Flowers & Plants" className="w-full">
                   Fresh Flowers & Plants
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/category?category=Bakery" className="w-full">
+                <Link to="/search?category=Bakery" className="w-full">
                   Bakery
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/category?category=Dairy" className="w-full">
+                <Link to="/search?category=Dairy" className="w-full">
                   Dairy
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/category?category=Rancher" className="w-full">
+                <Link to="/search?category=Rancher" className="w-full">
                   Rancher
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/category?category=Beverages" className="w-full">
+                <Link to="/search?category=Beverages" className="w-full">
                   Beverages
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/category?category=Seasonings & Spices" className="w-full">
+                <Link to="/search?category=Seasonings & Spices" className="w-full">
                   Seasonings & Spices
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/category?category=Pets" className="w-full">
+                <Link to="/search?category=Pets" className="w-full">
                   Pets
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/category?category=Home Goods" className="w-full">
+                <Link to="/search?category=Home Goods" className="w-full">
                   Home Goods
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/category?category=Farmers" className="w-full">
+                <Link to="/search?category=Farmers" className="w-full">
                   Farmers
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/category?category=Ready to Eat" className="w-full">
+                <Link to="/search?category=Ready to Eat" className="w-full">
                   Ready to Eat
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/category?category=Packaged Goods & Snacks" className="w-full">
+                <Link to="/search?category=Packaged Goods & Snacks" className="w-full">
                   Packaged Goods & Snacks
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/category?category=Artisan" className="w-full">
+                <Link to="/search?category=Artisan" className="w-full">
                   Artisan
                 </Link>
               </DropdownMenuItem>
