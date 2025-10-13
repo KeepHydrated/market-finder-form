@@ -324,7 +324,7 @@ const CategoryProducts = () => {
         <div className="flex items-center justify-end mb-8">
           {/* Category/Search Title */}
           {searchTerm ? (
-            <h1 className="hidden md:flex items-center text-xl font-bold mx-auto text-center">
+            <h1 className="hidden md:flex items-center text-xl font-bold mr-auto">
               {category || 'All'} <span className="text-base font-normal text-muted-foreground ml-3">"{searchTerm}"</span>
             </h1>
           ) : (
