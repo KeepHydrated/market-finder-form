@@ -204,7 +204,7 @@ const CategoryProducts = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           {/* Category Title */}
-          <h1 className="text-2xl font-bold capitalize">{category || 'All'}</h1>
+          <h1 className="text-xl font-bold capitalize">{category || 'All'}</h1>
           
           {/* Sort Dropdown */}
           <DropdownMenu>
