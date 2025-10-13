@@ -508,7 +508,7 @@ const Orders = () => {
                     >
                       {order.vendor_name}
                     </button>
-                    <span className="text-muted-foreground">on {formatDate(order.created_at)}</span>
+                    <span className="text-muted-foreground"><span className="hidden md:inline">on </span>{formatDate(order.created_at)}</span>
                   </div>
                 </CardHeader>
                 
