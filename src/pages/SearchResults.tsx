@@ -203,53 +203,8 @@ const SearchResults = () => {
       </div>
 
       <div className="container mx-auto px-4 pt-8 md:pt-24 pb-8">
-        {/* Desktop Header */}
-        <div className="hidden md:flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate(-1)}
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold">Search Results</h1>
-              <p className="text-sm text-muted-foreground">
-                {sortedProducts.length} {sortedProducts.length === 1 ? 'result' : 'results'} for "{query}"
-              </p>
-            </div>
-          </div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="py-2">
-                <span className="capitalize">{sortBy.replace('-', ' ')}</span>
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => setSortBy('relevancy')}>
-                Relevancy
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortBy('lowest-price')}>
-                Lowest Price
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortBy('highest-price')}>
-                Highest Price
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortBy('top-rated')}>
-                Top Rated
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortBy('most-recent')}>
-                Most Recent
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        {/* Mobile Results Count & Sort */}
-        <div className="md:hidden pt-24 pb-4 flex items-center justify-between">
+        {/* Sort dropdown - all screens */}
+        <div className="pb-4 flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             {sortedProducts.length} {sortedProducts.length === 1 ? 'result' : 'results'}
           </p>
