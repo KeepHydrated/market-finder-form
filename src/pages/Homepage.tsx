@@ -1196,7 +1196,7 @@ const Homepage = () => {
                             {day}
                           </Button>
                           {selectedDays.includes(day) && (
-                            <div className="flex items-center gap-2 pl-2">
+                            <div className="flex items-center gap-2 pl-2 mb-4">
                               <div className="flex items-center gap-1">
                                 <Select 
                                   value={dayTimeSelections[day]?.startTime || '08:00'}
