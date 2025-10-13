@@ -510,7 +510,7 @@ const Orders = () => {
                         {order.vendor_name}
                       </button>
                     </div>
-                    <span className="text-muted-foreground w-full md:w-auto"><span className="hidden md:inline">on </span>{formatDate(order.created_at)}</span>
+                    <span className="text-muted-foreground w-full md:w-auto text-sm md:text-base"><span className="hidden md:inline">on </span>{formatDate(order.created_at)}</span>
                   </div>
                 </CardHeader>
                 
