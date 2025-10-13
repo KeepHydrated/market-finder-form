@@ -46,7 +46,6 @@ const App = () => (
                 <Route path="/homepage" element={<Homepage />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/category" element={<CategoryProducts />} />
-                <Route path="/search" element={<Navigate to="/category" replace />} />
                 <Route path="/market" element={<VendorDuplicate />} />
                 <Route path="/likes" element={<Likes />} />
                 <Route path="/orders" element={<Orders />} />
