@@ -31,7 +31,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
   
   // Get current category if on category page
   const searchParams = new URLSearchParams(location.search);
-  const currentCategory = location.pathname === '/category' ? searchParams.get('category') : null;
+  const currentCategory = location.pathname === '/category' ? (searchParams.get('category') || 'All') : null;
 
   useEffect(() => {
     const checkAnySubmission = async () => {
