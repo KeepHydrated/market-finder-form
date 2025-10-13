@@ -1159,7 +1159,8 @@ const Homepage = () => {
             </DialogTrigger>
             <DialogContent className="w-[800px] max-w-none p-0 bg-background border shadow-lg max-h-[80vh] flex flex-col">
               <Tabs defaultValue="times" className="w-full flex flex-col overflow-hidden">
-                <div className="pt-8 px-8 flex justify-center flex-shrink-0 border-b">
+                <div className="pt-8 px-8 flex justify-between items-center flex-shrink-0 border-b">
+                  <div className="flex-1" />
                   <TabsList className="inline-flex gap-8 bg-transparent border-0 p-0 h-auto">
                     <TabsTrigger 
                       value="times" 
@@ -1174,6 +1175,25 @@ const Homepage = () => {
                       Categories
                     </TabsTrigger>
                   </TabsList>
+                  <div className="flex-1 flex justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedDays([]);
+                        setSelectedCategories([]);
+                        setDayTimeSelections({});
+                        toast({
+                          title: "Filters cleared",
+                          description: "All filters have been reset"
+                        });
+                      }}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Reset
+                    </Button>
+                  </div>
                 </div>
                 <TabsContent value="times" className="px-8 pb-8 pt-8 overflow-y-auto">
                   <div className="space-y-4">
