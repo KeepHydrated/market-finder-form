@@ -32,6 +32,15 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
   // Get current category if on category page
   const searchParams = new URLSearchParams(location.search);
   const currentCategory = location.pathname === '/category' ? (searchParams.get('category') || 'All') : null;
+  const currentSearchTerm = searchParams.get('q');
+  
+  // Helper function to build category URLs with preserved search term
+  const getCategoryUrl = (category?: string) => {
+    const params = new URLSearchParams();
+    if (category) params.set('category', category);
+    if (currentSearchTerm) params.set('q', currentSearchTerm);
+    return `/category${params.toString() ? `?${params.toString()}` : ''}`;
+  };
 
   useEffect(() => {
     const checkAnySubmission = async () => {
@@ -180,67 +189,67 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
                 <DropdownMenuItem>
-                  <Link to="/category" className="w-full font-semibold">
+                  <Link to={getCategoryUrl()} className="w-full font-semibold">
                     All
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Fresh Flowers & Plants" className="w-full">
+                  <Link to={getCategoryUrl('Fresh Flowers & Plants')} className="w-full">
                     Fresh Flowers & Plants
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Bakery" className="w-full">
+                  <Link to={getCategoryUrl('Bakery')} className="w-full">
                     Bakery
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Dairy" className="w-full">
+                  <Link to={getCategoryUrl('Dairy')} className="w-full">
                     Dairy
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Rancher" className="w-full">
+                  <Link to={getCategoryUrl('Rancher')} className="w-full">
                     Rancher
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Beverages" className="w-full">
+                  <Link to={getCategoryUrl('Beverages')} className="w-full">
                     Beverages
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Seasonings & Spices" className="w-full">
+                  <Link to={getCategoryUrl('Seasonings & Spices')} className="w-full">
                     Seasonings & Spices
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Pets" className="w-full">
+                  <Link to={getCategoryUrl('Pets')} className="w-full">
                     Pets
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Home Goods" className="w-full">
+                  <Link to={getCategoryUrl('Home Goods')} className="w-full">
                     Home Goods
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Farmers" className="w-full">
+                  <Link to={getCategoryUrl('Farmers')} className="w-full">
                     Farmers
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Ready to Eat" className="w-full">
+                  <Link to={getCategoryUrl('Ready to Eat')} className="w-full">
                     Ready to Eat
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Packaged Goods & Snacks" className="w-full">
+                  <Link to={getCategoryUrl('Packaged Goods & Snacks')} className="w-full">
                     Packaged Goods & Snacks
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Artisan" className="w-full">
+                  <Link to={getCategoryUrl('Artisan')} className="w-full">
                     Artisan
                   </Link>
                 </DropdownMenuItem>
@@ -331,67 +340,67 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
                 <DropdownMenuItem>
-                  <Link to="/category" className="w-full font-semibold">
+                  <Link to={getCategoryUrl()} className="w-full font-semibold">
                     All
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Fresh Flowers & Plants" className="w-full">
+                  <Link to={getCategoryUrl('Fresh Flowers & Plants')} className="w-full">
                     Fresh Flowers & Plants
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Bakery" className="w-full">
+                  <Link to={getCategoryUrl('Bakery')} className="w-full">
                     Bakery
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Dairy" className="w-full">
+                  <Link to={getCategoryUrl('Dairy')} className="w-full">
                     Dairy
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Rancher" className="w-full">
+                  <Link to={getCategoryUrl('Rancher')} className="w-full">
                     Rancher
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Beverages" className="w-full">
+                  <Link to={getCategoryUrl('Beverages')} className="w-full">
                     Beverages
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Seasonings & Spices" className="w-full">
+                  <Link to={getCategoryUrl('Seasonings & Spices')} className="w-full">
                     Seasonings & Spices
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Pets" className="w-full">
+                  <Link to={getCategoryUrl('Pets')} className="w-full">
                     Pets
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Home Goods" className="w-full">
+                  <Link to={getCategoryUrl('Home Goods')} className="w-full">
                     Home Goods
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Farmers" className="w-full">
+                  <Link to={getCategoryUrl('Farmers')} className="w-full">
                     Farmers
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Ready to Eat" className="w-full">
+                  <Link to={getCategoryUrl('Ready to Eat')} className="w-full">
                     Ready to Eat
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Packaged Goods & Snacks" className="w-full">
+                  <Link to={getCategoryUrl('Packaged Goods & Snacks')} className="w-full">
                     Packaged Goods & Snacks
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link to="/category?category=Artisan" className="w-full">
+                  <Link to={getCategoryUrl('Artisan')} className="w-full">
                     Artisan
                   </Link>
                 </DropdownMenuItem>
