@@ -743,32 +743,37 @@ const Orders = () => {
                   >
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between mb-1">
-                        <div>
+                        <div className="flex-1">
                           {order.estimated_delivery_date ? (
-                            <h3 className="text-base font-serif">
+                            <h3 className="text-base font-serif mb-1">
                               Arriving {new Date(order.estimated_delivery_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                             </h3>
                           ) : (
-                            <h3 className="text-base font-serif">Preparing for shipment</h3>
+                            <h3 className="text-base font-serif mb-1">Preparing for shipment</h3>
+                          )}
+                          {order.tracking_carrier && (
+                            <p className="text-xs mb-0.5">Estimated arrival from {order.tracking_carrier}</p>
+                          )}
+                          {order.ship_from_city && order.ship_to_city ? (
+                            <p className="text-xs">
+                              From <span className="font-medium">{order.ship_from_city}, {order.ship_from_state}</span> To{" "}
+                              <span className="font-medium underline">{order.ship_to_city}</span>
+                            </p>
+                          ) : order.ship_to_city && (
+                            <p className="text-xs">
+                              To <span className="font-medium underline">{order.ship_to_city}</span>
+                            </p>
                           )}
                         </div>
                         <Button 
                           variant="ghost" 
                           size="icon"
                           onClick={() => toggleFlip(order.id)}
+                          className="flex-shrink-0"
                         >
                           <ArrowLeftRight className="h-5 w-5" />
                         </Button>
                       </div>
-                      {order.tracking_carrier && (
-                        <p className="text-xs mb-0.5">Estimated arrival from {order.tracking_carrier}</p>
-                      )}
-                      {order.ship_from_city && order.ship_to_city && (
-                        <p className="text-xs">
-                          From <span className="font-medium">{order.ship_from_city}, {order.ship_from_state}</span> To{" "}
-                          <span className="font-medium underline">{order.ship_to_city}</span>
-                        </p>
-                      )}
                     </CardHeader>
                     
                     <CardContent className="pt-0">
