@@ -286,7 +286,7 @@ export default function Checkout() {
             <p className="text-muted-foreground">
               Add some items to your cart before checking out.
             </p>
-            <Button onClick={() => navigate('/homepage')} size="lg">
+            <Button onClick={() => navigate('/')} size="lg">
               Continue Shopping
             </Button>
           </CardContent>

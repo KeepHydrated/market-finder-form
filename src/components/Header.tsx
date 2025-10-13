@@ -148,7 +148,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
 
   // Clear search query when navigating to homepage
   useEffect(() => {
-    if (location.pathname === '/homepage') {
+    if (location.pathname === '/') {
       setSearchQuery('');
     }
   }, [location.pathname]);
@@ -180,7 +180,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             )}
-            <Link to="/homepage" className="hover:opacity-80 transition-opacity">
+            <Link to="/" className="hover:opacity-80 transition-opacity">
               <h1 className="text-2xl font-bold cursor-pointer hidden md:block">
                 My Local Farmers Markets
               </h1>
@@ -291,7 +291,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             </div>
             
             {/* Center home icon on mobile */}
-            <Link to="/homepage" className="md:hidden">
+            <Link to="/" className="md:hidden">
               <Button variant="ghost" size="sm">
                 <Home className="h-6 w-6" strokeWidth={2.5} />
               </Button>
@@ -417,7 +417,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => navigate('/homepage')}
+              onClick={() => navigate('/')}
             >
               <Search className="h-5 w-5" />
             </Button>

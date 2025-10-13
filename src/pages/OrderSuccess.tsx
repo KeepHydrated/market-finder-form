@@ -219,7 +219,7 @@ export default function OrderSuccess() {
             Print Receipt
           </Button>
           <Button asChild>
-            <Link to="/homepage">
+            <Link to="/">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Continue Shopping
             </Link>

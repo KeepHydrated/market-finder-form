@@ -493,7 +493,7 @@ const Orders = () => {
               Start shopping at your local farmer's market to see orders here.
             </p>
             <a
-              href="/homepage"
+              href="/"
               className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
             >
               Start Shopping
