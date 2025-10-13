@@ -146,6 +146,13 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
     }
   }, [user, isOnOrdersPage]);
 
+  // Clear search query when navigating to homepage
+  useEffect(() => {
+    if (location.pathname === '/homepage') {
+      setSearchQuery('');
+    }
+  }, [location.pathname]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
