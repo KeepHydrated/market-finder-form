@@ -499,16 +499,18 @@ const Orders = () => {
             <div key={order.id} className="grid md:grid-cols-[1fr,280px] gap-6">
               <Card className="overflow-hidden">
                 <CardHeader className="pb-4">
-                  <div className="flex items-center gap-2 text-base">
-                    <span className="text-muted-foreground hidden md:inline">Purchased from</span>
-                    <Store className="h-4 w-4" />
-                    <button
-                      onClick={() => handleVendorClick(order.vendor_id, order.vendor_name)}
-                      className="font-semibold hover:underline focus:outline-none focus:underline"
-                    >
-                      {order.vendor_name}
-                    </button>
-                    <span className="text-muted-foreground ml-auto md:ml-0"><span className="hidden md:inline">on </span>{formatDate(order.created_at)}</span>
+                  <div className="flex items-center gap-2 text-base flex-wrap md:flex-nowrap">
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground hidden md:inline">Purchased from</span>
+                      <Store className="h-4 w-4" />
+                      <button
+                        onClick={() => handleVendorClick(order.vendor_id, order.vendor_name)}
+                        className="font-semibold hover:underline focus:outline-none focus:underline"
+                      >
+                        {order.vendor_name}
+                      </button>
+                    </div>
+                    <span className="text-muted-foreground w-full md:w-auto"><span className="hidden md:inline">on </span>{formatDate(order.created_at)}</span>
                   </div>
                 </CardHeader>
                 
