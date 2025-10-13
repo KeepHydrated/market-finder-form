@@ -1178,7 +1178,7 @@ const Homepage = () => {
                 <TabsContent value="times" className="px-8 pb-8 pt-8 overflow-y-auto">
                   <div className="space-y-4">
                     {/* Mobile layout - integrated day buttons with time selectors */}
-                    <div className="md:hidden space-y-2 max-w-xs mx-auto">
+                    <div className="md:hidden space-y-4 max-w-xs mx-auto">
                       {DAYS.map((day) => (
                         <div key={day} className="space-y-2">
                           <Button
@@ -1196,7 +1196,7 @@ const Homepage = () => {
                             {day}
                           </Button>
                           {selectedDays.includes(day) && (
-                            <div className="flex items-center gap-2 pl-2 mb-4">
+                            <div className="flex items-center gap-2 pl-2">
                               <div className="flex items-center gap-1">
                                 <Select 
                                   value={dayTimeSelections[day]?.startTime || '08:00'}
