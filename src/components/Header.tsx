@@ -28,6 +28,10 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
   const [searchQuery, setSearchQuery] = useState("");
   const [newOrdersCount, setNewOrdersCount] = useState(0);
   const isOnOrdersPage = location.pathname === '/my-shop' && location.search.includes('section=orders2');
+  
+  // Get current category if on category page
+  const searchParams = new URLSearchParams(location.search);
+  const currentCategory = location.pathname === '/category' ? searchParams.get('category') : null;
 
   useEffect(() => {
     const checkAnySubmission = async () => {
@@ -136,7 +140,11 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      // If on a category page, include the category in the search
+      const searchUrl = currentCategory 
+        ? `/search?q=${encodeURIComponent(searchQuery.trim())}&category=${encodeURIComponent(currentCategory)}`
+        : `/search?q=${encodeURIComponent(searchQuery.trim())}`;
+      navigate(searchUrl);
     }
   };
 

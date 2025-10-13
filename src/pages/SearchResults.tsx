@@ -50,21 +50,29 @@ const SearchResults = () => {
   const [sortBy, setSortBy] = useState<'relevancy' | 'lowest-price' | 'highest-price' | 'top-rated' | 'most-recent'>('relevancy');
   
   const query = searchParams.get('q') || '';
+  const categoryFilter = searchParams.get('category') || null;
 
-  // Fetch all vendors and filter products by search query
+  // Fetch all vendors and filter products by search query and category
   useEffect(() => {
     const fetchSearchResults = async () => {
       setLoading(true);
       
       try {
-        const { data, error } = await supabase
+        let dbQuery = supabase
           .from('submissions')
           .select('*')
           .eq('status', 'accepted');
+        
+        // Filter by category if specified
+        if (categoryFilter) {
+          dbQuery = dbQuery.eq('primary_specialty', categoryFilter);
+        }
+
+        const { data, error } = await dbQuery;
 
         if (error) throw error;
 
-        console.log(`Searching across ${data?.length || 0} vendors for: "${query}"`);
+        console.log(`Searching across ${data?.length || 0} vendors${categoryFilter ? ` in category: ${categoryFilter}` : ''} for: "${query}"`);
         setVendors(data || []);
       } catch (error) {
         console.error('Error fetching vendors:', error);
@@ -79,7 +87,7 @@ const SearchResults = () => {
     };
 
     fetchSearchResults();
-  }, [query, toast]);
+  }, [query, categoryFilter, toast]);
 
   // Aggregate all products from all vendors
   const allProducts = vendors.flatMap(vendor => {
@@ -205,9 +213,12 @@ const SearchResults = () => {
       <div className="container mx-auto px-4 pt-8 md:pt-24 pb-8">
         {/* Sort dropdown - all screens */}
         <div className="pb-4 flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            {sortedProducts.length} {sortedProducts.length === 1 ? 'result' : 'results'}
-          </p>
+          <div>
+            <p className="text-sm text-muted-foreground">
+              {sortedProducts.length} {sortedProducts.length === 1 ? 'result' : 'results'}
+              {categoryFilter && <span> in {categoryFilter}</span>}
+            </p>
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="py-2">
