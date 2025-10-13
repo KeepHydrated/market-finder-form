@@ -1004,7 +1004,7 @@ const Homepage = () => {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm">
-                <span className="truncate">All</span>
+                <span className="truncate">Category</span>
                 <ChevronDown className="h-4 w-4 ml-1 flex-shrink-0" />
               </Button>
             </DropdownMenuTrigger>
