@@ -500,7 +500,7 @@ const Orders = () => {
               <Card className="overflow-hidden">
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-2 text-base">
-                    <span className="text-muted-foreground">Purchased from</span>
+                    <span className="text-muted-foreground hidden md:inline">Purchased from</span>
                     <Store className="h-4 w-4" />
                     <button
                       onClick={() => handleVendorClick(order.vendor_id, order.vendor_name)}
