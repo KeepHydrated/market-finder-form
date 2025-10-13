@@ -1188,13 +1188,13 @@ const Homepage = () => {
                     </div>
                     
                     {/* Time selectors for each selected day */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div className="grid grid-cols-1 gap-6">
                       {[...selectedDays].sort((a, b) => {
                         const dayOrder = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
                         return dayOrder.indexOf(a) - dayOrder.indexOf(b);
                       }).map((day) => (
                         <div key={day} className="space-y-3 border-t pt-4">
-                          <h5 className="font-semibold text-lg mb-2 text-center">
+                          <h5 className="font-semibold text-lg mb-2 text-left">
                             {day === 'Mon' ? 'Monday' : 
                              day === 'Tue' ? 'Tuesday' :
                              day === 'Wed' ? 'Wednesday' :
@@ -1202,7 +1202,7 @@ const Homepage = () => {
                              day === 'Fri' ? 'Friday' :
                              day === 'Sat' ? 'Saturday' : 'Sunday'}
                           </h5>
-                          <div className="flex items-center justify-center gap-3">
+                          <div className="flex items-center gap-3">
                             <div className="flex items-center gap-1">
                               <Select 
                                 value={dayTimeSelections[day]?.startTime || '08:00'}
