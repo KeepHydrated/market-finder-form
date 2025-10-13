@@ -1178,7 +1178,7 @@ const Homepage = () => {
                             toggleDay(day);
                           }}
                           className={cn(
-                            "h-12",
+                            "h-12 md:flex-1",
                             selectedDays.includes(day) && "bg-primary text-primary-foreground hover:bg-primary/90"
                           )}
                         >
