@@ -1097,7 +1097,7 @@ const Homepage = () => {
           </div>
         </div>
       
-      <div className="container mx-auto px-4 pt-2 pb-6 md:py-6">
+      <div className="container mx-auto px-4 pt-8 pb-6 md:py-6">
         
         {/* View Toggle and Filter Button */}
         <div className="flex justify-between items-center mb-6">
