@@ -211,12 +211,18 @@ const SearchResults = () => {
       </div>
 
       <div className="container mx-auto px-4 pt-8 md:pt-24 pb-8">
+        {/* Search context header */}
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold">
+            {categoryFilter || 'All'} | {query}
+          </h1>
+        </div>
+
         {/* Sort dropdown - all screens */}
         <div className="pb-4 flex items-center justify-between">
           <div>
             <p className="text-sm text-muted-foreground">
               {sortedProducts.length} {sortedProducts.length === 1 ? 'result' : 'results'}
-              {categoryFilter && <span> in {categoryFilter}</span>}
             </p>
           </div>
           <DropdownMenu>
