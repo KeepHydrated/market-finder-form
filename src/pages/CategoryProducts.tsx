@@ -206,9 +206,9 @@ const CategoryProducts = () => {
       <div className="w-full flex md:hidden items-center space-x-2 px-4 py-3 fixed bottom-0 left-0 right-0 bg-background z-40 border-t">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-             <Button variant="ghost" size="sm">
-              Category
-              <ChevronDown className="h-4 w-4 ml-1" />
+             <Button variant="ghost" size="sm" className="max-w-[160px]">
+              <span className="truncate">{category || 'All'}</span>
+              <ChevronDown className="h-4 w-4 ml-1 flex-shrink-0" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">

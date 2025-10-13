@@ -1004,8 +1004,8 @@ const Homepage = () => {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm">
-                Category
-                <ChevronDown className="h-4 w-4 ml-1" />
+                <span className="truncate">All</span>
+                <ChevronDown className="h-4 w-4 ml-1 flex-shrink-0" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
