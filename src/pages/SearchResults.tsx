@@ -48,13 +48,8 @@ const SearchResults = () => {
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product & { vendorName: string; vendorId: string } | null>(null);
   const [sortBy, setSortBy] = useState<'relevancy' | 'lowest-price' | 'highest-price' | 'top-rated' | 'most-recent'>('relevancy');
-  const [searchQuery, setSearchQuery] = useState<string>("");
   
   const query = searchParams.get('q') || '';
-
-  useEffect(() => {
-    setSearchQuery(query);
-  }, [query]);
 
   // Fetch all vendors and filter products by search query
   useEffect(() => {
@@ -155,39 +150,23 @@ const SearchResults = () => {
     await toggleLike(itemId, 'product');
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      setSearchParams({ q: searchQuery.trim() });
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        {/* Mobile Search Bar */}
-        <div className="md:hidden fixed top-16 left-0 right-0 z-40 bg-background border-b border-border px-4 py-3 flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="flex-shrink-0"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <form onSubmit={handleSearch} className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </form>
-        </div>
+      {/* Mobile Fixed Bar */}
+      <div className="md:hidden fixed top-16 left-0 right-0 z-40 bg-background border-b border-border px-4 py-3 flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate(-1)}
+          className="flex-shrink-0"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <span className="text-sm text-muted-foreground flex-1">
+          {sortedProducts.length} {sortedProducts.length === 1 ? 'result' : 'results'}
+        </span>
+      </div>
 
         <div className="container mx-auto px-4 pt-8 md:pt-24 pb-8">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -208,7 +187,7 @@ const SearchResults = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Mobile Search Bar */}
+      {/* Mobile Fixed Bar */}
       <div className="md:hidden fixed top-16 left-0 right-0 z-40 bg-background border-b border-border px-4 py-3 flex items-center gap-2">
         <Button
           variant="ghost"
@@ -218,18 +197,9 @@ const SearchResults = () => {
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <form onSubmit={handleSearch} className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </form>
+        <span className="text-sm text-muted-foreground flex-1">
+          {sortedProducts.length} {sortedProducts.length === 1 ? 'result' : 'results'}
+        </span>
       </div>
 
       <div className="container mx-auto px-4 pt-8 md:pt-24 pb-8">
@@ -251,46 +221,31 @@ const SearchResults = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <form onSubmit={handleSearch} className="w-80">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </form>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="py-2">
-                  <span className="capitalize">{sortBy.replace('-', ' ')}</span>
-                  <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => setSortBy('relevancy')}>
-                  Relevancy
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy('lowest-price')}>
-                  Lowest Price
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy('highest-price')}>
-                  Highest Price
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy('top-rated')}>
-                  Top Rated
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy('most-recent')}>
-                  Most Recent
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="py-2">
+                <span className="capitalize">{sortBy.replace('-', ' ')}</span>
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => setSortBy('relevancy')}>
+                Relevancy
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy('lowest-price')}>
+                Lowest Price
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy('highest-price')}>
+                Highest Price
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy('top-rated')}>
+                Top Rated
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy('most-recent')}>
+                Most Recent
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Mobile Results Count & Sort */}
