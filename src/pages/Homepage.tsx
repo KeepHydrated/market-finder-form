@@ -1177,104 +1177,192 @@ const Homepage = () => {
                 </div>
                 <TabsContent value="times" className="px-8 pb-8 pt-8 overflow-y-auto">
                   <div className="space-y-4">
-                    <div className="flex flex-col md:flex-row gap-2 max-w-xs md:max-w-none mx-auto md:mx-0">
+                    {/* Mobile layout - integrated day buttons with time selectors */}
+                    <div className="md:hidden space-y-2 max-w-xs mx-auto">
                       {DAYS.map((day) => (
-                        <Button
-                          key={day}
-                          type="button"
-                          variant={selectedDays.includes(day) ? "default" : "outline"}
-                          onClick={() => {
-                            console.log('Day clicked:', day);
-                            toggleDay(day);
-                          }}
-                          className={cn(
-                            "h-12 md:flex-1",
-                            selectedDays.includes(day) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                        <div key={day} className="space-y-2">
+                          <Button
+                            type="button"
+                            variant={selectedDays.includes(day) ? "default" : "outline"}
+                            onClick={() => {
+                              console.log('Day clicked:', day);
+                              toggleDay(day);
+                            }}
+                            className={cn(
+                              "h-12 w-full",
+                              selectedDays.includes(day) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                            )}
+                          >
+                            {day}
+                          </Button>
+                          {selectedDays.includes(day) && (
+                            <div className="flex items-center gap-2 pl-2">
+                              <div className="flex items-center gap-1">
+                                <Select 
+                                  value={dayTimeSelections[day]?.startTime || '08:00'}
+                                  onValueChange={(value) => updateTimeSelection(day, 'startTime', value)}
+                                >
+                                  <SelectTrigger className="w-20 bg-background">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-background border shadow-md z-50">
+                                    {timeOptions.map((time) => (
+                                      <SelectItem key={time} value={time}>{time}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                
+                                <Select
+                                  value={dayTimeSelections[day]?.startPeriod || 'AM'}
+                                  onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'startPeriod', value)}
+                                >
+                                  <SelectTrigger className="w-16 bg-background">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-background border shadow-md z-50">
+                                    <SelectItem value="AM">AM</SelectItem>
+                                    <SelectItem value="PM">PM</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              
+                              <span className="text-muted-foreground text-sm">to</span>
+                              
+                              <div className="flex items-center gap-1">
+                                <Select
+                                  value={dayTimeSelections[day]?.endTime || '02:00'}
+                                  onValueChange={(value) => updateTimeSelection(day, 'endTime', value)}
+                                >
+                                  <SelectTrigger className="w-20 bg-background">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-background border shadow-md z-50">
+                                    {timeOptions.map((time) => (
+                                      <SelectItem key={time} value={time}>{time}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                
+                                <Select
+                                  value={dayTimeSelections[day]?.endPeriod || 'PM'}
+                                  onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'endPeriod', value)}
+                                >
+                                  <SelectTrigger className="w-16 bg-background">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-background border shadow-md z-50">
+                                    <SelectItem value="AM">AM</SelectItem>
+                                    <SelectItem value="PM">PM</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
                           )}
-                        >
-                          {day}
-                        </Button>
+                        </div>
                       ))}
                     </div>
                     
-                    {/* Time selectors for each selected day */}
-                    <div className="grid grid-cols-1 gap-6">
-                      {[...selectedDays].sort((a, b) => {
-                        const dayOrder = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                        return dayOrder.indexOf(a) - dayOrder.indexOf(b);
-                      }).map((day) => (
-                        <div key={day} className="space-y-3 border-t pt-4 md:space-y-0 md:flex md:items-center md:gap-6">
-                          <h5 className="font-semibold text-base mb-0 text-left md:min-w-[100px]">
-                            {day === 'Mon' ? 'Monday' : 
-                             day === 'Tue' ? 'Tuesday' :
-                             day === 'Wed' ? 'Wednesday' :
-                             day === 'Thu' ? 'Thursday' :
-                             day === 'Fri' ? 'Friday' :
-                             day === 'Sat' ? 'Saturday' : 'Sunday'}
-                          </h5>
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-1">
-                              <Select 
-                                value={dayTimeSelections[day]?.startTime || '08:00'}
-                                onValueChange={(value) => updateTimeSelection(day, 'startTime', value)}
-                              >
-                                <SelectTrigger className="w-20 bg-background">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="bg-background border shadow-md z-50">
-                                  {timeOptions.map((time) => (
-                                    <SelectItem key={time} value={time}>{time}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                    {/* Desktop layout - separate sections */}
+                    <div className="hidden md:block space-y-4">
+                      <div className="flex flex-row gap-2">
+                        {DAYS.map((day) => (
+                          <Button
+                            key={day}
+                            type="button"
+                            variant={selectedDays.includes(day) ? "default" : "outline"}
+                            onClick={() => {
+                              console.log('Day clicked:', day);
+                              toggleDay(day);
+                            }}
+                            className={cn(
+                              "h-12 flex-1",
+                              selectedDays.includes(day) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                            )}
+                          >
+                            {day}
+                          </Button>
+                        ))}
+                      </div>
+                      
+                      {/* Time selectors for each selected day */}
+                      <div className="grid grid-cols-1 gap-6">
+                        {[...selectedDays].sort((a, b) => {
+                          const dayOrder = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                          return dayOrder.indexOf(a) - dayOrder.indexOf(b);
+                        }).map((day) => (
+                          <div key={day} className="flex items-center gap-6 border-t pt-4">
+                            <h5 className="font-semibold text-base mb-0 text-left min-w-[100px]">
+                              {day === 'Mon' ? 'Monday' : 
+                               day === 'Tue' ? 'Tuesday' :
+                               day === 'Wed' ? 'Wednesday' :
+                               day === 'Thu' ? 'Thursday' :
+                               day === 'Fri' ? 'Friday' :
+                               day === 'Sat' ? 'Saturday' : 'Sunday'}
+                            </h5>
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-1">
+                                <Select 
+                                  value={dayTimeSelections[day]?.startTime || '08:00'}
+                                  onValueChange={(value) => updateTimeSelection(day, 'startTime', value)}
+                                >
+                                  <SelectTrigger className="w-20 bg-background">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-background border shadow-md z-50">
+                                    {timeOptions.map((time) => (
+                                      <SelectItem key={time} value={time}>{time}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                
+                                <Select
+                                  value={dayTimeSelections[day]?.startPeriod || 'AM'}
+                                  onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'startPeriod', value)}
+                                >
+                                  <SelectTrigger className="w-16 bg-background">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-background border shadow-md z-50">
+                                    <SelectItem value="AM">AM</SelectItem>
+                                    <SelectItem value="PM">PM</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
                               
-                              <Select
-                                value={dayTimeSelections[day]?.startPeriod || 'AM'}
-                                onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'startPeriod', value)}
-                              >
-                                <SelectTrigger className="w-16 bg-background">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="bg-background border shadow-md z-50">
-                                  <SelectItem value="AM">AM</SelectItem>
-                                  <SelectItem value="PM">PM</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            
-                            <span className="text-muted-foreground text-sm">to</span>
-                            
-                            <div className="flex items-center gap-1">
-                              <Select
-                                value={dayTimeSelections[day]?.endTime || '02:00'}
-                                onValueChange={(value) => updateTimeSelection(day, 'endTime', value)}
-                              >
-                                <SelectTrigger className="w-20 bg-background">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="bg-background border shadow-md z-50">
-                                  {timeOptions.map((time) => (
-                                    <SelectItem key={time} value={time}>{time}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                              <span className="text-muted-foreground text-sm">to</span>
                               
-                              <Select
-                                value={dayTimeSelections[day]?.endPeriod || 'PM'}
-                                onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'endPeriod', value)}
-                              >
-                                <SelectTrigger className="w-16 bg-background">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="bg-background border shadow-md z-50">
-                                  <SelectItem value="AM">AM</SelectItem>
-                                  <SelectItem value="PM">PM</SelectItem>
-                                </SelectContent>
-                              </Select>
+                              <div className="flex items-center gap-1">
+                                <Select
+                                  value={dayTimeSelections[day]?.endTime || '02:00'}
+                                  onValueChange={(value) => updateTimeSelection(day, 'endTime', value)}
+                                >
+                                  <SelectTrigger className="w-20 bg-background">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-background border shadow-md z-50">
+                                    {timeOptions.map((time) => (
+                                      <SelectItem key={time} value={time}>{time}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                
+                                <Select
+                                  value={dayTimeSelections[day]?.endPeriod || 'PM'}
+                                  onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'endPeriod', value)}
+                                >
+                                  <SelectTrigger className="w-16 bg-background">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-background border shadow-md z-50">
+                                    <SelectItem value="AM">AM</SelectItem>
+                                    <SelectItem value="PM">PM</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </TabsContent>
