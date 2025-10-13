@@ -999,11 +999,9 @@ const Homepage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6">
-        
-        {/* Mobile Category and Search - Only visible on mobile */}
-        <div className="w-full flex md:hidden items-center space-x-4 mb-4">
-          <DropdownMenu>
+      {/* Mobile Category and Search - Sticky on mobile */}
+      <div className="w-full flex md:hidden items-center space-x-4 px-4 py-3 sticky top-16 bg-background z-40 border-b">
+        <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm">
                 Category
@@ -1098,6 +1096,8 @@ const Homepage = () => {
             </form>
           </div>
         </div>
+      
+      <div className="container mx-auto px-4 py-6">
         
         {/* View Toggle and Filter Button */}
         <div className="flex justify-between items-center mb-6">
