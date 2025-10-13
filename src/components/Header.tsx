@@ -174,7 +174,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                  <Button variant="ghost" size="sm" className="ml-4 hidden lg:flex">
-                  Category
+                  {currentCategory || 'Category'}
                   <ChevronDown className="h-4 w-4 ml-1" />
                 </Button>
               </DropdownMenuTrigger>
@@ -325,7 +325,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                  <Button variant="ghost" size="sm">
-                  Category
+                  {currentCategory || 'Category'}
                   <ChevronDown className="h-4 w-4 ml-1" />
                 </Button>
               </DropdownMenuTrigger>
