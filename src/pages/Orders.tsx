@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Package, Calendar, Store, DollarSign, Mail, Phone, Star, Upload, X } from "lucide-react";
+import { Package, Calendar, Store, DollarSign, Mail, Phone, Star, Upload, X, ArrowLeftRight } from "lucide-react";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useToast } from "@/hooks/use-toast";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
@@ -72,6 +72,7 @@ const Orders = () => {
   const [productReviews, setProductReviews] = useState<Set<string>>(new Set());
   const [reviewType, setReviewType] = useState<'vendor' | 'product'>('vendor');
   const [reviewProduct, setReviewProduct] = useState<OrderItem | null>(null);
+  const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (user) {
@@ -330,6 +331,13 @@ const Orders = () => {
     setShowReviewDialog(true);
   };
 
+  const toggleFlip = (orderId: string) => {
+    setFlippedCards(prev => ({
+      ...prev,
+      [orderId]: !prev[orderId]
+    }));
+  };
+
   const handleReviewPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const totalPhotos = reviewPhotos.length;
@@ -495,9 +503,13 @@ const Orders = () => {
         </Card>
       ) : (
         <div className="space-y-6 max-w-5xl">
-          {orders.map((order) => (
+          {orders.map((order) => {
+            const isFlipped = flippedCards[order.id] || false;
+            
+            return (
             <div key={order.id} className="grid md:grid-cols-[1fr,280px] gap-6">
-              <Card className="overflow-hidden">
+              {/* Desktop view - always show both cards */}
+              <Card className="overflow-hidden hidden md:block">
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-2 text-base flex-wrap md:flex-nowrap">
                     <div className="flex items-center gap-2">
@@ -574,7 +586,7 @@ const Orders = () => {
                 </CardContent>
               </Card>
 
-              <div className="flex flex-col gap-3">
+              <div className="flex-col gap-3 hidden md:flex">
                 <div>
                   {order.estimated_delivery_date ? (
                     <h3 className="text-lg font-serif mb-1">
@@ -631,8 +643,179 @@ const Orders = () => {
                   </Button>
                 </div>
               </div>
+
+              {/* Mobile flip card view */}
+              <div className="md:hidden relative h-[280px] perspective-1000">
+                <div 
+                  className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
+                    isFlipped ? 'rotate-y-180' : ''
+                  }`}
+                  style={{ 
+                    transformStyle: 'preserve-3d',
+                    transition: 'transform 0.6s'
+                  }}
+                >
+                  {/* Front - Order Details */}
+                  <Card 
+                    className={`absolute inset-0 overflow-hidden backface-hidden ${
+                      isFlipped ? 'pointer-events-none' : ''
+                    }`}
+                    style={{
+                      backfaceVisibility: 'hidden',
+                      WebkitBackfaceVisibility: 'hidden'
+                    }}
+                  >
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 text-base flex-wrap">
+                          <div className="flex items-center gap-2">
+                            <Store className="h-4 w-4" />
+                            <button
+                              onClick={() => handleVendorClick(order.vendor_id, order.vendor_name)}
+                              className="font-semibold hover:underline focus:outline-none focus:underline"
+                            >
+                              {order.vendor_name}
+                            </button>
+                          </div>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => toggleFlip(order.id)}
+                        >
+                          <ArrowLeftRight className="h-5 w-5" />
+                        </Button>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{formatDate(order.created_at)}</p>
+                    </CardHeader>
+                    
+                    <CardContent className="pt-0 pb-0">
+                      <Separator className="mb-2" />
+                      
+                      <div className="space-y-1 max-h-[140px] overflow-y-auto">
+                        {order.order_items.map((item) => (
+                          <div key={item.id} className="flex justify-between items-start py-1">
+                            <div className="flex items-start gap-2 flex-1">
+                              <button
+                                onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
+                                className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity"
+                              >
+                                {item.product_image ? (
+                                  <img 
+                                    src={item.product_image} 
+                                    alt={item.product_name}
+                                    className="w-full h-full object-cover rounded-lg"
+                                  />
+                                ) : (
+                                  <Package className="h-5 w-5 text-green-600" />
+                                )}
+                              </button>
+                              <div className="flex-1 min-w-0">
+                                <button
+                                  onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
+                                  className="text-left w-full hover:underline text-sm"
+                                >
+                                  {item.quantity > 1 && (
+                                    <span className="text-muted-foreground mr-1">(x{item.quantity})</span>
+                                  )}
+                                  {item.product_name}
+                                </button>
+                              </div>
+                            </div>
+                            <div className="text-right ml-2">
+                              <p className="font-medium text-sm">{formatPrice(item.total_price)}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Back - Actions */}
+                  <Card 
+                    className={`absolute inset-0 overflow-hidden ${
+                      !isFlipped ? 'pointer-events-none' : ''
+                    }`}
+                    style={{
+                      backfaceVisibility: 'hidden',
+                      WebkitBackfaceVisibility: 'hidden',
+                      transform: 'rotateY(180deg)'
+                    }}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <div>
+                          {order.estimated_delivery_date ? (
+                            <h3 className="text-base font-serif">
+                              Arriving {new Date(order.estimated_delivery_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                            </h3>
+                          ) : (
+                            <h3 className="text-base font-serif">Preparing for shipment</h3>
+                          )}
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => toggleFlip(order.id)}
+                        >
+                          <ArrowLeftRight className="h-5 w-5" />
+                        </Button>
+                      </div>
+                      {order.tracking_carrier && (
+                        <p className="text-xs mb-0.5">Estimated arrival from {order.tracking_carrier}</p>
+                      )}
+                      {order.ship_from_city && order.ship_to_city && (
+                        <p className="text-xs">
+                          From <span className="font-medium">{order.ship_from_city}, {order.ship_from_state}</span> To{" "}
+                          <span className="font-medium underline">{order.ship_to_city}</span>
+                        </p>
+                      )}
+                    </CardHeader>
+                    
+                    <CardContent className="pt-0">
+                      <div className="flex flex-col gap-2">
+                        {hasPackageArrived(order) && !userReviews.has(order.vendor_id) ? (
+                          <Button 
+                            size="sm" 
+                            className="w-full rounded-full"
+                            onClick={() => handleLeaveReview(order, 'vendor')}
+                          >
+                            <Star className="h-4 w-4 mr-1" />
+                            Review Store
+                          </Button>
+                        ) : (
+                          <Button 
+                            size="sm" 
+                            className="w-full rounded-full"
+                            onClick={() => handleTrackPackage(order)}
+                          >
+                            Track package
+                          </Button>
+                        )}
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full rounded-full"
+                          onClick={() => handleMessageSeller(order)}
+                        >
+                          Message seller
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full rounded-full"
+                          onClick={() => handleViewReceipt(order)}
+                        >
+                          View receipt
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
