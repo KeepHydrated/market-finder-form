@@ -202,8 +202,8 @@ const CategoryProducts = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Mobile Category and Search - Sticky on mobile */}
-      <div className="w-full flex md:hidden items-center space-x-2 px-4 py-3 sticky top-16 bg-background z-40 border-b">
+      {/* Mobile Category and Search - Fixed at bottom on mobile */}
+      <div className="w-full flex md:hidden items-center space-x-2 px-4 py-3 fixed bottom-0 left-0 right-0 bg-background z-40 border-t">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
              <Button variant="ghost" size="sm">
