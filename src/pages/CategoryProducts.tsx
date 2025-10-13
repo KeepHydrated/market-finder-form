@@ -299,9 +299,9 @@ const CategoryProducts = () => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-end mb-8">
           {/* Category Title */}
-          <h1 className="hidden md:block text-xl font-bold capitalize">{category || 'All'}</h1>
+          <h1 className="hidden md:block text-xl font-bold capitalize mr-auto">{category || 'All'}</h1>
           
           {/* Sort Dropdown */}
           <DropdownMenu>
