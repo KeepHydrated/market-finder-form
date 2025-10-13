@@ -1188,7 +1188,7 @@ const Homepage = () => {
                           description: "All filters have been reset"
                         });
                       }}
-                      className="text-muted-foreground hover:text-foreground"
+                      className="text-foreground hover:bg-muted"
                     >
                       <RotateCcw className="h-4 w-4 mr-2" />
                       Reset
