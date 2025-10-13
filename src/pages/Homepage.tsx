@@ -1157,11 +1157,11 @@ const Homepage = () => {
                 <span className="hidden md:inline">Filter search results</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="w-[800px] max-w-none p-0 bg-background border shadow-lg max-h-[80vh] flex flex-col">
+            <DialogContent className="w-full md:w-[800px] max-w-none p-0 bg-background border shadow-lg max-h-[80vh] flex flex-col">
               <Tabs defaultValue="times" className="w-full flex flex-col overflow-hidden">
-                <div className="pt-8 px-8 flex justify-between items-center flex-shrink-0 border-b">
+                <div className="pt-8 px-4 md:px-8 flex justify-between items-center flex-shrink-0 border-b">
                   <div className="flex-1" />
-                  <TabsList className="inline-flex gap-8 bg-transparent border-0 p-0 h-auto">
+                  <TabsList className="inline-flex gap-4 md:gap-8 bg-transparent border-0 p-0 h-auto">
                     <TabsTrigger 
                       value="times" 
                       className="py-4 px-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=inactive]:text-muted-foreground font-semibold"
@@ -1189,13 +1189,14 @@ const Homepage = () => {
                         });
                       }}
                       className={cn(
+                        "flex items-center gap-1 md:gap-2",
                         selectedDays.length > 0 || selectedCategories.length > 0 || Object.keys(dayTimeSelections).length > 0
                           ? "text-foreground hover:bg-muted"
                           : "text-muted-foreground hover:text-foreground"
                       )}
                     >
-                      <RotateCcw className="h-4 w-4 mr-2" />
-                      Reset
+                      <RotateCcw className="h-4 w-4" />
+                      <span className="text-sm">Reset</span>
                     </Button>
                   </div>
                 </div>
