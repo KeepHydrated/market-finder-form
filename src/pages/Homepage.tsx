@@ -1159,10 +1159,20 @@ const Homepage = () => {
             </DialogTrigger>
             <DialogContent className="w-[800px] max-w-none p-0 bg-background border shadow-lg max-h-[80vh] flex flex-col">
               <Tabs defaultValue="times" className="w-full flex flex-col overflow-hidden">
-                <div className="pt-8 px-8 flex justify-center flex-shrink-0">
-                  <TabsList className="inline-flex gap-1 rounded-none md:border-b p-1">
-                    <TabsTrigger value="times" className="py-4 px-6">Times</TabsTrigger>
-                    <TabsTrigger value="categories" className="py-4 px-6">Categories</TabsTrigger>
+                <div className="pt-8 px-8 flex justify-center flex-shrink-0 border-b">
+                  <TabsList className="inline-flex gap-8 bg-transparent border-0 p-0 h-auto">
+                    <TabsTrigger 
+                      value="times" 
+                      className="py-4 px-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=inactive]:text-muted-foreground font-semibold"
+                    >
+                      Times
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="categories" 
+                      className="py-4 px-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=inactive]:text-muted-foreground font-semibold"
+                    >
+                      Categories
+                    </TabsTrigger>
                   </TabsList>
                 </div>
                 <TabsContent value="times" className="px-8 pb-8 pt-8 overflow-y-auto">
