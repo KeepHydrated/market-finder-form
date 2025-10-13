@@ -209,9 +209,9 @@ const CategoryProducts = () => {
           {/* Sort Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="min-w-[180px] justify-between">
-                Sort by: {sortOptions.find(opt => opt.value === sortBy)?.label}
-                <ChevronDown className="h-4 w-4 ml-2" />
+              <Button variant="outline" className="md:min-w-[180px] justify-between md:justify-between">
+                <span className="hidden md:inline">Sort by: {sortOptions.find(opt => opt.value === sortBy)?.label}</span>
+                <ChevronDown className="h-4 w-4 md:ml-2" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[180px] bg-background border shadow-lg z-50">
