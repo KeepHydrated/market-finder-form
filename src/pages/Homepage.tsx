@@ -1167,7 +1167,7 @@ const Homepage = () => {
                 </div>
                 <TabsContent value="times" className="px-8 pb-8 pt-8 overflow-y-auto">
                   <div className="space-y-4">
-                    <div className="flex flex-col gap-2 max-w-xs mx-auto">
+                    <div className="flex flex-col md:flex-row gap-2 max-w-xs md:max-w-none mx-auto md:mx-0">
                       {DAYS.map((day) => (
                         <Button
                           key={day}
