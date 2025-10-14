@@ -204,6 +204,20 @@ export default function Checkout() {
     setIsProductModalOpen(true);
   };
 
+  // Convert cart items to product array for modal navigation
+  const cartProducts = firstVendor?.items.map((item, index) => {
+    const lastHyphenIndex = item.id.lastIndexOf('-');
+    const productId = parseInt(item.id.substring(lastHyphenIndex + 1));
+    
+    return {
+      id: productId,
+      name: item.product_name,
+      description: item.product_description || '',
+      price: item.unit_price / 100,
+      images: item.product_image ? [item.product_image] : []
+    };
+  }) || [];
+
   const handleCompletePayment = async () => {
     if (!user || !selectedAddress || !selectedPaymentMethod) return;
     
@@ -616,17 +630,17 @@ export default function Checkout() {
       </AlertDialog>
 
       {/* Product Detail Modal */}
-      {selectedProduct && vendorData && (
+      {selectedProduct && (
         <ProductDetailModal
           product={selectedProduct}
-          products={vendorData.products || []}
+          products={cartProducts}
           open={isProductModalOpen}
           onClose={() => {
             setIsProductModalOpen(false);
             setSelectedProduct(null);
           }}
-          vendorId={firstVendor.vendor_id}
-          vendorName={vendorData.store_name || firstVendor.vendor_name}
+          vendorId={firstVendor?.vendor_id}
+          vendorName={vendorData?.store_name || firstVendor?.vendor_name}
           hideVendorName={true}
         />
       )}
