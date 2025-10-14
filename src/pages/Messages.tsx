@@ -5,12 +5,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MessageSquare, X, Send } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
+import { FloatingChat } from '@/components/FloatingChat';
 
 interface Conversation {
   id: string;
@@ -46,12 +44,6 @@ export default function Messages() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [loadingMessages, setLoadingMessages] = useState(false);
-  const [orderItems, setOrderItems] = useState<any[]>([]);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const channelRef = useRef<any>(null);
 
   useEffect(() => {
     if (authLoading) return; // Wait for auth to load
@@ -168,133 +160,14 @@ export default function Messages() {
     }
   };
 
-  const openConversation = async (convo: Conversation) => {
-    // Clean up previous subscription
-    if (channelRef.current) {
-      await supabase.removeChannel(channelRef.current);
-      channelRef.current = null;
-    }
-
-    // Reset state and use the conversation data from the list (including store_name)
-    setMessages([]);
-    setNewMessage('');
-    setOrderItems([]);
-    setSelectedConversation(convo); // Use the conversation as-is with its store_name
-    setLoadingMessages(true);
-
-    try {
-      // Fetch messages for this specific conversation
-      const { data: msgs, error } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('conversation_id', convo.id)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      setMessages(msgs || []);
-
-      // If conversation has an order_id, fetch order items
-      if (convo.order_id) {
-        const { data: items, error: itemsError } = await supabase
-          .from('order_items')
-          .select('*')
-          .eq('order_id', convo.order_id);
-
-        if (!itemsError && items) {
-          setOrderItems(items);
-        }
-      }
-
-      // Mark messages as read
-      await supabase
-        .from('messages')
-        .update({ is_read: true })
-        .eq('conversation_id', convo.id)
-        .neq('sender_id', user!.id)
-        .eq('is_read', false);
-
-      // Subscribe to new messages for this conversation
-      const channel = supabase
-        .channel(`conversation-${convo.id}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'messages',
-            filter: `conversation_id=eq.${convo.id}`,
-          },
-          (payload) => {
-            setMessages((prev) => [...prev, payload.new as Message]);
-          }
-        )
-        .subscribe();
-
-      channelRef.current = channel;
-    } catch (error) {
-      console.error('Error loading messages:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load messages',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoadingMessages(false);
-    }
+  const openConversation = (convo: Conversation) => {
+    setSelectedConversation(convo);
   };
 
-  const closeConversation = async () => {
-    // Clean up subscription
-    if (channelRef.current) {
-      await supabase.removeChannel(channelRef.current);
-      channelRef.current = null;
-    }
+  const closeConversation = () => {
     setSelectedConversation(null);
-    setMessages([]);
-    setOrderItems([]);
-    setNewMessage('');
+    fetchConversations(); // Refresh to update unread counts
   };
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !selectedConversation || !user) return;
-
-    try {
-      const { error } = await supabase
-        .from('messages')
-        .insert({
-          conversation_id: selectedConversation.id,
-          sender_id: user.id,
-          message: newMessage.trim(),
-        });
-
-      if (error) throw error;
-
-      // Update conversation's last_message_at
-      await supabase
-        .from('conversations')
-        .update({ last_message_at: new Date().toISOString() })
-        .eq('id', selectedConversation.id);
-
-      setNewMessage('');
-      fetchConversations(); // Refresh conversation list
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to send message',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (messages.length > 0 && selectedConversation) {
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
-  }, [messages, selectedConversation]);
 
   if (loading) {
     return (
@@ -353,128 +226,14 @@ export default function Messages() {
         </div>
       )}
 
-      {/* Floating Chat Box */}
-      {selectedConversation && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black/20 z-40"
-            onClick={closeConversation}
-          />
-          
-          {/* Chat Box */}
-          <div 
-            className="fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <button
-                onClick={() => {
-                  if (selectedConversation?.vendor_id) {
-                    navigate(`/market?id=${selectedConversation.vendor_id}`);
-                    closeConversation();
-                  }
-                }}
-                className="font-semibold text-foreground hover:text-primary transition-colors cursor-pointer"
-              >
-                {selectedConversation.store_name || 'Unknown Store'}
-              </button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={closeConversation}
-                className="h-8 w-8 p-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Messages */}
-            <ScrollArea className="flex-1 p-4">
-              {loadingMessages ? (
-                <div className="flex items-center justify-center h-full">
-                  <p className="text-muted-foreground">Loading messages...</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* Order Items - Show at top if available */}
-                  {orderItems.length > 0 && (
-                    <div className="bg-muted/50 rounded-lg p-3 border border-border">
-                      <p className="text-xs font-semibold text-muted-foreground mb-2">Order Items:</p>
-                      <div className="space-y-2">
-                        {orderItems.map((item) => (
-                          <div key={item.id} className="flex items-center gap-3">
-                            {item.product_image && (
-                              <img 
-                                src={item.product_image} 
-                                alt={item.product_name}
-                                className="w-10 h-10 object-cover rounded"
-                              />
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">{item.product_name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                Qty: {item.quantity} × ${(item.unit_price / 100).toFixed(2)}
-                              </p>
-                            </div>
-                            <p className="text-sm font-semibold">
-                              ${(item.total_price / 100).toFixed(2)}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {messages.length === 0 && (
-                    <div className="flex items-center justify-center py-8">
-                      <p className="text-muted-foreground text-center text-sm">
-                        Start the conversation!
-                      </p>
-                    </div>
-                  )}
-                  
-                  {messages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={`flex ${msg.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                          msg.sender_id === user?.id
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted text-foreground'
-                        }`}
-                      >
-                        <p className="text-sm">{msg.message}</p>
-                        <p className="text-xs opacity-70 mt-1">
-                          {format(new Date(msg.created_at), 'h:mm a')}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
-              )}
-            </ScrollArea>
-
-            {/* Input */}
-            <form onSubmit={handleSendMessage} className="p-4 border-t border-border">
-              <div className="flex gap-2">
-                <Input
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  className="flex-1"
-                />
-                <Button type="submit" size="sm" disabled={!newMessage.trim()}>
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            </form>
-          </div>
-        </>
+      {/* Floating Chat */}
+      {selectedConversation && selectedConversation.vendor_id && (
+        <FloatingChat
+          isOpen={true}
+          onClose={closeConversation}
+          vendorId={selectedConversation.vendor_id}
+          vendorName={selectedConversation.store_name || 'Unknown Store'}
+        />
       )}
     </div>
   );
