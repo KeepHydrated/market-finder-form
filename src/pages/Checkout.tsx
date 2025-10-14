@@ -180,7 +180,10 @@ export default function Checkout() {
         .single();
 
       if (!error && data) {
+        console.log('Checkout vendor data:', data);
         setVendorData(data);
+      } else {
+        console.error('Error fetching vendor data:', error);
       }
     };
 
