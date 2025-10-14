@@ -1280,34 +1280,30 @@ const VendorDuplicate = () => {
                     </div>
                   )}
                   
-                   {/* Rating - Top Left */}
-                   <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                     <div className="flex items-center gap-2">
-                       <div className="flex gap-0.5">
-                         {[1, 2, 3, 4, 5].map((star) => {
-                           const rating = vendorRatings[vendor.id]?.totalReviews > 0 
-                             ? vendorRatings[vendor.id].averageRating 
-                             : 0;
-                           return (
-                             <Star 
-                               key={star}
-                               className={`h-3 w-3 fill-current ${
-                                 star <= rating
-                                   ? 'text-yellow-500' 
-                                   : 'text-gray-300'
-                               } ${star > 1 ? 'hidden md:block' : ''}`}
-                             />
-                           );
-                         })}
-                       </div>
-                       <span className="text-xs font-medium">
-                         {vendorRatings[vendor.id]?.totalReviews > 0 
-                           ? vendorRatings[vendor.id].averageRating.toFixed(1)
-                           : '0.0'
-                         }
-                       </span>
-                       <span className="text-xs text-gray-600">
-                         ({vendorRatings[vendor.id]?.totalReviews || 0})
+                  {/* Rating - Top Left */}
+                  <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5">
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => {
+                          const rating = vendorRatings[vendor.id]?.totalReviews > 0 
+                            ? vendorRatings[vendor.id].averageRating 
+                            : 0;
+                          return (
+                            <Star 
+                              key={star}
+                              className={`h-3.5 w-3.5 fill-current ${
+                                star <= rating
+                                  ? 'text-yellow-400' 
+                                  : 'text-gray-300'
+                              } ${star > 1 ? 'hidden md:block' : ''}`}
+                            />
+                          );
+                        })}
+                      </div>
+                      <span className="text-sm font-semibold">
+                        {vendorRatings[vendor.id]?.totalReviews > 0 
+                          ? vendorRatings[vendor.id].averageRating.toFixed(1)
+                          : '0.0'} {vendorRatings[vendor.id]?.totalReviews > 0 && `(${vendorRatings[vendor.id].totalReviews})`}
                        </span>
                      </div>
                    </div>
