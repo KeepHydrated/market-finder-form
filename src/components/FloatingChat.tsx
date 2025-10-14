@@ -230,9 +230,9 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
         onClick={onClose}
       />
       
-      {/* Chat Box */}
+      {/* Chat Box - Fullscreen on mobile, floating on desktop */}
       <div 
-        className="fixed bottom-4 right-4 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50"
+        className="fixed inset-0 md:inset-auto md:bottom-4 md:right-4 w-full h-full md:w-96 md:h-[500px] max-w-2xl mx-auto md:mx-0 bg-card rounded-none md:rounded-lg border-0 md:border md:border-border shadow-2xl flex flex-col z-[9999]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
