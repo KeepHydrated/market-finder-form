@@ -68,6 +68,7 @@ export default function Checkout() {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [reviews, setReviews] = useState<any[]>([]);
 
   // Calculate totals
   const subtotal = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
@@ -185,6 +186,26 @@ export default function Checkout() {
     };
 
     fetchVendorData();
+  }, [firstVendor?.vendor_id, items.length]);
+
+  // Fetch reviews for the vendor
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!firstVendor || items.length === 0) return;
+      
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('vendor_id', firstVendor.vendor_id)
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      if (!error && data) {
+        setReviews(data);
+      }
+    };
+
+    fetchReviews();
   }, [firstVendor?.vendor_id, items.length]);
 
   const handleProductClick = (item: any) => {
@@ -513,6 +534,52 @@ export default function Checkout() {
                     )}
                   </Link>
                 </div>
+
+                {/* Reviews Section */}
+                {reviews.length > 0 && (
+                  <div className="space-y-3 pb-4 border-b">
+                    {reviews.map((review) => (
+                      <div key={review.id} className="bg-muted/30 rounded-lg p-3">
+                        <div className="flex items-start gap-3 mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="flex">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <Star
+                                    key={star}
+                                    className={`w-4 h-4 ${
+                                      star <= (review.rating || 0)
+                                        ? 'fill-yellow-400 text-yellow-400'
+                                        : 'text-gray-300'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-sm text-muted-foreground">
+                                {new Date(review.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                            {review.comment && (
+                              <p className="text-sm text-gray-700">{review.comment}</p>
+                            )}
+                          </div>
+                        </div>
+                        {review.photos && review.photos.length > 0 && (
+                          <div className="flex gap-2 mt-2">
+                            {review.photos.slice(0, 3).map((photo: string, idx: number) => (
+                              <img
+                                key={idx}
+                                src={photo}
+                                alt={`Review ${idx + 1}`}
+                                className="w-16 h-16 rounded object-cover"
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Order Items */}
                 <div className="space-y-4">
