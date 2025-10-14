@@ -28,6 +28,8 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Profile {
   id: string;
@@ -65,6 +67,7 @@ export default function AccountSettings() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('account');
+  const isMobile = useIsMobile();
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -1099,26 +1102,57 @@ export default function AccountSettings() {
     );
   }
 
+  const getInitials = (name?: string) => {
+    if (!name) return user?.email?.charAt(0).toUpperCase() || 'U';
+    return name
+      .split(' ')
+      .map((n) => n.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
+      {/* Mobile Profile Header - Only visible on mobile */}
+      {isMobile && (
+        <div className="mb-6 p-4 bg-card rounded-lg border">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-16 w-16">
+              <AvatarImage src={profile?.avatar_url || ''} alt="Profile" />
+              <AvatarFallback className="text-xl">
+                {getInitials(profile?.full_name)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <p className="text-lg font-semibold">
+                {profile?.full_name || 'User'}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {user?.email}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="flex flex-row gap-8">
-        {/* Vertical Tab Navigation - Fixed to left */}
-        <div className="w-64 flex-shrink-0">
-          <Card className="sticky top-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="flex flex-col md:flex-row gap-8">
+        {/* Vertical Tab Navigation - Fixed to left on desktop, horizontal on mobile */}
+        <div className="w-full md:w-64 md:flex-shrink-0">
+          <Card className="md:sticky md:top-4">
             <CardContent className="p-0">
-              <TabsList className="flex flex-col w-full h-auto p-0 bg-transparent">
-                <TabsTrigger value="account" className="flex items-center justify-start gap-3 w-full px-6 py-4 text-left rounded-none border-b data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsList className="flex flex-row md:flex-col w-full h-auto p-0 bg-transparent">
+                <TabsTrigger value="account" className="flex items-center justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-none border-b data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <User className="h-4 w-4" />
-                  Account
+                  <span className="hidden sm:inline">Account</span>
                 </TabsTrigger>
-                <TabsTrigger value="addresses" className="flex items-center justify-start gap-3 w-full px-6 py-4 text-left rounded-none border-b data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="addresses" className="flex items-center justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-none border-b data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <MapPin className="h-4 w-4" />
-                  Addresses
+                  <span className="hidden sm:inline">Addresses</span>
                 </TabsTrigger>
-                <TabsTrigger value="payments" className="flex items-center justify-start gap-3 w-full px-6 py-4 text-left rounded-none border-b data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="payments" className="flex items-center justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-none border-b data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <CreditCard className="h-4 w-4" />
-                  Payments
+                  <span className="hidden sm:inline">Payments</span>
                 </TabsTrigger>
               </TabsList>
             </CardContent>
