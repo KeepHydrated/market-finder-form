@@ -28,8 +28,6 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Profile {
   id: string;
@@ -67,7 +65,6 @@ export default function AccountSettings() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('account');
-  const isMobile = useIsMobile();
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -1102,40 +1099,8 @@ export default function AccountSettings() {
     );
   }
 
-  const getInitials = (name?: string) => {
-    if (!name) return user?.email?.charAt(0).toUpperCase() || 'U';
-    return name
-      .split(' ')
-      .map((n) => n.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Mobile Profile Header - Only visible on mobile */}
-      {isMobile && (
-        <div className="mb-6 p-4 bg-card rounded-lg border">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16">
-              <AvatarImage src={profile?.avatar_url || ''} alt="Profile" />
-              <AvatarFallback className="text-xl">
-                {getInitials(profile?.full_name)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-              <p className="text-lg font-semibold">
-                {profile?.full_name || 'User'}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {user?.email}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="flex flex-col md:flex-row gap-8">
         {/* Vertical Tab Navigation - Fixed to left on desktop, horizontal on mobile */}
         <div className="w-full md:w-64 md:flex-shrink-0">
