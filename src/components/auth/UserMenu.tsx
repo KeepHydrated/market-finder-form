@@ -38,6 +38,7 @@ export function UserMenu({ user, profile }: UserMenuProps) {
 
   const handleProfileClick = () => {
     navigate('/account');
+    setSheetOpen(false);
   };
 
   const handleOrdersClick = () => {
