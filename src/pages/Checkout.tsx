@@ -413,52 +413,51 @@ export default function Checkout() {
                   </div>
                 ) : (
                   <>
-                    <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
-                      {paymentMethods.map((method) => (
-                        <div key={method.id} className="flex items-center space-x-3 py-3 px-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                          <RadioGroupItem value={method.id} id={method.id} />
-                          <Label htmlFor={method.id} className="flex items-center gap-3 cursor-pointer flex-1">
-                            <CreditCard className="w-5 h-5 text-muted-foreground" />
-                            <div>
-                              {method.payment_type === 'card' && (
-                                <>
-                                  <p className="font-medium capitalize">
-                                    {method.card_brand} •••• {method.card_last_four}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    Expires {method.card_exp_month}/{method.card_exp_year}
-                                  </p>
-                                </>
-                              )}
-                              {method.payment_type === 'paypal' && (
-                                <>
-                                  <p className="font-medium">PayPal</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {method.paypal_email}
-                                  </p>
-                                </>
-                              )}
-                              {method.payment_type === 'apple_pay' && (
-                                <>
-                                  <p className="font-medium">Apple Pay</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {method.apple_pay_email}
-                                  </p>
-                                </>
-                              )}
-                            </div>
-                          </Label>
+                    {(() => {
+                      const defaultMethod = paymentMethods.find(m => m.is_default);
+                      if (!defaultMethod) return null;
+                      
+                      return (
+                        <div className="flex items-center gap-3 py-3 px-4 border rounded-lg bg-muted/50">
+                          <CreditCard className="w-5 h-5 text-muted-foreground" />
+                          <div className="flex-1">
+                            {defaultMethod.payment_type === 'card' && (
+                              <>
+                                <p className="font-medium capitalize">
+                                  {defaultMethod.card_brand} •••• {defaultMethod.card_last_four}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Expires {defaultMethod.card_exp_month}/{defaultMethod.card_exp_year}
+                                </p>
+                              </>
+                            )}
+                            {defaultMethod.payment_type === 'paypal' && (
+                              <>
+                                <p className="font-medium">PayPal</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {defaultMethod.paypal_email}
+                                </p>
+                              </>
+                            )}
+                            {defaultMethod.payment_type === 'apple_pay' && (
+                              <>
+                                <p className="font-medium">Apple Pay</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {defaultMethod.apple_pay_email}
+                                </p>
+                              </>
+                            )}
+                          </div>
                         </div>
-                      ))}
-                    </RadioGroup>
+                      );
+                    })()}
                     
                     <Button 
                       variant="outline" 
                       className="w-full"
                       onClick={() => navigate('/account?tab=payments')}
                     >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add new card
+                      Manage payment methods
                     </Button>
                   </>
                 )}
