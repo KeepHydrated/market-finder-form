@@ -299,15 +299,17 @@ export default function ShippingAddressesSection() {
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant={address.type === 'shipping' ? 'default' : 'secondary'}>
+                        <div className="flex items-center gap-2 mb-2 min-h-[24px]">
+                          <Badge variant={address.type === 'shipping' ? 'default' : 'secondary'} className="flex items-center">
                             {address.type}
                           </Badge>
-                          {address.is_default && (
+                          {address.is_default ? (
                             <Badge variant="outline" className="flex items-center gap-1">
                               <Star className="h-3 w-3 fill-current" />
                               Default
                             </Badge>
+                          ) : (
+                            <div className="w-[88px]"></div>
                           )}
                         </div>
                         <div className="text-muted-foreground text-sm space-y-1">
