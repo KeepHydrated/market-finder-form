@@ -642,6 +642,7 @@ export default function Checkout() {
           vendorId={firstVendor?.vendor_id}
           vendorName={vendorData?.store_name || firstVendor?.vendor_name}
           hideVendorName={true}
+          hideAddToCart={true}
         />
       )}
     </div>

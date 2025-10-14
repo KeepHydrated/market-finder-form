@@ -28,9 +28,10 @@ interface ProductDetailModalProps {
   vendorId?: string;
   vendorName?: string;
   hideVendorName?: boolean;
+  hideAddToCart?: boolean;
 }
 
-export const ProductDetailModal = ({ product, products = [], open, onClose, onProductChange, vendorId, vendorName, hideVendorName = false }: ProductDetailModalProps) => {
+export const ProductDetailModal = ({ product, products = [], open, onClose, onProductChange, vendorId, vendorName, hideVendorName = false, hideAddToCart = false }: ProductDetailModalProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showVendorConflict, setShowVendorConflict] = useState(false);
   const [pendingCartItem, setPendingCartItem] = useState<any>(null);
@@ -327,7 +328,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
                 </div>
 
                 {/* Add to Cart Section */}
-                {vendorId && vendorName && (
+                {vendorId && vendorName && !hideAddToCart && (
                   <div className="pt-3 border-t border-gray-200">
                     <Button
                       className="w-full h-8 text-sm"
