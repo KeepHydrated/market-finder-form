@@ -1131,46 +1131,6 @@ export default function AccountSettings() {
             <div className="space-y-8">
               {/* Profile Picture */}
               <Card>
-                <div className="p-6 pb-0 flex justify-end">
-                  {isEditingProfilePic ? (
-                    <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className="w-24"
-                        onClick={() => {
-                          setProfileForm(prev => ({ ...prev, avatar_url: originalAvatarUrl }));
-                          setIsEditingProfilePic(false);
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                       <Button 
-                         size="sm"
-                         className="w-24"
-                         onClick={async () => {
-                           await saveProfile();
-                           setIsEditingProfilePic(false);
-                         }}
-                         disabled={savingProfile}
-                       >
-                        {savingProfile ? 'Saving...' : 'Save'}
-                      </Button>
-                    </div>
-                   ) : (
-                     <Button 
-                       size="sm" 
-                       variant="outline"
-                       onClick={() => {
-                         setOriginalAvatarUrl(profileForm.avatar_url);
-                         setIsEditingProfilePic(true);
-                       }}
-                     >
-                       <Edit className="h-4 w-4 mr-2" />
-                       Edit
-                     </Button>
-                   )}
-                </div>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base">Profile Picture</CardTitle>
                   <CardDescription>Upload and manage your profile picture</CardDescription>
@@ -1218,6 +1178,44 @@ export default function AccountSettings() {
                          </div>
                        )}
                      </div>
+                     
+                     {/* Edit/Save buttons */}
+                     {isEditingProfilePic ? (
+                       <div className="w-full flex gap-2">
+                         <Button 
+                           variant="outline"
+                           className="flex-1"
+                           onClick={() => {
+                             setProfileForm(prev => ({ ...prev, avatar_url: originalAvatarUrl }));
+                             setIsEditingProfilePic(false);
+                           }}
+                         >
+                           Cancel
+                         </Button>
+                          <Button 
+                            className="flex-1"
+                            onClick={async () => {
+                              await saveProfile();
+                              setIsEditingProfilePic(false);
+                            }}
+                            disabled={savingProfile}
+                          >
+                           {savingProfile ? 'Saving...' : 'Save'}
+                         </Button>
+                       </div>
+                      ) : (
+                        <Button 
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => {
+                            setOriginalAvatarUrl(profileForm.avatar_url);
+                            setIsEditingProfilePic(true);
+                          }}
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit
+                        </Button>
+                      )}
                   </div>
                 </CardContent>
               </Card>
