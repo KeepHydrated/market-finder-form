@@ -106,7 +106,7 @@ export default function PaymentMethodsSection() {
             <div>
               <Button 
                 onClick={() => setShowAddDialog(true)}
-                className="bg-gradient-primary hover:opacity-90 w-full"
+                className="bg-primary hover:bg-primary/90 w-full"
                 size="lg"
               >
                 <Plus className="h-5 w-5 mr-2" />
