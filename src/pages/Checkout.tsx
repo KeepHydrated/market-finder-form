@@ -511,7 +511,7 @@ export default function Checkout() {
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star 
                               key={star} 
-                              className={`w-5 h-5 ${
+                              className={`w-4 h-4 ${
                                 star <= Math.round(vendorData.google_rating!) 
                                   ? 'fill-yellow-400 text-yellow-400' 
                                   : 'text-gray-300'
@@ -519,10 +519,10 @@ export default function Checkout() {
                             />
                           ))}
                         </div>
-                        <span className="font-semibold text-lg">
+                        <span className="font-semibold text-base">
                           {vendorData.google_rating.toFixed(1)}
                         </span>
-                        <span className="text-muted-foreground text-lg">
+                        <span className="text-muted-foreground text-sm">
                           ({vendorData.google_rating_count || 0})
                         </span>
                       </>
