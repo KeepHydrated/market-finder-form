@@ -169,7 +169,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         onKeyDown={handleKeyDown}
       >
         {/* Product Navigation Arrows - Mobile: top corners, Desktop: sides */}
-        {hasPrevious && (
+        {products.length > 1 && hasPrevious && (
           <Button
             variant="secondary"
             size="sm"
@@ -183,7 +183,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
           </Button>
         )}
         
-        {hasNext && (
+        {products.length > 1 && hasNext && (
           <Button
             variant="secondary"
             size="sm"
@@ -198,7 +198,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         )}
 
         {/* Desktop navigation arrows on sides */}
-        {hasPrevious && (
+        {products.length > 1 && hasPrevious && (
           <Button
             variant="secondary"
             size="sm"
@@ -212,7 +212,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
           </Button>
         )}
         
-        {hasNext && (
+        {products.length > 1 && hasNext && (
           <Button
             variant="secondary"
             size="sm"
