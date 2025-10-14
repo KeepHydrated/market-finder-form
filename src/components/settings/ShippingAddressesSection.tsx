@@ -297,21 +297,26 @@ export default function ShippingAddressesSection() {
               {addresses.map((address) => (
                 <Card key={address.id} className="relative">
                   <CardContent className="pt-6">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
                         <Badge variant={address.type === 'shipping' ? 'default' : 'secondary'}>
                           {address.type}
                         </Badge>
-                        {address.is_default ? (
+                        {address.is_default && (
                           <Badge variant="outline" className="flex items-center gap-1">
                             <Star className="h-3 w-3 fill-current" />
                             Default
                           </Badge>
-                        ) : (
-                          <div className="w-[88px]"></div>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEditAddress(address)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
                         {!address.is_default && (
                           <Button
                             variant="ghost"
@@ -331,21 +336,13 @@ export default function ShippingAddressesSection() {
                         </Button>
                       </div>
                     </div>
-                    <div className="text-muted-foreground text-sm space-y-1 mb-4">
+                    <div className="text-muted-foreground text-sm space-y-1">
                       <p>{address.address_line_1}</p>
                       <p>
                         {address.city}, {address.state} {address.postal_code}
                       </p>
                       {address.phone && <p>{address.phone}</p>}
                     </div>
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => handleEditAddress(address)}
-                    >
-                      <Pencil className="h-4 w-4 mr-2" />
-                      Edit
-                    </Button>
                   </CardContent>
                 </Card>
               ))}
