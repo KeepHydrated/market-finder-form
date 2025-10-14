@@ -1137,6 +1137,7 @@ export default function AccountSettings() {
                       <Button 
                         size="sm" 
                         variant="outline"
+                        className="w-24"
                         onClick={() => {
                           setProfileForm(prev => ({ ...prev, avatar_url: originalAvatarUrl }));
                           setIsEditingProfilePic(false);
@@ -1145,7 +1146,8 @@ export default function AccountSettings() {
                         Cancel
                       </Button>
                        <Button 
-                         size="sm" 
+                         size="sm"
+                         className="w-24"
                          onClick={async () => {
                            await saveProfile();
                            setIsEditingProfilePic(false);
