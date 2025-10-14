@@ -325,26 +325,27 @@ export default function ShippingAddressesSection() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleEditAddress(address)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
                           onClick={() => handleDeleteClick(address.id)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
-                    <div className="text-muted-foreground text-sm space-y-1">
+                    <div className="text-muted-foreground text-sm space-y-1 mb-4">
                       <p>{address.address_line_1}</p>
                       <p>
                         {address.city}, {address.state} {address.postal_code}
                       </p>
                       {address.phone && <p>{address.phone}</p>}
                     </div>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => handleEditAddress(address)}
+                    >
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Edit
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
