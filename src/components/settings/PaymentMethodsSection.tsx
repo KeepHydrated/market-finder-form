@@ -94,20 +94,25 @@ export default function PaymentMethodsSection() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="space-y-4">
             <div>
               <CardTitle>Your Payment Methods</CardTitle>
-              <CardDescription className="mt-1">
+            </div>
+            <div>
+              <CardDescription>
                 Manage your saved payment methods
               </CardDescription>
             </div>
-            <Button 
-              onClick={() => setShowAddDialog(true)}
-              className="bg-primary hover:bg-primary/90"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Payment Method
-            </Button>
+            <div>
+              <Button 
+                onClick={() => setShowAddDialog(true)}
+                className="bg-gradient-primary hover:opacity-90 w-full"
+                size="lg"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Add Payment Method
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
