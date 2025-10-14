@@ -134,11 +134,11 @@ export default function PaymentMethodsSection() {
               {paymentMethods.map((method) => (
                 <div
                   key={method.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                  className="p-4 border rounded-lg hover:bg-accent/50 transition-colors"
                 >
-                  <div className="flex items-center gap-3">
-                    <CreditCard className="h-5 w-5 text-muted-foreground" />
-                    <div>
+                  <div className="flex items-start gap-3 mb-3">
+                    <CreditCard className="h-5 w-5 text-muted-foreground mt-0.5" />
+                    <div className="flex-1">
                       {method.payment_type === 'card' && (
                         <>
                           <p className="font-medium">
@@ -173,7 +173,8 @@ export default function PaymentMethodsSection() {
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  
+                  <div className="flex items-center gap-2 pl-8">
                     {!method.is_default && (
                       <Button
                         variant="outline"
