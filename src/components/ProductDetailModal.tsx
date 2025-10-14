@@ -168,7 +168,42 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         className="max-w-[85vw] sm:max-w-[600px] max-h-[65vh] sm:max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible"
         onKeyDown={handleKeyDown}
       >
-        {/* Product Navigation Arrows - Positioned absolutely relative to DialogContent */}
+        {/* Product Navigation Arrows - Mobile: top, Desktop: sides */}
+        <div className="absolute top-3 left-3 right-3 flex justify-between items-center z-[60] md:hidden pointer-events-none">
+          {hasPrevious ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                goToPreviousProduct();
+              }}
+              className="h-9 w-9 p-0 bg-white/90 hover:bg-white border border-gray-200 shadow-sm rounded-full pointer-events-auto"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+          ) : (
+            <div className="h-9 w-9" />
+          )}
+          
+          {hasNext ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                goToNextProduct();
+              }}
+              className="h-9 w-9 p-0 bg-white/90 hover:bg-white border border-gray-200 shadow-sm rounded-full pointer-events-auto"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          ) : (
+            <div className="h-9 w-9" />
+          )}
+        </div>
+
+        {/* Desktop navigation arrows on sides */}
         {hasPrevious && (
           <Button
             variant="secondary"
