@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MessageSquare, X, Send } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -311,35 +312,43 @@ export default function Messages() {
           <p className="text-muted-foreground">No conversations yet</p>
         </Card>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-0 divide-y">
           {conversations.map((convo) => (
-            <Card
+            <div
               key={convo.id}
               className="p-4 hover:bg-accent cursor-pointer transition-colors"
               onClick={() => openConversation(convo)}
             >
               <div className="flex items-start gap-4">
-                <div className="flex-1 min-w-0 flex items-center gap-3">
-                  <h3 className="font-semibold whitespace-nowrap">
-                    {convo.store_name || 'Unknown Store'}
-                  </h3>
-                  <p className="text-sm text-muted-foreground truncate flex-1">
+                <Avatar className="h-14 w-14 flex-shrink-0">
+                  <AvatarImage src={convo.otherParty?.avatar_url || ''} />
+                  <AvatarFallback className="text-lg">
+                    {convo.store_name?.[0]?.toUpperCase() || '?'}
+                  </AvatarFallback>
+                </Avatar>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline justify-between gap-2 mb-1">
+                    <h3 className="font-semibold text-lg text-foreground">
+                      {convo.store_name || 'Unknown Store'}
+                    </h3>
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                      {format(new Date(convo.last_message_at), 'MMM d')}
+                    </span>
+                  </div>
+                  
+                  <p className="text-base text-muted-foreground truncate">
                     {convo.lastMessage?.message || 'No messages yet'}
                   </p>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">
-                    {format(new Date(convo.last_message_at), 'MMM d')}
-                  </span>
-                  {convo.unread_count! > 0 && (
-                    <Badge variant="default" className="rounded-full px-2 py-0.5 text-xs">
-                      {convo.unread_count}
-                    </Badge>
-                  )}
-                </div>
+                {convo.unread_count! > 0 && (
+                  <Badge variant="default" className="rounded-full px-2 py-0.5 text-xs ml-2 flex-shrink-0">
+                    {convo.unread_count}
+                  </Badge>
+                )}
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}
