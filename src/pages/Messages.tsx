@@ -298,7 +298,6 @@ export default function Messages() {
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Messages</h1>
         <div className="text-muted-foreground">Loading conversations...</div>
       </div>
     );
@@ -306,8 +305,6 @@ export default function Messages() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Messages</h1>
-
       {conversations.length === 0 ? (
         <Card className="p-8 text-center">
           <MessageSquare className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
