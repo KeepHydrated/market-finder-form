@@ -1282,8 +1282,24 @@ const VendorDuplicate = () => {
                   
                    {/* Rating - Top Left */}
                    <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                     <div className="flex items-center gap-1">
-                       <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                     <div className="flex items-center gap-2">
+                       <div className="flex gap-0.5">
+                         {[1, 2, 3, 4, 5].map((star) => {
+                           const rating = vendorRatings[vendor.id]?.totalReviews > 0 
+                             ? vendorRatings[vendor.id].averageRating 
+                             : 0;
+                           return (
+                             <Star 
+                               key={star}
+                               className={`h-3 w-3 fill-current ${
+                                 star <= rating
+                                   ? 'text-yellow-500' 
+                                   : 'text-gray-300'
+                               } ${star > 1 ? 'hidden md:block' : ''}`}
+                             />
+                           );
+                         })}
+                       </div>
                        <span className="text-xs font-medium">
                          {vendorRatings[vendor.id]?.totalReviews > 0 
                            ? vendorRatings[vendor.id].averageRating.toFixed(1)
