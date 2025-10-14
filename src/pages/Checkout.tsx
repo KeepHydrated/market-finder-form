@@ -484,43 +484,34 @@ export default function Checkout() {
             <Card>
               <CardContent className="pt-6 space-y-6">
                 {/* Vendor Info */}
-                <div className="flex items-center gap-3 pb-4 border-b">
-                  <Link to={`/market?id=${firstVendor.vendor_id}`}>
-                    <Avatar className="w-12 h-12 cursor-pointer">
-                      <AvatarImage src={storeLogo || undefined} alt={vendorData?.store_name || firstVendor.vendor_name} />
-                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                        {storeInitial}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Link>
-                  <div className="flex-1">
-                    <Link to={`/market?id=${firstVendor.vendor_id}`}>
-                      <h3 className="font-bold text-lg cursor-pointer">
-                        {vendorData?.store_name || firstVendor.vendor_name}
-                      </h3>
-                    </Link>
-                    <div className="flex items-center gap-1 text-sm">
-                      {vendorData?.google_rating ? (
-                        <>
+                <div className="pb-4 border-b">
+                  <Link to={`/market?id=${firstVendor.vendor_id}`} className="flex items-center gap-2">
+                    <h3 className="font-bold text-lg">
+                      {vendorData?.store_name || firstVendor.vendor_name}
+                    </h3>
+                    {vendorData?.google_rating && (
+                      <>
+                        <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star 
                               key={star} 
-                              className={`w-4 h-4 ${
+                              className={`w-5 h-5 ${
                                 star <= Math.round(vendorData.google_rating!) 
-                                  ? 'fill-primary text-primary' 
-                                  : 'text-muted-foreground'
+                                  ? 'fill-yellow-400 text-yellow-400' 
+                                  : 'text-gray-300'
                               }`} 
                             />
                           ))}
-                          <span className="ml-1 text-muted-foreground">
-                            ({vendorData.google_rating_count || 0})
-                          </span>
-                        </>
-                      ) : (
-                        <span className="text-muted-foreground">No ratings yet</span>
-                      )}
-                    </div>
-                  </div>
+                        </div>
+                        <span className="font-semibold text-lg">
+                          {vendorData.google_rating.toFixed(1)}
+                        </span>
+                        <span className="text-muted-foreground text-lg">
+                          ({vendorData.google_rating_count || 0})
+                        </span>
+                      </>
+                    )}
+                  </Link>
                 </div>
 
                 {/* Order Items */}
