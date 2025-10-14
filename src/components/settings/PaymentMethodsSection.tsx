@@ -136,8 +136,7 @@ export default function PaymentMethodsSection() {
                   key={method.id}
                   className="p-4 border rounded-lg hover:bg-accent/50 transition-colors"
                 >
-                  <div className="flex items-start gap-3 mb-3">
-                    <CreditCard className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <div className="mb-3">
                     <div className="flex-1">
                       {method.payment_type === 'card' && (
                         <>
@@ -168,7 +167,7 @@ export default function PaymentMethodsSection() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2 pl-8">
+                  <div className="flex items-center gap-2">
                     {method.is_default ? (
                       <div className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-md text-sm font-medium">
                         <Star className="h-4 w-4 fill-current" />
