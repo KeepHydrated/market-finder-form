@@ -1132,51 +1132,54 @@ export default function AccountSettings() {
               {/* Profile Picture */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Profile Picture</CardTitle>
-                  <CardDescription>Upload and manage your profile picture</CardDescription>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-base">Profile Picture</CardTitle>
+                      <CardDescription>Upload and manage your profile picture</CardDescription>
+                    </div>
+                    <div className="flex gap-2">
+                      {isEditingProfilePic ? (
+                        <>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              setProfileForm(prev => ({ ...prev, avatar_url: originalAvatarUrl }));
+                              setIsEditingProfilePic(false);
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                           <Button 
+                             size="sm" 
+                             onClick={async () => {
+                               await saveProfile();
+                               setIsEditingProfilePic(false);
+                             }}
+                             disabled={savingProfile}
+                           >
+                            {savingProfile ? 'Saving...' : 'Save'}
+                          </Button>
+                        </>
+                       ) : (
+                         <>
+                           <Button 
+                             size="sm" 
+                             variant="outline"
+                             onClick={() => {
+                               setOriginalAvatarUrl(profileForm.avatar_url);
+                               setIsEditingProfilePic(true);
+                             }}
+                           >
+                             <Edit className="h-4 w-4 mr-2" />
+                             Edit
+                           </Button>
+                         </>
+                       )}
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex gap-2 mb-4">
-                    {isEditingProfilePic ? (
-                      <>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => {
-                            setProfileForm(prev => ({ ...prev, avatar_url: originalAvatarUrl }));
-                            setIsEditingProfilePic(false);
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                         <Button 
-                           size="sm" 
-                           onClick={async () => {
-                             await saveProfile();
-                             setIsEditingProfilePic(false);
-                           }}
-                           disabled={savingProfile}
-                         >
-                          {savingProfile ? 'Saving...' : 'Save'}
-                        </Button>
-                      </>
-                     ) : (
-                       <>
-                         <Button 
-                           size="sm" 
-                           variant="outline"
-                           onClick={() => {
-                             setOriginalAvatarUrl(profileForm.avatar_url);
-                             setIsEditingProfilePic(true);
-                           }}
-                         >
-                           <Edit className="h-4 w-4 mr-2" />
-                           Edit
-                         </Button>
-                       </>
-                     )}
-                  </div>
-                  
                   <div className="flex flex-col items-start gap-4">
                     <div className="relative">
                       <input
