@@ -272,16 +272,14 @@ export default function ShippingAddressesSection() {
     <>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Saved Addresses</CardTitle>
-              <CardDescription>Manage your shipping and billing addresses</CardDescription>
-            </div>
-            <Button onClick={handleAddAddress}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Address
-            </Button>
+          <div>
+            <CardTitle>Saved Addresses</CardTitle>
+            <CardDescription>Manage your shipping and billing addresses</CardDescription>
           </div>
+          <Button onClick={handleAddAddress} className="mt-4">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Address
+          </Button>
         </CardHeader>
         <CardContent>
           {addresses.length === 0 ? (
