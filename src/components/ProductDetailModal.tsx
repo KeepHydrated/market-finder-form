@@ -165,7 +165,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent
-        className="max-w-[90vw] sm:max-w-[600px] max-h-[70vh] sm:max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible"
+        className="max-w-[85vw] sm:max-w-[600px] max-h-[65vh] sm:max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible"
         onKeyDown={handleKeyDown}
       >
         {/* Product Navigation Arrows - Positioned absolutely relative to DialogContent */}
@@ -224,10 +224,10 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         </Button>
         
 
-        <div className="flex flex-col sm:flex-row w-full bg-white min-h-[300px] sm:min-h-[400px] relative">
+        <div className="flex flex-col sm:flex-row w-full bg-white min-h-[250px] sm:min-h-[400px] relative">
           {/* Left side - Images */}
           <div className="w-full sm:w-1/2 relative bg-gray-50">
-            <div className="h-[250px] sm:h-[400px] bg-muted relative group">
+            <div className="h-[200px] sm:h-[400px] bg-muted relative group">
                 {product.images.length > 0 ? (
                   <>
                     <img
@@ -281,10 +281,10 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
           </div>
 
           {/* Right side - Product info */}
-          <div className="w-full sm:w-1/2 p-4 flex flex-col justify-start bg-white sm:border-l border-gray-100">
-              <h2 className="text-2xl font-bold mb-3 text-gray-900">{product.name}</h2>
+          <div className="w-full sm:w-1/2 p-3 sm:p-4 flex flex-col justify-start bg-white sm:border-l border-gray-100">
+              <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-900">{product.name}</h2>
               
-              <div className="space-y-3 flex-1">
+              <div className="space-y-2 sm:space-y-3 flex-1">
                 <div>
                   <span className="text-base font-semibold text-muted-foreground">
                     ${product.price.toFixed(2)}
