@@ -249,7 +249,7 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
         </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4 [&>div>div[style]]:!hidden">
+      <ScrollArea className="flex-1 p-4 [&>[data-radix-scroll-area-scrollbar]]:md:flex [&>[data-radix-scroll-area-scrollbar]]:hidden">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-muted-foreground">Loading messages...</p>
