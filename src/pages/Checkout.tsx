@@ -506,7 +506,7 @@ export default function Checkout() {
                       {vendorData?.store_name || firstVendor.vendor_name}
                     </h3>
                     {vendorData?.google_rating ? (
-                      <>
+                      <div className="flex items-center gap-1">
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star 
@@ -525,7 +525,7 @@ export default function Checkout() {
                         <span className="text-muted-foreground text-sm">
                           ({vendorData.google_rating_count || 0})
                         </span>
-                      </>
+                      </div>
                     ) : (
                       <span className="text-muted-foreground text-sm">No ratings yet</span>
                     )}
