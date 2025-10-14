@@ -99,21 +99,25 @@ export function PaymentMethodsManager() {
       {/* Saved Payment Methods */}
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-4">
             <div>
               <CardTitle>Your Payment Methods</CardTitle>
+            </div>
+            <div>
               <CardDescription>
                 Manage your saved payment methods
               </CardDescription>
             </div>
-            <Button 
-              onClick={() => setShowAddDialog(true)} 
-              className="bg-gradient-primary hover:opacity-90 shrink-0"
-              size="lg"
-            >
-              <Plus className="h-5 w-5 mr-2" />
-              Add Payment Method
-            </Button>
+            <div>
+              <Button 
+                onClick={() => setShowAddDialog(true)} 
+                className="bg-gradient-primary hover:opacity-90 w-full"
+                size="lg"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Add Payment Method
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
