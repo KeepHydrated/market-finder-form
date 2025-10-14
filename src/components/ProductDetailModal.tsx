@@ -168,40 +168,34 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
         className="max-w-[85vw] sm:max-w-[600px] max-h-[65vh] sm:max-h-[80vh] overflow-y-auto p-0 gap-0 [&>button[data-radix-dialog-close]]:hidden bg-white overflow-visible"
         onKeyDown={handleKeyDown}
       >
-        {/* Product Navigation Arrows - Mobile: top, Desktop: sides */}
-        <div className="absolute top-3 left-3 right-3 flex justify-between items-center z-[60] md:hidden pointer-events-none">
-          {hasPrevious ? (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                goToPreviousProduct();
-              }}
-              className="h-9 w-9 p-0 bg-white/90 hover:bg-white border border-gray-200 shadow-sm rounded-full pointer-events-auto"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-          ) : (
-            <div className="h-9 w-9" />
-          )}
-          
-          {hasNext ? (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                goToNextProduct();
-              }}
-              className="h-9 w-9 p-0 bg-white/90 hover:bg-white border border-gray-200 shadow-sm rounded-full pointer-events-auto"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          ) : (
-            <div className="h-9 w-9" />
-          )}
-        </div>
+        {/* Product Navigation Arrows - Mobile: top corners, Desktop: sides */}
+        {hasPrevious && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              goToPreviousProduct();
+            }}
+            className="absolute top-3 left-3 z-[70] h-10 w-10 p-0 bg-white hover:bg-gray-100 border border-gray-200 shadow-md rounded-full md:hidden"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+        )}
+        
+        {hasNext && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              goToNextProduct();
+            }}
+            className="absolute top-3 right-14 z-[70] h-10 w-10 p-0 bg-white hover:bg-gray-100 border border-gray-200 shadow-md rounded-full md:hidden"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+        )}
 
         {/* Desktop navigation arrows on sides */}
         {hasPrevious && (
