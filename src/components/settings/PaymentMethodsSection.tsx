@@ -166,16 +166,15 @@ export default function PaymentMethodsSection() {
                         </>
                       )}
                     </div>
-                    {method.is_default && (
-                      <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md text-xs font-medium">
-                        <Star className="h-3 w-3 fill-current" />
-                        Default
-                      </div>
-                    )}
                   </div>
                   
                   <div className="flex items-center gap-2 pl-8">
-                    {!method.is_default && (
+                    {method.is_default ? (
+                      <div className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-md text-sm font-medium">
+                        <Star className="h-4 w-4 fill-current" />
+                        Default
+                      </div>
+                    ) : (
                       <Button
                         variant="outline"
                         size="sm"
