@@ -485,11 +485,11 @@ export default function Checkout() {
               <CardContent className="pt-6 space-y-6">
                 {/* Vendor Info */}
                 <div className="pb-4 border-b">
-                  <Link to={`/market?id=${firstVendor.vendor_id}`} className="flex items-center gap-2">
+                  <Link to={`/market?id=${firstVendor.vendor_id}`} className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-bold text-lg">
                       {vendorData?.store_name || firstVendor.vendor_name}
                     </h3>
-                    {vendorData?.google_rating && (
+                    {vendorData?.google_rating ? (
                       <>
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
@@ -510,6 +510,8 @@ export default function Checkout() {
                           ({vendorData.google_rating_count || 0})
                         </span>
                       </>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">No ratings yet</span>
                     )}
                   </Link>
                 </div>
