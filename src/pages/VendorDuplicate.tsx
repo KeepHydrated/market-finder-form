@@ -1119,9 +1119,9 @@ const VendorDuplicate = () => {
                     className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
                     onClick={() => setIsReviewModalOpen(true)}
                   >
-                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
                     <span className="text-foreground font-medium">
-                      {vendorReviews?.rating ? Number(vendorReviews.rating).toFixed(1) : 'No rating'}
+                      {vendorReviews?.rating ? Number(vendorReviews.rating).toFixed(1) : '0.0'}
                     </span>
                     <span className="text-muted-foreground">
                       ({vendorReviews?.reviewCount ?? 0})
