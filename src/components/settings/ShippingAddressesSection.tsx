@@ -354,13 +354,13 @@ export default function ShippingAddressesSection() {
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-full h-full max-w-none max-h-none m-0 rounded-none">
           <DialogHeader>
             <DialogDescription className="text-lg font-semibold text-foreground">
               {editingAddress ? 'Update your address details' : 'Add a new shipping or billing address'}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4 overflow-y-auto flex-1">
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
                 <Label htmlFor="address_line_1">Address *</Label>
