@@ -1200,18 +1200,16 @@ export default function AccountSettings() {
                      </div>
                     
                      {/* Username section */}
-                     <div className="text-left space-y-2">
+                     <div className="text-left space-y-2 w-full">
                        <Label htmlFor="username" className="text-sm font-medium">Username</Label>
                        {isEditingProfilePic ? (
-                         <div className="flex items-center gap-2">
-                           <Input
-                             id="username"
-                             value={profileForm.full_name}
-                             onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
-                             className="w-40 text-center"
-                             placeholder="Enter username"
-                           />
-                         </div>
+                         <Input
+                           id="username"
+                           value={profileForm.full_name}
+                           onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
+                           className="w-full text-left"
+                           placeholder="Enter username"
+                         />
                        ) : (
                          <div className="text-sm font-medium">
                            {profileForm.full_name || "No username set"}
