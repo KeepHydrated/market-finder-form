@@ -72,6 +72,7 @@ const Likes = () => {
   const [currentVendorProducts, setCurrentVendorProducts] = useState<any[]>([]);
   const [currentVendorInfo, setCurrentVendorInfo] = useState<{id: string; name: string} | null>(null);
   const [marketAddressesMap, setMarketAddressesMap] = useState<Record<string, string>>({});
+  const [marketGoogleRatings, setMarketGoogleRatings] = useState<Record<string, {rating: number; reviewCount: number}>>({});
 
   const tabs = [
     { id: "vendors" as TabType, title: "Vendors", icon: Store },
@@ -79,12 +80,12 @@ const Likes = () => {
     { id: "products" as TabType, title: "Products", icon: Package },
   ];
 
-  // Fetch market addresses from database
+  // Fetch market addresses and ratings from database
   const fetchMarketAddresses = async () => {
     try {
       const { data, error } = await supabase
         .from('markets')
-        .select('name, address');
+        .select('name, address, google_rating, google_rating_count');
       
       if (error) {
         console.error('Error fetching market addresses:', error);
@@ -93,10 +94,19 @@ const Likes = () => {
       
       if (data) {
         const addressMap: Record<string, string> = {};
+        const ratingsMap: Record<string, {rating: number; reviewCount: number}> = {};
         data.forEach(market => {
           addressMap[market.name] = market.address;
+          const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+          if (market.google_rating && market.google_rating_count) {
+            ratingsMap[marketId] = {
+              rating: market.google_rating,
+              reviewCount: market.google_rating_count
+            };
+          }
         });
         setMarketAddressesMap(addressMap);
+        setMarketGoogleRatings(ratingsMap);
       }
     } catch (error) {
       console.error('Error fetching market addresses:', error);
@@ -784,26 +794,10 @@ const Likes = () => {
                 <div className="flex items-center gap-1">
                   <Star className="h-3 w-3 text-yellow-500 fill-current" />
                   <span className="text-xs font-medium">
-                    {(() => {
-                      const marketVendorRatings = market.vendors
-                        .map(vendor => vendorRatings[vendor.id])
-                        .filter(rating => rating && rating.totalReviews > 0);
-                      
-                      if (marketVendorRatings.length === 0) return '0.0';
-                      
-                      const totalRating = marketVendorRatings.reduce((sum, rating) => sum + rating.averageRating, 0);
-                      const averageRating = totalRating / marketVendorRatings.length;
-                      return averageRating.toFixed(1);
-                    })()}
+                    {marketGoogleRatings[market.id]?.rating?.toFixed(1) || '0.0'}
                   </span>
                   <span className="text-xs text-gray-600">
-                    ({(() => {
-                      const totalReviews = market.vendors.reduce((sum, vendor) => {
-                        const rating = vendorRatings[vendor.id];
-                        return sum + (rating ? rating.totalReviews : 0);
-                      }, 0);
-                      return totalReviews;
-                    })()})
+                    ({marketGoogleRatings[market.id]?.reviewCount || 0})
                   </span>
                 </div>
               </div>
