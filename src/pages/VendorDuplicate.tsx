@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
+import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight, MessageSquare, ArrowUp } from "lucide-react";
 import { FloatingChat } from "@/components/FloatingChat";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -98,6 +98,7 @@ const VendorDuplicate = () => {
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [marketOpeningHours, setMarketOpeningHours] = useState<any>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const [marketReviews, setMarketReviews] = useState<{rating?: number; reviewCount?: number} | null>(null);
   const [vendorReviews, setVendorReviews] = useState<{rating?: number; reviewCount?: number} | null>(null);
   const [vendorRatings, setVendorRatings] = useState<Record<string, {vendorId: string; averageRating: number; totalReviews: number}>>({});
@@ -922,6 +923,20 @@ const VendorDuplicate = () => {
     if (!address) return "Address TBD";
     // Remove "United States" and any trailing comma/space
     return address.replace(/,\s*United States\s*$/i, '').trim();
+  };
+
+  // Handle scroll to top button visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (loading || loadingData) {
@@ -2038,6 +2053,17 @@ const VendorDuplicate = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Scroll to Top Button - Mobile Only */}
+      {showScrollTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-4 left-4 md:hidden z-50 h-12 w-12 rounded-full shadow-lg"
+          size="icon"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </Button>
+      )}
     </>
   );
 };
