@@ -500,7 +500,7 @@ export default function Checkout() {
             <Card>
               <CardContent className="pt-6 space-y-6">
                 {/* Vendor Info */}
-                <div className="pb-4 border-b">
+                <div className="pb-6 border-b">
                   <Link to={`/market?id=${firstVendor.vendor_id}`} className="flex items-center gap-4 flex-wrap">
                     <h3 className="font-bold text-lg">
                       {vendorData?.store_name || firstVendor.vendor_name}
