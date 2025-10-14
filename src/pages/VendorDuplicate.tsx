@@ -116,8 +116,6 @@ const VendorDuplicate = () => {
   const [navigationMarketsOrder, setNavigationMarketsOrder] = useState<string[]>([]);
   const isMobile = useIsMobile();
   const [isTablet, setIsTablet] = useState(false);
-  const [isHeaderMinimized, setIsHeaderMinimized] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   // Check if viewport is tablet (768px - 1024px)
   useEffect(() => {
@@ -130,28 +128,6 @@ const VendorDuplicate = () => {
     window.addEventListener('resize', checkTablet);
     return () => window.removeEventListener('resize', checkTablet);
   }, []);
-
-  // Handle scroll to minimize/maximize header
-  useEffect(() => {
-    if (!selectedVendor) return;
-
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down & past threshold
-        setIsHeaderMinimized(true);
-      } else if (currentScrollY < lastScrollY) {
-        // Scrolling up
-        setIsHeaderMinimized(false);
-      }
-      
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY, selectedVendor]);
 
   useEffect(() => {
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
@@ -1512,30 +1488,37 @@ const VendorDuplicate = () => {
                 {selectedVendor ? (
                   // Show selected vendor details
                   <div className="space-y-6">
-                    {/* Sticky Vendor Header with minimize on scroll */}
-                    <div className={cn(
-                      "sticky top-0 z-10 bg-background border-b transition-all duration-300",
-                      isHeaderMinimized ? "py-2" : "py-6"
-                    )}>
-                      {isHeaderMinimized ? (
-                        // Minimized Header
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <h2 className="text-lg font-bold text-foreground">{selectedVendor.store_name}</h2>
-                            <div 
-                              className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
-                              onClick={() => setIsReviewModalOpen(true)}
-                            >
-                              <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                              <span className="text-sm font-medium">
-                                {vendorReviews?.rating ? Number(vendorReviews.rating).toFixed(1) : '0.0'}
-                              </span>
-                              <span className="text-sm text-muted-foreground">
-                                ({vendorReviews?.reviewCount ?? 0})
-                              </span>
+                    {/* Vendor Details */}
+                    <div className="mb-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <h1 className="text-xl font-bold text-foreground">{selectedVendor.store_name}</h1>
+                          <div 
+                            className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
+                            onClick={() => setIsReviewModalOpen(true)}
+                          >
+                            <div className="flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star 
+                                  key={star}
+                                  className={`h-4 w-4 fill-current ${
+                                    vendorReviews?.rating && star <= vendorReviews.rating
+                                      ? 'text-yellow-500' 
+                                      : 'text-gray-300'
+                                  } ${star > 1 ? 'hidden md:block' : ''}`}
+                                />
+                              ))}
                             </div>
+                            <span className="text-foreground font-medium">
+                              {vendorReviews?.rating ? Number(vendorReviews.rating).toFixed(1) : 'No rating'}
+                            </span>
+                            <span className="text-muted-foreground">
+                              ({vendorReviews?.reviewCount ?? 0})
+                            </span>
                           </div>
-                          <div className="flex items-center gap-2">
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {selectedVendor && (
                             <Button
                               variant="ghost"
                               size="sm"
@@ -1555,140 +1538,59 @@ const VendorDuplicate = () => {
                               }}
                               className="text-muted-foreground hover:text-foreground transition-colors"
                             >
-                              <MessageSquare className="h-5 w-5" />
+                              <MessageSquare className="h-6 w-6" />
                             </Button>
-                            
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={async () => {
-                                if (selectedVendor) {
-                                  await toggleLike(selectedVendor.id, 'vendor');
-                                }
-                              }}
-                              className={cn(
-                                "transition-colors",
-                                selectedVendor && isLiked(selectedVendor.id, 'vendor')
-                                  ? "text-red-500 hover:text-red-600"
-                                  : "text-muted-foreground hover:text-foreground"
-                              )}
-                            >
-                              <Heart 
-                                className={cn(
-                                  "h-5 w-5 transition-colors",
-                                  selectedVendor && isLiked(selectedVendor.id, 'vendor') && "fill-current"
-                                )} 
-                              />
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        // Full Header
-                        <div>
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-4">
-                              <h1 className="text-xl font-bold text-foreground">{selectedVendor.store_name}</h1>
-                              <div 
-                                className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
-                                onClick={() => setIsReviewModalOpen(true)}
-                              >
-                                <div className="flex gap-0.5">
-                                  {[1, 2, 3, 4, 5].map((star) => (
-                                    <Star 
-                                      key={star}
-                                      className={`h-4 w-4 fill-current ${
-                                        vendorReviews?.rating && star <= vendorReviews.rating
-                                          ? 'text-yellow-500' 
-                                          : 'text-gray-300'
-                                      } ${star > 1 ? 'hidden md:block' : ''}`}
-                                    />
-                                  ))}
-                                </div>
-                                <span className="text-foreground font-medium">
-                                  {vendorReviews?.rating ? Number(vendorReviews.rating).toFixed(1) : 'No rating'}
-                                </span>
-                                <span className="text-muted-foreground">
-                                  ({vendorReviews?.reviewCount ?? 0})
-                                </span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {selectedVendor && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    if (!user) {
-                                      toast({
-                                        title: "Authentication required",
-                                        description: "Please log in to message vendors",
-                                        variant: "destructive",
-                                      });
-                                      return;
-                                    }
-                                    
-                                    setChatVendorId(selectedVendor.id);
-                                    setChatVendorName(selectedVendor.store_name);
-                                    setIsChatOpen(true);
-                                  }}
-                                  className="text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                  <MessageSquare className="h-6 w-6" />
-                                </Button>
-                              )}
-                              
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={async () => {
-                                  if (selectedVendor) {
-                                    await toggleLike(selectedVendor.id, 'vendor');
-                                  }
-                                }}
-                                className={cn(
-                                  "transition-colors",
-                                  selectedVendor && isLiked(selectedVendor.id, 'vendor')
-                                    ? "text-red-500 hover:text-red-600"
-                                    : "text-muted-foreground hover:text-foreground"
-                                )}
-                              >
-                                <Heart 
-                                  className={cn(
-                                    "h-6 w-6 transition-colors",
-                                    selectedVendor && isLiked(selectedVendor.id, 'vendor') && "fill-current"
-                                  )} 
-                                />
-                              </Button>
-                            </div>
-                          </div>
-
-                          <div className="flex gap-2 mb-4">
-                            {selectedVendor.primary_specialty && (
-                              <Badge variant="secondary">{selectedVendor.primary_specialty}</Badge>
-                            )}
-                          </div>
-                          
-                          <p className="text-muted-foreground mb-4">
-                            {selectedVendor.description || "Quality produce from local farmers."}
-                          </p>
-
-                          {selectedVendor.website && (
-                            <div className="mb-4">
-                              <a 
-                                href={selectedVendor.website} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-primary hover:underline"
-                              >
-                                {selectedVendor.website}
-                              </a>
-                            </div>
                           )}
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={async () => {
+                              if (selectedVendor) {
+                                await toggleLike(selectedVendor.id, 'vendor');
+                              }
+                            }}
+                            className={cn(
+                              "transition-colors",
+                              selectedVendor && isLiked(selectedVendor.id, 'vendor')
+                                ? "text-red-500 hover:text-red-600"
+                                : "text-muted-foreground hover:text-foreground"
+                            )}
+                          >
+                            <Heart 
+                              className={cn(
+                                "h-6 w-6 transition-colors",
+                                selectedVendor && isLiked(selectedVendor.id, 'vendor') && "fill-current"
+                              )} 
+                            />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 mb-4">
+                        {selectedVendor.primary_specialty && (
+                          <Badge variant="secondary">{selectedVendor.primary_specialty}</Badge>
+                        )}
+                      </div>
+                      
+                      <p className="text-muted-foreground mb-4">
+                        {selectedVendor.description || "Quality produce from local farmers."}
+                      </p>
+
+                      {selectedVendor.website && (
+                        <div className="mb-4">
+                          <a 
+                            href={selectedVendor.website} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
+                            {selectedVendor.website}
+                          </a>
                         </div>
                       )}
                     </div>
 
-                    {/* Products Section */}
                     <div className="space-y-6">
                       {selectedVendor.products && selectedVendor.products.length > 0 ? (
                         <ProductGrid 
