@@ -172,18 +172,31 @@ export default function Checkout() {
     const fetchVendorData = async () => {
       if (!firstVendor || items.length === 0) return;
       
-      const { data, error } = await supabase
-        .from('submissions')
-        .select('store_name, google_rating, google_rating_count, products')
-        .eq('id', firstVendor.vendor_id)
-        .eq('status', 'accepted')
-        .single();
+      const [submissionData, reviewsData] = await Promise.all([
+        supabase
+          .from('submissions')
+          .select('store_name, google_rating, google_rating_count, products')
+          .eq('id', firstVendor.vendor_id)
+          .eq('status', 'accepted')
+          .single(),
+        supabase
+          .from('reviews')
+          .select('rating')
+          .eq('vendor_id', firstVendor.vendor_id)
+      ]);
 
-      if (!error && data) {
-        console.log('Checkout vendor data:', data);
-        setVendorData(data);
-      } else {
-        console.error('Error fetching vendor data:', error);
+      if (!submissionData.error && submissionData.data) {
+        // Calculate average rating from reviews
+        const reviews = reviewsData.data || [];
+        const avgRating = reviews.length > 0
+          ? reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length
+          : null;
+
+        setVendorData({
+          ...submissionData.data,
+          google_rating: avgRating,
+          google_rating_count: reviews.length
+        });
       }
     };
 
