@@ -276,7 +276,7 @@ export default function ShippingAddressesSection() {
             <CardTitle>Saved Addresses</CardTitle>
             <CardDescription>Manage your shipping and billing addresses</CardDescription>
           </div>
-          <Button onClick={handleAddAddress} className="mt-4">
+          <Button onClick={handleAddAddress} className="mt-6">
             <Plus className="h-4 w-4 mr-2" />
             Add Address
           </Button>
