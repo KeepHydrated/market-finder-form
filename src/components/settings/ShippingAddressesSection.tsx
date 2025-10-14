@@ -297,7 +297,7 @@ export default function ShippingAddressesSection() {
               {addresses.map((address) => (
                 <Card key={address.id} className="relative">
                   <CardContent className="pt-6">
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant={address.type === 'shipping' ? 'default' : 'secondary'}>
@@ -318,7 +318,7 @@ export default function ShippingAddressesSection() {
                           {address.phone && <p>{address.phone}</p>}
                         </div>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex items-center gap-2">
                         {!address.is_default && (
                           <Button
                             variant="ghost"
