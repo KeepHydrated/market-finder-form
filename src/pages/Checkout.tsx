@@ -597,7 +597,7 @@ export default function Checkout() {
                     onClick={() => setShowConfirmDialog(true)}
                     disabled={!selectedAddress || !selectedPaymentMethod || selectedPaymentMethod === 'new'}
                   >
-                    Proceed to Payment
+                    Purchase
                   </Button>
                   {(!selectedAddress || !selectedPaymentMethod || selectedPaymentMethod === 'new') && (
                     <p className="text-xs text-muted-foreground text-center mt-2">
