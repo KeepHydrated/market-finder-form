@@ -626,6 +626,7 @@ const Analytics = () => {
               ) : (
                 recentOrders.map((order) => {
                   const firstItem = order.order_items?.[0];
+                  console.log('Order data:', { order, firstItem, productName: firstItem?.product_name });
                   
                   return (
                     <div 
