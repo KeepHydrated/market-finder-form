@@ -1,5 +1,5 @@
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 
 const Analytics = () => {
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const AUTHORIZED_EMAIL = 'nadiachibri@gmail.com';
   const [stats, setStats] = useState({
     users: 0,
@@ -231,7 +232,11 @@ const Analytics = () => {
               <p className="text-muted-foreground">No users yet</p>
             ) : (
               recentUsers.map((user) => (
-                <div key={user.id} className="flex flex-col items-center gap-2 min-w-[100px]">
+                <div 
+                  key={user.id} 
+                  className="flex flex-col items-center gap-2 min-w-[100px] cursor-pointer transition-transform hover:scale-105"
+                  onClick={() => navigate(`/profile/${user.user_id}`)}
+                >
                   <Avatar className="h-16 w-16">
                     <AvatarImage src={user.avatar_url} alt={user.full_name || 'User'} />
                     <AvatarFallback className="text-lg font-semibold">
@@ -239,7 +244,7 @@ const Analytics = () => {
                     </AvatarFallback>
                   </Avatar>
                   <div className="text-center">
-                    <p className="font-medium text-sm truncate max-w-[100px]">
+                    <p className="font-medium text-sm truncate max-w-[100px] hover:text-primary transition-colors">
                       {user.full_name || 'Anonymous'}
                     </p>
                     <p className="text-xs text-muted-foreground">
