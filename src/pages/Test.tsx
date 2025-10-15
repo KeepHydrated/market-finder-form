@@ -37,6 +37,12 @@ const Test = () => {
         <div className="bg-card border rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Report:</h2>
           <p className="text-foreground font-semibold">Inappropriate Content</p>
+          <div className="mt-4">
+            <h3 className="text-sm font-semibold mb-2">Additional Details:</h3>
+            <p className="text-sm text-muted-foreground">
+              This vendor has been posting inappropriate content on their profile page that violates community guidelines.
+            </p>
+          </div>
         </div>
         <div className="bg-card border rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-2">Column 4</h2>
