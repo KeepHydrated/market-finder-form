@@ -23,32 +23,13 @@ interface Report {
 }
 
 export default function AdminReports() {
-  const navigate = useNavigate();
-  const { isAdmin, loading: adminLoading } = useAdmin();
   const { toast } = useToast();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("AdminReports: useEffect triggered", { isAdmin, adminLoading });
-    if (!adminLoading && !isAdmin) {
-      console.log("AdminReports: Redirecting - user is not admin");
-      navigate("/");
-      toast({
-        title: "Access Denied",
-        description: "You don't have permission to access this page.",
-        variant: "destructive",
-      });
-    } else if (!adminLoading && isAdmin) {
-      console.log("AdminReports: User is admin, allowing access");
-    }
-  }, [isAdmin, adminLoading, navigate, toast]);
-
-  useEffect(() => {
-    if (isAdmin) {
-      fetchReports();
-    }
-  }, [isAdmin]);
+    fetchReports();
+  }, []);
 
   const fetchReports = async () => {
     try {
@@ -107,18 +88,6 @@ export default function AdminReports() {
       });
     }
   };
-
-  if (adminLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
