@@ -149,7 +149,20 @@ const Analytics = () => {
       // Get order statistics
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
-        .select('id, total_amount, status, created_at, vendor_name, email')
+        .select(`
+          id, 
+          total_amount, 
+          status, 
+          created_at, 
+          vendor_name, 
+          email,
+          order_items (
+            product_name,
+            product_image,
+            quantity,
+            unit_price
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (ordersError) throw ordersError;
@@ -604,34 +617,56 @@ const Analytics = () => {
           </div>
           <p className="text-muted-foreground mb-6">Latest orders placed on the platform</p>
           
-          <div className="space-y-4">
-            {loading ? (
-              <p className="text-muted-foreground">Loading...</p>
-            ) : recentOrders.length === 0 ? (
-              <p className="text-muted-foreground">No orders yet</p>
-            ) : (
-              recentOrders.map((order) => (
-                <Card key={order.id} className="hover:border-primary transition-colors">
-                  <CardContent className="pt-6">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-medium">Order #{order.id.slice(0, 8)}</p>
-                        <p className="text-sm text-muted-foreground">{order.vendor_name}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{order.email}</p>
+          <ScrollArea className="w-full whitespace-nowrap">
+            <div className="flex gap-6 pb-4">
+              {loading ? (
+                <p className="text-muted-foreground">Loading...</p>
+              ) : recentOrders.length === 0 ? (
+                <p className="text-muted-foreground">No orders yet</p>
+              ) : (
+                recentOrders.map((order) => {
+                  const firstItem = order.order_items?.[0];
+                  const itemCount = order.order_items?.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0;
+                  
+                  return (
+                    <div 
+                      key={order.id}
+                      className="flex flex-col gap-2 min-w-[200px] cursor-pointer transition-transform hover:scale-105"
+                    >
+                      <div className="relative h-48 w-full rounded-lg overflow-hidden bg-muted">
+                        {firstItem?.product_image ? (
+                          <img 
+                            src={firstItem.product_image} 
+                            alt={firstItem.product_name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-full">
+                            <ShoppingCart className="h-12 w-12 text-muted-foreground" />
+                          </div>
+                        )}
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold">${(order.total_amount / 100).toFixed(2)}</p>
-                        <p className="text-xs text-muted-foreground capitalize">{order.status}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {format(new Date(order.created_at), 'MMM d, yyyy')}
+                      <div className="space-y-1">
+                        <p className="font-medium text-sm truncate">
+                          Order #{order.id.slice(0, 8)}
+                        </p>
+                        <p className="text-lg font-bold text-primary">
+                          ${(order.total_amount / 100).toFixed(2)}
+                        </p>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {order.vendor_name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {itemCount} item{itemCount !== 1 ? 's' : ''} • {format(new Date(order.created_at), 'MMM d')}
                         </p>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
+                  );
+                })
+              )}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </div>
       )}
     </div>
