@@ -2,9 +2,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect } from 'react';
 import { Users, Store, MapPin, Package } from 'lucide-react';
+import { format } from 'date-fns';
 
 const Analytics = () => {
   const { user, loading: authLoading } = useAuth();
@@ -16,6 +18,7 @@ const Analytics = () => {
     products: 0
   });
   const [loading, setLoading] = useState(true);
+  const [recentUsers, setRecentUsers] = useState<any[]>([]);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -64,11 +67,31 @@ const Analytics = () => {
         markets: marketsCount || 0,
         products: totalProducts
       });
+
+      // Get recent users
+      const { data: recentUsersData } = await supabase
+        .from('profiles')
+        .select('id, user_id, full_name, avatar_url, created_at')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (recentUsersData) {
+        setRecentUsers(recentUsersData);
+      }
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const getInitials = (name: string | null) => {
+    if (!name) return '?';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
   };
 
   // Check if user is authorized
@@ -192,6 +215,44 @@ const Analytics = () => {
         </div>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
+
+      <div className="mt-8">
+        <div className="flex items-center gap-2 mb-2">
+          <Users className="h-5 w-5" />
+          <h2 className="text-2xl font-bold">Recently Joined Users</h2>
+        </div>
+        <p className="text-muted-foreground mb-6">Latest users who signed up to the platform</p>
+        
+        <ScrollArea className="w-full whitespace-nowrap">
+          <div className="flex gap-6 pb-4">
+            {loading ? (
+              <p className="text-muted-foreground">Loading...</p>
+            ) : recentUsers.length === 0 ? (
+              <p className="text-muted-foreground">No users yet</p>
+            ) : (
+              recentUsers.map((user) => (
+                <div key={user.id} className="flex flex-col items-center gap-2 min-w-[100px]">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={user.avatar_url} alt={user.full_name || 'User'} />
+                    <AvatarFallback className="text-lg font-semibold">
+                      {getInitials(user.full_name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="text-center">
+                    <p className="font-medium text-sm truncate max-w-[100px]">
+                      {user.full_name || 'Anonymous'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {format(new Date(user.created_at), 'MMM d')}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      </div>
     </div>
   );
 };
