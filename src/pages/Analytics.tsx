@@ -22,6 +22,8 @@ const Analytics = () => {
   const [loading, setLoading] = useState(true);
   const [recentUsers, setRecentUsers] = useState<any[]>([]);
   const [showRecentUsers, setShowRecentUsers] = useState(false);
+  const [recentVendors, setRecentVendors] = useState<any[]>([]);
+  const [showRecentVendors, setShowRecentVendors] = useState(false);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -80,6 +82,18 @@ const Analytics = () => {
 
       if (recentUsersData) {
         setRecentUsers(recentUsersData);
+      }
+
+      // Get recent vendors (accepted submissions)
+      const { data: recentVendorsData } = await supabase
+        .from('submissions')
+        .select('id, user_id, store_name, created_at, updated_at')
+        .eq('status', 'accepted')
+        .order('updated_at', { ascending: false })
+        .limit(10);
+
+      if (recentVendorsData) {
+        setRecentVendors(recentVendorsData);
       }
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -182,92 +196,147 @@ const Analytics = () => {
                 </CardContent>
               </Card>
             </CollapsibleTrigger>
-
-          <Card className="min-w-[200px] flex-shrink-0">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Vendors</CardTitle>
-              <Store className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold mb-1">
-                {loading ? '...' : stats.vendors.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">Active vendors</p>
-            </CardContent>
-          </Card>
-
-          <Card className="min-w-[200px] flex-shrink-0">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Markets</CardTitle>
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold mb-1">
-                {loading ? '...' : stats.markets.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">Listed markets</p>
-            </CardContent>
-          </Card>
-
-          <Card className="min-w-[200px] flex-shrink-0">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Products</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold mb-1">
-                {loading ? '...' : stats.products.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">Available products</p>
-            </CardContent>
-          </Card>
-        </div>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
-
-      <CollapsibleContent>
-        <div className="mt-8">
-          <div className="flex items-center gap-2 mb-2">
-            <Users className="h-5 w-5" />
-            <h2 className="text-2xl font-bold">Recently Joined Users</h2>
           </div>
-          <p className="text-muted-foreground mb-6">Latest users who signed up to the platform</p>
-          
-          <ScrollArea className="w-full whitespace-nowrap">
-            <div className="flex gap-6 pb-4">
-              {loading ? (
-                <p className="text-muted-foreground">Loading...</p>
-              ) : recentUsers.length === 0 ? (
-                <p className="text-muted-foreground">No users yet</p>
-              ) : (
-                recentUsers.map((user) => (
-                  <div 
-                    key={user.id} 
-                    className="flex flex-col items-center gap-2 min-w-[100px] cursor-pointer transition-transform hover:scale-105"
-                    onClick={() => navigate(`/profile/${user.user_id}`)}
-                  >
-                    <Avatar className="h-16 w-16">
-                      <AvatarImage src={user.avatar_url} alt={user.full_name || 'User'} />
-                      <AvatarFallback className="text-lg font-semibold">
-                        {getInitials(user.full_name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="text-center">
-                      <p className="font-medium text-sm truncate max-w-[100px] hover:text-primary transition-colors">
-                        {user.full_name || 'Anonymous'}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(user.created_at), 'MMM d')}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              )}
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+
+        <CollapsibleContent>
+          <div className="mt-8">
+            <div className="flex items-center gap-2 mb-2">
+              <Users className="h-5 w-5" />
+              <h2 className="text-2xl font-bold">Recently Joined Users</h2>
             </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </div>
-      </CollapsibleContent>
+            <p className="text-muted-foreground mb-6">Latest users who signed up to the platform</p>
+            
+            <ScrollArea className="w-full whitespace-nowrap">
+              <div className="flex gap-6 pb-4">
+                {loading ? (
+                  <p className="text-muted-foreground">Loading...</p>
+                ) : recentUsers.length === 0 ? (
+                  <p className="text-muted-foreground">No users yet</p>
+                ) : (
+                  recentUsers.map((user) => (
+                    <div 
+                      key={user.id} 
+                      className="flex flex-col items-center gap-2 min-w-[100px] cursor-pointer transition-transform hover:scale-105"
+                      onClick={() => navigate(`/profile/${user.user_id}`)}
+                    >
+                      <Avatar className="h-16 w-16">
+                        <AvatarImage src={user.avatar_url} alt={user.full_name || 'User'} />
+                        <AvatarFallback className="text-lg font-semibold">
+                          {getInitials(user.full_name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="text-center">
+                        <p className="font-medium text-sm truncate max-w-[100px] hover:text-primary transition-colors">
+                          {user.full_name || 'Anonymous'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(new Date(user.created_at), 'MMM d')}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+
+      <Collapsible open={showRecentVendors} onOpenChange={setShowRecentVendors} className="mt-6">
+        <ScrollArea className="w-full whitespace-nowrap">
+          <div className="flex gap-4 pb-4">
+            <CollapsibleTrigger asChild>
+              <Card className="min-w-[200px] flex-shrink-0 cursor-pointer hover:border-primary transition-colors">
+                <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Vendors</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Store className="h-4 w-4 text-muted-foreground" />
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showRecentVendors ? 'rotate-180' : ''}`} />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold mb-1">
+                    {loading ? '...' : stats.vendors.toLocaleString()}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Active vendors</p>
+                </CardContent>
+              </Card>
+            </CollapsibleTrigger>
+
+            <Card className="min-w-[200px] flex-shrink-0">
+              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Markets</CardTitle>
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold mb-1">
+                  {loading ? '...' : stats.markets.toLocaleString()}
+                </div>
+                <p className="text-xs text-muted-foreground">Listed markets</p>
+              </CardContent>
+            </Card>
+
+            <Card className="min-w-[200px] flex-shrink-0">
+              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Products</CardTitle>
+                <Package className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold mb-1">
+                  {loading ? '...' : stats.products.toLocaleString()}
+                </div>
+                <p className="text-xs text-muted-foreground">Available products</p>
+              </CardContent>
+            </Card>
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+
+        <CollapsibleContent>
+          <div className="mt-8">
+            <div className="flex items-center gap-2 mb-2">
+              <Store className="h-5 w-5" />
+              <h2 className="text-2xl font-bold">Recently Joined Vendors</h2>
+            </div>
+            <p className="text-muted-foreground mb-6">Latest vendors whose stores were accepted</p>
+            
+            <ScrollArea className="w-full whitespace-nowrap">
+              <div className="flex gap-6 pb-4">
+                {loading ? (
+                  <p className="text-muted-foreground">Loading...</p>
+                ) : recentVendors.length === 0 ? (
+                  <p className="text-muted-foreground">No vendors yet</p>
+                ) : (
+                  recentVendors.map((vendor) => (
+                    <div 
+                      key={vendor.id} 
+                      className="flex flex-col items-center gap-2 min-w-[120px] cursor-pointer transition-transform hover:scale-105"
+                      onClick={() => navigate(`/market?vendor=${vendor.id}`)}
+                    >
+                      <Avatar className="h-16 w-16">
+                        <AvatarFallback className="text-lg font-semibold bg-primary/10">
+                          <Store className="h-8 w-8" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="text-center">
+                        <p className="font-medium text-sm truncate max-w-[120px] hover:text-primary transition-colors">
+                          {vendor.store_name || 'Store'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(new Date(vendor.updated_at), 'MMM d')}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+        </CollapsibleContent>
       </Collapsible>
     </div>
   );
