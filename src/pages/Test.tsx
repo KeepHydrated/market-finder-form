@@ -4,7 +4,7 @@ const Test = () => {
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-card border rounded-lg p-6">
+        <div className="bg-card rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Person Reported:</h2>
           <Link 
             to="/profile" 
@@ -19,7 +19,7 @@ const Test = () => {
             </div>
           </Link>
         </div>
-        <div className="bg-card border rounded-lg p-6">
+        <div className="bg-card rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Reported By:</h2>
           <Link 
             to="/profile" 
@@ -34,7 +34,7 @@ const Test = () => {
             </div>
           </Link>
         </div>
-        <div className="bg-card border rounded-lg p-6">
+        <div className="bg-card rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Report:</h2>
           <p className="text-foreground font-semibold">Inappropriate Content</p>
           <div className="mt-4">
