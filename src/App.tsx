@@ -17,7 +17,6 @@ import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
 import ShopManager2 from "./pages/ShopManager2";
 import Report from "./pages/Report";
-import Quiz from "./pages/Quiz";
 import Messages from "./pages/Messages";
 import Conversation from "./pages/Conversation";
 
@@ -54,7 +53,6 @@ const App = () => (
                 <Route path="/my-shop" element={<ShopManager2 />} />
                 <Route path="/commissions" element={<Commissions />} />
                 <Route path="/report" element={<Report />} />
-                <Route path="/quiz" element={<Quiz />} />
                 <Route path="/messages" element={<Messages />} />
                 <Route path="/messages/:conversationId" element={<Conversation />} />
                 
