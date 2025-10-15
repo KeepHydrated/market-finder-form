@@ -17,7 +17,7 @@ interface Profile {
   avatar_url: string | null;
 }
 
-const Test = () => {
+const Report = () => {
   const { reportId } = useParams();
   const [report, setReport] = useState<Report | null>(null);
   const [reporterProfile, setReporterProfile] = useState<Profile | null>(null);
@@ -182,5 +182,5 @@ const Test = () => {
   );
 };
 
-export default Test;
+export default Report;
 
