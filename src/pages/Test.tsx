@@ -3,16 +3,16 @@ const Test = () => {
     <div className="min-h-screen bg-background p-8">
       <div className="grid grid-cols-3 gap-4">
         <div className="rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Reported By:</h2>
+          <h2 className="text-lg font-semibold mb-2">Reported By:</h2>
         </div>
         <div className="rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Person Reported:</h2>
+          <h2 className="text-lg font-semibold mb-2">Person Reported:</h2>
         </div>
         <div className="rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Report:</h2>
+          <h2 className="text-lg font-semibold mb-2">Report:</h2>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-4 border rounded-lg p-6 bg-card mt-4">
+      <div className="grid grid-cols-3 gap-4 border rounded-lg p-6 bg-card">
         <div>
           <div className="flex items-center gap-3 p-2 rounded-lg">
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
