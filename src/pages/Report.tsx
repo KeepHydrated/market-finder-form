@@ -146,7 +146,6 @@ const Report = () => {
 
   return (
     <div className="min-h-screen bg-background p-8">
-      <h1 className="text-3xl font-bold mb-8 text-foreground">Reports</h1>
       <div className="space-y-8">
         {reports.map(({ report, reporterProfile, vendorProfile, reporterEmail, vendorEmail }) => (
           <div key={report.id} className="border rounded-lg p-6 bg-card">
