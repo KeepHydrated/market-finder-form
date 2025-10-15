@@ -52,7 +52,6 @@ const App = () => (
                 <Route path="/order-success" element={<OrderSuccess />} />
                 <Route path="/shop-manager" element={<ShopManager2 />} />
                 <Route path="/my-shop" element={<ShopManager2 />} />
-                <Route path="/submit" element={<Navigate to="/my-shop" replace />} />
                 <Route path="/commissions" element={<Commissions />} />
                 <Route path="/report" element={<Report />} />
                 <Route path="/quiz" element={<Quiz />} />
