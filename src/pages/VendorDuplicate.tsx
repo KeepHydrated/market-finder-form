@@ -1162,7 +1162,7 @@ const VendorDuplicate = () => {
                         }
                         setIsReportDialogOpen(true);
                       }}
-                      className="text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-muted-foreground hover:text-foreground transition-colors mr-3"
                     >
                       <Flag className="h-5 w-5" />
                     </Button>
@@ -1365,27 +1365,27 @@ const VendorDuplicate = () => {
                        </Button>
 
                        {/* Report Button */}
-                       <Button
-                         variant="ghost"
-                         size="sm"
-                         className="h-8 w-8 p-0"
-                         onClick={(e) => {
-                           e.stopPropagation();
-                           if (!user) {
-                             toast({
-                               title: "Authentication required",
-                               description: "Please log in to report vendors",
-                               variant: "destructive",
-                             });
-                             return;
-                           }
-                           setAcceptedSubmission(vendor);
-                           setSelectedVendor(vendor);
-                           setIsReportDialogOpen(true);
-                         }}
-                       >
-                         <Flag className="h-4 w-4 text-muted-foreground" />
-                       </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 mr-3"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!user) {
+                              toast({
+                                title: "Authentication required",
+                                description: "Please log in to report vendors",
+                                variant: "destructive",
+                              });
+                              return;
+                            }
+                            setAcceptedSubmission(vendor);
+                            setSelectedVendor(vendor);
+                            setIsReportDialogOpen(true);
+                          }}
+                        >
+                          <Flag className="h-4 w-4 text-muted-foreground" />
+                        </Button>
 
                        {/* Like Button */}
                        <Button
@@ -1597,7 +1597,7 @@ const VendorDuplicate = () => {
                                 }
                                 setIsReportDialogOpen(true);
                               }}
-                              className="text-muted-foreground hover:text-foreground transition-colors"
+                              className="text-muted-foreground hover:text-foreground transition-colors mr-3"
                             >
                               <Flag className="h-5 w-5" />
                             </Button>
