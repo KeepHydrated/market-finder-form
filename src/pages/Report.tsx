@@ -148,7 +148,7 @@ const Report = () => {
     <div className="min-h-screen bg-background p-8">
       <div className="space-y-8">
         {reports.map(({ report, reporterProfile, vendorProfile, reporterEmail, vendorEmail }) => (
-          <div key={report.id} className="border rounded-lg p-6 bg-card">
+          <div key={report.id}>
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div>
                 <h2 className="text-lg font-semibold mb-2">Reported By:</h2>
@@ -160,45 +160,47 @@ const Report = () => {
                 <h2 className="text-lg font-semibold mb-2">Report:</h2>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <div className="flex items-center gap-3 p-2 rounded-lg">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-primary">
-                      {getInitials(reporterProfile?.full_name || null)}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <p className="font-medium text-foreground">
-                      {reporterProfile?.full_name || 'Anonymous User'}
-                    </p>
-                    <p className="text-sm text-muted-foreground">{reporterEmail}</p>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center gap-3 p-2 rounded-lg">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-primary">
-                      {getInitials(vendorProfile?.full_name || null)}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <p className="font-medium text-foreground">
-                      {vendorProfile?.full_name || 'Unknown Vendor'}
-                    </p>
-                    <p className="text-sm text-muted-foreground">{vendorEmail}</p>
-                  </div>
-                </div>
-              </div>
-              <div>
+            <div className="border rounded-lg p-6 bg-card">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <p className="text-foreground font-semibold">{formatReason(report.reason)}</p>
-                  {report.description && (
-                    <div className="mt-4">
-                      <p className="text-sm text-muted-foreground">{report.description}</p>
+                  <div className="flex items-center gap-3 p-2 rounded-lg">
+                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-sm font-semibold text-primary">
+                        {getInitials(reporterProfile?.full_name || null)}
+                      </span>
                     </div>
-                  )}
+                    <div className="flex flex-col">
+                      <p className="font-medium text-foreground">
+                        {reporterProfile?.full_name || 'Anonymous User'}
+                      </p>
+                      <p className="text-sm text-muted-foreground">{reporterEmail}</p>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center gap-3 p-2 rounded-lg">
+                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-sm font-semibold text-primary">
+                        {getInitials(vendorProfile?.full_name || null)}
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <p className="font-medium text-foreground">
+                        {vendorProfile?.full_name || 'Unknown Vendor'}
+                      </p>
+                      <p className="text-sm text-muted-foreground">{vendorEmail}</p>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div>
+                    <p className="text-foreground font-semibold">{formatReason(report.reason)}</p>
+                    {report.description && (
+                      <div className="mt-4">
+                        <p className="text-sm text-muted-foreground">{report.description}</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
