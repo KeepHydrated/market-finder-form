@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect } from 'react';
-import { Users, Store, MapPin, Package, ChevronDown } from 'lucide-react';
+import { Users, Store, MapPin, Package, ChevronDown, ShoppingCart, DollarSign, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
 
 const Analytics = () => {
@@ -19,12 +19,20 @@ const Analytics = () => {
     markets: 0,
     products: 0
   });
+  const [orderStats, setOrderStats] = useState({
+    totalOrders: 0,
+    totalRevenue: 0,
+    averageOrderValue: 0,
+    pendingOrders: 0,
+    completedOrders: 0
+  });
   const [loading, setLoading] = useState(true);
   const [recentUsers, setRecentUsers] = useState<any[]>([]);
   const [recentVendors, setRecentVendors] = useState<any[]>([]);
   const [recentMarkets, setRecentMarkets] = useState<any[]>([]);
   const [recentProducts, setRecentProducts] = useState<any[]>([]);
-  const [activeSection, setActiveSection] = useState<'users' | 'vendors' | 'markets' | 'products' | null>(null);
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [activeSection, setActiveSection] = useState<'users' | 'vendors' | 'markets' | 'products' | 'orders' | null>(null);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -137,6 +145,30 @@ const Analytics = () => {
       }).slice(0, 10);
 
       setRecentProducts(sortedProducts);
+
+      // Get order statistics
+      const { data: ordersData, error: ordersError } = await supabase
+        .from('orders')
+        .select('id, total_amount, status, created_at, vendor_name, email')
+        .order('created_at', { ascending: false });
+
+      if (ordersError) throw ordersError;
+
+      const totalOrders = ordersData?.length || 0;
+      const totalRevenue = ordersData?.reduce((sum, order) => sum + order.total_amount, 0) || 0;
+      const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+      const pendingOrders = ordersData?.filter(o => o.status === 'pending').length || 0;
+      const completedOrders = ordersData?.filter(o => o.status === 'completed').length || 0;
+
+      setOrderStats({
+        totalOrders,
+        totalRevenue: totalRevenue / 100, // Convert from cents
+        averageOrderValue: averageOrderValue / 100,
+        pendingOrders,
+        completedOrders
+      });
+
+      setRecentOrders(ordersData?.slice(0, 10) || []);
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
@@ -481,6 +513,125 @@ const Analytics = () => {
             </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
+        </div>
+      )}
+
+      <div className="mb-6 mt-12">
+        <h2 className="text-xl font-semibold mb-4">Order Statistics</h2>
+      </div>
+
+      <ScrollArea className="w-full whitespace-nowrap mb-6">
+        <div className="flex gap-4 pb-4">
+          <Card 
+            className="min-w-[200px] flex-shrink-0 cursor-pointer hover:border-primary transition-colors"
+            onClick={() => setActiveSection(activeSection === 'orders' ? null : 'orders')}
+          >
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Orders</CardTitle>
+              <div className="flex items-center gap-2">
+                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${activeSection === 'orders' ? 'rotate-180' : ''}`} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">
+                {loading ? '...' : orderStats.totalOrders.toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground">All time orders</p>
+            </CardContent>
+          </Card>
+
+          <Card className="min-w-[200px] flex-shrink-0">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">
+                {loading ? '...' : `$${orderStats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+              </div>
+              <p className="text-xs text-muted-foreground">Total sales</p>
+            </CardContent>
+          </Card>
+
+          <Card className="min-w-[200px] flex-shrink-0">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Avg Order Value</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">
+                {loading ? '...' : `$${orderStats.averageOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+              </div>
+              <p className="text-xs text-muted-foreground">Per order</p>
+            </CardContent>
+          </Card>
+
+          <Card className="min-w-[200px] flex-shrink-0">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Pending Orders</CardTitle>
+              <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">
+                {loading ? '...' : orderStats.pendingOrders.toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground">Awaiting fulfillment</p>
+            </CardContent>
+          </Card>
+
+          <Card className="min-w-[200px] flex-shrink-0">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Completed Orders</CardTitle>
+              <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">
+                {loading ? '...' : orderStats.completedOrders.toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground">Fulfilled orders</p>
+            </CardContent>
+          </Card>
+        </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+
+      {activeSection === 'orders' && (
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-2">
+            <ShoppingCart className="h-5 w-5" />
+            <h2 className="text-2xl font-bold">Recent Orders</h2>
+          </div>
+          <p className="text-muted-foreground mb-6">Latest orders placed on the platform</p>
+          
+          <div className="space-y-4">
+            {loading ? (
+              <p className="text-muted-foreground">Loading...</p>
+            ) : recentOrders.length === 0 ? (
+              <p className="text-muted-foreground">No orders yet</p>
+            ) : (
+              recentOrders.map((order) => (
+                <Card key={order.id} className="hover:border-primary transition-colors">
+                  <CardContent className="pt-6">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium">Order #{order.id.slice(0, 8)}</p>
+                        <p className="text-sm text-muted-foreground">{order.vendor_name}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{order.email}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold">${(order.total_amount / 100).toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground capitalize">{order.status}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {format(new Date(order.created_at), 'MMM d, yyyy')}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
         </div>
       )}
     </div>
