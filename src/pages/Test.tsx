@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 const Test = () => {
   return (
     <div className="min-h-screen bg-background p-8">
-      <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div className="bg-card rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Reported By:</h2>
           <Link
