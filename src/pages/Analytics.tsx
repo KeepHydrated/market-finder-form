@@ -22,7 +22,9 @@ const Analytics = () => {
   const [loading, setLoading] = useState(true);
   const [recentUsers, setRecentUsers] = useState<any[]>([]);
   const [recentVendors, setRecentVendors] = useState<any[]>([]);
-  const [activeSection, setActiveSection] = useState<'users' | 'vendors' | null>(null);
+  const [recentMarkets, setRecentMarkets] = useState<any[]>([]);
+  const [recentProducts, setRecentProducts] = useState<any[]>([]);
+  const [activeSection, setActiveSection] = useState<'users' | 'vendors' | 'markets' | 'products' | null>(null);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -94,6 +96,47 @@ const Analytics = () => {
       if (recentVendorsData) {
         setRecentVendors(recentVendorsData);
       }
+
+      // Get recent markets
+      const { data: recentMarketsData } = await supabase
+        .from('markets')
+        .select('id, name, address, city, state, created_at')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (recentMarketsData) {
+        setRecentMarkets(recentMarketsData);
+      }
+
+      // Get recent products (from all accepted submissions)
+      const { data: allSubmissions } = await supabase
+        .from('submissions')
+        .select('id, store_name, products')
+        .eq('status', 'accepted');
+
+      const allProducts: any[] = [];
+      if (allSubmissions) {
+        allSubmissions.forEach((submission: any) => {
+          if (Array.isArray(submission.products)) {
+            submission.products.forEach((product: any) => {
+              allProducts.push({
+                ...product,
+                vendorId: submission.id,
+                storeName: submission.store_name
+              });
+            });
+          }
+        });
+      }
+
+      // Sort by creation date and take the 10 most recent
+      const sortedProducts = allProducts.sort((a, b) => {
+        const dateA = new Date(a.created_at || 0).getTime();
+        const dateB = new Date(b.created_at || 0).getTime();
+        return dateB - dateA;
+      }).slice(0, 10);
+
+      setRecentProducts(sortedProducts);
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
@@ -215,10 +258,16 @@ const Analytics = () => {
             </CardContent>
           </Card>
 
-          <Card className="min-w-[200px] flex-shrink-0">
+          <Card 
+            className="min-w-[200px] flex-shrink-0 cursor-pointer hover:border-primary transition-colors"
+            onClick={() => setActiveSection(activeSection === 'markets' ? null : 'markets')}
+          >
             <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Markets</CardTitle>
-              <MapPin className="h-4 w-4 text-muted-foreground" />
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${activeSection === 'markets' ? 'rotate-180' : ''}`} />
+              </div>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold mb-1">
@@ -228,10 +277,16 @@ const Analytics = () => {
             </CardContent>
           </Card>
 
-          <Card className="min-w-[200px] flex-shrink-0">
+          <Card 
+            className="min-w-[200px] flex-shrink-0 cursor-pointer hover:border-primary transition-colors"
+            onClick={() => setActiveSection(activeSection === 'products' ? null : 'products')}
+          >
             <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Products</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
+              <div className="flex items-center gap-2">
+                <Package className="h-4 w-4 text-muted-foreground" />
+                <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${activeSection === 'products' ? 'rotate-180' : ''}`} />
+              </div>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold mb-1">
@@ -320,6 +375,104 @@ const Analytics = () => {
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {format(new Date(vendor.updated_at), 'MMM d')}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
+      )}
+
+      {activeSection === 'markets' && (
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-2">
+            <MapPin className="h-5 w-5" />
+            <h2 className="text-2xl font-bold">Recently Joined Markets</h2>
+          </div>
+          <p className="text-muted-foreground mb-6">Latest farmers markets added to the platform</p>
+          
+          <ScrollArea className="w-full whitespace-nowrap">
+            <div className="flex gap-6 pb-4">
+              {loading ? (
+                <p className="text-muted-foreground">Loading...</p>
+              ) : recentMarkets.length === 0 ? (
+                <p className="text-muted-foreground">No markets yet</p>
+              ) : (
+                recentMarkets.map((market) => (
+                  <div 
+                    key={market.id} 
+                    className="flex flex-col gap-2 min-w-[180px] cursor-pointer transition-transform hover:scale-105 p-4 border rounded-lg"
+                    onClick={() => window.location.href = `/?market=${market.id}`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <MapPin className="h-8 w-8 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm truncate max-w-[160px] hover:text-primary transition-colors">
+                        {market.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {market.city}, {market.state}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {format(new Date(market.created_at), 'MMM d')}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
+      )}
+
+      {activeSection === 'products' && (
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-2">
+            <Package className="h-5 w-5" />
+            <h2 className="text-2xl font-bold">Recently Added Products</h2>
+          </div>
+          <p className="text-muted-foreground mb-6">Latest products added by vendors</p>
+          
+          <ScrollArea className="w-full whitespace-nowrap">
+            <div className="flex gap-6 pb-4">
+              {loading ? (
+                <p className="text-muted-foreground">Loading...</p>
+              ) : recentProducts.length === 0 ? (
+                <p className="text-muted-foreground">No products yet</p>
+              ) : (
+                recentProducts.map((product, index) => (
+                  <div 
+                    key={`${product.vendorId}-${index}`}
+                    className="flex flex-col gap-2 min-w-[160px] cursor-pointer transition-transform hover:scale-105"
+                    onClick={() => navigate(`/market?vendor=${product.vendorId}`)}
+                  >
+                    <div className="relative h-32 w-full rounded-lg overflow-hidden bg-muted">
+                      {product.images?.[0] ? (
+                        <img 
+                          src={product.images[0]} 
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <Package className="h-12 w-12 text-muted-foreground" />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm truncate max-w-[160px] hover:text-primary transition-colors">
+                        {product.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {product.storeName}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        ${product.price}
                       </p>
                     </div>
                   </div>
