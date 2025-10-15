@@ -10,10 +10,13 @@ export const useAdmin = () => {
   useEffect(() => {
     const checkAdminStatus = async () => {
       if (!user) {
+        console.log("useAdmin: No user, setting isAdmin to false");
         setIsAdmin(false);
         setLoading(false);
         return;
       }
+
+      console.log("useAdmin: Checking admin status for user:", user.id);
 
       try {
         const { data, error } = await supabase
@@ -24,11 +27,15 @@ export const useAdmin = () => {
           .maybeSingle();
 
         if (error) throw error;
-        setIsAdmin(!!data);
+        
+        const isAdminUser = !!data;
+        console.log("useAdmin: Admin check result:", { data, isAdminUser });
+        setIsAdmin(isAdminUser);
       } catch (error) {
         console.error("Error checking admin status:", error);
         setIsAdmin(false);
       } finally {
+        console.log("useAdmin: Setting loading to false");
         setLoading(false);
       }
     };
