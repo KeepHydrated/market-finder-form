@@ -57,7 +57,7 @@ export function ShopMobileNav({ hasShopData = false }: ShopMobileNavProps) {
   const [open, setOpen] = useState(false);
   
   const urlParams = new URLSearchParams(location.search);
-  const currentSection = urlParams.get('section') || 'overview';
+  const currentSection = urlParams.get('section') || 'setup';
 
   const availableItems = menuItems.filter(item => 
     !item.requiresShop || hasShopData

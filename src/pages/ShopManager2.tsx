@@ -65,7 +65,7 @@ export default function ShopManager() {
   
   // Get current section from URL params
   const urlParams = new URLSearchParams(location.search);
-  const currentSection = urlParams.get('section') || 'shop';
+  const currentSection = urlParams.get('section') || 'setup';
   
   const [shopData, setShopData] = useState<ShopData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -118,7 +118,7 @@ export default function ShopManager() {
   useEffect(() => {
     // Auto-navigate based on shop data existence
     if (!isSavingRef.current && !loadingShop) {
-      const newSection = shopData ? currentSection : 'overview';
+      const newSection = shopData ? currentSection : 'setup';
       if (newSection !== currentSection) {
         navigate(`/my-shop?section=${newSection}`, { replace: true });
       }

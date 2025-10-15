@@ -64,7 +64,7 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
   
   // Get current section from URL params or default
   const urlParams = new URLSearchParams(location.search);
-  const currentSection = urlParams.get('section') || 'overview';
+  const currentSection = urlParams.get('section') || 'setup';
 
   // Filter items based on whether shop data exists
   const availableItems = menuItems.filter(item => 
