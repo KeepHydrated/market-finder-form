@@ -156,6 +156,7 @@ const Analytics = () => {
           created_at, 
           vendor_name, 
           email,
+          user_id,
           order_items (
             product_name,
             product_image,
@@ -164,6 +165,30 @@ const Analytics = () => {
           )
         `)
         .order('created_at', { ascending: false });
+      
+      // Fetch profiles for orders with user_id
+      if (ordersData) {
+        const userIds = ordersData
+          .map(order => order.user_id)
+          .filter((id): id is string => id !== null);
+        
+        if (userIds.length > 0) {
+          const { data: profilesData } = await supabase
+            .from('profiles')
+            .select('user_id, full_name, avatar_url')
+            .in('user_id', userIds);
+          
+          // Attach profile data to orders
+          if (profilesData) {
+            ordersData.forEach((order: any) => {
+              const profile = profilesData.find(p => p.user_id === order.user_id);
+              if (profile) {
+                order.profile = profile;
+              }
+            });
+          }
+        }
+      }
 
       if (ordersError) throw ordersError;
 
@@ -632,6 +657,20 @@ const Analytics = () => {
                       key={order.id}
                       className="flex flex-col gap-2 min-w-[200px] cursor-pointer transition-transform hover:scale-105"
                     >
+                      {/* Customer Profile */}
+                      <div className="flex items-center gap-2 mb-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={order.profile?.avatar_url} alt={order.profile?.full_name || order.email} />
+                          <AvatarFallback className="text-xs">
+                            {getInitials(order.profile?.full_name || order.email)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium truncate max-w-[150px]">
+                          {order.profile?.full_name || order.email}
+                        </span>
+                      </div>
+                      
+                      {/* Product Image */}
                       <div className="relative h-48 w-full rounded-lg overflow-hidden bg-muted">
                         {firstItem?.product_image ? (
                           <img 
@@ -645,6 +684,8 @@ const Analytics = () => {
                           </div>
                         )}
                       </div>
+                      
+                      {/* Order Details */}
                       <div className="space-y-1">
                         <p className="text-base text-foreground">
                           {firstItem?.product_name || order.vendor_name}
