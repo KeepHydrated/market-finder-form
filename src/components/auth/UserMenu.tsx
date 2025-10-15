@@ -63,11 +63,6 @@ export function UserMenu({ user, profile }: UserMenuProps) {
     setSheetOpen(false);
   };
 
-  const handleAdminReportsClick = () => {
-    navigate('/admin/reports');
-    setSheetOpen(false);
-  };
-
   const getInitials = (name?: string) => {
     if (!name) return user?.email?.charAt(0).toUpperCase() || 'U';
     return name
@@ -158,20 +153,6 @@ export function UserMenu({ user, profile }: UserMenuProps) {
                   <span>My Shop</span>
                 </Button>
 
-                {isAdmin && (
-                  <>
-                    <Separator className="my-2" />
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-base h-12"
-                      onClick={handleAdminReportsClick}
-                    >
-                      <Shield className="mr-3 h-5 w-5" />
-                      <span>Admin: Reports</span>
-                    </Button>
-                  </>
-                )}
-
                 <Separator className="my-2" />
                 
                 <Button
@@ -232,12 +213,6 @@ export function UserMenu({ user, profile }: UserMenuProps) {
           <MessageSquare className="mr-2 h-4 w-4" />
           <span>Messages</span>
         </DropdownMenuItem>
-        {isAdmin && (
-          <DropdownMenuItem onClick={handleAdminReportsClick}>
-            <Shield className="mr-2 h-4 w-4" />
-            <span>Admin: Reports</span>
-          </DropdownMenuItem>
-        )}
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
