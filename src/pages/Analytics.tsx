@@ -646,11 +646,11 @@ const Analytics = () => {
                         )}
                       </div>
                       <div className="space-y-1">
-                        <p className="text-lg font-normal text-muted-foreground">
-                          ${(order.total_amount / 100).toFixed(2)}
-                        </p>
                         <p className="text-base text-foreground">
                           {firstItem?.product_name || order.vendor_name}
+                        </p>
+                        <p className="text-lg font-normal text-muted-foreground">
+                          ${(order.total_amount / 100).toFixed(2)}
                         </p>
                       </div>
                     </div>
