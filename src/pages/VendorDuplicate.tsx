@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight, MessageSquare, ArrowUp } from "lucide-react";
+import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight, MessageSquare, ArrowUp, Flag } from "lucide-react";
 import { FloatingChat } from "@/components/FloatingChat";
+import { ReportVendorDialog } from "@/components/ReportVendorDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -117,6 +118,7 @@ const VendorDuplicate = () => {
   const [navigationMarketsOrder, setNavigationMarketsOrder] = useState<string[]>([]);
   const isMobile = useIsMobile();
   const [isTablet, setIsTablet] = useState(false);
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
 
   // Check if viewport is tablet (768px - 1024px)
   useEffect(() => {
@@ -1168,6 +1170,28 @@ const VendorDuplicate = () => {
                       <MessageSquare className="h-6 w-6" />
                     </Button>
                   )}
+
+                  {/* Report button */}
+                  {selectedVendor && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        if (!user) {
+                          toast({
+                            title: "Authentication required",
+                            description: "Please log in to report vendors",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        setIsReportDialogOpen(true);
+                      }}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Flag className="h-5 w-5" />
+                    </Button>
+                  )}
                   
                   <Button
                     variant="ghost"
@@ -1723,6 +1747,16 @@ const VendorDuplicate = () => {
         vendorId={chatVendorId}
         vendorName={chatVendorName}
       />
+
+      {/* Report Vendor Dialog */}
+      {selectedVendor && (
+        <ReportVendorDialog
+          open={isReportDialogOpen}
+          onClose={() => setIsReportDialogOpen(false)}
+          vendorId={selectedVendor.id}
+          vendorName={selectedVendor.store_name}
+        />
+      )}
 
       {/* Review Modal */}
       <Dialog open={isReviewModalOpen} onOpenChange={(open) => {
