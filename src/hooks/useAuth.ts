@@ -7,11 +7,14 @@ export function useAuth() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  console.log("useAuth: Current state", { hasUser: !!user, userId: user?.id, userEmail: user?.email, loading });
+
   useEffect(() => {
+    console.log("useAuth: Setting up auth listener");
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state changed:', event, session);
+        console.log('useAuth: Auth state changed:', event, 'hasSession:', !!session, 'userEmail:', session?.user?.email);
         setUser(session?.user ?? null);
         setLoading(false);
         
@@ -28,7 +31,7 @@ export function useAuth() {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session:', session);
+      console.log('useAuth: Initial session check - hasSession:', !!session, 'userEmail:', session?.user?.email);
       setUser(session?.user ?? null);
       setLoading(false);
       
