@@ -23,7 +23,8 @@ const Test = () => {
         </div>
         <div className="bg-card rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Person Reported:</h2>
-          <Link 
+          <div className="border-b mb-4"></div>
+          <Link
             to="/profile" 
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer"
           >
