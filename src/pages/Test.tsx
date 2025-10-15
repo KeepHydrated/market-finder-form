@@ -20,7 +20,19 @@ const Test = () => {
           </Link>
         </div>
         <div className="bg-card border rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-2">Reported By:</h2>
+          <h2 className="text-lg font-semibold mb-4">Reported By:</h2>
+          <Link 
+            to="/profile" 
+            className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer"
+          >
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <span className="text-sm font-semibold text-primary">NH</span>
+            </div>
+            <div className="flex flex-col">
+              <p className="font-medium text-foreground">Nadia Hibri</p>
+              <p className="text-sm text-muted-foreground">nadiachibri@gmail.com</p>
+            </div>
+          </Link>
         </div>
         <div className="bg-card border rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-2">Column 3</h2>
