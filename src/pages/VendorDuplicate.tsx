@@ -1604,6 +1604,28 @@ const VendorDuplicate = () => {
                               <MessageSquare className="h-6 w-6" />
                             </Button>
                           )}
+
+                          {/* Report button */}
+                          {selectedVendor && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                if (!user) {
+                                  toast({
+                                    title: "Authentication required",
+                                    description: "Please log in to report vendors",
+                                    variant: "destructive",
+                                  });
+                                  return;
+                                }
+                                setIsReportDialogOpen(true);
+                              }}
+                              className="text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                              <Flag className="h-5 w-5" />
+                            </Button>
+                          )}
                           
                           <Button
                             variant="ghost"
