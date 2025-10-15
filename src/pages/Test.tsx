@@ -3,7 +3,7 @@ const Test = () => {
     <div className="min-h-screen bg-background p-8">
       <div className="grid grid-cols-4 gap-4">
         <div className="bg-card border rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-2">Person By:</h2>
+          <h2 className="text-lg font-semibold mb-2">Person Reported:</h2>
         </div>
         <div className="bg-card border rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-2">Column 2</h2>
