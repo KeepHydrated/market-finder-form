@@ -30,13 +30,17 @@ export default function AdminReports() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("AdminReports: useEffect triggered", { isAdmin, adminLoading });
     if (!adminLoading && !isAdmin) {
+      console.log("AdminReports: Redirecting - user is not admin");
       navigate("/");
       toast({
         title: "Access Denied",
         description: "You don't have permission to access this page.",
         variant: "destructive",
       });
+    } else if (!adminLoading && isAdmin) {
+      console.log("AdminReports: User is admin, allowing access");
     }
   }, [isAdmin, adminLoading, navigate, toast]);
 
