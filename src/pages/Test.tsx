@@ -20,7 +20,7 @@ const Test = () => {
           </Link>
         </div>
         <div className="bg-card border rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-2">Column 2</h2>
+          <h2 className="text-lg font-semibold mb-2">Reported By:</h2>
         </div>
         <div className="bg-card border rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-2">Column 3</h2>
