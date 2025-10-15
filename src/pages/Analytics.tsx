@@ -626,7 +626,6 @@ const Analytics = () => {
               ) : (
                 recentOrders.map((order) => {
                   const firstItem = order.order_items?.[0];
-                  const itemCount = order.order_items?.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0;
                   
                   return (
                     <div 
@@ -647,17 +646,14 @@ const Analytics = () => {
                         )}
                       </div>
                       <div className="space-y-1">
-                        <p className="font-medium text-sm truncate">
+                        <p className="font-medium text-lg">
                           Order #{order.id.slice(0, 8)}
                         </p>
-                        <p className="text-lg font-bold text-primary">
+                        <p className="text-lg font-normal text-muted-foreground">
                           ${(order.total_amount / 100).toFixed(2)}
                         </p>
-                        <p className="text-sm text-muted-foreground truncate">
+                        <p className="text-base text-foreground">
                           {order.vendor_name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {itemCount} item{itemCount !== 1 ? 's' : ''} • {format(new Date(order.created_at), 'MMM d')}
                         </p>
                       </div>
                     </div>
