@@ -6,7 +6,7 @@ import { Send, Package, X, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 
 interface OrderItem {
   id: string;
@@ -42,6 +42,8 @@ interface OrderChatDialogProps {
 }
 
 export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: OrderChatDialogProps) => {
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -50,6 +52,9 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
   const [isOrderOpen, setIsOrderOpen] = useState(true);
   const { toast } = useToast();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Check if we're already on this vendor's page
+  const isOnVendorPage = location.pathname === '/market' && searchParams.get('id') === vendorId;
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -200,12 +205,21 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <Link 
-            to={`/market?id=${vendorId}`}
-            className="font-semibold text-foreground hover:underline"
-          >
-            {vendorName || 'Store'}
-          </Link>
+          {isOnVendorPage ? (
+            <button 
+              onClick={onClose}
+              className="font-semibold text-foreground hover:underline"
+            >
+              {vendorName || 'Store'}
+            </button>
+          ) : (
+            <Link 
+              to={`/market?id=${vendorId}`}
+              className="font-semibold text-foreground hover:underline"
+            >
+              {vendorName || 'Store'}
+            </Link>
+          )}
           <Button
             variant="ghost"
             size="sm"

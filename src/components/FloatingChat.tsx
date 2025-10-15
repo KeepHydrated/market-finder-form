@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 
 interface Message {
   id: string;
@@ -46,11 +46,16 @@ interface FloatingChatProps {
 export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems }: FloatingChatProps) {
   const { user } = useAuth();
   const { toast } = useToast();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [conversation, setConversation] = useState<ConversationDetails | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Check if we're already on this vendor's page
+  const isOnVendorPage = location.pathname === '/market' && searchParams.get('id') === vendorId;
 
   useEffect(() => {
     if (!isOpen || !user || !vendorId) return;
@@ -238,12 +243,21 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <Link 
-            to={`/market?id=${vendorId}`}
-            className="font-semibold text-foreground hover:underline"
-          >
-            {vendorName}
-          </Link>
+          {isOnVendorPage ? (
+            <button 
+              onClick={onClose}
+              className="font-semibold text-foreground hover:underline"
+            >
+              {vendorName}
+            </button>
+          ) : (
+            <Link 
+              to={`/market?id=${vendorId}`}
+              className="font-semibold text-foreground hover:underline"
+            >
+              {vendorName}
+            </Link>
+          )}
           <Button
             variant="ghost"
             size="sm"
