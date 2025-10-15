@@ -182,6 +182,11 @@ const Analytics = () => {
       });
 
       setRecentOrders(ordersData?.slice(0, 10) || []);
+      console.log('Recent orders IDs:', ordersData?.slice(0, 10).map(o => ({
+        fullId: o.id,
+        shortId: o.id.slice(0, 8),
+        productName: o.order_items?.[0]?.product_name
+      })));
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
