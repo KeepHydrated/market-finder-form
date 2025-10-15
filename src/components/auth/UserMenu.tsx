@@ -18,8 +18,9 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut, Package, Settings, MessageSquare, Store } from 'lucide-react';
+import { LogOut, Package, Settings, MessageSquare, Store, Shield } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAdmin } from '@/hooks/useAdmin';
 
 interface UserMenuProps {
   user: any;
@@ -30,6 +31,7 @@ export function UserMenu({ user, profile }: UserMenuProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const { isAdmin } = useAdmin();
   
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -58,6 +60,11 @@ export function UserMenu({ user, profile }: UserMenuProps) {
 
   const handleShopClick = () => {
     navigate('/my-shop');
+    setSheetOpen(false);
+  };
+
+  const handleAdminReportsClick = () => {
+    navigate('/admin/reports');
     setSheetOpen(false);
   };
 
@@ -151,6 +158,20 @@ export function UserMenu({ user, profile }: UserMenuProps) {
                   <span>My Shop</span>
                 </Button>
 
+                {isAdmin && (
+                  <>
+                    <Separator className="my-2" />
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-base h-12"
+                      onClick={handleAdminReportsClick}
+                    >
+                      <Shield className="mr-3 h-5 w-5" />
+                      <span>Admin: Reports</span>
+                    </Button>
+                  </>
+                )}
+
                 <Separator className="my-2" />
                 
                 <Button
@@ -211,6 +232,12 @@ export function UserMenu({ user, profile }: UserMenuProps) {
           <MessageSquare className="mr-2 h-4 w-4" />
           <span>Messages</span>
         </DropdownMenuItem>
+        {isAdmin && (
+          <DropdownMenuItem onClick={handleAdminReportsClick}>
+            <Shield className="mr-2 h-4 w-4" />
+            <span>Admin: Reports</span>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>

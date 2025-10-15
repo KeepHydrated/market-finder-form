@@ -26,6 +26,7 @@ import Commissions from "./pages/Commissions";
 import Checkout from "./pages/Checkout";
 import AccountSettings from "./pages/AccountSettings";
 import Auth from "./pages/Auth";
+import AdminReports from "./pages/AdminReports";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
                 <Route path="/2" element={<Two />} />
                 <Route path="/messages" element={<Messages />} />
                 <Route path="/messages/:conversationId" element={<Conversation />} />
+                <Route path="/admin/reports" element={<AdminReports />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
