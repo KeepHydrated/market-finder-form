@@ -18,7 +18,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut, Package, Settings, MessageSquare, Store, Shield, FileWarning } from 'lucide-react';
+import { LogOut, Package, Settings, MessageSquare, Store, Shield, FileWarning, DollarSign } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAdmin } from '@/hooks/useAdmin';
 
@@ -65,6 +65,11 @@ export function UserMenu({ user, profile }: UserMenuProps) {
 
   const handleReportClick = () => {
     navigate('/report');
+    setSheetOpen(false);
+  };
+
+  const handleCommissionsClick = () => {
+    navigate('/commissions');
     setSheetOpen(false);
   };
 
@@ -171,6 +176,14 @@ export function UserMenu({ user, profile }: UserMenuProps) {
                       <FileWarning className="mr-3 h-5 w-5" />
                       <span>Reports</span>
                     </Button>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-base h-12"
+                      onClick={handleCommissionsClick}
+                    >
+                      <DollarSign className="mr-3 h-5 w-5" />
+                      <span>Commissions</span>
+                    </Button>
                     <Separator className="my-2" />
                   </>
                 )}
@@ -239,6 +252,10 @@ export function UserMenu({ user, profile }: UserMenuProps) {
             <DropdownMenuItem onClick={handleReportClick}>
               <FileWarning className="mr-2 h-4 w-4" />
               <span>Reports</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleCommissionsClick}>
+              <DollarSign className="mr-2 h-4 w-4" />
+              <span>Commissions</span>
             </DropdownMenuItem>
           </>
         )}
