@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 const Test = () => {
   return (
     <div className="min-h-screen bg-background p-8">
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-card rounded-lg p-6">
+      <div className="grid grid-cols-3 gap-4 border rounded-lg p-6 bg-card">
+        <div className="rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Reported By:</h2>
           <Link
             to="/profile" 
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer border"
+            className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer"
           >
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="text-sm font-semibold text-primary">NH</span>
@@ -19,11 +19,11 @@ const Test = () => {
             </div>
           </Link>
         </div>
-        <div className="bg-card rounded-lg p-6">
+        <div className="rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Person Reported:</h2>
           <Link
             to="/profile" 
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer border"
+            className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer"
           >
             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="text-sm font-semibold text-primary">NT</span>
@@ -34,9 +34,9 @@ const Test = () => {
             </div>
           </Link>
         </div>
-        <div className="bg-card rounded-lg p-6">
+        <div className="rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Report:</h2>
-          <div className="border rounded-lg p-4">
+          <div className="rounded-lg">
             <p className="text-foreground font-semibold">Inappropriate Content</p>
             <div className="mt-4">
               <h3 className="text-sm font-semibold mb-2">Additional Details:</h3>
