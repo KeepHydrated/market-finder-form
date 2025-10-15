@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Link } from 'react-router-dom';
 
 interface Message {
   id: string;
@@ -237,7 +238,12 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <h3 className="font-semibold text-foreground">{vendorName}</h3>
+          <Link 
+            to={`/profile/${vendorId}`}
+            className="font-semibold text-foreground hover:underline"
+          >
+            {vendorName}
+          </Link>
           <Button
             variant="ghost"
             size="sm"

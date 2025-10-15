@@ -6,6 +6,7 @@ import { Send, Package, X, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Link } from "react-router-dom";
 
 interface OrderItem {
   id: string;
@@ -199,7 +200,12 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <h3 className="font-semibold text-foreground">{vendorName || 'Store'}</h3>
+          <Link 
+            to={`/profile/${vendorId}`}
+            className="font-semibold text-foreground hover:underline"
+          >
+            {vendorName || 'Store'}
+          </Link>
           <Button
             variant="ghost"
             size="sm"
