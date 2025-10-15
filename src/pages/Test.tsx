@@ -3,11 +3,9 @@ import { Link } from 'react-router-dom';
 const Test = () => {
   return (
     <div className="min-h-screen bg-background p-8">
-      <div className="border-b mb-6"></div>
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-card rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Reported By:</h2>
-          <div className="border-b mb-4"></div>
           <Link
             to="/profile" 
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer"
@@ -23,7 +21,6 @@ const Test = () => {
         </div>
         <div className="bg-card rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Person Reported:</h2>
-          <div className="border-b mb-4"></div>
           <Link
             to="/profile" 
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer"
@@ -48,7 +45,6 @@ const Test = () => {
           </div>
         </div>
       </div>
-      <div className="border-b mt-6"></div>
     </div>
   );
 };
