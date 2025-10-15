@@ -55,7 +55,7 @@ const App = () => (
                 <Route path="/my-shop" element={<ShopManager2 />} />
                 <Route path="/submit" element={<Navigate to="/my-shop" replace />} />
                 <Route path="/commissions" element={<Commissions />} />
-                <Route path="/test" element={<Test />} />
+                <Route path="/test/:reportId" element={<Test />} />
                 <Route path="/quiz" element={<Quiz />} />
                 <Route path="/2" element={<Two />} />
                 <Route path="/messages" element={<Messages />} />
