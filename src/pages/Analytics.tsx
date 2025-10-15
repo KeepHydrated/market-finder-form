@@ -176,9 +176,9 @@ const Analytics = () => {
         <h2 className="text-xl font-semibold mb-4">Platform Statistics</h2>
       </div>
 
-      <Collapsible open={showRecentUsers} onOpenChange={setShowRecentUsers}>
-        <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex gap-4 pb-4">
+      <ScrollArea className="w-full whitespace-nowrap mb-6">
+        <div className="flex gap-4 pb-4">
+          <Collapsible open={showRecentUsers} onOpenChange={setShowRecentUsers}>
             <CollapsibleTrigger asChild>
               <Card className="min-w-[200px] flex-shrink-0 cursor-pointer hover:border-primary transition-colors">
                 <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
@@ -196,12 +196,60 @@ const Analytics = () => {
                 </CardContent>
               </Card>
             </CollapsibleTrigger>
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+          </Collapsible>
 
+          <Collapsible open={showRecentVendors} onOpenChange={setShowRecentVendors}>
+            <CollapsibleTrigger asChild>
+              <Card className="min-w-[200px] flex-shrink-0 cursor-pointer hover:border-primary transition-colors">
+                <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Vendors</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Store className="h-4 w-4 text-muted-foreground" />
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showRecentVendors ? 'rotate-180' : ''}`} />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold mb-1">
+                    {loading ? '...' : stats.vendors.toLocaleString()}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Active vendors</p>
+                </CardContent>
+              </Card>
+            </CollapsibleTrigger>
+          </Collapsible>
+
+          <Card className="min-w-[200px] flex-shrink-0">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Markets</CardTitle>
+              <MapPin className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">
+                {loading ? '...' : stats.markets.toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground">Listed markets</p>
+            </CardContent>
+          </Card>
+
+          <Card className="min-w-[200px] flex-shrink-0">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Products</CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">
+                {loading ? '...' : stats.products.toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground">Available products</p>
+            </CardContent>
+          </Card>
+        </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+
+      <Collapsible open={showRecentUsers} onOpenChange={setShowRecentUsers}>
         <CollapsibleContent>
-          <div className="mt-8">
+          <div className="mb-8">
             <div className="flex items-center gap-2 mb-2">
               <Users className="h-5 w-5" />
               <h2 className="text-2xl font-bold">Recently Joined Users</h2>
@@ -245,58 +293,9 @@ const Analytics = () => {
         </CollapsibleContent>
       </Collapsible>
 
-      <Collapsible open={showRecentVendors} onOpenChange={setShowRecentVendors} className="mt-6">
-        <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex gap-4 pb-4">
-            <CollapsibleTrigger asChild>
-              <Card className="min-w-[200px] flex-shrink-0 cursor-pointer hover:border-primary transition-colors">
-                <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Vendors</CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Store className="h-4 w-4 text-muted-foreground" />
-                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showRecentVendors ? 'rotate-180' : ''}`} />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold mb-1">
-                    {loading ? '...' : stats.vendors.toLocaleString()}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Active vendors</p>
-                </CardContent>
-              </Card>
-            </CollapsibleTrigger>
-
-            <Card className="min-w-[200px] flex-shrink-0">
-              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Markets</CardTitle>
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold mb-1">
-                  {loading ? '...' : stats.markets.toLocaleString()}
-                </div>
-                <p className="text-xs text-muted-foreground">Listed markets</p>
-              </CardContent>
-            </Card>
-
-            <Card className="min-w-[200px] flex-shrink-0">
-              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Products</CardTitle>
-                <Package className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold mb-1">
-                  {loading ? '...' : stats.products.toLocaleString()}
-                </div>
-                <p className="text-xs text-muted-foreground">Available products</p>
-              </CardContent>
-            </Card>
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-
+      <Collapsible open={showRecentVendors} onOpenChange={setShowRecentVendors}>
         <CollapsibleContent>
-          <div className="mt-8">
+          <div className="mb-8">
             <div className="flex items-center gap-2 mb-2">
               <Store className="h-5 w-5" />
               <h2 className="text-2xl font-bold">Recently Joined Vendors</h2>
