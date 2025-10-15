@@ -6,21 +6,6 @@ const Test = () => {
       <div className="border-b mb-6"></div>
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-card rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Person Reported:</h2>
-          <Link 
-            to="/profile" 
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer"
-          >
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <span className="text-sm font-semibold text-primary">NT</span>
-            </div>
-            <div className="flex flex-col">
-              <p className="font-medium text-foreground">Nadia's Test account</p>
-              <p className="text-sm text-muted-foreground">info@quotally.com</p>
-            </div>
-          </Link>
-        </div>
-        <div className="bg-card rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Reported By:</h2>
           <Link 
             to="/profile" 
@@ -32,6 +17,21 @@ const Test = () => {
             <div className="flex flex-col">
               <p className="font-medium text-foreground">Nadia Hibri</p>
               <p className="text-sm text-muted-foreground">nadiachibri@gmail.com</p>
+            </div>
+          </Link>
+        </div>
+        <div className="bg-card rounded-lg p-6">
+          <h2 className="text-lg font-semibold mb-4">Person Reported:</h2>
+          <Link 
+            to="/profile" 
+            className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer"
+          >
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <span className="text-sm font-semibold text-primary">NT</span>
+            </div>
+            <div className="flex flex-col">
+              <p className="font-medium text-foreground">Nadia's Test account</p>
+              <p className="text-sm text-muted-foreground">info@quotally.com</p>
             </div>
           </Link>
         </div>
