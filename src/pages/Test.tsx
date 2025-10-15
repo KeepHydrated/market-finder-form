@@ -47,7 +47,6 @@ const Test = () => {
           <div>
             <p className="text-foreground font-semibold">Inappropriate Content</p>
             <div className="mt-4">
-              <h3 className="text-sm font-semibold mb-2">Additional Details:</h3>
               <p className="text-sm text-muted-foreground">
                 This vendor has been posting inappropriate content on their profile page that violates community guidelines.
               </p>
