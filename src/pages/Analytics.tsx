@@ -647,7 +647,7 @@ const Analytics = () => {
                       </div>
                       <div className="space-y-1">
                         <p className="font-medium text-lg">
-                          Order #{order.id.slice(0, 8)}
+                          {order.id.slice(0, 8)}
                         </p>
                         <p className="text-lg font-normal text-muted-foreground">
                           ${(order.total_amount / 100).toFixed(2)}
