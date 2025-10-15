@@ -101,6 +101,13 @@ const Report = () => {
       .slice(0, 2);
   };
 
+  const formatReason = (reason: string) => {
+    return reason
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-8 flex items-center justify-center">
@@ -167,7 +174,7 @@ const Report = () => {
               </div>
               <div>
                 <div>
-                  <p className="text-foreground font-semibold">{report.reason}</p>
+                  <p className="text-foreground font-semibold">{formatReason(report.reason)}</p>
                   {report.description && (
                     <div className="mt-4">
                       <p className="text-sm text-muted-foreground">{report.description}</p>
