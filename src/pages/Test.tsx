@@ -35,7 +35,7 @@ const Test = () => {
           </Link>
         </div>
         <div className="bg-card border rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Reason For Report:</h2>
+          <h2 className="text-lg font-semibold mb-4">Report:</h2>
           <p className="text-foreground">Inappropriate Content</p>
         </div>
         <div className="bg-card border rounded-lg p-6">
