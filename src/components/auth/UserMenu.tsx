@@ -18,7 +18,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut, Package, Settings, MessageSquare, Store, Shield } from 'lucide-react';
+import { LogOut, Package, Settings, MessageSquare, Store, Shield, FileWarning } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAdmin } from '@/hooks/useAdmin';
 
@@ -60,6 +60,11 @@ export function UserMenu({ user, profile }: UserMenuProps) {
 
   const handleShopClick = () => {
     navigate('/my-shop');
+    setSheetOpen(false);
+  };
+
+  const handleReportClick = () => {
+    navigate('/report');
     setSheetOpen(false);
   };
 
@@ -154,6 +159,21 @@ export function UserMenu({ user, profile }: UserMenuProps) {
                 </Button>
 
                 <Separator className="my-2" />
+
+                {/* Admin Reports Section - Only for nadiachibri@gmail.com */}
+                {user?.email === 'nadiachibri@gmail.com' && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-base h-12"
+                      onClick={handleReportClick}
+                    >
+                      <FileWarning className="mr-3 h-5 w-5" />
+                      <span>Reports</span>
+                    </Button>
+                    <Separator className="my-2" />
+                  </>
+                )}
                 
                 <Button
                   variant="ghost"
@@ -213,6 +233,16 @@ export function UserMenu({ user, profile }: UserMenuProps) {
           <MessageSquare className="mr-2 h-4 w-4" />
           <span>Messages</span>
         </DropdownMenuItem>
+        {user?.email === 'nadiachibri@gmail.com' && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleReportClick}>
+              <FileWarning className="mr-2 h-4 w-4" />
+              <span>Reports</span>
+            </DropdownMenuItem>
+          </>
+        )}
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
