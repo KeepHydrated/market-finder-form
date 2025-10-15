@@ -18,7 +18,6 @@ const Test = () => {
               <p className="text-sm text-muted-foreground">info@quotally.com</p>
             </div>
           </Link>
-          <div className="border-b mt-6"></div>
         </div>
         <div className="bg-card rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Reported By:</h2>
@@ -46,6 +45,7 @@ const Test = () => {
           </div>
         </div>
       </div>
+      <div className="border-b mt-6"></div>
     </div>
   );
 };
