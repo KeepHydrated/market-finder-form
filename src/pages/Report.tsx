@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 interface Report {
   id: string;
@@ -25,10 +26,29 @@ interface ReportData {
 }
 
 const Report = () => {
+  const navigate = useNavigate();
   const [reports, setReports] = useState<ReportData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user || user.email !== 'nadiachibri@gmail.com') {
+        navigate('/');
+        return;
+      }
+      
+      setAuthorized(true);
+    };
+
+    checkAuth();
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!authorized) return;
+
     const fetchAllReports = async () => {
       // Fetch all reports
       const { data: reportsData, error: reportsError } = await supabase
@@ -89,7 +109,7 @@ const Report = () => {
     };
 
     fetchAllReports();
-  }, []);
+  }, [authorized]);
 
   const getInitials = (name: string | null) => {
     if (!name) return 'U';
@@ -108,10 +128,10 @@ const Report = () => {
       .join(' ');
   };
 
-  if (loading) {
+  if (loading || !authorized) {
     return (
       <div className="min-h-screen bg-background p-8 flex items-center justify-center">
-        <p className="text-foreground">Loading reports...</p>
+        <p className="text-foreground">Loading...</p>
       </div>
     );
   }
