@@ -29,7 +29,7 @@ const menuItems = [
     title: "Overview", 
     icon: TestTube, 
     section: "overview",
-    requiresShop: false 
+    requiresShop: true 
   },
   { 
     title: "Setup", 
