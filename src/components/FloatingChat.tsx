@@ -239,7 +239,7 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <Link 
-            to={`/profile/${vendorId}`}
+            to={`/market?id=${vendorId}`}
             className="font-semibold text-foreground hover:underline"
           >
             {vendorName}
