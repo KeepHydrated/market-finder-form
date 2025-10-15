@@ -1330,34 +1330,84 @@ const VendorDuplicate = () => {
                       </span>
                     </div>
                   </div>
-                  
-                   {/* Like Button */}
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      await toggleLike(vendor.id, 'vendor');
-                    }}
-                  >
-                    <Heart 
-                      className={cn(
-                        "h-4 w-4 transition-colors",
-                        isLiked(vendor.id, 'vendor') 
-                          ? "text-red-500 fill-current" 
-                          : "text-gray-600"
-                      )} 
-                    />
-                  </Button>
-
                 </div>
                 
                  {/* Store Information */}
                  <div className="p-4 space-y-3">
-                   <h3 className="text-lg font-semibold text-foreground text-left">
-                     {vendor.store_name}
-                   </h3>
+                   <div className="flex items-center justify-between">
+                     <h3 className="text-lg font-semibold text-foreground text-left">
+                       {vendor.store_name}
+                     </h3>
+                     
+                     {/* Action Buttons */}
+                     <div className="flex items-center gap-1">
+                       {/* Message Button */}
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         className="h-8 w-8 p-0"
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           if (!user) {
+                             toast({
+                               title: "Authentication required",
+                               description: "Please log in to message vendors",
+                               variant: "destructive",
+                             });
+                             return;
+                           }
+                           setChatVendorId(vendor.id);
+                           setChatVendorName(vendor.store_name);
+                           setIsChatOpen(true);
+                         }}
+                       >
+                         <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                       </Button>
+
+                       {/* Report Button */}
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         className="h-8 w-8 p-0"
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           if (!user) {
+                             toast({
+                               title: "Authentication required",
+                               description: "Please log in to report vendors",
+                               variant: "destructive",
+                             });
+                             return;
+                           }
+                           setAcceptedSubmission(vendor);
+                           setSelectedVendor(vendor);
+                           setIsReportDialogOpen(true);
+                         }}
+                       >
+                         <Flag className="h-4 w-4 text-muted-foreground" />
+                       </Button>
+
+                       {/* Like Button */}
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         className="h-8 w-8 p-0"
+                         onClick={async (e) => {
+                           e.stopPropagation();
+                           await toggleLike(vendor.id, 'vendor');
+                         }}
+                       >
+                         <Heart 
+                           className={cn(
+                             "h-4 w-4 transition-colors",
+                             isLiked(vendor.id, 'vendor') 
+                               ? "text-red-500 fill-current" 
+                               : "text-muted-foreground"
+                           )} 
+                         />
+                       </Button>
+                     </div>
+                   </div>
                    
                    {vendor.primary_specialty && (
                      <Badge variant="secondary" className="text-xs">
