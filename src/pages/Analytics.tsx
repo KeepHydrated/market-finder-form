@@ -653,7 +653,7 @@ const Analytics = () => {
                           ${(order.total_amount / 100).toFixed(2)}
                         </p>
                         <p className="text-base text-foreground">
-                          {order.vendor_name}
+                          {firstItem?.product_name || order.vendor_name}
                         </p>
                       </div>
                     </div>
