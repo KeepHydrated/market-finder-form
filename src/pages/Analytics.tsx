@@ -3,9 +3,10 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect } from 'react';
-import { Users, Store, MapPin, Package } from 'lucide-react';
+import { Users, Store, MapPin, Package, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 
 const Analytics = () => {
@@ -20,6 +21,7 @@ const Analytics = () => {
   });
   const [loading, setLoading] = useState(true);
   const [recentUsers, setRecentUsers] = useState<any[]>([]);
+  const [showRecentUsers, setShowRecentUsers] = useState(false);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -160,20 +162,26 @@ const Analytics = () => {
         <h2 className="text-xl font-semibold mb-4">Platform Statistics</h2>
       </div>
 
-      <ScrollArea className="w-full whitespace-nowrap">
-        <div className="flex gap-4 pb-4">
-          <Card className="min-w-[200px] flex-shrink-0">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold mb-1">
-                {loading ? '...' : stats.users.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">Registered accounts</p>
-            </CardContent>
-          </Card>
+      <Collapsible open={showRecentUsers} onOpenChange={setShowRecentUsers}>
+        <ScrollArea className="w-full whitespace-nowrap">
+          <div className="flex gap-4 pb-4">
+            <CollapsibleTrigger asChild>
+              <Card className="min-w-[200px] flex-shrink-0 cursor-pointer hover:border-primary transition-colors">
+                <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${showRecentUsers ? 'rotate-180' : ''}`} />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold mb-1">
+                    {loading ? '...' : stats.users.toLocaleString()}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Registered accounts</p>
+                </CardContent>
+              </Card>
+            </CollapsibleTrigger>
 
           <Card className="min-w-[200px] flex-shrink-0">
             <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
@@ -217,47 +225,50 @@ const Analytics = () => {
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
 
-      <div className="mt-8">
-        <div className="flex items-center gap-2 mb-2">
-          <Users className="h-5 w-5" />
-          <h2 className="text-2xl font-bold">Recently Joined Users</h2>
-        </div>
-        <p className="text-muted-foreground mb-6">Latest users who signed up to the platform</p>
-        
-        <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex gap-6 pb-4">
-            {loading ? (
-              <p className="text-muted-foreground">Loading...</p>
-            ) : recentUsers.length === 0 ? (
-              <p className="text-muted-foreground">No users yet</p>
-            ) : (
-              recentUsers.map((user) => (
-                <div 
-                  key={user.id} 
-                  className="flex flex-col items-center gap-2 min-w-[100px] cursor-pointer transition-transform hover:scale-105"
-                  onClick={() => navigate(`/profile/${user.user_id}`)}
-                >
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src={user.avatar_url} alt={user.full_name || 'User'} />
-                    <AvatarFallback className="text-lg font-semibold">
-                      {getInitials(user.full_name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="text-center">
-                    <p className="font-medium text-sm truncate max-w-[100px] hover:text-primary transition-colors">
-                      {user.full_name || 'Anonymous'}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {format(new Date(user.created_at), 'MMM d')}
-                    </p>
-                  </div>
-                </div>
-              ))
-            )}
+      <CollapsibleContent>
+        <div className="mt-8">
+          <div className="flex items-center gap-2 mb-2">
+            <Users className="h-5 w-5" />
+            <h2 className="text-2xl font-bold">Recently Joined Users</h2>
           </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-      </div>
+          <p className="text-muted-foreground mb-6">Latest users who signed up to the platform</p>
+          
+          <ScrollArea className="w-full whitespace-nowrap">
+            <div className="flex gap-6 pb-4">
+              {loading ? (
+                <p className="text-muted-foreground">Loading...</p>
+              ) : recentUsers.length === 0 ? (
+                <p className="text-muted-foreground">No users yet</p>
+              ) : (
+                recentUsers.map((user) => (
+                  <div 
+                    key={user.id} 
+                    className="flex flex-col items-center gap-2 min-w-[100px] cursor-pointer transition-transform hover:scale-105"
+                    onClick={() => navigate(`/profile/${user.user_id}`)}
+                  >
+                    <Avatar className="h-16 w-16">
+                      <AvatarImage src={user.avatar_url} alt={user.full_name || 'User'} />
+                      <AvatarFallback className="text-lg font-semibold">
+                        {getInitials(user.full_name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="text-center">
+                      <p className="font-medium text-sm truncate max-w-[100px] hover:text-primary transition-colors">
+                        {user.full_name || 'Anonymous'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {format(new Date(user.created_at), 'MMM d')}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
+      </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 };
