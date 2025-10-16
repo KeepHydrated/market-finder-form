@@ -194,7 +194,7 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/20 z-40"
+        className="fixed inset-0 bg-black/80 z-40"
         onClick={onClose}
       />
       
