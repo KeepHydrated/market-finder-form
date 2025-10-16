@@ -1106,16 +1106,25 @@ export default function AccountSettings() {
         <div className="w-full md:w-64 md:flex-shrink-0">
           <Card className="md:sticky md:top-4">
             <CardContent className="p-0">
-              <TabsList className="flex flex-row md:flex-col w-full h-auto p-0 bg-transparent">
-                <TabsTrigger value="account" className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-none border-b data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsList className="flex flex-row md:flex-col w-full h-auto p-0 bg-card">
+                <TabsTrigger 
+                  value="account" 
+                  className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-none border-b border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary transition-colors"
+                >
                   <User className="h-4 w-4" />
                   <span className="hidden md:inline">Account</span>
                 </TabsTrigger>
-                <TabsTrigger value="addresses" className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-none border-b data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger 
+                  value="addresses" 
+                  className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-none border-b border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary transition-colors"
+                >
                   <MapPin className="h-4 w-4" />
                   <span className="hidden md:inline">Addresses</span>
                 </TabsTrigger>
-                <TabsTrigger value="payments" className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-none border-b data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger 
+                  value="payments" 
+                  className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-none border-b border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary transition-colors"
+                >
                   <CreditCard className="h-4 w-4" />
                   <span className="hidden md:inline">Payments</span>
                 </TabsTrigger>
