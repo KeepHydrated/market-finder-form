@@ -238,6 +238,14 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
             </div>
           ) : (
             <div className="space-y-4">
+              {messages.length === 0 && (
+                <div className="flex items-center justify-center py-4">
+                  <p className="text-muted-foreground text-center text-sm">
+                    Start the conversation!
+                  </p>
+                </div>
+              )}
+              
               {/* Order Items - Show at top */}
               <div className="bg-muted/50 rounded-lg p-3 border border-border">
                 <Collapsible open={isOrderOpen} onOpenChange={setIsOrderOpen}>
@@ -277,14 +285,6 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
                   </CollapsibleContent>
                 </Collapsible>
               </div>
-              
-              {messages.length === 0 && (
-                <div className="flex items-center justify-center py-8">
-                  <p className="text-muted-foreground text-center text-sm">
-                    Start the conversation!
-                  </p>
-                </div>
-              )}
               
               {/* User messages */}
               {messages.map((msg) => (
