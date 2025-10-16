@@ -204,7 +204,7 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
+        <div className="flex items-center justify-between py-3 px-4 border-b border-border">
           {isOnVendorPage ? (
             <button 
               onClick={onClose}
