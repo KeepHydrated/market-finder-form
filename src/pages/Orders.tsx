@@ -694,7 +694,7 @@ const Orders = () => {
                           <div key={item.id} className="flex items-start gap-2 py-1">
                             <button
                               onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
-                              className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity"
+                              className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity"
                             >
                               {item.product_image ? (
                                 <img 
