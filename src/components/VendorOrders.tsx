@@ -219,7 +219,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         {item.product_image && (
                           <button
                             onClick={() => handleProductClick(item)}
-                            className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden cursor-pointer"
+                            className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden cursor-pointer"
                           >
                             <img 
                               src={item.product_image} 
@@ -385,7 +385,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                         {order.order_items.map((item) => (
                           <div key={item.id} className="flex gap-3 py-1">
                             {item.product_image && (
-                              <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                              <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                                 <img 
                                   src={item.product_image} 
                                   alt={item.product_name}
