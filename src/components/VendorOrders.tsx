@@ -261,7 +261,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                   </p>
                 </div>
 
-                <div className="flex flex-col gap-2 mt-6">
+                <div className="flex flex-col gap-2 mt-2">
                   {/* Status Update Button */}
                   {order.status === 'paid' && (
                     <Button 
