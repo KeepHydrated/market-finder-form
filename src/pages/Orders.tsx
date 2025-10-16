@@ -530,49 +530,47 @@ const Orders = () => {
                   
                   <div className="space-y-3">
                     {order.order_items.map((item) => (
-                      <div key={item.id} className="flex justify-between items-start py-2">
-                        <div className="flex items-start gap-3 flex-1">
-                          <button
-                            onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
-                            className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                          >
-                            {item.product_image ? (
-                              <img 
-                                src={item.product_image} 
-                                alt={item.product_name}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  // Show Package icon as fallback if image fails to load
-                                  e.currentTarget.style.display = 'none';
-                                  e.currentTarget.parentElement.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-green-600"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>';
-                                }}
-                              />
-                            ) : (
-                              <Package className="h-6 w-6 text-green-600" />
-                            )}
-                          </button>
+                      <div key={item.id} className="flex items-start gap-3 py-2">
+                        <button
+                          onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
+                          className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        >
+                          {item.product_image ? (
+                            <img 
+                              src={item.product_image} 
+                              alt={item.product_name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                // Show Package icon as fallback if image fails to load
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.parentElement.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-green-600"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>';
+                              }}
+                            />
+                          ) : (
+                            <Package className="h-6 w-6 text-green-600" />
+                          )}
+                        </button>
+                        <div className="flex-1 flex items-start justify-between gap-4">
                           <div className="flex-1">
                             <button
                               onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
-                              className="font-medium text-left hover:underline focus:outline-none focus:underline"
+                              className="font-medium text-left hover:underline focus:outline-none focus:underline block"
                             >
                               {item.product_name}
                             </button>
+                            <p className="font-medium text-muted-foreground">{formatPrice(item.total_price)}</p>
                             {item.quantity > 1 && (
                               <p className="text-sm text-muted-foreground">
                                 Quantity: {item.quantity}
                               </p>
                             )}
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2 ml-4">
-                          <p className="font-medium">{formatPrice(item.total_price)}</p>
                           {hasPackageArrived(order) && !productReviews.has(item.id) && (
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={() => handleLeaveReview(order, 'product', item)}
-                              className="whitespace-nowrap"
+                              className="whitespace-nowrap flex-shrink-0"
                             >
                               <Star className="h-3 w-3 mr-1" />
                               Review
@@ -693,36 +691,32 @@ const Orders = () => {
                       
                       <div className="space-y-1 max-h-[140px] overflow-y-auto">
                         {order.order_items.map((item) => (
-                          <div key={item.id} className="flex justify-between items-start py-1">
-                            <div className="flex items-start gap-2 flex-1">
+                          <div key={item.id} className="flex items-start gap-2 py-1">
+                            <button
+                              onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
+                              className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity"
+                            >
+                              {item.product_image ? (
+                                <img 
+                                  src={item.product_image} 
+                                  alt={item.product_name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <Package className="h-5 w-5 text-green-600" />
+                              )}
+                            </button>
+                            <div className="flex-1 min-w-0">
                               <button
                                 onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
-                                className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity"
+                                className="text-left w-full hover:underline text-sm block"
                               >
-                                {item.product_image ? (
-                                  <img 
-                                    src={item.product_image} 
-                                    alt={item.product_name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <Package className="h-5 w-5 text-green-600" />
-                                )}
+                                {item.product_name}
                               </button>
-                              <div className="flex-1 min-w-0">
-                                <button
-                                  onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
-                                  className="text-left w-full hover:underline text-sm"
-                                >
-                                  {item.quantity > 1 && (
-                                    <span className="text-muted-foreground mr-1">(x{item.quantity})</span>
-                                  )}
-                                  {item.product_name}
-                                </button>
-                              </div>
-                            </div>
-                            <div className="text-right ml-2">
-                              <p className="font-medium text-sm">{formatPrice(item.total_price)}</p>
+                              <p className="font-medium text-sm text-muted-foreground">{formatPrice(item.total_price)}</p>
+                              {item.quantity > 1 && (
+                                <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
+                              )}
                             </div>
                           </div>
                         ))}
