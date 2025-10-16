@@ -534,13 +534,13 @@ const Orders = () => {
                         <div className="flex items-start gap-3 flex-1">
                           <button
                             onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
-                            className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                           >
                             {item.product_image ? (
                               <img 
                                 src={item.product_image} 
                                 alt={item.product_name}
-                                className="w-full h-full object-cover rounded-lg"
+                                className="w-full h-full object-cover"
                                 onError={(e) => {
                                   // Show Package icon as fallback if image fails to load
                                   e.currentTarget.style.display = 'none';
@@ -697,13 +697,13 @@ const Orders = () => {
                             <div className="flex items-start gap-2 flex-1">
                               <button
                                 onClick={() => handleProductClick(item, order.vendor_id, order.vendor_name)}
-                                className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity"
+                                className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity"
                               >
                                 {item.product_image ? (
                                   <img 
                                     src={item.product_image} 
                                     alt={item.product_name}
-                                    className="w-full h-full object-cover rounded-lg"
+                                    className="w-full h-full object-cover"
                                   />
                                 ) : (
                                   <Package className="h-5 w-5 text-green-600" />
