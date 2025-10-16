@@ -686,7 +686,7 @@ const Orders = () => {
                       <p className="text-sm text-muted-foreground">{formatDate(order.created_at)}</p>
                     </CardHeader>
                     
-                    <CardContent className="pt-0 pb-0">
+                    <CardContent className="pt-0 pb-3">
                       <Separator className="mb-2" />
                       
                       <div className="space-y-1 max-h-[140px] overflow-y-auto">
