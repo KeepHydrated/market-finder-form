@@ -18,7 +18,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut, Package, Settings, MessageSquare, Store, Shield, FileWarning, DollarSign, BarChart } from 'lucide-react';
+import { LogOut, Package, Settings, MessageSquare, Shield, FileWarning, DollarSign, BarChart } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAdmin } from '@/hooks/useAdmin';
 
@@ -55,11 +55,6 @@ export function UserMenu({ user, profile }: UserMenuProps) {
 
   const handleMessagesClick = () => {
     navigate('/messages');
-    setSheetOpen(false);
-  };
-
-  const handleShopClick = () => {
-    navigate('/my-shop');
     setSheetOpen(false);
   };
 
@@ -154,18 +149,6 @@ export function UserMenu({ user, profile }: UserMenuProps) {
                 >
                   <MessageSquare className="mr-3 h-5 w-5" />
                   <span>Messages</span>
-                </Button>
-
-                <Separator className="my-2" />
-
-                {/* My Shop Section */}
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-base h-12"
-                  onClick={handleShopClick}
-                >
-                  <Store className="mr-3 h-5 w-5" />
-                  <span>My Shop</span>
                 </Button>
 
                 <Separator className="my-2" />
