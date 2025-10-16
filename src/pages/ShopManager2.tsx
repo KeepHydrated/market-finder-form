@@ -809,7 +809,7 @@ export default function ShopManager() {
           <CardTitle>Store Settings</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4 border rounded-lg">
             <div>
               <h3 className="font-medium">Vacation Mode</h3>
               <p className="text-sm text-muted-foreground">
