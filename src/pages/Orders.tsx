@@ -642,7 +642,7 @@ const Orders = () => {
               </div>
 
               {/* Mobile flip card view */}
-              <div className="md:hidden relative h-[280px] perspective-1000">
+              <div className="md:hidden relative h-[240px] perspective-1000">
                 <div 
                   className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
                     isFlipped ? 'rotate-y-180' : ''
@@ -662,7 +662,7 @@ const Orders = () => {
                       WebkitBackfaceVisibility: 'hidden'
                     }}
                   >
-                    <CardHeader className="pb-4">
+                    <CardHeader className="pb-2">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2 text-base flex-wrap">
                           <div className="flex items-center gap-2">
@@ -686,7 +686,7 @@ const Orders = () => {
                       <p className="text-sm text-muted-foreground">{formatDate(order.created_at)}</p>
                     </CardHeader>
                     
-                    <CardContent className="pt-0 pb-3">
+                    <CardContent className="pt-0 pb-2">
                       <Separator className="mb-2" />
                       
                       <div className="space-y-1 max-h-[140px] overflow-y-auto">
