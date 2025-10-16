@@ -79,27 +79,6 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClic
                 alt={`${product.name} - Image ${currentImageIndex + 1}`}
                 className="w-full h-full object-cover"
               />
-              {/* Like Button */}
-              {vendorId && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="absolute -top-1 -right-1 h-6 w-6 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm z-10"
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    await toggleLike(`${vendorId}-${product.id}`, 'product');
-                  }}
-                >
-                  <Heart 
-                    className={cn(
-                      "h-3 w-3 transition-colors",
-                      isLiked(`${vendorId}-${product.id}`, 'product')
-                        ? "text-red-500 fill-current" 
-                        : "text-gray-600"
-                    )} 
-                  />
-                </Button>
-              )}
             </div>
           )}
           
