@@ -106,12 +106,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClic
           {/* Content area */}
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
-              <div className="flex-1 min-w-0">
-                <h3 className="font-normal text-base mb-1">{product.name}</h3>
-                <span className="text-base font-medium text-muted-foreground">
-                  ${product.price.toFixed(2)}
-                </span>
-              </div>
+              <h3 className="font-normal text-base">{product.name}</h3>
               
               {(onDeleteProduct || onDuplicateClick || onEditClick) && (
                 <DropdownMenu>
@@ -166,6 +161,10 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClic
                 </DropdownMenu>
               )}
             </div>
+            
+            <span className="text-base font-medium text-muted-foreground block mt-1">
+              ${product.price.toFixed(2)}
+            </span>
             
             {vendorName && !onDeleteProduct && !hideVendorName && (
               <div className="mt-2 pt-2 border-t border-muted">
