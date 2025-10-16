@@ -231,15 +231,15 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
         </div>
 
         {/* Messages */}
-        <ScrollArea className="flex-1 px-4 pb-4 pt-2">
+        <ScrollArea className="flex-1 px-4 pb-4">
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <p className="text-muted-foreground">Loading messages...</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {messages.length === 0 && (
-                <div className="flex items-center justify-center py-2">
+                <div className="flex items-center justify-center">
                   <p className="text-muted-foreground text-center text-sm">
                     Start the conversation!
                   </p>
