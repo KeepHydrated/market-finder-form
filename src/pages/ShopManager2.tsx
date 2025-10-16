@@ -859,7 +859,7 @@ export default function ShopManager() {
           <CardTitle className="text-destructive">Danger Zone</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between p-4 border border-destructive rounded-lg">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4 border border-destructive rounded-lg">
             <div>
               <h3 className="font-medium">Delete Store</h3>
               <p className="text-sm text-muted-foreground">
