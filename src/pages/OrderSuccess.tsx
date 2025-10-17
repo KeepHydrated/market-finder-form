@@ -188,12 +188,12 @@ export default function OrderSuccess() {
                     
                     {/* Product details */}
                     <div className="flex-1">
-                      <h4 className="text-lg font-semibold mb-1">{item.product_name}</h4>
-                      <p className="text-lg text-muted-foreground mb-2">
+                      <h4 className="text-base font-semibold mb-1">{item.product_name}</h4>
+                      <p className="text-sm text-muted-foreground mb-2">
                         {formatPrice(item.unit_price)}
                       </p>
                       {item.product_description && (
-                        <p className="text-muted-foreground mb-2">{item.product_description}</p>
+                        <p className="text-sm text-muted-foreground mb-2">{item.product_description}</p>
                       )}
                       <p className="text-sm text-muted-foreground">
                         Qty: {item.quantity} × {formatPrice(item.unit_price)}
