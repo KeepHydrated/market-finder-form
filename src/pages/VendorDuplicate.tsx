@@ -1145,7 +1145,7 @@ const VendorDuplicate = () => {
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 md:gap-2">
+                <div className="flex items-center gap-0.5 md:gap-2">
                   {/* Report button */}
                   {selectedVendor && (
                     <Button
