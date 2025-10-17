@@ -193,24 +193,24 @@ export default function Messages() {
               onClick={() => openConversation(convo)}
             >
               <div className="flex items-start gap-4">
-                <Avatar className="h-14 w-14 flex-shrink-0">
+                <Avatar className="h-12 w-12 flex-shrink-0">
                   <AvatarImage src={convo.otherParty?.avatar_url || ''} />
-                  <AvatarFallback className="text-lg">
+                  <AvatarFallback className="text-base">
                     {convo.store_name?.[0]?.toUpperCase() || '?'}
                   </AvatarFallback>
                 </Avatar>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline justify-between gap-2 mb-1">
-                    <h3 className="font-semibold text-lg text-foreground">
+                    <h3 className="font-semibold text-base text-foreground">
                       {convo.store_name || 'Unknown Store'}
                     </h3>
-                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
                       {format(new Date(convo.last_message_at), 'MMM d')}
                     </span>
                   </div>
                   
-                  <p className="text-base text-muted-foreground truncate">
+                  <p className="text-sm text-muted-foreground truncate">
                     {convo.lastMessage?.message || 'No messages yet'}
                   </p>
                 </div>
