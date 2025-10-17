@@ -189,7 +189,7 @@ export default function Messages() {
           {conversations.map((convo) => (
             <div
               key={convo.id}
-              className="p-4 hover:bg-accent cursor-pointer transition-colors"
+              className="p-2 hover:bg-accent cursor-pointer transition-colors"
               onClick={() => openConversation(convo)}
             >
               <div className="flex items-start gap-4">
