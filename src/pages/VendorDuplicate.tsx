@@ -1842,7 +1842,7 @@ const VendorDuplicate = () => {
           {!showReviewForm ? (
             // Reviews List View
             <>
-              <DialogHeader className="pb-6">
+              <DialogHeader className="pb-6 text-left">
                 <div className="flex items-center gap-4">
                   <DialogTitle className="m-0">Customer Reviews</DialogTitle>
                   <div className="flex items-center gap-2">
