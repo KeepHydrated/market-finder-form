@@ -156,7 +156,7 @@ export default function OrderSuccess() {
           <div className="bg-card border rounded-lg p-8 mb-8">
             {/* Header with vendor name and date */}
             <div className="flex items-center justify-between mb-6 pb-6 border-b">
-              <h2 className="text-2xl font-bold">{order.vendor_name}</h2>
+              <h2 className="text-xl font-bold">{order.vendor_name}</h2>
               <p className="text-muted-foreground">
                 {new Date(order.created_at).toLocaleDateString('en-US', { 
                   month: 'short', 
