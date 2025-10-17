@@ -238,7 +238,13 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
       
       {/* Chat Box - Fullscreen on mobile, floating on desktop */}
       <div 
-        className="fixed inset-0 md:inset-auto md:bottom-4 md:right-4 w-full h-full md:w-96 md:h-[500px] max-w-2xl mx-auto md:mx-0 bg-card rounded-none md:rounded-lg border-0 md:border md:border-border shadow-2xl flex flex-col overflow-hidden z-[9999]"
+        className="fixed md:inset-auto md:bottom-4 md:right-4 w-full h-full md:w-96 md:h-[500px] bg-card rounded-none md:rounded-lg border-0 md:border md:border-border shadow-2xl flex flex-col overflow-hidden z-[9999]"
+        style={{ 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0 
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
