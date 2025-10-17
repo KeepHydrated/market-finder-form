@@ -327,12 +327,12 @@ const CategoryProducts = () => {
             <h1 className="flex flex-wrap items-center text-lg md:text-xl font-bold mr-auto gap-2">
               <span>{category || 'All'}</span>
               <span className="text-sm md:text-base font-normal text-muted-foreground">"{searchTerm}"</span>
-              <span className="text-sm md:text-base font-normal text-muted-foreground">({sortedProducts.length} results)</span>
+              <span className="hidden md:inline text-sm md:text-base font-normal text-muted-foreground">({sortedProducts.length} results)</span>
             </h1>
           ) : (
             <h1 className="flex flex-wrap items-center text-lg md:text-xl font-bold capitalize mr-auto gap-2">
               <span>{category || 'All'}</span>
-              <span className="text-sm md:text-base font-normal text-muted-foreground">({sortedProducts.length} results)</span>
+              <span className="hidden md:inline text-sm md:text-base font-normal text-muted-foreground">({sortedProducts.length} results)</span>
             </h1>
           )}
           
