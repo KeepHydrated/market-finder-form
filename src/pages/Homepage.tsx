@@ -1085,7 +1085,7 @@ const Homepage = () => {
             <form onSubmit={(e) => {
               e.preventDefault();
               if (searchQuery.trim()) {
-                navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+                navigate(`/search?search=${encodeURIComponent(searchQuery.trim())}`);
               }
             }} className="relative flex items-center gap-2">
               <div className="relative flex-1">
