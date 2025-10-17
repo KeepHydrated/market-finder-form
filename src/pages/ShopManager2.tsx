@@ -745,7 +745,7 @@ export default function ShopManager() {
   );
 
   const renderProducts = () => (
-    <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-3xl pt-10 sm:pt-[40px] pb-4">
+    <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-3xl pt-14 sm:pt-[40px] pb-4">
       <div className="flex items-center justify-center sm:justify-between">
         <div>
           <h2 className="hidden sm:block text-2xl font-bold mb-2">Product Listings</h2>
