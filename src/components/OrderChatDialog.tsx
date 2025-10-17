@@ -200,7 +200,7 @@ export const OrderChatDialog = ({ open, onClose, order, vendorId, vendorName }: 
       
       {/* Chat Box - Positioned higher on mobile, floating on desktop */}
       <div 
-        className="fixed top-0 left-0 right-0 bottom-64 md:inset-auto md:bottom-4 md:right-4 w-full md:w-96 h-auto md:h-[500px] max-w-2xl mx-auto md:mx-0 bg-card rounded-b-lg md:rounded-lg border-0 md:border md:border-border shadow-2xl flex flex-col z-[9999]"
+        className="fixed top-0 left-0 right-0 bottom-80 md:inset-auto md:bottom-4 md:right-4 w-full md:w-96 h-auto md:h-[500px] max-w-2xl mx-auto md:mx-0 bg-card rounded-b-lg md:rounded-lg border-0 md:border md:border-border shadow-2xl flex flex-col z-[9999]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
