@@ -1162,7 +1162,7 @@ const VendorDuplicate = () => {
                         }
                         setIsReportDialogOpen(true);
                       }}
-                      className="text-muted-foreground hover:text-foreground transition-colors mr-0 md:mr-3"
+                      className="text-muted-foreground hover:text-foreground transition-colors -mr-2 md:mr-3"
                     >
                       <Flag className="h-5 w-5" />
                     </Button>
