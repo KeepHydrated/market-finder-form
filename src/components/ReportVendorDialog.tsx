@@ -94,7 +94,7 @@ export function ReportVendorDialog({ open, onClose, vendorId, vendorName }: Repo
             <Flag className="h-5 w-5" />
             Report {vendorName}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-left">
             Help us maintain a safe marketplace by reporting any issues with this vendor.
           </DialogDescription>
         </DialogHeader>
