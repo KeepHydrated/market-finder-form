@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Package, Mail, ArrowLeftRight } from "lucide-react";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
-import { OrderChatDialog } from "@/components/OrderChatDialog";
+import { FloatingChat } from "@/components/FloatingChat";
 import { useToast } from "@/hooks/use-toast";
 
 interface OrderItem {
@@ -41,7 +41,9 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatBuyerEmail, setChatBuyerEmail] = useState<string | null>(null);
+  const [chatOrderItems, setChatOrderItems] = useState<OrderItem[]>([]);
   const [showReceiptDialog, setShowReceiptDialog] = useState(false);
   const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -116,8 +118,10 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
   };
 
   const handleMessageBuyer = (order: Order) => {
-    setSelectedOrder(order);
-    setIsChatOpen(true);
+    // Open floating chat with buyer info and order items
+    setChatBuyerEmail(order.email);
+    setChatOrderItems(order.order_items);
+    setChatOpen(true);
   };
 
   const handleViewReceipt = (order: Order) => {
@@ -567,13 +571,20 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
         hideVendorName={true}
       />
 
-      <OrderChatDialog
-        open={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
-        order={selectedOrder}
-        vendorId={vendorId || ''}
-        vendorName={vendorName}
-      />
+      {/* Floating Chat with Buyer */}
+      {chatOpen && chatBuyerEmail && (
+        <FloatingChat
+          isOpen={chatOpen}
+          onClose={() => {
+            setChatOpen(false);
+            setChatBuyerEmail(null);
+            setChatOrderItems([]);
+          }}
+          vendorId={vendorId || ''}
+          vendorName={chatBuyerEmail}
+          orderItems={chatOrderItems}
+        />
+      )}
 
       {/* Receipt Dialog */}
       <Dialog open={showReceiptDialog} onOpenChange={setShowReceiptDialog}>
