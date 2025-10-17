@@ -1130,7 +1130,7 @@ const VendorDuplicate = () => {
             {/* Vendor Details */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 md:gap-4">
                   <h1 className="text-xl font-bold text-foreground">{selectedVendor.store_name}</h1>
                   <div 
                     className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
@@ -1145,7 +1145,7 @@ const VendorDuplicate = () => {
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 md:gap-2">
                   {/* Report button */}
                   {selectedVendor && (
                     <Button
