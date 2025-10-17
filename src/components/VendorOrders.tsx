@@ -400,7 +400,6 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                     <CardHeader className="pb-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2 text-base">
-                          <span className="text-muted-foreground">Order from</span>
                           <Mail className="h-4 w-4" />
                           <span className="font-semibold">{order.email}</span>
                         </div>
