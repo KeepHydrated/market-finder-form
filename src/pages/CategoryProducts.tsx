@@ -63,7 +63,7 @@ const CategoryProducts = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   
   const category = searchParams.get('category');
-  const searchTerm = searchParams.get('q');
+  const searchTerm = searchParams.get('search') || searchParams.get('q');
 
   // Fetch all vendors nationwide for the selected category (or all categories)
   useEffect(() => {
