@@ -309,8 +309,12 @@ const CategoryProducts = () => {
         
         <form onSubmit={(e) => {
           e.preventDefault();
+          const currentCategory = searchParams.get('category');
           if (searchQuery.trim()) {
-            navigate(`/search?search=${encodeURIComponent(searchQuery.trim())}`);
+            navigate(`/search?${currentCategory ? `category=${encodeURIComponent(currentCategory)}&` : ''}search=${encodeURIComponent(searchQuery.trim())}`);
+          } else {
+            // Allow empty search - just navigate to category or all
+            navigate(`/search${currentCategory ? `?category=${encodeURIComponent(currentCategory)}` : ''}`);
           }
         }} className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
