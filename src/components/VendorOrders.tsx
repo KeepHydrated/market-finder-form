@@ -233,7 +233,6 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                 </CardHeader>
                 
                 <CardContent className="pt-0">
-                  <Separator className="mb-4" />
                   
                   <div className="space-y-3 max-h-[150px] overflow-y-auto pr-2">
                     {order.order_items.map((item) => (
@@ -415,7 +414,6 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                     </CardHeader>
                     
                     <CardContent className="pt-0 pb-0">
-                      <Separator className="mb-2" />
                       
                       <div className="space-y-2 max-h-[150px] overflow-y-auto pr-2">
                         {order.order_items.map((item) => (
