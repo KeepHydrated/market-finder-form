@@ -235,7 +235,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                 <CardContent className="pt-0">
                   <Separator className="mb-4" />
                   
-                  <div className="space-y-3 max-h-[150px] overflow-y-auto pr-2 border rounded-md p-2">
+                  <div className="space-y-3 max-h-[150px] overflow-y-auto pr-2">
                     {order.order_items.map((item) => (
                       <div key={item.id} className="flex items-start gap-3 py-2">
                         <button
@@ -417,7 +417,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                     <CardContent className="pt-0 pb-0">
                       <Separator className="mb-2" />
                       
-                      <div className="space-y-2 max-h-[150px] overflow-y-auto pr-2 border rounded-md p-2">
+                      <div className="space-y-2 max-h-[150px] overflow-y-auto pr-2">
                         {order.order_items.map((item) => (
                           <div key={item.id} className="flex gap-3 py-1">
                             {item.product_image && (
