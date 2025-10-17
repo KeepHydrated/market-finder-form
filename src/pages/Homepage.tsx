@@ -1087,15 +1087,25 @@ const Homepage = () => {
               if (searchQuery.trim()) {
                 navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
               }
-            }} className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                type="text"
-                placeholder=""
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-background/50 border-border"
-              />
+            }} className="relative flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  type="search"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-4 bg-background/50 border-border"
+                  autoComplete="off"
+                />
+              </div>
+              <Button 
+                type="submit" 
+                size="sm"
+                className="md:hidden px-3"
+              >
+                Go
+              </Button>
             </form>
           </div>
         </div>
