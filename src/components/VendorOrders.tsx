@@ -26,6 +26,14 @@ interface Order {
   status: string;
   created_at: string;
   order_items: OrderItem[];
+  tracking_number?: string;
+  tracking_carrier?: string;
+  tracking_url?: string;
+  estimated_delivery_date?: string;
+  ship_from_city?: string;
+  ship_from_state?: string;
+  ship_to_city?: string;
+  ship_to_state?: string;
 }
 
 interface VendorOrdersProps {
@@ -68,6 +76,14 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
           email,
           status,
           created_at,
+          tracking_number,
+          tracking_carrier,
+          tracking_url,
+          estimated_delivery_date,
+          ship_from_city,
+          ship_from_state,
+          ship_to_city,
+          ship_to_state,
           order_items (
             id,
             product_name,
@@ -202,15 +218,17 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
               const isFlipped = flippedCards[order.id] || false;
             
             return (
-            <div key={order.id} className="grid lg:grid-cols-[2fr,280px] gap-6">
+            <div key={order.id} className="grid md:grid-cols-[1fr,280px] gap-6">
               {/* Desktop view - always show both cards */}
-              <Card className="overflow-hidden hidden lg:block">
+              <Card className="overflow-hidden hidden md:block">
                 <CardHeader className="pb-4">
-                  <div className="flex items-center gap-2 text-base">
-                    <span className="text-muted-foreground">Order from</span>
-                    <Mail className="h-4 w-4" />
-                    <span className="font-semibold">{order.email}</span>
-                    <span className="text-muted-foreground">on {formatDate(order.created_at)}</span>
+                  <div className="flex items-center gap-2 text-base flex-wrap md:flex-nowrap">
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground hidden md:inline">Order from</span>
+                      <Mail className="h-4 w-4" />
+                      <span className="font-semibold">{order.email}</span>
+                    </div>
+                    <span className="text-muted-foreground w-full md:w-auto text-sm md:text-base"><span className="hidden md:inline">on </span>{formatDate(order.created_at)}</span>
                   </div>
                 </CardHeader>
                 
@@ -219,35 +237,40 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                   
                   <div className="space-y-3">
                     {order.order_items.map((item) => (
-                      <div key={item.id} className="flex gap-4 py-2">
-                        {item.product_image && (
-                          <button
-                            onClick={() => handleProductClick(item)}
-                            className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden cursor-pointer"
-                          >
+                      <div key={item.id} className="flex items-start gap-3 py-2">
+                        <button
+                          onClick={() => handleProductClick(item)}
+                          className="w-14 h-14 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        >
+                          {item.product_image ? (
                             <img 
                               src={item.product_image} 
                               alt={item.product_name}
-                              className="w-full h-full object-cover rounded-lg"
+                              className="w-full h-full object-cover"
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
-                                e.currentTarget.parentElement!.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-muted-foreground"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>';
+                                e.currentTarget.parentElement!.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-green-600"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>';
                               }}
                             />
-                          </button>
-                        )}
-                        <div className="flex-1">
-                          <button
-                            onClick={() => handleProductClick(item)}
-                            className="text-left w-full cursor-pointer"
-                          >
-                            <h5 className="font-medium text-base mb-1">
+                          ) : (
+                            <Package className="h-6 w-6 text-green-600" />
+                          )}
+                        </button>
+                        <div className="flex-1 flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <button
+                              onClick={() => handleProductClick(item)}
+                              className="font-medium text-left hover:underline focus:outline-none focus:underline block"
+                            >
                               {item.product_name}
-                            </h5>
-                            <p className="text-base font-medium text-muted-foreground">
-                              {formatPrice(item.total_price)}
-                            </p>
-                          </button>
+                            </button>
+                            <p className="font-medium text-muted-foreground">{formatPrice(item.total_price)}</p>
+                            {item.quantity > 1 && (
+                              <p className="text-sm text-muted-foreground">
+                                Quantity: {item.quantity}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -255,17 +278,27 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                 </CardContent>
               </Card>
 
-              <div className="flex-col gap-3 hidden lg:flex">
+              <div className="flex-col gap-3 hidden md:flex">
                 <div>
-                  <h3 className="text-lg font-serif mb-1">Arriving Friday, October 3rd</h3>
-                  <p className="text-xs mb-0.5">Estimated arrival from USPS</p>
-                  <p className="text-xs">
-                    From <span className="font-medium">GLENDALE, AZ</span> To{" "}
-                    <span className="font-medium underline">San Antonio</span>
-                  </p>
+                  {order.estimated_delivery_date ? (
+                    <h3 className="text-lg font-serif mb-1">
+                      Arriving {new Date(order.estimated_delivery_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                    </h3>
+                  ) : (
+                    <h3 className="text-lg font-serif mb-1">Preparing for shipment</h3>
+                  )}
+                  {order.tracking_carrier && (
+                    <p className="text-xs mb-0.5">Estimated arrival from {order.tracking_carrier}</p>
+                  )}
+                  {order.ship_from_city && order.ship_to_city && (
+                    <p className="text-xs">
+                      From <span className="font-medium">{order.ship_from_city}, {order.ship_from_state}</span> To{" "}
+                      <span className="font-medium underline">{order.ship_to_city}</span>
+                    </p>
+                  )}
                 </div>
 
-                <div className="flex flex-col gap-2 mt-2">
+                <div className="flex flex-col gap-2">
                   {/* Status Update Button */}
                   {order.status === 'paid' && (
                     <Button 
@@ -343,8 +376,8 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                 </div>
               </div>
 
-              {/* Tablet/Mobile flip card view */}
-              <div className="lg:hidden relative h-[240px] perspective-1000">
+              {/* Mobile flip card view */}
+              <div className="md:hidden relative h-[240px] perspective-1000">
                 <div 
                   className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
                     isFlipped ? 'rotate-y-180' : ''
