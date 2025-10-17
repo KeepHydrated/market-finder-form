@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Package, Mail, ArrowLeftRight } from "lucide-react";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
+import { OrderChatDialog } from "@/components/OrderChatDialog";
 import { useToast } from "@/hooks/use-toast";
 
 interface OrderItem {
@@ -40,6 +41,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [showReceiptDialog, setShowReceiptDialog] = useState(false);
   const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -111,6 +113,11 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
     };
     setSelectedProduct(product);
     setIsModalOpen(true);
+  };
+
+  const handleMessageBuyer = (order: Order) => {
+    setSelectedOrder(order);
+    setIsChatOpen(true);
   };
 
   const handleViewReceipt = (order: Order) => {
@@ -317,6 +324,7 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                     variant="outline" 
                     size="sm" 
                     className="w-full rounded-full"
+                    onClick={() => handleMessageBuyer(order)}
                   >
                     Message buyer
                   </Button>
@@ -499,7 +507,10 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                           variant="outline" 
                           size="sm" 
                           className="flex-1 rounded-full"
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMessageBuyer(order);
+                          }}
                         >
                           Message buyer
                         </Button>
@@ -554,6 +565,14 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         hideVendorName={true}
+      />
+
+      <OrderChatDialog
+        open={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        order={selectedOrder}
+        vendorId={vendorId || ''}
+        vendorName={vendorName}
       />
 
       {/* Receipt Dialog */}
