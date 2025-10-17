@@ -146,7 +146,7 @@ export default function OrderSuccess() {
       <div className="max-w-4xl mx-auto pt-8">
         <div className="text-center mb-8 no-print">
           <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-green-600 mb-2">Order Successful!</h1>
+          <h1 className="text-2xl font-bold text-green-600 mb-2">Order Successful!</h1>
           <p className="text-muted-foreground">
             Thank you for your purchase. Your order has been confirmed.
           </p>
