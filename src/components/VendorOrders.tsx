@@ -317,6 +317,13 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                     variant="outline" 
                     size="sm" 
                     className="w-full rounded-full"
+                  >
+                    Message buyer
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full rounded-full"
                     onClick={() => handleViewReceipt(order)}
                   >
                     View receipt
@@ -488,6 +495,14 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
                             Track package
                           </Button>
                         )}
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1 rounded-full"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Message buyer
+                        </Button>
                         <Button 
                           variant="outline" 
                           size="sm" 
