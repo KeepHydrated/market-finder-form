@@ -321,14 +321,19 @@ const CategoryProducts = () => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center justify-end mb-8">
+        <div className="flex items-center justify-between mb-8 gap-2">
           {/* Category/Search Title */}
           {searchTerm ? (
-            <h1 className="hidden md:flex items-center text-xl font-bold mr-auto">
-              {category || 'All'} <span className="text-base font-normal text-muted-foreground ml-6">"{searchTerm}"</span> <span className="text-base font-normal text-muted-foreground ml-3">({sortedProducts.length} results)</span>
+            <h1 className="flex flex-wrap items-center text-lg md:text-xl font-bold mr-auto gap-2">
+              <span>{category || 'All'}</span>
+              <span className="text-sm md:text-base font-normal text-muted-foreground">"{searchTerm}"</span>
+              <span className="text-sm md:text-base font-normal text-muted-foreground">({sortedProducts.length} results)</span>
             </h1>
           ) : (
-            <h1 className="hidden md:block text-xl font-bold capitalize mr-auto">{category || 'All'} <span className="text-base font-normal text-muted-foreground ml-3">({sortedProducts.length} results)</span></h1>
+            <h1 className="flex flex-wrap items-center text-lg md:text-xl font-bold capitalize mr-auto gap-2">
+              <span>{category || 'All'}</span>
+              <span className="text-sm md:text-base font-normal text-muted-foreground">({sortedProducts.length} results)</span>
+            </h1>
           )}
           
           {/* Sort Dropdown */}
