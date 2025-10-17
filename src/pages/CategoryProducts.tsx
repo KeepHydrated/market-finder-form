@@ -65,6 +65,11 @@ const CategoryProducts = () => {
   const category = searchParams.get('category');
   const searchTerm = searchParams.get('search') || searchParams.get('q');
 
+  // Initialize search query from URL
+  useEffect(() => {
+    setSearchQuery(searchTerm || "");
+  }, [searchTerm]);
+
   // Fetch all vendors nationwide for the selected category (or all categories)
   useEffect(() => {
     const fetchVendors = async () => {
@@ -235,67 +240,67 @@ const CategoryProducts = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
             <DropdownMenuItem>
-              <Link to="/search" className="w-full font-semibold">
+              <Link to={`/search${searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : ''}`} className="w-full font-semibold">
                 All
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link to="/search?category=Fresh Flowers & Plants" className="w-full">
+              <Link to={`/search?category=Fresh Flowers & Plants${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`} className="w-full">
                 Fresh Flowers & Plants
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link to="/search?category=Bakery" className="w-full">
+              <Link to={`/search?category=Bakery${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`} className="w-full">
                 Bakery
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link to="/search?category=Dairy" className="w-full">
+              <Link to={`/search?category=Dairy${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`} className="w-full">
                 Dairy
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link to="/search?category=Rancher" className="w-full">
+              <Link to={`/search?category=Rancher${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`} className="w-full">
                 Rancher
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link to="/search?category=Beverages" className="w-full">
+              <Link to={`/search?category=Beverages${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`} className="w-full">
                 Beverages
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link to="/search?category=Seasonings & Spices" className="w-full">
+              <Link to={`/search?category=Seasonings & Spices${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`} className="w-full">
                 Seasonings & Spices
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link to="/search?category=Pets" className="w-full">
+              <Link to={`/search?category=Pets${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`} className="w-full">
                 Pets
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link to="/search?category=Home Goods" className="w-full">
+              <Link to={`/search?category=Home Goods${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`} className="w-full">
                 Home Goods
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link to="/search?category=Farmers" className="w-full">
+              <Link to={`/search?category=Farmers${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`} className="w-full">
                 Farmers
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link to="/search?category=Ready to Eat" className="w-full">
+              <Link to={`/search?category=Ready to Eat${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`} className="w-full">
                 Ready to Eat
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link to="/search?category=Packaged Goods & Snacks" className="w-full">
+              <Link to={`/search?category=Packaged Goods & Snacks${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`} className="w-full">
                 Packaged Goods & Snacks
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link to="/search?category=Artisan" className="w-full">
+              <Link to={`/search?category=Artisan${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`} className="w-full">
                 Artisan
               </Link>
             </DropdownMenuItem>
