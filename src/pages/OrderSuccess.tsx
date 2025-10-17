@@ -168,7 +168,6 @@ export default function OrderSuccess() {
 
             {/* Items section */}
             <div className="mb-6">
-              <h3 className="text-xl font-bold mb-4">Items</h3>
               <div className="space-y-6">
                 {order.order_items.map((item, index) => (
                   <div key={index} className="flex gap-4 pb-6 border-b last:border-b-0">
