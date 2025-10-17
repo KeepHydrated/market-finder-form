@@ -136,6 +136,9 @@ const Homepage = () => {
         submission.store_name.toLowerCase().includes(query) ||
         submission.primary_specialty.toLowerCase().includes(query) ||
         submission.description.toLowerCase().includes(query) ||
+        submission.search_term?.toLowerCase().includes(query) ||
+        submission.selected_market?.toLowerCase().includes(query) ||
+        submission.market_address?.toLowerCase().includes(query) ||
         submission.products.some((product: any) => 
           product.name?.toLowerCase().includes(query) ||
           product.description?.toLowerCase().includes(query)
