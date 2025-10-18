@@ -953,42 +953,39 @@ const VendorDuplicate = () => {
   // Handle scroll to top button visibility
   useEffect(() => {
     const handleScroll = () => {
-      // On desktop/iPad with container scroll, check container scroll
       const rightContainer = document.querySelector('.flex-1.overflow-y-auto') as HTMLElement;
+      const isMobile = window.innerWidth < 768;
       
-      if (rightContainer && rightContainer.clientHeight < rightContainer.scrollHeight && window.innerWidth >= 768) {
-        // Desktop/iPad: container is scrollable
+      if (!isMobile && rightContainer) {
+        // Desktop/tablet: check container scroll
         setShowScrollTop(rightContainer.scrollTop > 100);
       } else {
-        // Mobile: use window scroll
+        // Mobile: check window scroll
         setShowScrollTop(window.scrollY > 100);
       }
     };
 
-    // Listen to both window and container scroll
+    // Add listeners
     window.addEventListener('scroll', handleScroll);
     const rightContainer = document.querySelector('.flex-1.overflow-y-auto');
-    
-    if (rightContainer) {
-      rightContainer.addEventListener('scroll', handleScroll);
-    }
+    rightContainer?.addEventListener('scroll', handleScroll);
 
     // Initial check
     handleScroll();
 
+    // Cleanup
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      if (rightContainer) {
-        rightContainer.removeEventListener('scroll', handleScroll);
-      }
+      rightContainer?.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
   const scrollToTop = () => {
     const rightContainer = document.querySelector('.flex-1.overflow-y-auto') as HTMLElement;
+    const isMobile = window.innerWidth < 768;
     
-    // Check if container is actually scrollable (desktop/iPad)
-    if (rightContainer && rightContainer.scrollTop > 0 && window.innerWidth >= 768) {
+    if (!isMobile && rightContainer) {
+      // Desktop/tablet: scroll the container
       rightContainer.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       // Mobile: scroll the window
