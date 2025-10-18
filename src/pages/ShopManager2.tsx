@@ -74,6 +74,7 @@ export default function ShopManager() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [originalFormData, setOriginalFormData] = useState<any>(null);
   const isSavingRef = useRef(false);
+  const previousSectionRef = useRef(currentSection);
   
   // Analytics state
   const [analytics, setAnalytics] = useState({
@@ -126,6 +127,16 @@ export default function ShopManager() {
       isSavingRef.current = false;
     }
   }, [shopData, navigate, loadingShop]);
+
+  // Handle navigating away from setup page while in edit mode (acts as cancel)
+  useEffect(() => {
+    if (previousSectionRef.current === 'setup' && currentSection !== 'setup' && isEditMode) {
+      // Revert changes when navigating away from setup page in edit mode
+      setFormData(originalFormData);
+      setIsEditMode(false);
+    }
+    previousSectionRef.current = currentSection;
+  }, [currentSection, isEditMode, originalFormData]);
 
   const fetchShopData = async () => {
     if (!user) return;
