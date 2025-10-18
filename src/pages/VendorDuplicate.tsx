@@ -2183,11 +2183,11 @@ const VendorDuplicate = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Scroll to Top Button - Mobile Only */}
+      {/* Scroll to Top Button */}
       {showScrollTop && (
         <Button
           onClick={scrollToTop}
-          className="fixed bottom-4 left-4 md:hidden z-50 h-12 w-12 rounded-full shadow-lg"
+          className="fixed bottom-4 left-4 z-50 h-12 w-12 rounded-full shadow-lg"
           size="icon"
         >
           <ArrowUp className="h-5 w-5" />
