@@ -952,13 +952,14 @@ const VendorDuplicate = () => {
 
   // Handle scroll to top button visibility
   useEffect(() => {
+    const container = document.getElementById('vendor-content-scroll') as HTMLElement;
+    
     const handleScroll = () => {
-      const rightContainer = document.querySelector('.flex-1.overflow-y-auto') as HTMLElement;
       const isMobile = window.innerWidth < 768;
       
-      if (!isMobile && rightContainer) {
+      if (!isMobile && container) {
         // Desktop/tablet: check container scroll
-        setShowScrollTop(rightContainer.scrollTop > 100);
+        setShowScrollTop(container.scrollTop > 100);
       } else {
         // Mobile: check window scroll
         setShowScrollTop(window.scrollY > 100);
@@ -966,27 +967,30 @@ const VendorDuplicate = () => {
     };
 
     // Add listeners
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+    }
     window.addEventListener('scroll', handleScroll);
-    const rightContainer = document.querySelector('.flex-1.overflow-y-auto');
-    rightContainer?.addEventListener('scroll', handleScroll);
 
     // Initial check
     handleScroll();
 
     // Cleanup
     return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll);
+      }
       window.removeEventListener('scroll', handleScroll);
-      rightContainer?.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
   const scrollToTop = () => {
-    const rightContainer = document.querySelector('.flex-1.overflow-y-auto') as HTMLElement;
+    const container = document.getElementById('vendor-content-scroll') as HTMLElement;
     const isMobile = window.innerWidth < 768;
     
-    if (!isMobile && rightContainer) {
+    if (!isMobile && container) {
       // Desktop/tablet: scroll the container
-      rightContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      container.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       // Mobile: scroll the window
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1147,7 +1151,7 @@ const VendorDuplicate = () => {
             </div>
             
             {/* Main content - right column */}
-            <div className="flex-1 overflow-y-auto h-screen">
+            <div id="vendor-content-scroll" className="flex-1 overflow-y-auto h-screen">
               <div className="mx-auto px-4 py-6 max-w-xl">
                   {selectedVendor ? (
           // Show selected vendor details
