@@ -952,39 +952,46 @@ const VendorDuplicate = () => {
 
   // Handle scroll to top button visibility
   useEffect(() => {
-    const handleScroll = (e: Event) => {
-      const target = e.target as HTMLElement;
-      const scrollY = target.scrollTop || window.scrollY;
-      setShowScrollTop(scrollY > 100);
+    const handleScroll = () => {
+      // On desktop/iPad with container scroll, check container scroll
+      const rightContainer = document.querySelector('.flex-1.overflow-y-auto') as HTMLElement;
+      
+      if (rightContainer && rightContainer.clientHeight < rightContainer.scrollHeight && window.innerWidth >= 768) {
+        // Desktop/iPad: container is scrollable
+        setShowScrollTop(rightContainer.scrollTop > 100);
+      } else {
+        // Mobile: use window scroll
+        setShowScrollTop(window.scrollY > 100);
+      }
     };
 
-    // Prioritize the right content container scroll
+    // Listen to both window and container scroll
+    window.addEventListener('scroll', handleScroll);
     const rightContainer = document.querySelector('.flex-1.overflow-y-auto');
     
     if (rightContainer) {
       rightContainer.addEventListener('scroll', handleScroll);
-      
-      return () => {
-        rightContainer.removeEventListener('scroll', handleScroll);
-      };
-    } else {
-      // Fallback to window scroll
-      window.addEventListener('scroll', handleScroll);
-      
-      return () => {
-        window.removeEventListener('scroll', handleScroll);
-      };
     }
+
+    // Initial check
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rightContainer) {
+        rightContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
   }, []);
 
   const scrollToTop = () => {
-    // Prioritize scrolling the right content container (the smaller scroller)
     const rightContainer = document.querySelector('.flex-1.overflow-y-auto') as HTMLElement;
     
-    if (rightContainer) {
+    // Check if container is actually scrollable (desktop/iPad)
+    if (rightContainer && rightContainer.scrollTop > 0 && window.innerWidth >= 768) {
       rightContainer.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      // Fallback to window scroll
+      // Mobile: scroll the window
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
