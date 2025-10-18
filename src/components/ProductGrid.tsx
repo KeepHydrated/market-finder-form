@@ -567,7 +567,7 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...products].reverse().map((product, index) => {
+        {products.map((product, index) => {
           // Ensure product has an ID - use existing ID or fallback to index
           const productWithId = {
             ...product,
@@ -591,7 +591,7 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
       
       <ProductDetailModal
         product={selectedProduct}
-        products={[...products].reverse().map((p, idx) => ({ ...p, id: p.id || idx }))}
+        products={products.map((p, idx) => ({ ...p, id: p.id || idx }))}
         open={isModalOpen}
         onClose={handleCloseModal}
         onProductChange={setSelectedProduct}
