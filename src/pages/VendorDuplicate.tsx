@@ -958,46 +958,35 @@ const VendorDuplicate = () => {
       setShowScrollTop(scrollY > 100);
     };
 
-    // Listen to scroll events
-    window.addEventListener('scroll', handleScroll);
+    // Prioritize the right content container scroll
     const rightContainer = document.querySelector('.flex-1.overflow-y-auto');
-    const sidebarContainer = document.querySelector('.bg-green-50 .overflow-y-auto');
     
     if (rightContainer) {
       rightContainer.addEventListener('scroll', handleScroll);
-    }
-    if (sidebarContainer) {
-      sidebarContainer.addEventListener('scroll', handleScroll);
-    }
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (rightContainer) {
+      
+      return () => {
         rightContainer.removeEventListener('scroll', handleScroll);
-      }
-      if (sidebarContainer) {
-        sidebarContainer.removeEventListener('scroll', handleScroll);
-      }
-    };
+      };
+    } else {
+      // Fallback to window scroll
+      window.addEventListener('scroll', handleScroll);
+      
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }
   }, []);
 
   const scrollToTop = () => {
-    // Find the scrollable containers
+    // Prioritize scrolling the right content container (the smaller scroller)
     const rightContainer = document.querySelector('.flex-1.overflow-y-auto') as HTMLElement;
-    const sidebarContainer = document.querySelector('.bg-green-50 .overflow-y-auto') as HTMLElement;
     
-    // Scroll the right container
     if (rightContainer) {
       rightContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // Fallback to window scroll
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    
-    // Scroll the sidebar container
-    if (sidebarContainer) {
-      sidebarContainer.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    
-    // Scroll window as fallback
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (loading || loadingData) {
