@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { Footer } from "@/components/Footer";
 import { ShoppingCartProvider } from "@/contexts/ShoppingCartContext";
@@ -29,43 +29,6 @@ import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
-const AppContent = () => {
-  const location = useLocation();
-  const hideFooter = location.pathname === '/market';
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <GlobalHeader />
-      <ShoppingCart />
-      <main className="flex-1">
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/search" element={<CategoryProducts />} />
-          <Route path="/market" element={<VendorDuplicate />} />
-          <Route path="/likes" element={<Likes />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/account" element={<AccountSettings />} />
-          <Route path="/order-success" element={<OrderSuccess />} />
-          <Route path="/shop-manager" element={<ShopManager2 />} />
-          <Route path="/my-shop" element={<ShopManager2 />} />
-          <Route path="/commissions" element={<Commissions />} />
-          <Route path="/report" element={<Report />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route path="/messages/:conversationId" element={<Conversation />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/profile/:userId" element={<Profile />} />
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-      {!hideFooter && <Footer />}
-    </div>
-  );
-};
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -74,7 +37,35 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <AppContent />
+          <div className="min-h-screen flex flex-col">
+            <GlobalHeader />
+            <ShoppingCart />
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<Homepage />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/search" element={<CategoryProducts />} />
+                <Route path="/market" element={<VendorDuplicate />} />
+                <Route path="/likes" element={<Likes />} />
+                <Route path="/orders" element={<Orders />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/account" element={<AccountSettings />} />
+                <Route path="/order-success" element={<OrderSuccess />} />
+                <Route path="/shop-manager" element={<ShopManager2 />} />
+                <Route path="/my-shop" element={<ShopManager2 />} />
+                <Route path="/commissions" element={<Commissions />} />
+                <Route path="/report" element={<Report />} />
+                <Route path="/messages" element={<Messages />} />
+                <Route path="/messages/:conversationId" element={<Conversation />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/profile/:userId" element={<Profile />} />
+                
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
         </BrowserRouter>
       </ShoppingCartProvider>
     </TooltipProvider>
