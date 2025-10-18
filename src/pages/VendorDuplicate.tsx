@@ -1028,16 +1028,16 @@ const VendorDuplicate = () => {
         <SidebarProvider>
           <div className="h-screen bg-background w-full overflow-hidden">
             <div className="flex w-full h-full">
-              <Sidebar className="bg-green-50 border-r flex-shrink-0 w-80" collapsible="icon">
-                <div className="h-full overflow-y-auto p-6">
-                  <div className="space-y-6">
-          <div className="flex items-center justify-between gap-2">
-            <span 
-              className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors flex-1 min-w-0"
+              <Sidebar className="bg-green-50 border-r flex-shrink-0 w-80 h-[calc(100vh-4rem)]" collapsible="icon">
+                <div className="h-full overflow-y-auto">
+                  <div className="space-y-4 p-4">
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <h2 
+              className="text-lg font-bold cursor-pointer hover:text-gray-600 transition-colors flex-1 min-w-0 break-words"
               onClick={() => setSelectedVendor(null)}
             >
               {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
-            </span>
+            </h2>
             {/* Heart icon */}
             <Button
               variant="ghost"
@@ -1115,17 +1115,15 @@ const VendorDuplicate = () => {
           </div>
 
           {/* Google Reviews Section */}
-          <div className="flex items-start gap-2">
-            <div className="flex items-center gap-2 mt-0.5">
-              <Star className="h-4 w-4 text-yellow-500 fill-current" />
-              <span className="text-foreground font-semibold text-lg">
-                {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
-                 acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
-              </span>
-              <span className="text-muted-foreground text-sm">
-                ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0}) Google reviews
-              </span>
-            </div>
+          <div className="flex items-center gap-2">
+            <Star className="h-4 w-4 text-yellow-500 fill-current flex-shrink-0" />
+            <span className="text-foreground font-semibold">
+              {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
+               acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
+            </span>
+            <span className="text-muted-foreground text-xs">
+              ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0}) Google reviews
+            </span>
           </div>
 
           {/* Markets Navigation - Only show if viewing a vendor that sells at multiple markets */}
