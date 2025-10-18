@@ -1028,9 +1028,9 @@ const VendorDuplicate = () => {
         <SidebarProvider>
           <div className="h-screen bg-background w-full overflow-hidden">
             <div className="flex w-full h-full">
-              <Sidebar className="bg-green-50 border-r flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16" collapsible="icon">
-                <div className="h-full overflow-y-auto">
-                  <div className="space-y-6 px-4 pt-6 pb-8">
+              <Sidebar className="bg-green-50 border-r flex-shrink-0 w-80" collapsible="icon">
+                <div className="h-full overflow-y-auto p-6">
+                  <div className="space-y-6">
           <div className="flex items-center justify-between gap-2">
             <span 
               className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors flex-1 min-w-0"
@@ -1064,9 +1064,9 @@ const VendorDuplicate = () => {
           </div>
 
           <div className="flex items-start gap-2">
-            <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <div>
-              <p className="text-muted-foreground text-base font-normal">
+            <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-muted-foreground text-sm">
                 {cleanAddress(selectedMarketAddress || acceptedSubmission.market_address)}
               </p>
               {distance && (
@@ -1082,8 +1082,8 @@ const VendorDuplicate = () => {
           </div>
 
           <div className="flex items-start gap-2">
-            <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-            <div className="text-muted-foreground text-base font-normal">
+            <Clock className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+            <div className="text-muted-foreground text-sm">
               {marketOpeningHours?.open_now !== undefined && (
                 <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
                   marketOpeningHours.open_now 
@@ -1093,7 +1093,7 @@ const VendorDuplicate = () => {
                   {marketOpeningHours.open_now ? 'Open Now' : 'Currently Closed'}
                 </div>
               )}
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => {
                   // Split day and time for iPad view
                   const parts = line.split(':');
@@ -1101,9 +1101,10 @@ const VendorDuplicate = () => {
                     const day = parts[0].trim();
                     const time = parts.slice(1).join(':').trim();
                     return (
-                      <div key={index} className="space-y-0">
-                        <div className="font-medium">{day}:</div>
-                        <div>{time}</div>
+                      <div key={index}>
+                        <span className="font-medium">{day}:</span>
+                        <br />
+                        <span>{time}</span>
                       </div>
                     );
                   }
