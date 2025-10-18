@@ -1473,8 +1473,8 @@ const VendorDuplicate = () => {
         </SidebarProvider>
       ) : (
         // Desktop and Mobile view - original non-collapsible layout  
-        <div className="min-h-screen bg-background">
-          <div className="flex flex-col md:flex-row">
+        <div className="bg-background">
+          <div className="flex flex-col md:flex-row min-h-screen">
             {/* Left column/Top section - sticky on desktop, at top on mobile */}
             <div className="w-full md:w-96 md:h-[70vh] md:sticky md:top-0 bg-green-50 border-b md:border-b-0 md:border-r">
               <div className="space-y-6 px-4 pt-6 pb-6">
