@@ -961,10 +961,18 @@ const VendorDuplicate = () => {
   }, []);
 
   const scrollToTop = () => {
-    // Force immediate scroll to top
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    // Find the scrollable container (for tablet view)
+    const scrollableContainer = document.querySelector('.overflow-y-auto.h-screen');
+    
+    if (scrollableContainer) {
+      // Tablet view - scroll the container
+      scrollableContainer.scrollTop = 0;
+    } else {
+      // Desktop/mobile view - scroll the window
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
   };
 
   if (loading || loadingData) {
