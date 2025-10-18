@@ -379,6 +379,17 @@ const VendorDuplicate = () => {
 
       if (error) throw error;
       
+      // Get current user email
+      const { data: { user } } = await supabase.auth.getUser();
+      const userEmail = user?.email;
+      
+      // Check if this is test store bb and user is not nadiachibri@gmail.com
+      if (data.store_name?.toLowerCase() === 'test store bb' && userEmail !== 'nadiachibri@gmail.com') {
+        // Redirect to homepage if not authorized
+        navigate('/');
+        return;
+      }
+      
       const parsedSubmission = {
         ...data,
         products: typeof data.products === 'string' ? JSON.parse(data.products) : data.products,
@@ -423,7 +434,19 @@ const VendorDuplicate = () => {
           : undefined
       })) || [];
       
-      console.log('Fetched submissions with ratings:', parsedSubmissions.map(s => ({
+      // Get current user email
+      const { data: { user } } = await supabase.auth.getUser();
+      const userEmail = user?.email;
+      
+      // Filter out "test store bb" unless user is nadiachibri@gmail.com
+      const filteredSubmissions = parsedSubmissions.filter(submission => {
+        if (submission.store_name?.toLowerCase() === 'test store bb') {
+          return userEmail === 'nadiachibri@gmail.com';
+        }
+        return true;
+      });
+      
+      console.log('Fetched submissions with ratings:', filteredSubmissions.map(s => ({
         name: s.store_name,
         google_rating: s.google_rating,
         google_rating_count: s.google_rating_count,
@@ -432,13 +455,13 @@ const VendorDuplicate = () => {
       })));
       
       // Also log the full objects to see their structure
-      console.log('Full parsed submissions:', parsedSubmissions);
+      console.log('Full parsed submissions:', filteredSubmissions);
       
-      setAllVendors(parsedSubmissions);
+      setAllVendors(filteredSubmissions);
       // Set the first vendor as the market representative and selected vendor
-      if (parsedSubmissions.length > 0) {
-        setAcceptedSubmission(parsedSubmissions[0]);
-        setSelectedVendor(parsedSubmissions[0]);
+      if (filteredSubmissions.length > 0) {
+        setAcceptedSubmission(filteredSubmissions[0]);
+        setSelectedVendor(filteredSubmissions[0]);
       }
     } catch (error) {
       console.error('Error fetching vendors:', error);

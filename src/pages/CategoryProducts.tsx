@@ -90,9 +90,21 @@ const CategoryProducts = () => {
 
         if (error) throw error;
 
+        // Get current user email
+        const { data: { user } } = await supabase.auth.getUser();
+        const userEmail = user?.email;
+        
+        // Filter out "test store bb" unless user is nadiachibri@gmail.com
+        const filteredData = (data || []).filter(vendor => {
+          if (vendor.store_name?.toLowerCase() === 'test store bb') {
+            return userEmail === 'nadiachibri@gmail.com';
+          }
+          return true;
+        });
+
         const logMessage = category 
-          ? `Found ${data?.length || 0} vendors nationwide for category: ${category}`
-          : `Found ${data?.length || 0} vendors nationwide (all categories)`;
+          ? `Found ${filteredData.length} vendors nationwide for category: ${category}`
+          : `Found ${filteredData.length} vendors nationwide (all categories)`;
         
         if (searchTerm) {
           console.log(`${logMessage}, searching for: "${searchTerm}"`);
@@ -100,7 +112,7 @@ const CategoryProducts = () => {
           console.log(logMessage);
         }
         
-        setVendors(data || []);
+        setVendors(filteredData);
       } catch (error) {
         console.error('Error fetching vendors:', error);
         toast({

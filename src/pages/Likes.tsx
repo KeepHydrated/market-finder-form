@@ -154,10 +154,22 @@ const Likes = () => {
           : undefined
       })) || [];
       
-      setAcceptedSubmissions(parsedSubmissions);
+      // Get current user email
+      const { data: { user } } = await supabase.auth.getUser();
+      const userEmail = user?.email;
+      
+      // Filter out "test store bb" unless user is nadiachibri@gmail.com
+      const filteredSubmissions = parsedSubmissions.filter(submission => {
+        if (submission.store_name?.toLowerCase() === 'test store bb') {
+          return userEmail === 'nadiachibri@gmail.com';
+        }
+        return true;
+      });
+      
+      setAcceptedSubmissions(filteredSubmissions);
       
       // Fetch ratings for all vendors
-      const vendorIds = parsedSubmissions.map(sub => sub.id);
+      const vendorIds = filteredSubmissions.map(sub => sub.id);
       if (vendorIds.length > 0) {
         await fetchVendorRatings(vendorIds);
       }
