@@ -626,34 +626,46 @@ export default function ShopManager() {
           <h2 className="hidden sm:block text-2xl font-bold mb-2">Shop Details</h2>
         </div>
         {shopData && (
-          <Button
-            variant="outline"
-            onClick={async () => {
-              if (isEditMode) {
-                if (currentSection === 'shop') {
-                  isSavingRef.current = true;
-                }
-                await handleSubmit();
-                setIsEditMode(false);
-              } else {
-                setOriginalFormData({ ...formData });
-                setIsEditMode(true);
-              }
-            }}
-            disabled={isSubmitting}
-          >
+          <div className="flex gap-2">
             {isEditMode ? (
               <>
-                <Save className="h-4 w-4 mr-2" />
-                {isSubmitting ? 'Saving...' : 'Save'}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setFormData(originalFormData);
+                    setIsEditMode(false);
+                  }}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={async () => {
+                    if (currentSection === 'shop') {
+                      isSavingRef.current = true;
+                    }
+                    await handleSubmit();
+                    setIsEditMode(false);
+                  }}
+                  disabled={isSubmitting}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {isSubmitting ? 'Saving...' : 'Save'}
+                </Button>
               </>
             ) : (
-              <>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setOriginalFormData({ ...formData });
+                  setIsEditMode(true);
+                }}
+              >
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
-              </>
+              </Button>
             )}
-          </Button>
+          </div>
         )}
       </div>
       
