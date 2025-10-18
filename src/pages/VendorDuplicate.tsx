@@ -961,9 +961,10 @@ const VendorDuplicate = () => {
   }, []);
 
   const scrollToTop = () => {
+    // Scroll both window and document to ensure it works across all scenarios
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Ensure we're at the absolute top
-    setTimeout(() => window.scrollTo(0, 0), 100);
   };
 
   if (loading || loadingData) {
