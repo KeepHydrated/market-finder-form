@@ -953,25 +953,37 @@ const VendorDuplicate = () => {
   // Handle scroll to top button visibility
   useEffect(() => {
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 100);
+      // Check both window scroll and scrollable container
+      const scrollableContainer = document.querySelector('.overflow-y-auto.h-screen') as HTMLElement;
+      const scrollY = scrollableContainer ? scrollableContainer.scrollTop : window.scrollY;
+      setShowScrollTop(scrollY > 100);
     };
 
+    // Listen to both window scroll and container scroll
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const scrollableContainer = document.querySelector('.overflow-y-auto.h-screen');
+    if (scrollableContainer) {
+      scrollableContainer.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollableContainer) {
+        scrollableContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
   }, []);
 
   const scrollToTop = () => {
     // Find the scrollable container (for tablet view)
-    const scrollableContainer = document.querySelector('.overflow-y-auto.h-screen');
+    const scrollableContainer = document.querySelector('.overflow-y-auto.h-screen') as HTMLElement;
     
     if (scrollableContainer) {
       // Tablet view - scroll the container
-      scrollableContainer.scrollTop = 0;
+      scrollableContainer.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       // Desktop/mobile view - scroll the window
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
