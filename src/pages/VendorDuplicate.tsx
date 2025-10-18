@@ -960,32 +960,46 @@ const VendorDuplicate = () => {
 
     // Listen to both window scroll and container scroll
     window.addEventListener('scroll', handleScroll);
-    const scrollableContainer = document.querySelector('.flex-1.overflow-y-auto.h-screen');
-    if (scrollableContainer) {
-      scrollableContainer.addEventListener('scroll', handleScroll);
+    const rightContainer = document.querySelector('.flex-1.overflow-y-auto.h-screen');
+    const sidebarContainer = document.querySelector('.bg-green-50 .overflow-y-auto');
+    
+    if (rightContainer) {
+      rightContainer.addEventListener('scroll', handleScroll);
+    }
+    if (sidebarContainer) {
+      sidebarContainer.addEventListener('scroll', handleScroll);
     }
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      if (scrollableContainer) {
-        scrollableContainer.removeEventListener('scroll', handleScroll);
+      if (rightContainer) {
+        rightContainer.removeEventListener('scroll', handleScroll);
+      }
+      if (sidebarContainer) {
+        sidebarContainer.removeEventListener('scroll', handleScroll);
       }
     };
   }, []);
 
   const scrollToTop = () => {
-    // Find the scrollable container (for tablet view)
-    const scrollableContainer = document.querySelector('.flex-1.overflow-y-auto.h-screen') as HTMLElement;
+    // Find both scrollable containers
+    const rightContainer = document.querySelector('.flex-1.overflow-y-auto.h-screen') as HTMLElement;
+    const sidebarContainer = document.querySelector('.bg-green-50 .overflow-y-auto') as HTMLElement;
     
-    if (scrollableContainer && scrollableContainer.scrollTop > 0) {
-      // Tablet view - scroll the container to the very top
-      scrollableContainer.scrollTop = 0;
-    } else {
-      // Desktop/mobile view - scroll the window
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
+    // Scroll the right container if it exists and has scroll
+    if (rightContainer) {
+      rightContainer.scrollTo({ top: 0, behavior: 'smooth' });
     }
+    
+    // Scroll the sidebar container if it exists and has scroll
+    if (sidebarContainer) {
+      sidebarContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    // Also scroll the window as fallback
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   };
 
   if (loading || loadingData) {
