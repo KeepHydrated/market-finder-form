@@ -958,9 +958,9 @@ const VendorDuplicate = () => {
       setShowScrollTop(scrollY > 100);
     };
 
-    // Listen to both window scroll and container scroll
+    // Listen to scroll events
     window.addEventListener('scroll', handleScroll);
-    const rightContainer = document.querySelector('.flex-1.overflow-y-auto.h-screen');
+    const rightContainer = document.querySelector('.flex-1.overflow-y-auto');
     const sidebarContainer = document.querySelector('.bg-green-50 .overflow-y-auto');
     
     if (rightContainer) {
@@ -982,24 +982,22 @@ const VendorDuplicate = () => {
   }, []);
 
   const scrollToTop = () => {
-    // Find both scrollable containers
-    const rightContainer = document.querySelector('.flex-1.overflow-y-auto.h-screen') as HTMLElement;
+    // Find the scrollable containers
+    const rightContainer = document.querySelector('.flex-1.overflow-y-auto') as HTMLElement;
     const sidebarContainer = document.querySelector('.bg-green-50 .overflow-y-auto') as HTMLElement;
     
-    // Scroll the right container if it exists and has scroll
+    // Scroll the right container
     if (rightContainer) {
       rightContainer.scrollTo({ top: 0, behavior: 'smooth' });
     }
     
-    // Scroll the sidebar container if it exists and has scroll
+    // Scroll the sidebar container
     if (sidebarContainer) {
       sidebarContainer.scrollTo({ top: 0, behavior: 'smooth' });
     }
     
-    // Also scroll the window as fallback
+    // Scroll window as fallback
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
   };
 
   if (loading || loadingData) {
@@ -1028,8 +1026,8 @@ const VendorDuplicate = () => {
       {isTablet ? (
         // iPad view with collapsible sidebar
         <SidebarProvider>
-          <div className="min-h-screen bg-background w-full">
-            <div className="flex w-full">
+          <div className="h-screen bg-background w-full overflow-hidden">
+            <div className="flex w-full h-full">
               <Sidebar className="bg-green-50 border-r flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16" collapsible="icon">
                 <div className="h-full overflow-y-auto">
                   <div className="space-y-6 px-4 pt-6 pb-8">
@@ -1182,7 +1180,7 @@ const VendorDuplicate = () => {
               </Sidebar>
               
               {/* Main content - right column, scrollable */}
-              <div className="flex-1 overflow-y-auto h-screen">
+              <div className="flex-1 overflow-y-auto">
                 <div className="mx-auto px-4 py-6 md:max-w-xl">
                   {selectedVendor ? (
           // Show selected vendor details
