@@ -953,7 +953,7 @@ const VendorDuplicate = () => {
   // Handle scroll to top button visibility
   useEffect(() => {
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 300);
+      setShowScrollTop(window.scrollY > 100);
     };
 
     window.addEventListener('scroll', handleScroll);
