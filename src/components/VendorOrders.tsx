@@ -194,10 +194,11 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="mb-8">
-        <h2 className="hidden sm:block text-2xl font-bold mb-2">Your Market's Orders</h2>
-      </div>
+    <>
+      <div className="space-y-6">
+        <div className="mb-8">
+          <h2 className="hidden sm:block text-2xl font-bold mb-2">Your Market's Orders</h2>
+        </div>
 
       {orders.length === 0 ? (
         <Card className="text-center py-12">
@@ -601,21 +602,6 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
         hideVendorName={true}
       />
 
-      {/* Floating Chat with Buyer */}
-      {chatOpen && chatBuyerEmail && (
-        <FloatingChat
-          isOpen={chatOpen}
-          onClose={() => {
-            setChatOpen(false);
-            setChatBuyerEmail(null);
-            setChatOrderItems([]);
-          }}
-          vendorId={vendorId || ''}
-          vendorName={chatBuyerEmail}
-          orderItems={chatOrderItems}
-        />
-      )}
-
       {/* Receipt Dialog */}
       <Dialog open={showReceiptDialog} onOpenChange={setShowReceiptDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -679,6 +665,22 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+
+      {/* Floating Chat with Buyer - rendered at root level for proper z-index */}
+      {chatOpen && chatBuyerEmail && (
+        <FloatingChat
+          isOpen={chatOpen}
+          onClose={() => {
+            setChatOpen(false);
+            setChatBuyerEmail(null);
+            setChatOrderItems([]);
+          }}
+          vendorId={vendorId || ''}
+          vendorName={chatBuyerEmail}
+          orderItems={chatOrderItems}
+        />
+      )}
+    </>
   );
 };
