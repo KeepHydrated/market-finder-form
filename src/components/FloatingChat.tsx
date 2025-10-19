@@ -240,7 +240,14 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
         description: "Failed to send message",
         variant: "destructive"
       });
+      return;
     }
+
+    // Update conversation's last_message_at
+    await supabase
+      .from('conversations')
+      .update({ last_message_at: new Date().toISOString() })
+      .eq('id', conversation.id);
   };
 
   if (!isOpen) return null;

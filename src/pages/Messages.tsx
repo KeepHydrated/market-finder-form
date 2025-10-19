@@ -55,9 +55,9 @@ export default function Messages() {
 
     fetchConversations();
 
-    // Subscribe to real-time updates
+    // Subscribe to real-time updates for both conversations and messages
     const channel = supabase
-      .channel('conversations-changes')
+      .channel('messages-updates')
       .on(
         'postgres_changes',
         {
@@ -66,6 +66,19 @@ export default function Messages() {
           table: 'conversations',
         },
         () => {
+          console.log('Conversation updated, refreshing...');
+          fetchConversations();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+        },
+        () => {
+          console.log('New message received, refreshing conversations...');
           fetchConversations();
         }
       )
