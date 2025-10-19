@@ -1109,21 +1109,21 @@ export default function AccountSettings() {
               <TabsList className="flex flex-row md:flex-col w-full h-auto p-0 bg-card">
                 <TabsTrigger 
                   value="account" 
-                  className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-tl-lg rounded-bl-none md:rounded-bl-none border-b border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary transition-colors"
+                  className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-tl-lg rounded-bl-none md:rounded-bl-none text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
                 >
                   <User className="h-4 w-4" />
                   <span className="hidden md:inline">Account</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="addresses" 
-                  className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-none border-b border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary transition-colors"
+                  className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
                 >
                   <MapPin className="h-4 w-4" />
                   <span className="hidden md:inline">Addresses</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="payments" 
-                  className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-tr-lg rounded-br-none md:rounded-tr-none md:rounded-bl-lg border-b border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary transition-colors"
+                  className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-tr-lg rounded-br-none md:rounded-tr-none md:rounded-bl-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
                 >
                   <CreditCard className="h-4 w-4" />
                   <span className="hidden md:inline">Payments</span>
