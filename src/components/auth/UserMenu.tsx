@@ -152,37 +152,6 @@ export function UserMenu({ user, profile }: UserMenuProps) {
                 </Button>
 
                 <Separator className="my-2" />
-
-                {/* Admin Reports Section - Only for nadiachibri@gmail.com */}
-                {user?.email === 'nadiachibri@gmail.com' && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-base h-12"
-                      onClick={handleReportClick}
-                    >
-                      <FileWarning className="mr-3 h-5 w-5" />
-                      <span>Reports</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-base h-12"
-                      onClick={handleCommissionsClick}
-                    >
-                      <DollarSign className="mr-3 h-5 w-5" />
-                      <span>Commissions</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-base h-12"
-                      onClick={handleAnalyticsClick}
-                    >
-                      <BarChart className="mr-3 h-5 w-5" />
-                      <span>Analytics</span>
-                    </Button>
-                    <Separator className="my-2" />
-                  </>
-                )}
                 
                 <Button
                   variant="ghost"
