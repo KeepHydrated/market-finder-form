@@ -111,10 +111,7 @@ export function UserMenu({ user, profile }: UserMenuProps) {
             
             <div className="flex flex-col h-full">
               {/* Profile Section */}
-              <button
-                onClick={handleProfileClick}
-                className="w-full p-4 text-left hover:bg-muted/50 rounded-lg transition-colors mb-4"
-              >
+              <div className="w-full p-4 mb-4">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-12 w-12">
                     <AvatarImage src={profile?.avatar_url} alt="Avatar" />
@@ -129,7 +126,7 @@ export function UserMenu({ user, profile }: UserMenuProps) {
                     </p>
                   </div>
                 </div>
-              </button>
+              </div>
 
               {/* Menu Items */}
               <div className="flex-1 space-y-2">
