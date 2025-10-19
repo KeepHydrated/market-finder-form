@@ -138,6 +138,11 @@ export default function ShopManager() {
     previousSectionRef.current = currentSection;
   }, [currentSection, isEditMode, originalFormData]);
 
+  // Scroll to top when navigating between sections
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentSection]);
+
   const fetchShopData = async () => {
     if (!user) return;
 
