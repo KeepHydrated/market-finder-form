@@ -118,6 +118,7 @@ const VendorDuplicate = () => {
   const [navigationMarketsOrder, setNavigationMarketsOrder] = useState<string[]>([]);
   const isMobile = useIsMobile();
   const [isTablet, setIsTablet] = useState(false);
+  const contentScrollRef = useRef<HTMLDivElement>(null);
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
 
   // Check if viewport is tablet (768px - 1024px)
@@ -952,8 +953,8 @@ const VendorDuplicate = () => {
 
   // Handle scroll to top button visibility
   useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-    const container = document.getElementById('vendor-content-scroll') as HTMLElement;
+    const isMobileDevice = window.innerWidth < 768;
+    const container = contentScrollRef.current;
 
     const handleContainerScroll = () => {
       if (container) {
@@ -965,30 +966,30 @@ const VendorDuplicate = () => {
       setShowScrollTop(window.scrollY > 100);
     };
 
-    // Desktop/tablet: ONLY listen to container scroll
+    // Desktop/tablet: ONLY listen to container scroll (right column)
     // Mobile: ONLY listen to window scroll
-    if (!isMobile && container) {
+    if (!isMobileDevice && container) {
       container.addEventListener('scroll', handleContainerScroll);
       handleContainerScroll(); // Initial check
+      
+      return () => {
+        container.removeEventListener('scroll', handleContainerScroll);
+      };
     } else {
       window.addEventListener('scroll', handleWindowScroll);
       handleWindowScroll(); // Initial check
+      
+      return () => {
+        window.removeEventListener('scroll', handleWindowScroll);
+      };
     }
-
-    // Cleanup
-    return () => {
-      if (container) {
-        container.removeEventListener('scroll', handleContainerScroll);
-      }
-      window.removeEventListener('scroll', handleWindowScroll);
-    };
   }, []);
 
   const scrollToTop = () => {
-    const isMobile = window.innerWidth < 768;
-    const container = document.getElementById('vendor-content-scroll') as HTMLElement;
+    const isMobileDevice = window.innerWidth < 768;
+    const container = contentScrollRef.current;
     
-    if (!isMobile && container) {
+    if (!isMobileDevice && container) {
       // Desktop/tablet: scroll the container (right column only)
       container.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
@@ -1151,7 +1152,7 @@ const VendorDuplicate = () => {
             </div>
             
             {/* Main content - right column */}
-            <div id="vendor-content-scroll" className="flex-1 overflow-y-auto h-screen">
+            <div ref={contentScrollRef} className="flex-1 overflow-y-auto h-screen">
               <div className="mx-auto px-4 py-6 max-w-xl">
                   {selectedVendor ? (
           // Show selected vendor details
