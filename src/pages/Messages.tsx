@@ -197,55 +197,57 @@ export default function Messages() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {conversations.length === 0 ? (
-        <Card className="p-8 text-center">
-          <MessageSquare className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-muted-foreground">No conversations yet</p>
-        </Card>
-      ) : (
-        <div className="space-y-0 divide-y">
-          {conversations.map((convo) => (
-            <div
-              key={convo.id}
-              className="p-2 hover:bg-accent cursor-pointer transition-colors"
-              onClick={() => openConversation(convo)}
-            >
-              <div className="flex items-start gap-4">
-                <Avatar className="h-12 w-12 flex-shrink-0">
-                  <AvatarImage src={convo.otherParty?.avatar_url || ''} />
-                  <AvatarFallback className="text-base">
-                    {convo.store_name?.[0]?.toUpperCase() || '?'}
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline justify-between gap-2 mb-1">
-                    <h3 className="font-semibold text-base text-foreground">
-                      {convo.store_name || 'Unknown Store'}
-                    </h3>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {format(new Date(convo.last_message_at), 'MMM d')}
-                    </span>
+    <>
+      <div className="container mx-auto px-4 py-8">
+        {conversations.length === 0 ? (
+          <Card className="p-8 text-center">
+            <MessageSquare className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground">No conversations yet</p>
+          </Card>
+        ) : (
+          <div className="space-y-0 divide-y">
+            {conversations.map((convo) => (
+              <div
+                key={convo.id}
+                className="p-2 hover:bg-accent cursor-pointer transition-colors"
+                onClick={() => openConversation(convo)}
+              >
+                <div className="flex items-start gap-4">
+                  <Avatar className="h-12 w-12 flex-shrink-0">
+                    <AvatarImage src={convo.otherParty?.avatar_url || ''} />
+                    <AvatarFallback className="text-base">
+                      {convo.store_name?.[0]?.toUpperCase() || '?'}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline justify-between gap-2 mb-1">
+                      <h3 className="font-semibold text-base text-foreground">
+                        {convo.store_name || 'Unknown Store'}
+                      </h3>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        {format(new Date(convo.last_message_at), 'MMM d')}
+                      </span>
+                    </div>
+                    
+                    <p className="text-sm text-muted-foreground truncate">
+                      {convo.lastMessage?.message || 'No messages yet'}
+                    </p>
                   </div>
                   
-                  <p className="text-sm text-muted-foreground truncate">
-                    {convo.lastMessage?.message || 'No messages yet'}
-                  </p>
+                  {convo.unread_count! > 0 && (
+                    <Badge variant="default" className="rounded-full px-2 py-0.5 text-xs ml-2 flex-shrink-0">
+                      {convo.unread_count}
+                    </Badge>
+                  )}
                 </div>
-                
-                {convo.unread_count! > 0 && (
-                  <Badge variant="default" className="rounded-full px-2 py-0.5 text-xs ml-2 flex-shrink-0">
-                    {convo.unread_count}
-                  </Badge>
-                )}
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
 
-      {/* Floating Chat */}
+      {/* Floating Chat - rendered at root level for proper mobile fullscreen */}
       {selectedConversation && selectedConversation.vendor_id && (
         <FloatingChat
           isOpen={true}
@@ -254,6 +256,6 @@ export default function Messages() {
           vendorName={selectedConversation.store_name || 'Unknown Store'}
         />
       )}
-    </div>
+    </>
   );
 }
