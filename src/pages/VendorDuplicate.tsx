@@ -100,6 +100,7 @@ const VendorDuplicate = () => {
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [marketOpeningHours, setMarketOpeningHours] = useState<any>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showMobileScrollTop, setShowMobileScrollTop] = useState(false);
   const [marketReviews, setMarketReviews] = useState<{rating?: number; reviewCount?: number} | null>(null);
   const [vendorReviews, setVendorReviews] = useState<{rating?: number; reviewCount?: number} | null>(null);
   const [vendorRatings, setVendorRatings] = useState<Record<string, {vendorId: string; averageRating: number; totalReviews: number}>>({});
@@ -951,45 +952,46 @@ const VendorDuplicate = () => {
     return address.replace(/,\s*United States\s*$/i, '').trim();
   };
 
-  // Handle scroll to top button visibility
+  // Handle scroll to top button visibility for desktop/iPad
   useEffect(() => {
-    const isMobileDevice = window.innerWidth < 768;
     const container = contentScrollRef.current;
 
     const handleContainerScroll = () => {
-      if (container) {
+      if (container && window.innerWidth >= 768) {
         setShowScrollTop(container.scrollTop > 100);
       }
     };
 
-    const handleWindowScroll = () => {
-      setShowScrollTop(window.scrollY > 100);
-    };
-
-    // Desktop/tablet: ONLY listen to container scroll (right column)
-    // Mobile: ONLY listen to window scroll
-    if (!isMobileDevice && container) {
+    if (container) {
       container.addEventListener('scroll', handleContainerScroll);
       handleContainerScroll(); // Initial check
       
       return () => {
         container.removeEventListener('scroll', handleContainerScroll);
       };
-    } else {
-      window.addEventListener('scroll', handleWindowScroll);
-      handleWindowScroll(); // Initial check
-      
-      return () => {
-        window.removeEventListener('scroll', handleWindowScroll);
-      };
     }
   }, []);
 
+  // Handle scroll to top button visibility for mobile ONLY
+  useEffect(() => {
+    const handleWindowScroll = () => {
+      if (window.innerWidth < 768) {
+        setShowMobileScrollTop(window.scrollY > 100);
+      }
+    };
+
+    window.addEventListener('scroll', handleWindowScroll);
+    handleWindowScroll(); // Initial check
+    
+    return () => {
+      window.removeEventListener('scroll', handleWindowScroll);
+    };
+  }, []);
+
   const scrollToTop = () => {
-    const isMobileDevice = window.innerWidth < 768;
     const container = contentScrollRef.current;
     
-    if (!isMobileDevice && container) {
+    if (window.innerWidth >= 768 && container) {
       // Desktop/tablet: scroll the container (right column only)
       container.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
@@ -2190,8 +2192,19 @@ const VendorDuplicate = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Scroll to Top Button */}
-      {showScrollTop && (
+      {/* Scroll to Top Button - Desktop/iPad */}
+      {showScrollTop && window.innerWidth >= 768 && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-24 right-4 z-[100] h-12 w-12 rounded-full shadow-lg"
+          size="icon"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </Button>
+      )}
+
+      {/* Scroll to Top Button - Mobile ONLY */}
+      {showMobileScrollTop && window.innerWidth < 768 && (
         <Button
           onClick={scrollToTop}
           className="fixed bottom-24 right-4 z-[100] h-12 w-12 rounded-full shadow-lg"
