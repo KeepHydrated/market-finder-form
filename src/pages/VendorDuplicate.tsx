@@ -120,6 +120,7 @@ const VendorDuplicate = () => {
   const isMobile = useIsMobile();
   const [isTablet, setIsTablet] = useState(false);
   const contentScrollRef = useRef<HTMLDivElement>(null);
+  const desktopScrollRef = useRef<HTMLDivElement>(null); // Separate ref for desktop/iPad
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
 
   // Check if viewport is tablet (768px - 1024px)
@@ -952,22 +953,22 @@ const VendorDuplicate = () => {
     return address.replace(/,\s*United States\s*$/i, '').trim();
   };
 
-  // Handle scroll to top button visibility for desktop/iPad
+  // Handle scroll to top button visibility for desktop/iPad ONLY
   useEffect(() => {
-    const container = contentScrollRef.current;
+    const container = desktopScrollRef.current;
 
-    const handleContainerScroll = () => {
+    const handleDesktopScroll = () => {
       if (container && window.innerWidth >= 768) {
         setShowScrollTop(container.scrollTop > 100);
       }
     };
 
     if (container) {
-      container.addEventListener('scroll', handleContainerScroll);
-      handleContainerScroll(); // Initial check
+      container.addEventListener('scroll', handleDesktopScroll);
+      handleDesktopScroll(); // Initial check
       
       return () => {
-        container.removeEventListener('scroll', handleContainerScroll);
+        container.removeEventListener('scroll', handleDesktopScroll);
       };
     }
   }, []);
@@ -988,16 +989,15 @@ const VendorDuplicate = () => {
     };
   }, []);
 
-  const scrollToTop = () => {
-    const container = contentScrollRef.current;
-    
-    if (window.innerWidth >= 768 && container) {
-      // Desktop/tablet: scroll the container (right column only)
+  const scrollToTopDesktop = () => {
+    const container = desktopScrollRef.current;
+    if (container) {
       container.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      // Mobile: scroll the window
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  const scrollToTopMobile = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (loading || loadingData) {
@@ -1154,7 +1154,7 @@ const VendorDuplicate = () => {
             </div>
             
             {/* Main content - right column */}
-            <div ref={contentScrollRef} className="flex-1 overflow-y-auto h-screen">
+            <div ref={desktopScrollRef} className="flex-1 overflow-y-auto h-screen">
               <div className="mx-auto px-4 py-6 max-w-xl">
                   {selectedVendor ? (
           // Show selected vendor details
@@ -1589,7 +1589,7 @@ const VendorDuplicate = () => {
             </div>
             
             {/* Main content - right column, scrollable - FULL WIDTH ON MOBILE */}
-            <div ref={contentScrollRef} className="flex-1 w-full overflow-y-auto md:h-screen">
+            <div ref={desktopScrollRef} className="flex-1 w-full overflow-y-auto md:h-screen">
               <div className="mx-auto px-4 py-6 md:max-w-5xl">
                 {selectedVendor ? (
                   // Show selected vendor details
@@ -2192,10 +2192,10 @@ const VendorDuplicate = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Scroll to Top Button - Desktop/iPad */}
+      {/* Scroll to Top Button - Desktop/iPad ONLY */}
       {showScrollTop && window.innerWidth >= 768 && (
         <Button
-          onClick={scrollToTop}
+          onClick={scrollToTopDesktop}
           className="fixed bottom-24 right-4 z-[100] h-12 w-12 rounded-full shadow-lg"
           size="icon"
         >
@@ -2206,7 +2206,7 @@ const VendorDuplicate = () => {
       {/* Scroll to Top Button - Mobile ONLY */}
       {showMobileScrollTop && window.innerWidth < 768 && (
         <Button
-          onClick={scrollToTop}
+          onClick={scrollToTopMobile}
           className="fixed bottom-24 right-4 z-[100] h-12 w-12 rounded-full shadow-lg"
           size="icon"
         >
