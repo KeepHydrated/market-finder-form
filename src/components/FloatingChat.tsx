@@ -53,6 +53,7 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Check if we're already on this vendor's page
   const isOnVendorPage = location.pathname === '/market' && searchParams.get('id') === vendorId;
@@ -248,6 +249,11 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
       .from('conversations')
       .update({ last_message_at: new Date().toISOString() })
       .eq('id', conversation.id);
+
+    // Keep input focused on mobile
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 10);
   };
 
   if (!isOpen) return null;
@@ -380,6 +386,7 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
       <form onSubmit={handleSendMessage} className="p-4 pb-safe border-t border-border bg-card flex-shrink-0">
         <div className="flex gap-2">
           <Input
+            ref={inputRef}
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
