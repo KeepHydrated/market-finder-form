@@ -120,7 +120,8 @@ const VendorDuplicate = () => {
   const isMobile = useIsMobile();
   const [isTablet, setIsTablet] = useState(false);
   const contentScrollRef = useRef<HTMLDivElement>(null);
-  const desktopScrollRef = useRef<HTMLDivElement>(null); // Separate ref for desktop/iPad
+  const desktopScrollRef = useRef<HTMLDivElement>(null); // For tablet layout
+  const desktopScrollRef2 = useRef<HTMLDivElement>(null); // For desktop/mobile layout
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
 
   // Check if viewport is tablet (768px - 1024px)
@@ -955,7 +956,7 @@ const VendorDuplicate = () => {
 
   // Handle scroll to top button visibility for desktop/iPad ONLY
   useEffect(() => {
-    const container = desktopScrollRef.current;
+    const container = desktopScrollRef.current || desktopScrollRef2.current;
 
     const handleDesktopScroll = () => {
       if (container && window.innerWidth >= 768) {
@@ -971,7 +972,7 @@ const VendorDuplicate = () => {
         container.removeEventListener('scroll', handleDesktopScroll);
       };
     }
-  }, []);
+  }, [isTablet]);
 
   // Handle scroll to top button visibility for mobile ONLY
   useEffect(() => {
@@ -990,7 +991,7 @@ const VendorDuplicate = () => {
   }, []);
 
   const scrollToTopDesktop = () => {
-    const container = desktopScrollRef.current;
+    const container = desktopScrollRef.current || desktopScrollRef2.current;
     if (container) {
       container.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1589,7 +1590,7 @@ const VendorDuplicate = () => {
             </div>
             
             {/* Main content - right column, scrollable - FULL WIDTH ON MOBILE */}
-            <div ref={desktopScrollRef} className="flex-1 w-full overflow-y-auto md:h-screen">
+            <div ref={desktopScrollRef2} className="flex-1 w-full overflow-y-auto md:h-screen">
               <div className="mx-auto px-4 py-6 md:max-w-5xl">
                 {selectedVendor ? (
                   // Show selected vendor details
