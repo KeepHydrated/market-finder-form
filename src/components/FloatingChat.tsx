@@ -57,6 +57,23 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
   // Check if we're already on this vendor's page
   const isOnVendorPage = location.pathname === '/market' && searchParams.get('id') === vendorId;
 
+  // Prevent body scroll when chat is open on mobile
+  useEffect(() => {
+    if (isOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+
+      return () => {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen || !user || !vendorId) return;
 
