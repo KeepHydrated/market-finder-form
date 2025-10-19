@@ -238,7 +238,7 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
       
       {/* Chat Box - Fullscreen on mobile, floating on desktop */}
       <div 
-        className="fixed top-0 left-0 md:inset-auto md:bottom-4 md:right-4 w-screen h-screen md:w-96 md:h-[500px] bg-card md:rounded-lg border-0 md:border md:border-border shadow-2xl flex flex-col z-[9999]"
+        className="fixed inset-0 md:inset-auto md:bottom-4 md:right-4 w-full md:w-96 h-[100dvh] md:h-[500px] bg-card md:rounded-lg border-0 md:border md:border-border shadow-2xl flex flex-col z-[9999]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -353,7 +353,7 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
       </ScrollArea>
 
       {/* Input */}
-      <form onSubmit={handleSendMessage} className="p-4 border-t border-border">
+      <form onSubmit={handleSendMessage} className="p-4 pb-safe border-t border-border bg-card flex-shrink-0">
         <div className="flex gap-2">
           <Input
             value={newMessage}
