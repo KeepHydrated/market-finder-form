@@ -57,7 +57,7 @@ export default function Messages() {
 
     // Subscribe to real-time updates for both conversations and messages
     const channel = supabase
-      .channel('messages-updates')
+      .channel('messages-realtime-updates')
       .on(
         'postgres_changes',
         {
@@ -65,8 +65,8 @@ export default function Messages() {
           schema: 'public',
           table: 'conversations',
         },
-        () => {
-          console.log('Conversation updated, refreshing...');
+        (payload) => {
+          console.log('📱 Conversation change detected:', payload.eventType);
           fetchConversations();
         }
       )
@@ -77,14 +77,20 @@ export default function Messages() {
           schema: 'public',
           table: 'messages',
         },
-        () => {
-          console.log('New message received, refreshing conversations...');
+        (payload) => {
+          console.log('📱 New message detected, refreshing...');
           fetchConversations();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('📱 Realtime subscription status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Successfully subscribed to realtime updates');
+        }
+      });
 
     return () => {
+      console.log('📱 Cleaning up realtime subscription');
       supabase.removeChannel(channel);
     };
   }, [user, navigate, authLoading]);
