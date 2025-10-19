@@ -6,7 +6,6 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Package, Mail, ArrowLeftRight } from "lucide-react";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
-import { FloatingChat } from "@/components/FloatingChat";
 import { useToast } from "@/hooks/use-toast";
 
 interface OrderItem {
@@ -39,9 +38,10 @@ interface Order {
 interface VendorOrdersProps {
   vendorId?: string;
   vendorName?: string;
+  onOpenChat?: (email: string, items: OrderItem[]) => void;
 }
 
-export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
+export const VendorOrders = ({ vendorId, vendorName, onOpenChat }: VendorOrdersProps) => {
   const { toast } = useToast();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,9 +49,6 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [chatOpen, setChatOpen] = useState(false);
-  const [chatBuyerEmail, setChatBuyerEmail] = useState<string | null>(null);
-  const [chatOrderItems, setChatOrderItems] = useState<OrderItem[]>([]);
   const [showReceiptDialog, setShowReceiptDialog] = useState(false);
   const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -134,10 +131,10 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
   };
 
   const handleMessageBuyer = (order: Order) => {
-    // Open floating chat with buyer info and order items
-    setChatBuyerEmail(order.email);
-    setChatOrderItems(order.order_items);
-    setChatOpen(true);
+    // Call the parent handler if provided, otherwise do nothing
+    if (onOpenChat) {
+      onOpenChat(order.email, order.order_items);
+    }
   };
 
   const handleViewReceipt = (order: Order) => {
@@ -666,21 +663,6 @@ export const VendorOrders = ({ vendorId, vendorName }: VendorOrdersProps) => {
         </DialogContent>
       </Dialog>
       </div>
-
-      {/* Floating Chat with Buyer - rendered at root level for proper z-index */}
-      {chatOpen && chatBuyerEmail && (
-        <FloatingChat
-          isOpen={chatOpen}
-          onClose={() => {
-            setChatOpen(false);
-            setChatBuyerEmail(null);
-            setChatOrderItems([]);
-          }}
-          vendorId={vendorId || ''}
-          vendorName={chatBuyerEmail}
-          orderItems={chatOrderItems}
-        />
-      )}
     </>
   );
 };

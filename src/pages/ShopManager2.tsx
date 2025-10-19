@@ -16,6 +16,7 @@ import { FarmersMarketSearch } from '@/components/FarmersMarketSearch';
 import { ShopSidebar } from '@/components/ShopSidebar';
 import { ShopMobileNav } from '@/components/ShopMobileNav';
 import { VendorOrders } from '@/components/VendorOrders';
+import { FloatingChat } from '@/components/FloatingChat';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -75,6 +76,11 @@ export default function ShopManager() {
   const [originalFormData, setOriginalFormData] = useState<any>(null);
   const isSavingRef = useRef(false);
   const previousSectionRef = useRef(currentSection);
+  
+  // Chat state
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatBuyerEmail, setChatBuyerEmail] = useState<string | null>(null);
+  const [chatOrderItems, setChatOrderItems] = useState<any[]>([]);
   
   // Analytics state
   const [analytics, setAnalytics] = useState({
@@ -511,7 +517,15 @@ export default function ShopManager() {
       case 'orders2':
         return (
           <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-6xl pt-10 sm:pt-[40px] pb-4">
-            <VendorOrders vendorId={shopData?.id} vendorName={shopData?.store_name} />
+            <VendorOrders 
+              vendorId={shopData?.id} 
+              vendorName={shopData?.store_name}
+              onOpenChat={(email, items) => {
+                setChatBuyerEmail(email);
+                setChatOrderItems(items);
+                setChatOpen(true);
+              }}
+            />
           </div>
         );
       case 'account':
@@ -1229,26 +1243,43 @@ export default function ShopManager() {
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-screen bg-background overflow-x-hidden">
-        <ShopSidebar hasShopData={!!shopData} />
-        <ShopMobileNav hasShopData={!!shopData} />
-        
-        <main className="flex-1 w-full">
-          {renderContent()}
-        </main>
-      </div>
+    <>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-screen bg-background overflow-x-hidden">
+          <ShopSidebar hasShopData={!!shopData} />
+          <ShopMobileNav hasShopData={!!shopData} />
+          
+          <main className="flex-1 w-full">
+            {renderContent()}
+          </main>
+        </div>
 
-      {/* Product Form Modal */}
-      {showAddProduct && (
-        <AddProductForm
-          open={showAddProduct}
+        {/* Product Form Modal */}
+        {showAddProduct && (
+          <AddProductForm
+            open={showAddProduct}
+            onClose={() => {
+              setShowAddProduct(false);
+            }}
+            onProductAdded={handleAddProduct}
+          />
+        )}
+      </SidebarProvider>
+
+      {/* Floating Chat - rendered at root level for proper z-index */}
+      {chatOpen && chatBuyerEmail && shopData && (
+        <FloatingChat
+          isOpen={chatOpen}
           onClose={() => {
-            setShowAddProduct(false);
+            setChatOpen(false);
+            setChatBuyerEmail(null);
+            setChatOrderItems([]);
           }}
-          onProductAdded={handleAddProduct}
+          vendorId={shopData.id}
+          vendorName={chatBuyerEmail}
+          orderItems={chatOrderItems}
         />
       )}
-    </SidebarProvider>
+    </>
   );
 }
