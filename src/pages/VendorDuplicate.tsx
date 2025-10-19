@@ -1023,8 +1023,8 @@ const VendorDuplicate = () => {
     <>
       {isTablet ? (
         // iPad view - same as desktop layout but narrower
-        <div className="h-screen overflow-hidden bg-background">
-          <div className="flex h-full">
+        <div className="min-h-screen bg-background">
+          <div className="flex">
             {/* Left column - sticky sidebar */}
             <div className="w-80 h-screen sticky top-0 bg-green-50 border-r overflow-y-auto">
               <div className="space-y-6 px-4 pt-6 pb-6">
@@ -1456,8 +1456,8 @@ const VendorDuplicate = () => {
         </div>
       ) : (
         // Desktop and Mobile view - original non-collapsible layout  
-        <div className="min-h-screen md:h-screen md:overflow-hidden bg-background">
-          <div className="flex flex-col md:flex-row md:h-full">
+        <div className="min-h-screen bg-background">
+          <div className="flex flex-col md:flex-row">
             {/* Left column/Top section - sticky on desktop, at top on mobile */}
             <div className="w-full md:w-96 md:h-screen md:sticky md:top-0 bg-green-50 border-b md:border-b-0 md:border-r">
               <div className="space-y-6 px-4 pt-6 pb-6">
@@ -1587,7 +1587,7 @@ const VendorDuplicate = () => {
             </div>
             
             {/* Main content - right column, scrollable - FULL WIDTH ON MOBILE */}
-            <div ref={contentScrollRef} className="flex-1 w-full overflow-y-auto md:h-full">
+            <div ref={contentScrollRef} className="flex-1 w-full overflow-y-auto md:h-screen">
               <div className="mx-auto px-4 py-6 md:max-w-5xl">
                 {selectedVendor ? (
                   // Show selected vendor details
