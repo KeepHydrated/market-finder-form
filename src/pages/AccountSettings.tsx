@@ -1104,12 +1104,12 @@ export default function AccountSettings() {
       <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="flex flex-col md:flex-row gap-8">
         {/* Vertical Tab Navigation - Fixed to left on desktop, horizontal on mobile */}
         <div className="w-full md:w-64 md:flex-shrink-0">
-          <Card className="md:sticky md:top-4">
+          <Card className="md:sticky md:top-4 overflow-hidden">
             <CardContent className="p-0">
-              <TabsList className="flex flex-row md:flex-col w-full h-auto p-0 bg-card">
+              <TabsList className="flex flex-row md:flex-col w-full h-auto p-0 bg-card rounded-lg">
                 <TabsTrigger 
                   value="account" 
-                  className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-l-lg md:rounded-l-none md:rounded-t-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
+                  className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-tl-lg rounded-bl-lg md:rounded-bl-none md:rounded-tr-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
                 >
                   <User className="h-4 w-4" />
                   <span className="hidden md:inline">Account</span>
@@ -1123,7 +1123,7 @@ export default function AccountSettings() {
                 </TabsTrigger>
                 <TabsTrigger 
                   value="payments" 
-                  className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-r-lg md:rounded-r-none md:rounded-b-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
+                  className="flex items-center justify-center md:justify-start gap-3 flex-1 md:w-full px-6 py-4 text-left rounded-tr-lg rounded-br-lg md:rounded-tr-none md:rounded-bl-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors"
                 >
                   <CreditCard className="h-4 w-4" />
                   <span className="hidden md:inline">Payments</span>
