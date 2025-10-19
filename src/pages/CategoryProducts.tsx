@@ -70,6 +70,13 @@ const CategoryProducts = () => {
     setSearchQuery(searchTerm || "");
   }, [searchTerm]);
 
+  // Scroll to top when search results are loaded
+  useEffect(() => {
+    if (!loading && searchTerm) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [loading, searchTerm]);
+
   // Fetch all vendors nationwide for the selected category (or all categories)
   useEffect(() => {
     const fetchVendors = async () => {
