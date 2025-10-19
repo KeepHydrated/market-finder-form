@@ -1587,7 +1587,7 @@ const VendorDuplicate = () => {
             </div>
             
             {/* Main content - right column, scrollable - FULL WIDTH ON MOBILE */}
-            <div ref={contentScrollRef} className="flex-1 w-full overflow-y-auto md:h-screen">
+            <div ref={isMobile ? null : contentScrollRef} className="flex-1 w-full overflow-y-auto md:h-screen">
               <div className="mx-auto px-4 py-6 md:max-w-5xl">
                 {selectedVendor ? (
                   // Show selected vendor details
