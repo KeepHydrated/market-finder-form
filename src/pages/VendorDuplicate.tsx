@@ -952,9 +952,8 @@ const VendorDuplicate = () => {
 
   // Handle scroll to top button visibility
   useEffect(() => {
-    const container = document.getElementById('vendor-content-scroll') as HTMLElement;
-    
     const handleScroll = () => {
+      const container = document.getElementById('vendor-content-scroll') as HTMLElement;
       const isMobile = window.innerWidth < 768;
       
       if (!isMobile && container) {
@@ -966,7 +965,8 @@ const VendorDuplicate = () => {
       }
     };
 
-    // Add listeners
+    // Add listeners - need to check for container on each scroll
+    const container = document.getElementById('vendor-content-scroll') as HTMLElement;
     if (container) {
       container.addEventListener('scroll', handleScroll);
     }
@@ -977,6 +977,7 @@ const VendorDuplicate = () => {
 
     // Cleanup
     return () => {
+      const container = document.getElementById('vendor-content-scroll') as HTMLElement;
       if (container) {
         container.removeEventListener('scroll', handleScroll);
       }
