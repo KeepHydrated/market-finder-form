@@ -952,45 +952,44 @@ const VendorDuplicate = () => {
 
   // Handle scroll to top button visibility
   useEffect(() => {
-    const handleScroll = () => {
-      const container = document.getElementById('vendor-content-scroll') as HTMLElement;
-      const isMobile = window.innerWidth < 768;
-      
-      if (!isMobile && container) {
-        // Desktop/tablet: check container scroll
+    const isMobile = window.innerWidth < 768;
+    const container = document.getElementById('vendor-content-scroll') as HTMLElement;
+
+    const handleContainerScroll = () => {
+      if (container) {
         setShowScrollTop(container.scrollTop > 100);
-      } else {
-        // Mobile: check window scroll
-        setShowScrollTop(window.scrollY > 100);
       }
     };
 
-    // Add listeners - need to check for container on each scroll
-    const container = document.getElementById('vendor-content-scroll') as HTMLElement;
-    if (container) {
-      container.addEventListener('scroll', handleScroll);
-    }
-    window.addEventListener('scroll', handleScroll);
+    const handleWindowScroll = () => {
+      setShowScrollTop(window.scrollY > 100);
+    };
 
-    // Initial check
-    handleScroll();
+    // Desktop/tablet: ONLY listen to container scroll
+    // Mobile: ONLY listen to window scroll
+    if (!isMobile && container) {
+      container.addEventListener('scroll', handleContainerScroll);
+      handleContainerScroll(); // Initial check
+    } else {
+      window.addEventListener('scroll', handleWindowScroll);
+      handleWindowScroll(); // Initial check
+    }
 
     // Cleanup
     return () => {
-      const container = document.getElementById('vendor-content-scroll') as HTMLElement;
       if (container) {
-        container.removeEventListener('scroll', handleScroll);
+        container.removeEventListener('scroll', handleContainerScroll);
       }
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', handleWindowScroll);
     };
   }, []);
 
   const scrollToTop = () => {
-    const container = document.getElementById('vendor-content-scroll') as HTMLElement;
     const isMobile = window.innerWidth < 768;
+    const container = document.getElementById('vendor-content-scroll') as HTMLElement;
     
     if (!isMobile && container) {
-      // Desktop/tablet: scroll the container
+      // Desktop/tablet: scroll the container (right column only)
       container.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       // Mobile: scroll the window
