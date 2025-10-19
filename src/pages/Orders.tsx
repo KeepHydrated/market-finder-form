@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Package, Calendar, Store, DollarSign, Mail, Phone, Star, Upload, X, ArrowLeftRight } from "lucide-react";
+import { Package, Calendar, Store, DollarSign, Mail, Phone, Star, Upload, X, ArrowLeftRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useToast } from "@/hooks/use-toast";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
@@ -73,6 +73,8 @@ const Orders = () => {
   const [reviewType, setReviewType] = useState<'vendor' | 'product'>('vendor');
   const [reviewProduct, setReviewProduct] = useState<OrderItem | null>(null);
   const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10;
 
   useEffect(() => {
     if (user) {
@@ -478,10 +480,26 @@ const Orders = () => {
     );
   }
 
+  // Calculate pagination
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
+  const startIndex = (currentPage - 1) * ordersPerPage;
+  const endIndex = startIndex + ordersPerPage;
+  const currentOrders = orders.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-2">Your Market's Orders</h1>
+        {orders.length > 0 && (
+          <p className="text-sm text-muted-foreground">
+            Showing {startIndex + 1}-{Math.min(endIndex, orders.length)} of {orders.length} orders
+          </p>
+        )}
       </div>
 
       {orders.length === 0 ? (
@@ -501,8 +519,9 @@ const Orders = () => {
           </CardContent>
         </Card>
       ) : (
+        <>
         <div className="space-y-6 max-w-5xl">
-          {orders.map((order) => {
+          {currentOrders.map((order) => {
             const isFlipped = flippedCards[order.id] || false;
             
             return (
@@ -815,6 +834,58 @@ const Orders = () => {
             );
           })}
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-8">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                // Show first page, last page, current page, and pages around current
+                if (
+                  page === 1 ||
+                  page === totalPages ||
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+                ) {
+                  return (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => goToPage(page)}
+                      className="min-w-[40px]"
+                    >
+                      {page}
+                    </Button>
+                  );
+                } else if (page === currentPage - 2 || page === currentPage + 2) {
+                  return <span key={page} className="px-2">...</span>;
+                }
+                return null;
+              })}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+        </>
       )}
 
       {/* Product Detail Modal */}
