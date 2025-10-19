@@ -182,9 +182,12 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
         setMessages(msgs || []);
       }
 
-      // Subscribe to new messages
+      // Subscribe to new messages with unique channel name
+      const channelName = `floating-chat-${conversationId}-${Date.now()}`;
+      console.log('💬 FloatingChat: Setting up realtime subscription:', channelName);
+      
       channel = supabase
-        .channel(`conversation-${conversationId}`)
+        .channel(channelName)
         .on(
           'postgres_changes',
           {
@@ -194,12 +197,22 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
             filter: `conversation_id=eq.${conversationId}`
           },
           (payload) => {
-            console.log('New message received:', payload);
-            setMessages(prev => [...prev, payload.new as Message]);
+            console.log('💬 FloatingChat: New message received:', payload.new);
+            const newMsg = payload.new as Message;
+            setMessages(prev => {
+              // Avoid duplicates
+              if (prev.some(m => m.id === newMsg.id)) return prev;
+              return [...prev, newMsg];
+            });
           }
         )
         .subscribe((status) => {
-          console.log('Realtime subscription status:', status);
+          console.log('💬 FloatingChat: Subscription status:', status);
+          if (status === 'SUBSCRIBED') {
+            console.log('✅ FloatingChat: Successfully subscribed to conversation messages');
+          } else if (status === 'CHANNEL_ERROR') {
+            console.error('❌ FloatingChat: Channel subscription error');
+          }
         });
 
       setLoading(false);
