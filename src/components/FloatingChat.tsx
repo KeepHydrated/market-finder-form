@@ -223,8 +223,14 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
     e.preventDefault();
     if (!newMessage.trim() || !conversation || !user) return;
 
+    // Keep focus before any async operations (critical for mobile)
+    const input = inputRef.current;
+    
     const messageText = newMessage.trim();
     setNewMessage('');
+
+    // Immediately refocus to prevent keyboard from closing
+    input?.focus();
 
     const { error } = await supabase
       .from('messages')
@@ -250,10 +256,8 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
       .update({ last_message_at: new Date().toISOString() })
       .eq('id', conversation.id);
 
-    // Keep input focused on mobile
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 10);
+    // Refocus again after async operations
+    input?.focus();
   };
 
   if (!isOpen) return null;
