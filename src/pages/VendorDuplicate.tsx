@@ -956,15 +956,15 @@ const VendorDuplicate = () => {
 
   // Handle scroll to top button visibility for desktop/iPad ONLY
   useEffect(() => {
-    const container = desktopScrollRef.current || desktopScrollRef2.current;
-
     const handleDesktopScroll = () => {
-      if (container && window.innerWidth >= 768) {
+      const container = desktopScrollRef.current || desktopScrollRef2.current;
+      if (container && !isMobile) {
         setShowScrollTop(container.scrollTop > 100);
       }
     };
 
-    if (container) {
+    const container = desktopScrollRef.current || desktopScrollRef2.current;
+    if (container && !isMobile) {
       container.addEventListener('scroll', handleDesktopScroll);
       handleDesktopScroll(); // Initial check
       
@@ -972,23 +972,25 @@ const VendorDuplicate = () => {
         container.removeEventListener('scroll', handleDesktopScroll);
       };
     }
-  }, [isTablet]);
+  }, [isMobile, isTablet, desktopScrollRef.current, desktopScrollRef2.current]);
 
   // Handle scroll to top button visibility for mobile ONLY
   useEffect(() => {
     const handleWindowScroll = () => {
-      if (window.innerWidth < 768) {
+      if (isMobile) {
         setShowMobileScrollTop(window.scrollY > 100);
       }
     };
 
-    window.addEventListener('scroll', handleWindowScroll);
-    handleWindowScroll(); // Initial check
-    
-    return () => {
-      window.removeEventListener('scroll', handleWindowScroll);
-    };
-  }, []);
+    if (isMobile) {
+      window.addEventListener('scroll', handleWindowScroll);
+      handleWindowScroll(); // Initial check
+      
+      return () => {
+        window.removeEventListener('scroll', handleWindowScroll);
+      };
+    }
+  }, [isMobile]);
 
   const scrollToTopDesktop = () => {
     const container = desktopScrollRef.current || desktopScrollRef2.current;
@@ -2194,7 +2196,7 @@ const VendorDuplicate = () => {
       </AlertDialog>
 
       {/* Scroll to Top Button - Desktop/iPad ONLY */}
-      {showScrollTop && window.innerWidth >= 768 && (
+      {showScrollTop && !isMobile && (
         <Button
           onClick={scrollToTopDesktop}
           className="fixed bottom-24 right-4 z-[100] h-12 w-12 rounded-full shadow-lg"
@@ -2205,7 +2207,7 @@ const VendorDuplicate = () => {
       )}
 
       {/* Scroll to Top Button - Mobile ONLY */}
-      {showMobileScrollTop && window.innerWidth < 768 && (
+      {showMobileScrollTop && isMobile && (
         <Button
           onClick={scrollToTopMobile}
           className="fixed bottom-24 right-4 z-[100] h-12 w-12 rounded-full shadow-lg"
