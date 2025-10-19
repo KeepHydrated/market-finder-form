@@ -54,6 +54,14 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  // Close keyboard when scrolling on mobile
+  const handleScroll = () => {
+    if (document.activeElement === inputRef.current) {
+      inputRef.current?.blur();
+    }
+  };
 
   // Check if we're already on this vendor's page
   const isOnVendorPage = location.pathname === '/market' && searchParams.get('id') === vendorId;
@@ -316,7 +324,11 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
         </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4 [&>[data-radix-scroll-area-scrollbar]]:md:flex [&>[data-radix-scroll-area-scrollbar]]:hidden">
+      <ScrollArea 
+        ref={scrollAreaRef}
+        className="flex-1 p-4 [&>[data-radix-scroll-area-scrollbar]]:md:flex [&>[data-radix-scroll-area-scrollbar]]:hidden"
+        onScrollCapture={handleScroll}
+      >
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-muted-foreground">Loading messages...</p>
