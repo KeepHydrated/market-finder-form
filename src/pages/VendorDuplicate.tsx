@@ -206,6 +206,19 @@ const VendorDuplicate = () => {
     }
   }, [acceptedSubmission, actualSelectedMarket, marketSlug]);
 
+  // Update URL when vendor is selected/deselected
+  useEffect(() => {
+    if (selectedVendor) {
+      // When viewing a vendor, show vendor name in URL
+      const vendorSlug = marketNameToSlug(selectedVendor.store_name);
+      navigate(`/vendor/${vendorSlug}`, { replace: true, state: location.state });
+    } else if (selectedMarketName) {
+      // When viewing market grid, show market name in URL
+      const marketSlug = marketNameToSlug(selectedMarketName);
+      navigate(`/market/${marketSlug}`, { replace: true, state: location.state });
+    }
+  }, [selectedVendor, selectedMarketName]);
+
   const fetchVendorReviews = async () => {
     if (!acceptedSubmission?.id) {
       console.log('No vendor ID found, skipping reviews fetch');

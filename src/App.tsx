@@ -47,6 +47,7 @@ const App = () => (
                 <Route path="/search" element={<CategoryProducts />} />
                 <Route path="/market" element={<VendorDuplicate />} />
                 <Route path="/market/:marketSlug" element={<VendorDuplicate />} />
+                <Route path="/vendor/:vendorSlug" element={<VendorDuplicate />} />
                 <Route path="/likes" element={<Likes />} />
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/checkout" element={<Checkout />} />
