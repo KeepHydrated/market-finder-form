@@ -6,7 +6,8 @@ import {
   ShoppingBag,
   TestTube,
   Wrench,
-  Menu
+  Menu,
+  Store
 } from "lucide-react";
 import {
   Sheet,
@@ -42,6 +43,12 @@ const menuItems = [
     title: "Orders", 
     icon: ShoppingBag, 
     section: "orders2",
+    requiresShop: true 
+  },
+  { 
+    title: "Business Cards", 
+    icon: Store, 
+    section: "cards",
     requiresShop: true 
   },
   { 

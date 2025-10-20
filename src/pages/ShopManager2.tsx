@@ -18,6 +18,7 @@ import { ShopMobileNav } from '@/components/ShopMobileNav';
 import { VendorOrders } from '@/components/VendorOrders';
 import { FloatingChat } from '@/components/FloatingChat';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { BusinessCards } from '@/components/BusinessCards';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
@@ -528,6 +529,18 @@ export default function ShopManager() {
             />
           </div>
         );
+      case 'cards':
+        return shopData ? (
+          <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-5xl pt-10 sm:pt-[40px] pb-4">
+            <BusinessCards
+              storeName={shopData.store_name}
+              specialty={shopData.primary_specialty}
+              description={shopData.description}
+              vendorId={shopData.id}
+              markets={selectedFarmersMarkets.map(m => m.name)}
+            />
+          </div>
+        ) : renderShop();
       case 'account':
         return renderAccount();
       default:

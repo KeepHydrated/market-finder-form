@@ -50,6 +50,12 @@ const menuItems = [
     requiresShop: true 
   },
   { 
+    title: "Business Cards", 
+    icon: Store, 
+    section: "cards",
+    requiresShop: true 
+  },
+  { 
     title: "Account", 
     icon: Settings, 
     section: "account",
