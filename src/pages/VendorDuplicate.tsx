@@ -1045,12 +1045,17 @@ const VendorDuplicate = () => {
             <div className="w-80 h-screen sticky top-0 bg-green-50 border-r overflow-y-auto">
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
-                  <span 
-                    className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors"
-                    onClick={() => setSelectedVendor(null)}
+                  <button 
+                    className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors text-left"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('✅ Market name BUTTON clicked - clearing selected vendor');
+                      setSelectedVendor(null);
+                    }}
                   >
                     {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
-                  </span>
+                  </button>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -1479,12 +1484,17 @@ const VendorDuplicate = () => {
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span 
-                      className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors"
-                      onClick={() => setSelectedVendor(null)}
+                    <button 
+                      className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors text-left"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('✅ Market name BUTTON clicked - clearing selected vendor');
+                        setSelectedVendor(null);
+                      }}
                     >
                       {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
-                    </span>
+                    </button>
                   </div>
                   <Button
                     variant="ghost"
