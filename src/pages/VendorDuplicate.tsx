@@ -195,27 +195,36 @@ const VendorDuplicate = () => {
       }
       
       // Update URL with market slug if we have market info and URL doesn't match
+      // BUT don't update if we have a selected vendor (vendor view takes precedence)
       const marketName = acceptedSubmission.selected_market || acceptedSubmission.search_term;
-      if (marketName) {
+      if (marketName && !selectedVendor) {
         const expectedSlug = marketNameToSlug(marketName);
-        if (marketSlug !== expectedSlug) {
+        if (marketSlug !== expectedSlug && !location.pathname.startsWith('/vendor/')) {
           console.log('📍 Updating URL to market slug:', expectedSlug);
           navigate(`/market/${expectedSlug}`, { replace: true, state: location.state });
         }
       }
     }
-  }, [acceptedSubmission, actualSelectedMarket, marketSlug]);
+  }, [acceptedSubmission, actualSelectedMarket, marketSlug, selectedVendor]);
 
   // Update URL when vendor is selected/deselected
   useEffect(() => {
     if (selectedVendor) {
       // When viewing a vendor, show vendor name in URL
       const vendorSlug = marketNameToSlug(selectedVendor.store_name);
-      navigate(`/vendor/${vendorSlug}`, { replace: true, state: location.state });
-    } else if (selectedMarketName) {
+      const currentPath = location.pathname;
+      const expectedPath = `/vendor/${vendorSlug}`;
+      if (currentPath !== expectedPath) {
+        navigate(expectedPath, { replace: true, state: location.state });
+      }
+    } else if (selectedMarketName && !selectedVendor) {
       // When viewing market grid, show market name in URL
       const marketSlug = marketNameToSlug(selectedMarketName);
-      navigate(`/market/${marketSlug}`, { replace: true, state: location.state });
+      const currentPath = location.pathname;
+      const expectedPath = `/market/${marketSlug}`;
+      if (currentPath !== expectedPath) {
+        navigate(expectedPath, { replace: true, state: location.state });
+      }
     }
   }, [selectedVendor, selectedMarketName]);
 
