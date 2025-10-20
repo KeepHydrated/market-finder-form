@@ -193,19 +193,8 @@ const VendorDuplicate = () => {
         setSelectedMarketName(initialMarket);
         setSelectedMarketAddress(initialAddress);
       }
-      
-      // Update URL with market slug if we have market info and URL doesn't match
-      // BUT don't update if we have a selected vendor (vendor view takes precedence)
-      const marketName = acceptedSubmission.selected_market || acceptedSubmission.search_term;
-      if (marketName && !selectedVendor) {
-        const expectedSlug = marketNameToSlug(marketName);
-        if (marketSlug !== expectedSlug && !location.pathname.startsWith('/vendor/')) {
-          console.log('📍 Updating URL to market slug:', expectedSlug);
-          navigate(`/market/${expectedSlug}`, { replace: true, state: location.state });
-        }
-      }
     }
-  }, [acceptedSubmission, actualSelectedMarket, marketSlug, selectedVendor]);
+  }, [acceptedSubmission, actualSelectedMarket]);
 
   // Update URL when vendor is selected/deselected
   useEffect(() => {
