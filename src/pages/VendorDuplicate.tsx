@@ -140,18 +140,8 @@ const VendorDuplicate = () => {
   useEffect(() => {
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state, 'marketSlug:', marketSlug);
     
-    // Check for URL params first
-    const vendorId = searchParams.get('id');
-    const marketParam = searchParams.get('market');
-    
-    if (vendorId) {
-      console.log('Found vendor ID in URL params:', vendorId);
-      // Load specific vendor from URL params
-      fetchVendorById(vendorId);
-    } else if (marketParam) {
-      console.log('Found market in URL params:', marketParam);
-      // Load market from URL params (not implemented yet - would need backend support)
-    } else if (location.state?.selectedMarket) {
+    // Check if we already have market data in state (from Homepage navigation)
+    if (location.state?.selectedMarket) {
       console.log('Found selectedMarket in location.state:', location.state.selectedMarket);
       const selectedMarket = location.state.selectedMarket as any;
       
@@ -171,23 +161,50 @@ const VendorDuplicate = () => {
         const slug = marketNameToSlug(selectedMarket.name);
         navigate(`/market/${slug}`, { replace: true, state: location.state });
       }
+      return;
+    }
+    
+    // Check for URL params
+    const vendorId = searchParams.get('id') || searchParams.get('vendor');
+    
+    if (vendorId) {
+      console.log('Found vendor ID in URL params:', vendorId);
+      // Load specific vendor - URL will be updated after vendor loads
+      fetchVendorById(vendorId);
+    } else if (marketSlug) {
+      console.log('Found market slug in URL:', marketSlug);
+      // Market slug is already in URL, just fetch vendors for this market
+      // (Would need backend support to fetch by market name)
+      fetchAllVendors();
     } else {
-      console.log('No location state, fetching all vendors...');
-      // Fallback to loading all vendors if no state passed
+      console.log('No location state or params, fetching all vendors...');
+      // Fallback to loading all vendors
       fetchAllVendors();
     }
-  }, [location.state, searchParams]);
+  }, [location.state, searchParams, marketSlug]);
 
   // Initialize selectedMarketName when acceptedSubmission loads
   useEffect(() => {
-    // Only initialize from acceptedSubmission if we don't have an actual selected market from navigation
-    if (acceptedSubmission && !selectedMarketName && !actualSelectedMarket) {
-      const initialMarket = acceptedSubmission.selected_market || acceptedSubmission.search_term || '';
-      const initialAddress = acceptedSubmission.market_address || '';
-      setSelectedMarketName(initialMarket);
-      setSelectedMarketAddress(initialAddress);
+    if (acceptedSubmission) {
+      // Only initialize from acceptedSubmission if we don't have an actual selected market from navigation
+      if (!selectedMarketName && !actualSelectedMarket) {
+        const initialMarket = acceptedSubmission.selected_market || acceptedSubmission.search_term || '';
+        const initialAddress = acceptedSubmission.market_address || '';
+        setSelectedMarketName(initialMarket);
+        setSelectedMarketAddress(initialAddress);
+      }
+      
+      // Update URL with market slug if we have market info and URL doesn't match
+      const marketName = acceptedSubmission.selected_market || acceptedSubmission.search_term;
+      if (marketName) {
+        const expectedSlug = marketNameToSlug(marketName);
+        if (marketSlug !== expectedSlug) {
+          console.log('📍 Updating URL to market slug:', expectedSlug);
+          navigate(`/market/${expectedSlug}`, { replace: true, state: location.state });
+        }
+      }
     }
-  }, [acceptedSubmission, actualSelectedMarket]);
+  }, [acceptedSubmission, actualSelectedMarket, marketSlug]);
 
   const fetchVendorReviews = async () => {
     if (!acceptedSubmission?.id) {
