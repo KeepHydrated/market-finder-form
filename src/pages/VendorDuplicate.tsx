@@ -142,71 +142,41 @@ const VendorDuplicate = () => {
     
     // Check for URL params first
     const vendorId = searchParams.get('id');
-    const productId = searchParams.get('product');
-    
-    console.log('URL params - vendorId:', vendorId, 'productId:', productId);
+    const marketParam = searchParams.get('market');
     
     if (vendorId) {
-      console.log('Using URL param vendor ID:', vendorId);
+      console.log('Found vendor ID in URL params:', vendorId);
+      // Load specific vendor from URL params
       fetchVendorById(vendorId);
-    }
-    // Check if data was passed from navigation
-    else if (location.state) {
-      console.log('Using location state data');
-      const { type, selectedVendor, selectedMarket, allVendors, marketCoordinates, marketDistance } = location.state as {
-        type: 'vendor' | 'market';
-        selectedVendor?: AcceptedSubmission;
-        selectedMarket?: { name: string; address: string; vendors: AcceptedSubmission[] };
-        allVendors: AcceptedSubmission[];
-        marketCoordinates?: { lat: number; lng: number } | null;
-        marketDistance?: string;
-      };
+    } else if (marketParam) {
+      console.log('Found market in URL params:', marketParam);
+      // Load market from URL params (not implemented yet - would need backend support)
+    } else if (location.state?.selectedMarket) {
+      console.log('Found selectedMarket in location.state:', location.state.selectedMarket);
+      const selectedMarket = location.state.selectedMarket as any;
       
-      setAllVendors(allVendors);
-      setLoadingData(false);
-      
-      // Fetch ratings for all vendors
-      if (allVendors.length > 0) {
-        const vendorIds = allVendors.map(vendor => vendor.id);
-        fetchVendorRatings(vendorIds);
-      }
-      
-      // Store cached coordinates if passed
-      if (marketCoordinates) {
-        setCachedMarketCoordinates(marketCoordinates);
-        console.log('🗺️ Using passed market coordinates:', marketCoordinates);
-      }
-      
-      // Use the pre-calculated distance from Homepage if available
-      if (marketDistance) {
-        console.log('🗺️ Using pre-calculated distance from Homepage:', marketDistance);
-        setDistance(marketDistance);
-        setIsLoadingDistance(false);
-      }
-      
-      if (type === 'vendor' && selectedVendor) {
-        setAcceptedSubmission(selectedVendor);
-        setSelectedVendor(selectedVendor);
-        setActualSelectedMarket(null); // Clear market selection when viewing vendor
-      } else if (type === 'market' && selectedMarket) {
-        // For market view, store the actual market information
-        setActualSelectedMarket({ name: selectedMarket.name, address: selectedMarket.address });
+      // Ensure selectedMarket has the vendors array
+      if (selectedMarket && selectedMarket.vendors) {
+        console.log('Selected market vendors:', selectedMarket.vendors.length);
+        
+        setAllVendors(selectedMarket.vendors);
         setSelectedMarketName(selectedMarket.name);
-        setSelectedMarketAddress(selectedMarket.address);
+        setActualSelectedMarket(selectedMarket);
+        
         // Use the first vendor as the market representative for fetching hours/reviews
         setAcceptedSubmission(selectedMarket.vendors[0]);
         setSelectedVendor(null); // Start with vendor grid view
         
-        // Update URL with market name
-        const marketSlug = marketNameToSlug(selectedMarket.name);
-        navigate(`/market/${marketSlug}`, { replace: true, state: location.state });
+        // Update URL with market name immediately
+        const slug = marketNameToSlug(selectedMarket.name);
+        navigate(`/market/${slug}`, { replace: true, state: location.state });
       }
     } else {
       console.log('No location state, fetching all vendors...');
       // Fallback to loading all vendors if no state passed
       fetchAllVendors();
     }
-  }, [location.state, searchParams, marketSlug]);
+  }, [location.state, searchParams]);
 
   // Initialize selectedMarketName when acceptedSubmission loads
   useEffect(() => {
