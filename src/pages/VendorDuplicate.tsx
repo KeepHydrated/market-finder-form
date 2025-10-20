@@ -1049,15 +1049,7 @@ const VendorDuplicate = () => {
                 <div className="flex items-center justify-between">
                   <span 
                     className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors"
-                    onClick={() => {
-                      setSelectedVendor(null);
-                      // Update URL back to market view
-                      const marketName = selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term;
-                      if (marketName) {
-                        const slug = marketNameToSlug(marketName);
-                        navigate(`/market/${slug}`, { replace: true, state: location.state });
-                      }
-                    }}
+                    onClick={() => setSelectedVendor(null)}
                   >
                     {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
                   </span>
@@ -1491,15 +1483,7 @@ const VendorDuplicate = () => {
                   <div className="flex items-center gap-3">
                     <span 
                       className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors"
-                      onClick={() => {
-                        setSelectedVendor(null);
-                        // Update URL back to market view
-                        const marketName = selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term;
-                        if (marketName) {
-                          const slug = marketNameToSlug(marketName);
-                          navigate(`/market/${slug}`, { replace: true, state: location.state });
-                        }
-                      }}
+                      onClick={() => setSelectedVendor(null)}
                     >
                       {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
                     </span>
