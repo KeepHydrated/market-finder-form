@@ -12,7 +12,7 @@ interface BusinessCardsProps {
 }
 
 export function BusinessCards({ storeName, specialty, description, vendorId, markets }: BusinessCardsProps) {
-  const storeUrl = `${window.location.origin}/profile/${vendorId}`;
+  const storeUrl = `https://fromfarmersmarkets.com/profile/${vendorId}`;
 
   const handlePrint = () => {
     window.print();
