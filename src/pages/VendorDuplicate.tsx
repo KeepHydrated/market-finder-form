@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams, useParams } from "react-router-dom";
 import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight, MessageSquare, ArrowUp, Flag } from "lucide-react";
 import { FloatingChat } from "@/components/FloatingChat";
 import { ReportVendorDialog } from "@/components/ReportVendorDialog";
@@ -79,6 +79,7 @@ const VendorDuplicate = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const { marketSlug } = useParams<{ marketSlug?: string }>();
   const { user, profile, loading } = useAuth();
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
@@ -137,7 +138,7 @@ const VendorDuplicate = () => {
   }, []);
 
   useEffect(() => {
-    console.log('VendorDuplicate useEffect triggered, location.state:', location.state);
+    console.log('VendorDuplicate useEffect triggered, location.state:', location.state, 'marketSlug:', marketSlug);
     
     // Check for URL params first
     const vendorId = searchParams.get('id');
@@ -195,13 +196,17 @@ const VendorDuplicate = () => {
         // Use the first vendor as the market representative for fetching hours/reviews
         setAcceptedSubmission(selectedMarket.vendors[0]);
         setSelectedVendor(null); // Start with vendor grid view
+        
+        // Update URL with market name
+        const marketSlug = marketNameToSlug(selectedMarket.name);
+        navigate(`/market/${marketSlug}`, { replace: true, state: location.state });
       }
     } else {
       console.log('No location state, fetching all vendors...');
       // Fallback to loading all vendors if no state passed
       fetchAllVendors();
     }
-  }, [location.state, searchParams]);
+  }, [location.state, searchParams, marketSlug]);
 
   // Initialize selectedMarketName when acceptedSubmission loads
   useEffect(() => {
@@ -823,10 +828,18 @@ const VendorDuplicate = () => {
     }
   };
 
+  const marketNameToSlug = (name: string): string => {
+    return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  };
+
   const switchToMarket = async (marketName: string, isBackward = false) => {
     console.log('Switching to market:', marketName, 'isBackward:', isBackward);
     setSelectedMarketName(marketName);
     setActualSelectedMarket(null); // Clear the actual selected market to allow new market details to show
+    
+    // Update URL with market name
+    const marketSlug = marketNameToSlug(marketName);
+    navigate(`/market/${marketSlug}`, { replace: true });
     
     // Update navigation history
     if (!isBackward) {
