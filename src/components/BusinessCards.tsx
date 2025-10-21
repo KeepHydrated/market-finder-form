@@ -28,8 +28,6 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
     window.print();
   };
 
-  const firstMarket = markets[0];
-
   return (
     <div className="space-y-6">
       {/* Print button - hidden when printing */}
@@ -60,14 +58,18 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
                 </div>
 
                 {/* Markets */}
-                {markets.length > 0 && firstMarket && (
-                  <div className="text-sm text-foreground/90">
-                    <div className="font-medium">{firstMarket.structured_formatting?.main_text || firstMarket.name}</div>
-                    {(firstMarket.address || firstMarket.structured_formatting?.secondary_text) && (
-                      <div className="text-xs text-muted-foreground">
-                        {firstMarket.address || firstMarket.structured_formatting?.secondary_text}
+                {markets.length > 0 && (
+                  <div className="space-y-2">
+                    {markets.map((market, index) => (
+                      <div key={index} className="text-sm text-foreground/90">
+                        <div className="font-medium">{market.structured_formatting?.main_text || market.name}</div>
+                        {(market.address || market.structured_formatting?.secondary_text) && (
+                          <div className="text-xs text-muted-foreground">
+                            {market.address || market.structured_formatting?.secondary_text}
+                          </div>
+                        )}
                       </div>
-                    )}
+                    ))}
                   </div>
                 )}
               </div>
