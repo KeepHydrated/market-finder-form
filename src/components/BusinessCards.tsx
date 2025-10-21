@@ -75,9 +75,9 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
               </div>
 
               {/* Right Column */}
-              <div className="space-y-4 flex flex-col">
+              <div className="space-y-4 flex flex-col items-end">
                 {/* QR Code Placeholder */}
-                <div className="flex justify-center">
+                <div className="flex justify-end">
                   <div className="w-32 h-32 border-2 border-primary/20 rounded-lg flex items-center justify-center bg-muted/30">
                     <QrCode className="h-16 w-16 text-primary/40" />
                   </div>
