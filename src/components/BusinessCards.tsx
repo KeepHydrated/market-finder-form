@@ -44,7 +44,7 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
   };
 
   const handleOrderCards = () => {
-    window.open('https://www.gelato.com/products/business-cards', '_blank');
+    window.open('https://www.gelato.com/custom/stationery-and-business/business-cards', '_blank');
   };
 
   return (
