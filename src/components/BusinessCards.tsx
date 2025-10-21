@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { QrCode, Printer } from 'lucide-react';
+import { Printer } from 'lucide-react';
+import QRCode from 'qrcode';
 
 interface Market {
   name: string;
@@ -23,6 +24,20 @@ interface BusinessCardsProps {
 
 export function BusinessCards({ storeName, specialty, description, vendorId, markets }: BusinessCardsProps) {
   const storeUrl = `www.fromfarmersmarkets.com/vendor/${storeName.toLowerCase().replace(/\s+/g, '-')}`;
+  const qrCodeRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (qrCodeRef.current) {
+      QRCode.toCanvas(qrCodeRef.current, `https://${storeUrl}`, {
+        width: 128,
+        margin: 1,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF',
+        },
+      });
+    }
+  }, [storeUrl]);
 
   const handlePrint = () => {
     window.print();
@@ -76,11 +91,12 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
 
               {/* Right Column */}
               <div className="space-y-4 flex flex-col items-end">
-                {/* QR Code Placeholder */}
+                {/* QR Code */}
                 <div className="flex justify-end">
-                  <div className="w-32 h-32 border-2 border-primary/20 rounded-lg flex items-center justify-center bg-muted/30">
-                    <QrCode className="h-16 w-16 text-primary/40" />
-                  </div>
+                  <canvas 
+                    ref={qrCodeRef}
+                    className="w-32 h-32 border-2 border-primary/20 rounded-lg"
+                  />
                 </div>
 
                 {/* Contact Info */}
