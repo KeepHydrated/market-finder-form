@@ -77,8 +77,8 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
       {/* Business card */}
       <div className="flex justify-start">
         <Card ref={cardRef} className="business-card overflow-hidden border print:break-inside-avoid w-full bg-white" style={{ maxWidth: '500px', aspectRatio: '3.5 / 2' }}>
-          <CardContent className="p-6 md:p-8 h-full">
-            <div className="grid grid-cols-2 gap-4 md:gap-8 h-full">
+          <CardContent className="p-6 md:p-8 h-full flex items-end">
+            <div className="grid grid-cols-2 gap-4 md:gap-8 w-full">
               {/* Left Column */}
               <div className="space-y-4">
                 {/* Store Name & Specialty */}
