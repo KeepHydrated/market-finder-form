@@ -47,15 +47,6 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
                   <p className="text-sm text-primary font-medium mt-0.5">{specialty}</p>
                 </div>
 
-                {/* Description */}
-                {description && (
-                  <div>
-                    <p className="text-sm text-foreground/70 line-clamp-3">
-                      {description}
-                    </p>
-                  </div>
-                )}
-
                 {/* Markets */}
                 {markets.length > 0 && (
                   <div>
