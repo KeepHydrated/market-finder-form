@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Printer, ShoppingCart, Download } from 'lucide-react';
+import { Download } from 'lucide-react';
 import QRCode from 'qrcode';
 import { toPng } from 'html-to-image';
 
@@ -41,14 +41,6 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
     }
   }, [storeUrl]);
 
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const handleOrderCards = () => {
-    window.open('https://www.gelato.com/custom/stationery-and-business/business-cards', '_blank');
-  };
-
   const handleExportDesign = async () => {
     if (cardRef.current) {
       try {
@@ -76,20 +68,10 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
             Print or order professional business cards for farmers markets
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportDesign}>
-            <Download className="h-4 w-4 mr-2" />
-            Export Design
-          </Button>
-          <Button variant="outline" onClick={handlePrint}>
-            <Printer className="h-4 w-4 mr-2" />
-            Print Design
-          </Button>
-          <Button onClick={handleOrderCards}>
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            Order on Gelato
-          </Button>
-        </div>
+        <Button variant="outline" onClick={handleExportDesign}>
+          <Download className="h-4 w-4 mr-2" />
+          Export Design
+        </Button>
       </div>
 
       {/* Business card */}
