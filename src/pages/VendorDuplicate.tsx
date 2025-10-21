@@ -163,6 +163,7 @@ const VendorDuplicate = () => {
         // Use the first vendor as the market representative for fetching hours/reviews
         setAcceptedSubmission(selectedMarket.vendors[0]);
         setSelectedVendor(null); // Start with vendor grid view
+        setLoadingData(false); // Clear loading state
         
         // Update URL with market name immediately
         const slug = marketNameToSlug(selectedMarket.name);
