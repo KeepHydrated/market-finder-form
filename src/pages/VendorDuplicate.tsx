@@ -165,6 +165,10 @@ const VendorDuplicate = () => {
         setSelectedVendor(null); // Start with vendor grid view
         setLoadingData(false); // Clear loading state
         
+        // Fetch ratings for all vendors
+        const vendorIds = selectedMarket.vendors.map((v: any) => v.id);
+        fetchVendorRatings(vendorIds);
+        
         // Update URL with market name immediately
         const slug = marketNameToSlug(selectedMarket.name);
         navigate(`/market/${slug}`, { replace: true, state: location.state });
