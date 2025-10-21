@@ -537,7 +537,11 @@ export default function ShopManager() {
               specialty={shopData.primary_specialty}
               description={shopData.description}
               vendorId={shopData.id}
-              markets={selectedFarmersMarkets.map(m => m.name)}
+              markets={selectedFarmersMarkets.map(m => ({
+                name: m.name,
+                address: m.address || m.structured_formatting?.secondary_text || '',
+                place_id: m.place_id
+              }))}
             />
           </div>
         ) : renderShop();

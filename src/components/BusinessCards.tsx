@@ -3,12 +3,18 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { QrCode, Printer } from 'lucide-react';
 
+interface Market {
+  name: string;
+  address: string;
+  place_id: string;
+}
+
 interface BusinessCardsProps {
   storeName: string;
   specialty: string;
   description: string;
   vendorId: string;
-  markets: string[];
+  markets: Market[];
 }
 
 export function BusinessCards({ storeName, specialty, description, vendorId, markets }: BusinessCardsProps) {
@@ -49,10 +55,13 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
 
                 {/* Markets */}
                 {markets.length > 0 && (
-                  <div>
-                    <p className="text-sm text-foreground/90 leading-relaxed">
-                      {markets.join(', ')}
-                    </p>
+                  <div className="space-y-2">
+                    {markets.map((market, index) => (
+                      <div key={market.place_id || index} className="text-sm text-foreground/90">
+                        <div className="font-medium">{market.name}</div>
+                        <div className="text-xs text-muted-foreground">{market.address}</div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
