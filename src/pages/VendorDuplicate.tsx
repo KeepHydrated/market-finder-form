@@ -137,7 +137,14 @@ const VendorDuplicate = () => {
     return () => window.removeEventListener('resize', checkTablet);
   }, []);
 
+  const hasInitialized = useRef(false);
+
   useEffect(() => {
+    // Skip if already initialized to prevent loops from URL changes
+    if (hasInitialized.current) {
+      return;
+    }
+
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state, 'marketSlug:', marketSlug);
     
     // Check if we already have market data in state (from Homepage navigation)
@@ -160,6 +167,7 @@ const VendorDuplicate = () => {
         // Update URL with market name immediately
         const slug = marketNameToSlug(selectedMarket.name);
         navigate(`/market/${slug}`, { replace: true, state: location.state });
+        hasInitialized.current = true;
       }
       return;
     }
@@ -171,15 +179,18 @@ const VendorDuplicate = () => {
       console.log('Found vendor ID in URL params:', vendorId);
       // Load specific vendor - URL will be updated after vendor loads
       fetchVendorById(vendorId);
+      hasInitialized.current = true;
     } else if (marketSlug) {
       console.log('Found market slug in URL:', marketSlug);
       // Market slug is already in URL, just fetch vendors for this market
       // (Would need backend support to fetch by market name)
       fetchAllVendors();
+      hasInitialized.current = true;
     } else {
       console.log('No location state or params, fetching all vendors...');
       // Fallback to loading all vendors
       fetchAllVendors();
+      hasInitialized.current = true;
     }
   }, [location.state, searchParams, marketSlug]);
 
