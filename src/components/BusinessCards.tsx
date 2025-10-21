@@ -78,19 +78,6 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
         </Card>
       </div>
 
-      {/* Print instructions - hidden when printing */}
-      <Card className="print:hidden bg-muted/50">
-        <CardContent className="pt-6">
-          <h3 className="font-semibold mb-2">Printing Tips:</h3>
-          <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-            <li>Print on cardstock (heavy paper) for best results</li>
-            <li>Standard business card size: 3.5" × 2"</li>
-            <li>Cut along the card edges after printing</li>
-            <li>Consider adding a QR code generator to make scanning easier</li>
-          </ul>
-        </CardContent>
-      </Card>
-
       <style>{`
         @media print {
           body {
