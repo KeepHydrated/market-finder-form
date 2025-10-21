@@ -79,7 +79,7 @@ const VendorDuplicate = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const { marketSlug } = useParams<{ marketSlug?: string }>();
+  const { marketSlug, vendorSlug } = useParams<{ marketSlug?: string; vendorSlug?: string }>();
   const { user, profile, loading } = useAuth();
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
@@ -179,6 +179,11 @@ const VendorDuplicate = () => {
       console.log('Found vendor ID in URL params:', vendorId);
       // Load specific vendor - URL will be updated after vendor loads
       fetchVendorById(vendorId);
+      hasInitialized.current = true;
+    } else if (vendorSlug) {
+      console.log('Found vendor slug in URL:', vendorSlug);
+      // Fetch vendor by slug (store name)
+      fetchVendorBySlug(vendorSlug);
       hasInitialized.current = true;
     } else if (marketSlug) {
       console.log('Found market slug in URL:', marketSlug);
@@ -385,17 +390,114 @@ const VendorDuplicate = () => {
     return markets;
   }, [acceptedSubmission?.selected_markets, acceptedSubmission?.selected_market, selectedMarketName]);
 
-  const fetchVendorById = async (vendorId: string) => {
-    setLoadingData(true);
+  const fetchVendorBySlug = async (slug: string) => {
     try {
+      setLoadingData(true);
+      
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('*')
+        .eq('status', 'accepted');
+      
+      if (error) throw error;
+      
+      if (!data || data.length === 0) {
+        toast({
+          title: "Error",
+          description: "Vendor not found",
+          variant: "destructive",
+        });
+        setLoadingData(false);
+        return;
+      }
+      
+      // Parse all vendors and find the one matching the slug
+      const parsedVendors = data.map((vendor: any) => ({
+        ...vendor,
+        products: typeof vendor.products === 'string' ? JSON.parse(vendor.products) : vendor.products,
+        market_hours: vendor.market_hours && typeof vendor.market_hours === 'object' && vendor.market_hours !== null 
+          ? vendor.market_hours as Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>
+          : undefined
+      }));
+      
+      // Find vendor whose store_name matches the slug
+      const matchingVendor = parsedVendors.find((vendor: any) => 
+        marketNameToSlug(vendor.store_name) === slug
+      );
+      
+      if (!matchingVendor) {
+        toast({
+          title: "Error",
+          description: "Vendor not found",
+          variant: "destructive",
+        });
+        setLoadingData(false);
+        return;
+      }
+      
+      // Check authorization for test store bb
+      const { data: { user } } = await supabase.auth.getUser();
+      const userEmail = user?.email;
+      
+      if (matchingVendor.store_name?.toLowerCase() === 'test store bb' && userEmail !== 'nadiachibri@gmail.com') {
+        navigate('/');
+        return;
+      }
+      
+      console.log('🔍 fetchVendorBySlug - matchingVendor.selected_markets:', matchingVendor.selected_markets);
+      
+      setAcceptedSubmission(matchingVendor as AcceptedSubmission);
+      setSelectedVendor(matchingVendor as AcceptedSubmission);
+      setAllVendors([matchingVendor as AcceptedSubmission]);
+      
+      // Initialize navigationMarketsOrder with vendor's markets
+      if (matchingVendor.selected_markets && Array.isArray(matchingVendor.selected_markets)) {
+        const marketNames = matchingVendor.selected_markets.map((market: any) => 
+          typeof market === 'string' ? market : market.name
+        );
+        console.log('🔍 Setting navigationMarketsOrder:', marketNames);
+        setNavigationMarketsOrder(marketNames);
+      } else {
+        console.log('⚠️ No selected_markets array found or it is not an array');
+      }
+      
+      setLoadingData(false);
+      
+      // Fetch ratings for this vendor
+      fetchVendorRatings([matchingVendor.id]);
+    } catch (error) {
+      console.error('Error fetching vendor by slug:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load vendor details",
+        variant: "destructive",
+      });
+      setLoadingData(false);
+    }
+  };
+
+  const fetchVendorById = async (vendorId: string) => {
+    try {
+      setLoadingData(true);
+      
       const { data, error } = await supabase
         .from('submissions')
         .select('*')
         .eq('id', vendorId)
         .eq('status', 'accepted')
         .single();
-
+      
       if (error) throw error;
+      
+      if (!data) {
+        toast({
+          title: "Error",
+          description: "Vendor not found",
+          variant: "destructive",
+        });
+        setLoadingData(false);
+        return;
+      }
       
       // Get current user email
       const { data: { user } } = await supabase.auth.getUser();
