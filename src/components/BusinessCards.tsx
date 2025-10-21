@@ -59,7 +59,7 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-4 md:pt-0">
       {/* Action buttons - hidden when printing */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 print:hidden">
         <div>
