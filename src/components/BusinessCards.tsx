@@ -77,10 +77,10 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
       {/* Business card */}
       <div className="flex justify-start">
         <Card ref={cardRef} className="business-card overflow-hidden border print:break-inside-avoid w-full bg-white" style={{ maxWidth: '500px', aspectRatio: '3.5 / 2' }}>
-          <CardContent className="p-6 md:p-8 h-full flex items-end">
-            <div className="grid grid-cols-2 gap-4 md:gap-8 w-full">
+          <CardContent className="p-6 md:p-8 h-full">
+            <div className="grid grid-cols-2 gap-4 md:gap-8 h-full">
               {/* Left Column */}
-              <div className="space-y-4">
+              <div className="flex flex-col justify-between">
                 {/* Store Name & Specialty */}
                 <div>
                   <h3 className="text-xl md:text-2xl font-bold text-foreground">{storeName}</h3>
@@ -110,7 +110,7 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
               </div>
 
               {/* Right Column */}
-              <div className="space-y-4 flex flex-col items-end">
+              <div className="flex flex-col justify-between items-end">
                 {/* QR Code */}
                 <div className="flex justify-end">
                   <canvas 
