@@ -147,6 +147,41 @@ const VendorDuplicate = () => {
 
     console.log('VendorDuplicate useEffect triggered, location.state:', location.state, 'marketSlug:', marketSlug);
     
+    // Check if we have vendor data from Homepage navigation (clicking a vendor card)
+    if (location.state?.selectedVendor && location.state?.type === 'vendor') {
+      console.log('Found selectedVendor in location.state:', location.state.selectedVendor);
+      const vendor = location.state.selectedVendor as any;
+      const allVendorsFromState = location.state.allVendors as any[] || [vendor];
+      
+      setAllVendors(allVendorsFromState);
+      setAcceptedSubmission(vendor);
+      setSelectedVendor(vendor);
+      setLoadingData(false);
+      
+      // Initialize navigationMarketsOrder with vendor's markets
+      if (vendor.selected_markets && Array.isArray(vendor.selected_markets)) {
+        const marketNames = vendor.selected_markets.map((market: any) => 
+          typeof market === 'string' ? market : market.name
+        );
+        console.log('Setting navigationMarketsOrder from homepage:', marketNames);
+        setNavigationMarketsOrder(marketNames);
+      }
+      
+      // Set the market info
+      setSelectedMarketName(vendor.selected_market || '');
+      setSelectedMarketAddress(vendor.market_address || '');
+      
+      // Fetch ratings for all vendors
+      const vendorIds = allVendorsFromState.map((v: any) => v.id);
+      fetchVendorRatings(vendorIds);
+      
+      // Update URL with vendor name
+      const slug = marketNameToSlug(vendor.store_name);
+      navigate(`/vendor/${slug}`, { replace: true, state: location.state });
+      hasInitialized.current = true;
+      return;
+    }
+    
     // Check if we already have market data in state (from Homepage navigation)
     if (location.state?.selectedMarket) {
       console.log('Found selectedMarket in location.state:', location.state.selectedMarket);
@@ -449,21 +484,12 @@ const VendorDuplicate = () => {
         return;
       }
       
-      console.log('🔍 fetchVendorBySlug - matchingVendor.selected_markets:', matchingVendor.selected_markets);
-      
-      setAcceptedSubmission(matchingVendor as AcceptedSubmission);
-      setSelectedVendor(matchingVendor as AcceptedSubmission);
-      setAllVendors([matchingVendor as AcceptedSubmission]);
-      
       // Initialize navigationMarketsOrder with vendor's markets
       if (matchingVendor.selected_markets && Array.isArray(matchingVendor.selected_markets)) {
         const marketNames = matchingVendor.selected_markets.map((market: any) => 
           typeof market === 'string' ? market : market.name
         );
-        console.log('🔍 Setting navigationMarketsOrder:', marketNames);
         setNavigationMarketsOrder(marketNames);
-      } else {
-        console.log('⚠️ No selected_markets array found or it is not an array');
       }
       
       setLoadingData(false);
@@ -523,21 +549,12 @@ const VendorDuplicate = () => {
           : undefined
       };
       
-      console.log('🔍 fetchVendorById - parsedSubmission.selected_markets:', parsedSubmission.selected_markets);
-      
-      setAcceptedSubmission(parsedSubmission);
-      setSelectedVendor(parsedSubmission);
-      setAllVendors([parsedSubmission]);
-      
       // Initialize navigationMarketsOrder with vendor's markets
       if (parsedSubmission.selected_markets && Array.isArray(parsedSubmission.selected_markets)) {
         const marketNames = parsedSubmission.selected_markets.map((market: any) => 
           typeof market === 'string' ? market : market.name
         );
-        console.log('🔍 Setting navigationMarketsOrder:', marketNames);
         setNavigationMarketsOrder(marketNames);
-      } else {
-        console.log('⚠️ No selected_markets array found or it is not an array');
       }
       
       setLoadingData(false);
@@ -1264,7 +1281,6 @@ const VendorDuplicate = () => {
                 </div>
 
                 {selectedVendor && navigationMarketsOrder.length > 1 && (() => {
-                  console.log('🔍 Rendering market nav buttons - selectedVendor:', !!selectedVendor, 'navigationMarketsOrder:', navigationMarketsOrder);
                   const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
                   const currentPosition = navigationMarketsOrder.indexOf(currentMarket);
                   
