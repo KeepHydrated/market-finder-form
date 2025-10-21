@@ -34,50 +34,48 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
         </Button>
       </div>
 
-      {/* Business cards grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 print:gap-4">
-        {[1, 2, 3, 4, 5, 6].map((cardNum) => (
-          <Card key={cardNum} className="business-card overflow-hidden border-2 print:break-inside-avoid">
-            <CardContent className="p-6 space-y-3">
-              {/* Store Name */}
-              <div className="border-b-2 border-primary pb-3">
-                <h3 className="text-2xl font-bold text-primary">{storeName}</h3>
-                <p className="text-sm text-muted-foreground font-medium">{specialty}</p>
+      {/* Business card */}
+      <div className="flex justify-center">
+        <Card className="business-card overflow-hidden border-2 print:break-inside-avoid max-w-md">
+          <CardContent className="p-6 space-y-3">
+            {/* Store Name */}
+            <div className="border-b-2 border-primary pb-3">
+              <h3 className="text-2xl font-bold text-primary">{storeName}</h3>
+              <p className="text-sm text-muted-foreground font-medium">{specialty}</p>
+            </div>
+
+            {/* Description */}
+            {description && (
+              <p className="text-sm line-clamp-2 text-foreground/80">
+                {description}
+              </p>
+            )}
+
+            {/* Markets */}
+            {markets.length > 0 && (
+              <div className="text-xs text-muted-foreground">
+                <span className="font-semibold">Find us at:</span>
+                <p className="line-clamp-2">{markets.join(', ')}</p>
               </div>
+            )}
 
-              {/* Description */}
-              {description && (
-                <p className="text-sm line-clamp-2 text-foreground/80">
-                  {description}
-                </p>
-              )}
-
-              {/* Markets */}
-              {markets.length > 0 && (
-                <div className="text-xs text-muted-foreground">
-                  <span className="font-semibold">Find us at:</span>
-                  <p className="line-clamp-2">{markets.join(', ')}</p>
-                </div>
-              )}
-
-              {/* Store Link */}
-              <div className="pt-2 border-t space-y-1">
-                <div className="flex items-center gap-2">
-                  <QrCode className="h-4 w-4 text-primary" />
-                  <span className="text-xs font-semibold">Shop Online:</span>
-                </div>
-                <p className="text-xs font-mono break-all text-primary">
-                  {storeUrl}
-                </p>
+            {/* Store Link */}
+            <div className="pt-2 border-t space-y-1">
+              <div className="flex items-center gap-2">
+                <QrCode className="h-4 w-4 text-primary" />
+                <span className="text-xs font-semibold">Shop Online:</span>
               </div>
+              <p className="text-xs font-mono break-all text-primary">
+                {storeUrl}
+              </p>
+            </div>
 
-              {/* QR Code suggestion */}
-              <div className="text-xs text-center text-muted-foreground italic pt-2">
-                Scan QR code to visit our store
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+            {/* QR Code suggestion */}
+            <div className="text-xs text-center text-muted-foreground italic pt-2">
+              Scan QR code to visit our store
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Print instructions - hidden when printing */}
