@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Heart, Star, Filter, RotateCcw, MapPin, Search, ChevronDown, Store, Package } from "lucide-react";
+import { Heart, Star, Filter, RotateCcw, MapPin, Search, ChevronDown, Store, Package, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +30,7 @@ interface AcceptedSubmission {
   description: string;
   products: any[];
   selected_market: string;
+  selected_markets?: any; // Json type from database, can be array of objects or strings
   search_term: string;
   market_address?: string;
   market_days?: string[];
@@ -102,6 +103,7 @@ const Homepage = () => {
   const [currentVendorId, setCurrentVendorId] = useState<string | undefined>(undefined);
   const [currentVendorName, setCurrentVendorName] = useState<string | undefined>(undefined);
   const [marketAddressesMap, setMarketAddressesMap] = useState<Record<string, string>>({});
+  const [vendorMarketIndices, setVendorMarketIndices] = useState<Record<string, number>>({});
 
   // Sync search query with URL parameter
   useEffect(() => {
@@ -1559,19 +1561,77 @@ const Homepage = () => {
                         </Badge>
                       )}
 
-                      {/* Market Details Section - Moved to bottom */}
+                      {/* Market Details Section with Carousel */}
                       <div className="mt-2">
-                        <h4 className="text-sm font-semibold text-foreground mb-1">
-                          {submission.selected_market || submission.search_term || "Farmers Market"}
-                        </h4>
-                        {submission.market_address && (
-                          <div className="flex items-start gap-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-                            <p className="text-sm text-muted-foreground">
-                              {submission.market_address.replace(/,\s*United States\s*$/i, '').trim()}
-                            </p>
-                          </div>
-                        )}
+                        {(() => {
+                          // Get all markets for this vendor
+                          const allMarkets = submission.selected_markets && Array.isArray(submission.selected_markets)
+                            ? submission.selected_markets.map((market: any) => 
+                                typeof market === 'string' 
+                                  ? { name: market, address: submission.market_address || '' }
+                                  : { name: market.name, address: market.address || market.structured_formatting?.secondary_text || '' }
+                              )
+                            : [{ name: submission.selected_market || submission.search_term || "Farmers Market", address: submission.market_address || '' }];
+                          
+                          const currentIndex = vendorMarketIndices[submission.id] || 0;
+                          const currentMarket = allMarkets[currentIndex];
+                          const hasMultipleMarkets = allMarkets.length > 1;
+
+                          return (
+                            <>
+                              <div className="flex items-center justify-between gap-2">
+                                {hasMultipleMarkets && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setVendorMarketIndices(prev => ({
+                                        ...prev,
+                                        [submission.id]: (currentIndex - 1 + allMarkets.length) % allMarkets.length
+                                      }));
+                                    }}
+                                    className="p-1 hover:bg-muted rounded transition-colors"
+                                    aria-label="Previous market"
+                                  >
+                                    <ChevronLeft className="h-4 w-4" />
+                                  </button>
+                                )}
+                                <div className="flex-1">
+                                  <h4 className="text-sm font-semibold text-foreground mb-1">
+                                    {currentMarket.name}
+                                  </h4>
+                                  {currentMarket.address && (
+                                    <div className="flex items-start gap-2">
+                                      <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                                      <p className="text-sm text-muted-foreground">
+                                        {currentMarket.address.replace(/,\s*United States\s*$/i, '').trim()}
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+                                {hasMultipleMarkets && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setVendorMarketIndices(prev => ({
+                                        ...prev,
+                                        [submission.id]: (currentIndex + 1) % allMarkets.length
+                                      }));
+                                    }}
+                                    className="p-1 hover:bg-muted rounded transition-colors"
+                                    aria-label="Next market"
+                                  >
+                                    <ChevronRight className="h-4 w-4" />
+                                  </button>
+                                )}
+                              </div>
+                              {hasMultipleMarkets && (
+                                <div className="text-xs text-center text-muted-foreground mt-1">
+                                  {currentIndex + 1} of {allMarkets.length}
+                                </div>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                     </div>
                   </Card>
