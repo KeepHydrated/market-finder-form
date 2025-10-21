@@ -1,5 +1,8 @@
 project_id = "cxkvyrtdgbqxtcelytwl"
 
+[functions.create-gelato-order]
+verify_jwt = true
+
 [functions.farmers-market-search]
 verify_jwt = false
 

@@ -1,7 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Printer } from 'lucide-react';
+import { Printer, ShoppingCart } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import QRCode from 'qrcode';
 
 interface Market {
@@ -25,6 +27,7 @@ interface BusinessCardsProps {
 export function BusinessCards({ storeName, specialty, description, vendorId, markets }: BusinessCardsProps) {
   const storeUrl = `www.fromfarmersmarkets.com/vendor/${storeName.toLowerCase().replace(/\s+/g, '-')}`;
   const qrCodeRef = useRef<HTMLCanvasElement>(null);
+  const [isOrdering, setIsOrdering] = useState(false);
 
   useEffect(() => {
     if (qrCodeRef.current) {
@@ -43,20 +46,58 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
     window.print();
   };
 
+  const handleOrderCards = async () => {
+    setIsOrdering(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-gelato-order', {
+        body: {
+          storeName,
+          specialty,
+          markets,
+          vendorId,
+          quantity: 100
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        toast.success('Business cards ordered successfully!', {
+          description: `Order ID: ${data.orderId}`
+        });
+      } else {
+        throw new Error(data?.error || 'Failed to create order');
+      }
+    } catch (error) {
+      console.error('Error ordering cards:', error);
+      toast.error('Failed to order business cards', {
+        description: error.message
+      });
+    } finally {
+      setIsOrdering(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Print button - hidden when printing */}
+      {/* Action buttons - hidden when printing */}
       <div className="flex justify-between items-center print:hidden">
         <div>
           <h2 className="text-2xl font-bold">Business Cards</h2>
           <p className="text-muted-foreground mt-1">
-            Print these cards to share at farmers markets
+            Print or order professional business cards for farmers markets
           </p>
         </div>
-        <Button onClick={handlePrint}>
-          <Printer className="h-4 w-4 mr-2" />
-          Print Cards
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handlePrint}>
+            <Printer className="h-4 w-4 mr-2" />
+            Print Cards
+          </Button>
+          <Button onClick={handleOrderCards} disabled={isOrdering}>
+            <ShoppingCart className="h-4 w-4 mr-2" />
+            {isOrdering ? 'Ordering...' : 'Order 100 Cards'}
+          </Button>
+        </div>
       </div>
 
       {/* Business card */}
