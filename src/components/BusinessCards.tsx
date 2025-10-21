@@ -136,6 +136,10 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
             -webkit-print-color-adjust: exact;
           }
           
+          header, nav, [role="navigation"] {
+            display: none !important;
+          }
+          
           .business-card {
             width: 3.5in;
             height: 2in;
