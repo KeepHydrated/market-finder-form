@@ -77,8 +77,8 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
       {/* Business card */}
       <div>
         <Card ref={cardRef} className="business-card overflow-hidden border print:break-inside-avoid w-full max-w-2xl bg-white">
-          <CardContent className="p-8">
-            <div className="grid grid-cols-2 gap-8">
+          <CardContent className="p-4 md:p-8">
+            <div className="grid grid-cols-2 gap-4 md:gap-8">
               {/* Left Column */}
               <div className="space-y-4">
                 {/* Store Name & Specialty */}
