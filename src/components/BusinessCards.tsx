@@ -1,9 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Printer, ShoppingCart } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import QRCode from 'qrcode';
 
 interface Market {
@@ -27,7 +25,6 @@ interface BusinessCardsProps {
 export function BusinessCards({ storeName, specialty, description, vendorId, markets }: BusinessCardsProps) {
   const storeUrl = `www.fromfarmersmarkets.com/vendor/${storeName.toLowerCase().replace(/\s+/g, '-')}`;
   const qrCodeRef = useRef<HTMLCanvasElement>(null);
-  const [isOrdering, setIsOrdering] = useState(false);
 
   useEffect(() => {
     if (qrCodeRef.current) {
@@ -46,36 +43,8 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
     window.print();
   };
 
-  const handleOrderCards = async () => {
-    setIsOrdering(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('create-gelato-order', {
-        body: {
-          storeName,
-          specialty,
-          markets,
-          vendorId,
-          quantity: 100
-        }
-      });
-
-      if (error) throw error;
-
-      if (data?.success) {
-        toast.success('Business cards ordered successfully!', {
-          description: `Order ID: ${data.orderId}`
-        });
-      } else {
-        throw new Error(data?.error || 'Failed to create order');
-      }
-    } catch (error) {
-      console.error('Error ordering cards:', error);
-      toast.error('Failed to order business cards', {
-        description: error.message
-      });
-    } finally {
-      setIsOrdering(false);
-    }
+  const handleOrderCards = () => {
+    window.open('https://www.gelato.com/products/business-cards', '_blank');
   };
 
   return (
@@ -93,9 +62,9 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
             <Printer className="h-4 w-4 mr-2" />
             Print Cards
           </Button>
-          <Button onClick={handleOrderCards} disabled={isOrdering}>
+          <Button onClick={handleOrderCards}>
             <ShoppingCart className="h-4 w-4 mr-2" />
-            {isOrdering ? 'Ordering...' : 'Order 100 Cards'}
+            Order Cards on Gelato
           </Button>
         </div>
       </div>
