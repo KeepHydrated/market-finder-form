@@ -61,10 +61,10 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
   return (
     <div className="space-y-6">
       {/* Action buttons - hidden when printing */}
-      <div className="flex justify-between items-center print:hidden">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 print:hidden">
         <div>
           <h2 className="text-2xl font-bold">Business Cards</h2>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 mb-4 md:mb-0">
             Print or order professional business cards for farmers markets
           </p>
         </div>
