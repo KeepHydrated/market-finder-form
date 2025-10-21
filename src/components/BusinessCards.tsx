@@ -50,7 +50,6 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
                 {/* Description */}
                 {description && (
                   <div>
-                    <p className="text-sm font-semibold text-primary mb-1">About</p>
                     <p className="text-sm text-foreground/70 line-clamp-3">
                       {description}
                     </p>
