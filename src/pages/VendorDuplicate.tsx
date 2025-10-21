@@ -416,6 +416,8 @@ const VendorDuplicate = () => {
           : undefined
       };
       
+      console.log('🔍 fetchVendorById - parsedSubmission.selected_markets:', parsedSubmission.selected_markets);
+      
       setAcceptedSubmission(parsedSubmission);
       setSelectedVendor(parsedSubmission);
       setAllVendors([parsedSubmission]);
@@ -425,7 +427,10 @@ const VendorDuplicate = () => {
         const marketNames = parsedSubmission.selected_markets.map((market: any) => 
           typeof market === 'string' ? market : market.name
         );
+        console.log('🔍 Setting navigationMarketsOrder:', marketNames);
         setNavigationMarketsOrder(marketNames);
+      } else {
+        console.log('⚠️ No selected_markets array found or it is not an array');
       }
       
       setLoadingData(false);
@@ -1152,6 +1157,7 @@ const VendorDuplicate = () => {
                 </div>
 
                 {selectedVendor && navigationMarketsOrder.length > 1 && (() => {
+                  console.log('🔍 Rendering market nav buttons - selectedVendor:', !!selectedVendor, 'navigationMarketsOrder:', navigationMarketsOrder);
                   const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
                   const currentPosition = navigationMarketsOrder.indexOf(currentMarket);
                   
