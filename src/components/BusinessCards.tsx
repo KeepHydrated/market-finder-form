@@ -45,7 +45,7 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
       </div>
 
       {/* Business card */}
-      <div className="flex justify-center">
+      <div>
         <Card className="business-card overflow-hidden border print:break-inside-avoid w-full max-w-2xl bg-white">
           <CardContent className="p-8">
             <div className="grid grid-cols-2 gap-8">
