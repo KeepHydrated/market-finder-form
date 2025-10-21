@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Printer, ShoppingCart } from 'lucide-react';
+import { Printer, ShoppingCart, Download } from 'lucide-react';
 import QRCode from 'qrcode';
+import { toPng } from 'html-to-image';
 
 interface Market {
   name: string;
@@ -25,6 +26,7 @@ interface BusinessCardsProps {
 export function BusinessCards({ storeName, specialty, description, vendorId, markets }: BusinessCardsProps) {
   const storeUrl = `www.fromfarmersmarkets.com/vendor/${storeName.toLowerCase().replace(/\s+/g, '-')}`;
   const qrCodeRef = useRef<HTMLCanvasElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (qrCodeRef.current) {
@@ -47,6 +49,23 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
     window.open('https://www.gelato.com/custom/stationery-and-business/business-cards', '_blank');
   };
 
+  const handleExportDesign = async () => {
+    if (cardRef.current) {
+      try {
+        const dataUrl = await toPng(cardRef.current, { 
+          quality: 1.0,
+          pixelRatio: 3,
+        });
+        const link = document.createElement('a');
+        link.download = `${storeName.toLowerCase().replace(/\s+/g, '-')}-business-card.png`;
+        link.href = dataUrl;
+        link.click();
+      } catch (err) {
+        console.error('Failed to export design:', err);
+      }
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Action buttons - hidden when printing */}
@@ -58,6 +77,10 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportDesign}>
+            <Download className="h-4 w-4 mr-2" />
+            Export Design
+          </Button>
           <Button variant="outline" onClick={handlePrint}>
             <Printer className="h-4 w-4 mr-2" />
             Print Design
@@ -71,7 +94,7 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
 
       {/* Business card */}
       <div>
-        <Card className="business-card overflow-hidden border print:break-inside-avoid w-full max-w-2xl bg-white">
+        <Card ref={cardRef} className="business-card overflow-hidden border print:break-inside-avoid w-full max-w-2xl bg-white">
           <CardContent className="p-8">
             <div className="grid grid-cols-2 gap-8">
               {/* Left Column */}
