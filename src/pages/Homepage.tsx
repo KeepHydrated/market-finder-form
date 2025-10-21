@@ -687,14 +687,28 @@ const Homepage = () => {
         : [submission.selected_market || submission.search_term || 'Unknown Market'];
       
       // Add vendor to each market they're part of
-      marketsToProcess.forEach((marketName: string) => {
+      marketsToProcess.forEach((market: any) => {
+        // Handle both string and object formats
+        let marketName: string;
+        let marketAddress: string;
+        
+        if (typeof market === 'string') {
+          marketName = market;
+          marketAddress = marketAddressesMap[marketName] || submission.market_address || 'Address not available';
+        } else if (market && typeof market === 'object') {
+          // Extract string values from object
+          marketName = String(market.name || market.structured_formatting?.main_text || 'Unknown Market');
+          marketAddress = String(market.address || market.structured_formatting?.secondary_text || marketAddressesMap[marketName] || submission.market_address || 'Address not available');
+        } else {
+          marketName = 'Unknown Market';
+          marketAddress = 'Address not available';
+        }
+        
         const marketKey = marketName;
-        // Use the actual Google Maps address from the database, fallback to submission address
-        const marketAddress = marketAddressesMap[marketKey] || submission.market_address || 'Address not available';
         
         if (!markets[marketKey]) {
           markets[marketKey] = {
-            name: marketKey,
+            name: marketName,
             address: marketAddress,
             vendors: []
           };
