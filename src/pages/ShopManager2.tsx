@@ -185,15 +185,30 @@ export default function ShopManager() {
         setShopData(parsedData);
         setProducts(parsedData.products || []);
         
-        const farmersMarkets = (parsedData.selected_markets || []).map((marketName: string, index: number) => ({
-          place_id: `saved-${index}-${marketName.replace(/\s+/g, '-').toLowerCase()}`,
-          name: marketName,
-          address: '',
-          structured_formatting: {
-            main_text: marketName,
-            secondary_text: ''
+        const farmersMarkets = (parsedData.selected_markets || []).map((market: any, index: number) => {
+          // Handle both old format (string) and new format (object)
+          if (typeof market === 'string') {
+            return {
+              place_id: `saved-${index}-${market.replace(/\s+/g, '-').toLowerCase()}`,
+              name: market,
+              address: '',
+              structured_formatting: {
+                main_text: market,
+                secondary_text: ''
+              }
+            };
           }
-        }));
+          // New format with full market data
+          return {
+            place_id: market.place_id || `saved-${index}-${market.name.replace(/\s+/g, '-').toLowerCase()}`,
+            name: market.name,
+            address: market.address || market.structured_formatting?.secondary_text || '',
+            structured_formatting: {
+              main_text: market.name,
+              secondary_text: market.address || market.structured_formatting?.secondary_text || ''
+            }
+          };
+        });
         setSelectedFarmersMarkets(farmersMarkets);
         
         setFormData({
@@ -322,7 +337,11 @@ export default function ShopManager() {
         website: formData.website.trim(),
         description: formData.description.trim(),
         products: products,
-        selected_markets: selectedFarmersMarkets.map(m => m.name),
+        selected_markets: selectedFarmersMarkets.map(m => ({
+          name: m.name,
+          address: m.address || m.structured_formatting?.secondary_text || '',
+          place_id: m.place_id
+        })),
         search_term: selectedFarmersMarkets.length > 0 ? selectedFarmersMarkets[0].name : '',
         market_address: selectedFarmersMarkets.length > 0 && selectedFarmersMarkets[0].address 
           ? selectedFarmersMarkets[0].address 
