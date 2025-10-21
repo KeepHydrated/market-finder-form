@@ -5,8 +5,12 @@ import { QrCode, Printer } from 'lucide-react';
 
 interface Market {
   name: string;
-  address: string;
+  address?: string;
   place_id: string;
+  structured_formatting?: {
+    main_text: string;
+    secondary_text: string;
+  };
 }
 
 interface BusinessCardsProps {
@@ -56,12 +60,15 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
                 {/* Markets */}
                 {markets.length > 0 && (
                   <div className="space-y-2">
-                    {markets.map((market, index) => (
-                      <div key={market.place_id || index} className="text-sm text-foreground/90">
-                        <div className="font-medium">{market.name}</div>
-                        <div className="text-xs text-muted-foreground">{market.address}</div>
-                      </div>
-                    ))}
+                    {markets.map((market, index) => {
+                      const address = market.address || market.structured_formatting?.secondary_text;
+                      return (
+                        <div key={market.place_id || index} className="text-sm text-foreground/90">
+                          <div className="font-medium">{market.structured_formatting?.main_text || market.name}</div>
+                          {address && <div className="text-xs text-muted-foreground">{address}</div>}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
