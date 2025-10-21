@@ -1579,26 +1579,46 @@ const Homepage = () => {
 
                           return (
                             <>
-                              <div className="flex items-center justify-between gap-2">
-                                {hasMultipleMarkets && (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setVendorMarketIndices(prev => ({
-                                        ...prev,
-                                        [submission.id]: (currentIndex - 1 + allMarkets.length) % allMarkets.length
-                                      }));
-                                    }}
-                                    className="p-1 hover:bg-muted rounded transition-colors"
-                                    aria-label="Previous market"
-                                  >
-                                    <ChevronLeft className="h-4 w-4" />
-                                  </button>
-                                )}
+                              <div className="flex items-start justify-between gap-2">
                                 <div className="flex-1">
-                                  <h4 className="text-sm font-semibold text-foreground mb-1">
-                                    {currentMarket.name}
-                                  </h4>
+                                  <div className="flex items-center justify-between gap-2 mb-1">
+                                    <h4 className="text-sm font-semibold text-foreground">
+                                      {currentMarket.name}
+                                    </h4>
+                                    {hasMultipleMarkets && (
+                                      <div className="flex items-center gap-1 flex-shrink-0">
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setVendorMarketIndices(prev => ({
+                                              ...prev,
+                                              [submission.id]: (currentIndex - 1 + allMarkets.length) % allMarkets.length
+                                            }));
+                                          }}
+                                          className="p-1 hover:bg-muted rounded transition-colors"
+                                          aria-label="Previous market"
+                                        >
+                                          <ChevronLeft className="h-4 w-4" />
+                                        </button>
+                                        <span className="text-xs text-muted-foreground">
+                                          {currentIndex + 1}/{allMarkets.length}
+                                        </span>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setVendorMarketIndices(prev => ({
+                                              ...prev,
+                                              [submission.id]: (currentIndex + 1) % allMarkets.length
+                                            }));
+                                          }}
+                                          className="p-1 hover:bg-muted rounded transition-colors"
+                                          aria-label="Next market"
+                                        >
+                                          <ChevronRight className="h-4 w-4" />
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
                                   {currentMarket.address && (
                                     <div className="flex items-start gap-2">
                                       <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
@@ -1608,27 +1628,7 @@ const Homepage = () => {
                                     </div>
                                   )}
                                 </div>
-                                {hasMultipleMarkets && (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setVendorMarketIndices(prev => ({
-                                        ...prev,
-                                        [submission.id]: (currentIndex + 1) % allMarkets.length
-                                      }));
-                                    }}
-                                    className="p-1 hover:bg-muted rounded transition-colors"
-                                    aria-label="Next market"
-                                  >
-                                    <ChevronRight className="h-4 w-4" />
-                                  </button>
-                                )}
                               </div>
-                              {hasMultipleMarkets && (
-                                <div className="text-xs text-center text-muted-foreground mt-1">
-                                  {currentIndex + 1} of {allMarkets.length}
-                                </div>
-                              )}
                             </>
                           );
                         })()}
