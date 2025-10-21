@@ -1564,17 +1564,37 @@ const Homepage = () => {
                       {/* Market Details Section with Carousel */}
                       <div className="mt-2">
                         {(() => {
-                          // Get all markets for this vendor
-                          const allMarkets = submission.selected_markets && Array.isArray(submission.selected_markets)
-                            ? submission.selected_markets.map((market: any) => 
-                                typeof market === 'string' 
-                                  ? { name: market, address: submission.market_address || '' }
-                                  : { name: market.name, address: market.address || market.structured_formatting?.secondary_text || '' }
-                              )
-                            : [{ name: submission.selected_market || submission.search_term || "Farmers Market", address: submission.market_address || '' }];
+                          // Get all markets for this vendor - handle various data structures
+                          let allMarkets = [];
+                          
+                          if (submission.selected_markets && Array.isArray(submission.selected_markets)) {
+                            allMarkets = submission.selected_markets.map((market: any) => {
+                              // Handle string format (old format)
+                              if (typeof market === 'string') {
+                                return { name: market, address: submission.market_address || '' };
+                              }
+                              // Handle object format (new format)
+                              if (market && typeof market === 'object') {
+                                // Extract name properly - it should be a string
+                                const marketName = typeof market.name === 'string' 
+                                  ? market.name 
+                                  : (market.structured_formatting?.main_text || submission.selected_market || '');
+                                const marketAddress = market.address || market.structured_formatting?.secondary_text || submission.market_address || '';
+                                return { name: marketName, address: marketAddress };
+                              }
+                              // Fallback
+                              return { name: String(market), address: submission.market_address || '' };
+                            });
+                          } else {
+                            // Fallback to single market
+                            allMarkets = [{ 
+                              name: submission.selected_market || submission.search_term || "Farmers Market", 
+                              address: submission.market_address || '' 
+                            }];
+                          }
                           
                           const currentIndex = vendorMarketIndices[submission.id] || 0;
-                          const currentMarket = allMarkets[currentIndex];
+                          const currentMarket = allMarkets[currentIndex] || allMarkets[0];
                           const hasMultipleMarkets = allMarkets.length > 1;
 
                           return (
@@ -1583,7 +1603,7 @@ const Homepage = () => {
                                 <div className="flex-1">
                                   <div className="flex items-center justify-between gap-2 mb-1">
                                     <h4 className="text-sm font-semibold text-foreground">
-                                      {currentMarket.name}
+                                      {currentMarket?.name || 'Farmers Market'}
                                     </h4>
                                     {hasMultipleMarkets && (
                                       <div className="flex items-center gap-1 flex-shrink-0">
@@ -1619,7 +1639,7 @@ const Homepage = () => {
                                       </div>
                                     )}
                                   </div>
-                                  {currentMarket.address && (
+                                  {currentMarket?.address && (
                                     <div className="flex items-start gap-2">
                                       <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                                       <p className="text-sm text-muted-foreground">
