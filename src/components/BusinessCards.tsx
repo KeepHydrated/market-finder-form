@@ -22,7 +22,7 @@ interface BusinessCardsProps {
 }
 
 export function BusinessCards({ storeName, specialty, description, vendorId, markets }: BusinessCardsProps) {
-  const storeUrl = `https://fromfarmersmarkets.com/vendor/${storeName.toLowerCase().replace(/\s+/g, '-')}`;
+  const storeUrl = `www.fromfarmersmarkets.com/vendor/${storeName.toLowerCase().replace(/\s+/g, '-')}`;
 
   const handlePrint = () => {
     window.print();
