@@ -75,16 +75,21 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
                 {/* Markets */}
                 {markets.length > 0 && (
                   <div className="space-y-2">
-                    {markets.map((market, index) => (
-                      <div key={index} className="text-sm text-foreground/90">
-                        <div className="font-medium">{market.structured_formatting?.main_text || market.name}</div>
-                        {(market.address || market.structured_formatting?.secondary_text) && (
-                          <div className="text-xs text-muted-foreground">
-                            {market.address || market.structured_formatting?.secondary_text}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                    {markets.map((market, index) => {
+                      const address = market.address || market.structured_formatting?.secondary_text;
+                      const cleanAddress = address?.replace(/, United States$/, '');
+                      
+                      return (
+                        <div key={index} className="text-sm text-foreground/90">
+                          <div className="font-medium">{market.structured_formatting?.main_text || market.name}</div>
+                          {cleanAddress && (
+                            <div className="text-xs text-muted-foreground">
+                              {cleanAddress}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
