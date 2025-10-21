@@ -83,8 +83,8 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
               <div className="space-y-4">
                 {/* Store Name & Specialty */}
                 <div>
-                  <h3 className="text-2xl font-bold text-foreground">{storeName}</h3>
-                  <p className="text-sm text-primary font-medium mt-0.5">{specialty}</p>
+                  <h3 className="text-xl md:text-2xl font-bold text-foreground">{storeName}</h3>
+                  <p className="text-xs md:text-sm text-primary font-medium mt-0.5">{specialty}</p>
                 </div>
 
                 {/* Markets */}
@@ -95,10 +95,10 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
                       const cleanAddress = address?.replace(/, United States$/, '');
                       
                       return (
-                        <div key={index} className="text-sm text-foreground/90">
+                        <div key={index} className="text-xs md:text-sm text-foreground/90">
                           <div className="font-medium">{market.structured_formatting?.main_text || market.name}</div>
                           {cleanAddress && (
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-[10px] md:text-xs text-muted-foreground">
                               {cleanAddress}
                             </div>
                           )}
@@ -115,14 +115,14 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
                 <div className="flex justify-end">
                   <canvas 
                     ref={qrCodeRef}
-                    className="w-24 h-24 border-2 border-primary/20 rounded-lg"
+                    className="w-20 h-20 md:w-24 md:h-24 border-2 border-primary/20 rounded-lg"
                   />
                 </div>
 
                 {/* Contact Info */}
-                <div className="space-y-1.5 text-sm">
+                <div className="space-y-1.5 text-xs md:text-sm">
                   <div className="flex items-start gap-2">
-                    <span className="text-primary font-bold text-xs mt-0.5">W</span>
+                    <span className="text-primary font-bold text-[10px] md:text-xs mt-0.5">W</span>
                     <span className="text-foreground/90 break-all leading-relaxed">
                       {storeUrl}
                     </span>
