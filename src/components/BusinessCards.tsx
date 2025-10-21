@@ -29,7 +29,7 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
   useEffect(() => {
     if (qrCodeRef.current) {
       QRCode.toCanvas(qrCodeRef.current, `https://${storeUrl}`, {
-        width: 128,
+        width: 96,
         margin: 1,
         color: {
           dark: '#000000',
@@ -95,7 +95,7 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
                 <div className="flex justify-end">
                   <canvas 
                     ref={qrCodeRef}
-                    className="w-32 h-32 border-2 border-primary/20 rounded-lg"
+                    className="w-24 h-24 border-2 border-primary/20 rounded-lg"
                   />
                 </div>
 
