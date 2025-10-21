@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { QrCode, Printer, ChevronLeft, ChevronRight } from 'lucide-react';
+import { QrCode, Printer } from 'lucide-react';
 
 interface Market {
   name: string;
@@ -23,21 +23,12 @@ interface BusinessCardsProps {
 
 export function BusinessCards({ storeName, specialty, description, vendorId, markets }: BusinessCardsProps) {
   const storeUrl = `https://fromfarmersmarkets.com/vendor/${storeName.toLowerCase().replace(/\s+/g, '-')}`;
-  const [currentMarketIndex, setCurrentMarketIndex] = useState(0);
 
   const handlePrint = () => {
     window.print();
   };
 
-  const nextMarket = () => {
-    setCurrentMarketIndex((prev) => (prev + 1) % markets.length);
-  };
-
-  const previousMarket = () => {
-    setCurrentMarketIndex((prev) => (prev - 1 + markets.length) % markets.length);
-  };
-
-  const currentMarket = markets[currentMarketIndex];
+  const firstMarket = markets[0];
 
   return (
     <div className="space-y-6">
@@ -68,40 +59,13 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
                   <p className="text-sm text-primary font-medium mt-0.5">{specialty}</p>
                 </div>
 
-                {/* Markets with Navigation */}
-                {markets.length > 0 && currentMarket && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      {markets.length > 1 && (
-                        <button
-                          onClick={previousMarket}
-                          className="p-1 hover:bg-muted rounded print:hidden"
-                          aria-label="Previous market"
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </button>
-                      )}
-                      <div className="flex-1 text-sm text-foreground/90">
-                        <div className="font-medium">{currentMarket.structured_formatting?.main_text || currentMarket.name}</div>
-                        {(currentMarket.address || currentMarket.structured_formatting?.secondary_text) && (
-                          <div className="text-xs text-muted-foreground">
-                            {currentMarket.address || currentMarket.structured_formatting?.secondary_text}
-                          </div>
-                        )}
-                      </div>
-                      {markets.length > 1 && (
-                        <button
-                          onClick={nextMarket}
-                          className="p-1 hover:bg-muted rounded print:hidden"
-                          aria-label="Next market"
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
-                    {markets.length > 1 && (
-                      <div className="text-xs text-center text-muted-foreground print:hidden">
-                        {currentMarketIndex + 1} of {markets.length}
+                {/* Markets */}
+                {markets.length > 0 && firstMarket && (
+                  <div className="text-sm text-foreground/90">
+                    <div className="font-medium">{firstMarket.structured_formatting?.main_text || firstMarket.name}</div>
+                    {(firstMarket.address || firstMarket.structured_formatting?.secondary_text) && (
+                      <div className="text-xs text-muted-foreground">
+                        {firstMarket.address || firstMarket.structured_formatting?.secondary_text}
                       </div>
                     )}
                   </div>
