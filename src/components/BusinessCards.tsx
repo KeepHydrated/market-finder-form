@@ -64,7 +64,7 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 print:hidden">
         <div>
           <h2 className="text-2xl font-bold">Business Cards</h2>
-          <p className="text-muted-foreground mt-1 mb-4 md:mb-0">
+          <p className="text-muted-foreground mt-6 mb-4 md:mt-1 md:mb-0">
             Print or order professional business cards for farmers markets
           </p>
         </div>
