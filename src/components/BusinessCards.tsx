@@ -60,11 +60,11 @@ export function BusinessCards({ storeName, specialty, description, vendorId, mar
         <div className="flex gap-2">
           <Button variant="outline" onClick={handlePrint}>
             <Printer className="h-4 w-4 mr-2" />
-            Print Cards
+            Print Design
           </Button>
           <Button onClick={handleOrderCards}>
             <ShoppingCart className="h-4 w-4 mr-2" />
-            Order Cards on Gelato
+            Order on Gelato
           </Button>
         </div>
       </div>
