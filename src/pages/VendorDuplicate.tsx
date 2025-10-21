@@ -1337,7 +1337,10 @@ const VendorDuplicate = () => {
                   setSelectedVendor(vendor);
                   // Check if current market exists in vendor's market list
                   if (selectedMarketName && vendor.selected_markets && Array.isArray(vendor.selected_markets)) {
-                    const vendorMarkets = vendor.selected_markets as string[];
+                    // Handle both old format (strings) and new format (objects)
+                    const vendorMarkets = vendor.selected_markets.map((market: any) => 
+                      typeof market === 'string' ? market : market.name
+                    );
                     // Use exact match to find if this vendor sells at the current market
                     if (vendorMarkets.includes(selectedMarketName)) {
                       // Keep the current market selected and create navigation order with it first
@@ -1361,7 +1364,11 @@ const VendorDuplicate = () => {
                     setSelectedMarketName(vendor.selected_market || '');
                     setSelectedMarketAddress(vendor.market_address || '');
                     if (vendor.selected_markets && Array.isArray(vendor.selected_markets)) {
-                      setNavigationMarketsOrder(vendor.selected_markets as string[]);
+                      // Handle both old format (strings) and new format (objects)
+                      const marketNames = vendor.selected_markets.map((market: any) => 
+                        typeof market === 'string' ? market : market.name
+                      );
+                      setNavigationMarketsOrder(marketNames);
                     }
                     console.log('Using vendor primary market:', vendor.selected_market);
                   }
@@ -1770,7 +1777,10 @@ const VendorDuplicate = () => {
                           setAcceptedSubmission(vendor);
                           setSelectedVendor(vendor);
                           if (selectedMarketName && vendor.selected_markets && Array.isArray(vendor.selected_markets)) {
-                            const vendorMarkets = vendor.selected_markets as string[];
+                            // Handle both old format (strings) and new format (objects)
+                            const vendorMarkets = vendor.selected_markets.map((market: any) => 
+                              typeof market === 'string' ? market : market.name
+                            );
                             if (vendorMarkets.includes(selectedMarketName)) {
                               const reorderedMarkets = [...vendorMarkets];
                               const currentIdx = reorderedMarkets.indexOf(selectedMarketName);
@@ -1788,7 +1798,11 @@ const VendorDuplicate = () => {
                             setSelectedMarketName(vendor.selected_market || '');
                             setSelectedMarketAddress(vendor.market_address || '');
                             if (vendor.selected_markets && Array.isArray(vendor.selected_markets)) {
-                              setNavigationMarketsOrder(vendor.selected_markets as string[]);
+                              // Handle both old format (strings) and new format (objects)
+                              const marketNames = vendor.selected_markets.map((market: any) => 
+                                typeof market === 'string' ? market : market.name
+                              );
+                              setNavigationMarketsOrder(marketNames);
                             }
                           }
                           setMarketNavigationHistory([]);
