@@ -419,6 +419,15 @@ const VendorDuplicate = () => {
       setAcceptedSubmission(parsedSubmission);
       setSelectedVendor(parsedSubmission);
       setAllVendors([parsedSubmission]);
+      
+      // Initialize navigationMarketsOrder with vendor's markets
+      if (parsedSubmission.selected_markets && Array.isArray(parsedSubmission.selected_markets)) {
+        const marketNames = parsedSubmission.selected_markets.map((market: any) => 
+          typeof market === 'string' ? market : market.name
+        );
+        setNavigationMarketsOrder(marketNames);
+      }
+      
       setLoadingData(false);
       
       // Fetch ratings for this vendor
