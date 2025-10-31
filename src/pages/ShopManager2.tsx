@@ -802,7 +802,7 @@ export default function ShopManager() {
           <div className="pt-6 border-t flex gap-4">
             {!shopData && (
               <Button 
-                onClick={() => navigate('/submit?section=products')}
+                onClick={() => navigate('/my-shop?section=products')}
                 className="flex-1"
               >
                 Continue to Products
