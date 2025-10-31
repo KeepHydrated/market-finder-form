@@ -18,7 +18,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut, Package, Settings, MessageSquare, Shield, FileWarning, DollarSign, BarChart, User } from 'lucide-react';
+import { LogOut, Package, Settings, MessageSquare, Shield, User } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAdmin } from '@/hooks/useAdmin';
 
@@ -55,21 +55,6 @@ export function UserMenu({ user, profile }: UserMenuProps) {
 
   const handleMessagesClick = () => {
     navigate('/messages');
-    setSheetOpen(false);
-  };
-
-  const handleReportClick = () => {
-    navigate('/report');
-    setSheetOpen(false);
-  };
-
-  const handleCommissionsClick = () => {
-    navigate('/commissions');
-    setSheetOpen(false);
-  };
-
-  const handleAnalyticsClick = () => {
-    navigate('/analytics');
     setSheetOpen(false);
   };
 
@@ -217,23 +202,6 @@ export function UserMenu({ user, profile }: UserMenuProps) {
           <MessageSquare className="mr-2 h-4 w-4" />
           <span>Messages</span>
         </DropdownMenuItem>
-        {user?.email === 'nadiachibri@gmail.com' && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleReportClick}>
-              <FileWarning className="mr-2 h-4 w-4" />
-              <span>Reports</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleCommissionsClick}>
-              <DollarSign className="mr-2 h-4 w-4" />
-              <span>Commissions</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleAnalyticsClick}>
-              <BarChart className="mr-2 h-4 w-4" />
-              <span>Analytics</span>
-            </DropdownMenuItem>
-          </>
-        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
