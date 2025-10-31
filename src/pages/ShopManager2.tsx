@@ -372,8 +372,8 @@ export default function ShopManager() {
         if (error) throw error;
 
         toast({
-          title: "Submission Created",
-          description: "Your submission has been created and is pending review.",
+          title: "Published to Store",
+          description: "Congratulations! Your shop has been published and is now live.",
         });
       }
 
