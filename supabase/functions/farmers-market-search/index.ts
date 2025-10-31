@@ -66,10 +66,13 @@ serve(async (req) => {
     const searchQuery = `farmers market ${query}`;
     let url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&key=${apiKey}&type=establishment`;
     
-    // Add location bias if provided
+    // Add location bias if provided - use rankby=distance for better local results
     if (location && location.lat && location.lng) {
-      url += `&location=${location.lat},${location.lng}&radius=25000`;
-      console.log(`Using location bias: ${location.lat}, ${location.lng}`);
+      // Use a smaller radius (10km) to focus on nearby markets
+      url += `&location=${location.lat},${location.lng}&radius=10000&rankby=prominence`;
+      console.log(`Using location bias: ${location.lat}, ${location.lng} with 10km radius`);
+    } else {
+      console.log('No location provided, searching without location bias');
     }
     
     console.log('Searching for farmers markets with query:', searchQuery);
