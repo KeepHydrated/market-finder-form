@@ -49,12 +49,12 @@ const menuItems = [
     section: "orders2",
     requiresShop: true 
   },
-  { 
-    title: "Business Cards", 
-    icon: Store, 
-    section: "cards",
-    requiresShop: true 
-  },
+  // { 
+  //   title: "Business Cards", 
+  //   icon: Store, 
+  //   section: "cards",
+  //   requiresShop: true 
+  // },
   { 
     title: "Account", 
     icon: Settings, 
