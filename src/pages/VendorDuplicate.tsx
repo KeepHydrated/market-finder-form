@@ -2188,6 +2188,23 @@ const VendorDuplicate = () => {
                     <p>No reviews yet. Be the first to leave a review!</p>
                   </div>
                 )}
+                
+                {/* Leave a Review Button */}
+                <div className="pt-4 border-t">
+                  <Button 
+                    onClick={() => {
+                      setNewReview({ rating: 5, comment: '' });
+                      setEditingReviewId(null);
+                      setSelectedPhotos([]);
+                      setExistingReviewPhotos([]);
+                      setShowReviewForm(true);
+                    }}
+                    className="w-full"
+                  >
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Leave a Review
+                  </Button>
+                </div>
               </div>
             </>
           ) : (
