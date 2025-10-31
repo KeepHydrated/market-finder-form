@@ -58,24 +58,43 @@ export const FarmersMarketSearch = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  // Get user's location
+  // Get user's location - try browser geolocation first, then IP-based
   useEffect(() => {
+    const getIPLocation = async () => {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        if (data.latitude && data.longitude) {
+          console.log('Using IP-based location:', data.city, data.region);
+          setUserLocation({
+            lat: data.latitude,
+            lng: data.longitude
+          });
+        }
+      } catch (error) {
+        console.error('Error getting IP location:', error);
+        // Ultimate fallback
+        setUserLocation({ lat: 29.4241, lng: -98.4936 });
+      }
+    };
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log('Using browser geolocation');
           setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude
           });
         },
         (error) => {
-          console.log('Error getting location:', error);
-          // Default to San Antonio, TX if location access denied
-          setUserLocation({ lat: 29.4241, lng: -98.4936 });
+          console.log('Browser geolocation denied, falling back to IP location');
+          getIPLocation();
         }
       );
     } else {
-      setUserLocation({ lat: 29.4241, lng: -98.4936 });
+      console.log('Browser geolocation not available, using IP location');
+      getIPLocation();
     }
   }, []);
 
