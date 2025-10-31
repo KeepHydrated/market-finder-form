@@ -58,44 +58,52 @@ export const FarmersMarketSearch = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  // Get user's location - try browser geolocation first, then IP-based
+  // Get user's location - prioritize IP-based geolocation for accuracy
   useEffect(() => {
     const getIPLocation = async () => {
       try {
         const response = await fetch('https://ipapi.co/json/');
         const data = await response.json();
         if (data.latitude && data.longitude) {
-          console.log('Using IP-based location:', data.city, data.region);
+          console.log('Using IP-based location:', data.city, data.region, data.latitude, data.longitude);
           setUserLocation({
             lat: data.latitude,
             lng: data.longitude
           });
+          return true;
         }
+        return false;
       } catch (error) {
         console.error('Error getting IP location:', error);
-        // Ultimate fallback
-        setUserLocation({ lat: 29.4241, lng: -98.4936 });
+        return false;
       }
     };
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          console.log('Using browser geolocation');
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-        },
-        (error) => {
-          console.log('Browser geolocation denied, falling back to IP location');
-          getIPLocation();
+    // Try IP location first
+    getIPLocation().then(success => {
+      if (!success) {
+        // Fall back to browser geolocation if IP fails
+        if (navigator.geolocation) {
+          console.log('IP location failed, trying browser geolocation');
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              console.log('Using browser geolocation');
+              setUserLocation({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              });
+            },
+            (error) => {
+              console.log('All location methods failed, using default');
+              setUserLocation({ lat: 29.4241, lng: -98.4936 });
+            }
+          );
+        } else {
+          console.log('No location method available, using default');
+          setUserLocation({ lat: 29.4241, lng: -98.4936 });
         }
-      );
-    } else {
-      console.log('Browser geolocation not available, using IP location');
-      getIPLocation();
-    }
+      }
+    });
   }, []);
 
   // Calculate distances for suggestions
