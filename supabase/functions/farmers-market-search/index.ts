@@ -92,29 +92,10 @@ serve(async (req) => {
       });
     }
 
-    // Filter and transform results to focus on farmers markets
-    const filteredResults = data.results
-      ?.filter((place: any) => {
-        const name = place.name?.toLowerCase() || '';
-        const types = place.types || [];
-        
-        // Filter for places that are likely farmers markets
-        return (
-          name.includes('market') || 
-          name.includes('farmer') ||
-          name.includes('farm') ||
-          types.includes('food') ||
-          types.includes('grocery_or_supermarket') ||
-          types.includes('establishment')
-        ) && (
-          // Additional filtering to ensure it's market-related
-          name.includes('market') ||
-          name.includes('farmer') ||
-          name.includes('farm') ||
-          place.formatted_address?.toLowerCase().includes('market')
-        );
-      })
-      .slice(0, 8) || []; // Limit to 8 results for autocomplete
+    // Transform results - Google Places already sorted by distance
+    // Keep filtering minimal to match Google Maps behavior
+    const filteredResults = (data.results || [])
+      .slice(0, 10); // Get top 10 closest results
 
     // Fetch detailed information for each place to get full opening hours
     const farmersMarkets = await Promise.all(
