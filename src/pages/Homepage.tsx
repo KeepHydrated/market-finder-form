@@ -1044,43 +1044,52 @@ const Homepage = () => {
   // Fetch local markets based on user location
   useEffect(() => {
     const fetchLocalMarkets = async () => {
-      if (!userCoordinates) return;
-      
       setIsLoadingLocalMarkets(true);
       try {
         const { data, error } = await supabase
           .from('markets')
           .select('*')
-          .limit(6);
+          .order('google_rating', { ascending: false })
+          .limit(12);
 
         if (error) throw error;
 
-        // Calculate distances and sort by proximity
-        const marketsWithDistance = await Promise.all((data || []).map(async (market) => {
-          try {
-            const coords = await getCoordinatesForAddress(market.address);
-            if (coords) {
-              const distance = calculateDistance(
-                userCoordinates.lat,
-                userCoordinates.lng,
-                coords.lat,
-                coords.lng
-              );
-              return { ...market, distance };
+        if (userCoordinates) {
+          // If we have user location, calculate distances and show nearby markets
+          const marketsWithDistance = await Promise.all((data || []).map(async (market) => {
+            try {
+              const coords = await getCoordinatesForAddress(market.address);
+              if (coords) {
+                const distance = calculateDistance(
+                  userCoordinates.lat,
+                  userCoordinates.lng,
+                  coords.lat,
+                  coords.lng
+                );
+                return { ...market, distance };
+              }
+            } catch (err) {
+              console.error(`Error getting coordinates for ${market.name}:`, err);
             }
-          } catch (err) {
-            console.error(`Error getting coordinates for ${market.name}:`, err);
+            return null;
+          }));
+
+          // Filter out nulls and sort by distance, show within 100 miles
+          const validMarkets = marketsWithDistance
+            .filter(m => m !== null && m.distance <= 100)
+            .sort((a, b) => a!.distance - b!.distance)
+            .slice(0, 6);
+
+          if (validMarkets.length > 0) {
+            setLocalMarkets(validMarkets);
+          } else {
+            // If no nearby markets, show top rated markets
+            setLocalMarkets((data || []).slice(0, 6));
           }
-          return null;
-        }));
-
-        // Filter out nulls and sort by distance
-        const validMarkets = marketsWithDistance
-          .filter(m => m !== null && m.distance <= 50) // Only show markets within 50 miles
-          .sort((a, b) => a!.distance - b!.distance)
-          .slice(0, 6);
-
-        setLocalMarkets(validMarkets);
+        } else {
+          // If no location, show top rated markets
+          setLocalMarkets((data || []).slice(0, 6));
+        }
       } catch (error) {
         console.error('Error fetching local markets:', error);
       } finally {
@@ -1227,58 +1236,78 @@ const Homepage = () => {
           <div className="container mx-auto px-4 py-8 md:py-12">
             <div className="mb-6">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                Recommended Local Markets
+                {userCoordinates ? 'Recommended Local Markets' : 'Popular Farmers Markets'}
               </h2>
               <p className="text-muted-foreground">
-                Discover farmers markets near you
+                {userCoordinates ? 'Discover farmers markets near you' : 'Explore top-rated farmers markets across the country'}
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {localMarkets.map((market) => (
-                <Card key={market.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/market/${encodeURIComponent(market.name)}`)}>
-                  <CardContent className="p-6">
-                    <div className="space-y-3">
-                      <div className="flex items-start justify-between">
-                        <h3 className="font-semibold text-lg text-foreground line-clamp-2">{market.name}</h3>
-                        {market.google_rating && market.google_rating > 0 && (
-                          <div className="flex items-center gap-1 ml-2">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            <span className="text-sm font-medium">{market.google_rating.toFixed(1)}</span>
-                          </div>
-                        )}
+            {isLoadingLocalMarkets ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Card key={i} className="animate-pulse">
+                    <CardContent className="p-6">
+                      <div className="space-y-3">
+                        <div className="h-6 bg-muted rounded w-3/4"></div>
+                        <div className="h-4 bg-muted rounded w-full"></div>
+                        <div className="h-4 bg-muted rounded w-1/2"></div>
                       </div>
-                      
-                      <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                        <span className="line-clamp-2">{market.address}</span>
-                      </div>
-                      
-                      {market.distance && (
-                        <Badge variant="secondary" className="text-xs">
-                          {market.distance.toFixed(1)} miles away
-                        </Badge>
-                      )}
-                      
-                      {market.days && market.days.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {market.days.slice(0, 3).map((day: string) => (
-                            <Badge key={day} variant="outline" className="text-xs">
-                              {day}
-                            </Badge>
-                          ))}
-                          {market.days.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{market.days.length - 3}
-                            </Badge>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {localMarkets.map((market) => (
+                  <Card key={market.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/market/${encodeURIComponent(market.name)}`)}>
+                    <CardContent className="p-6">
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between">
+                          <h3 className="font-semibold text-lg text-foreground line-clamp-2">{market.name}</h3>
+                          {market.google_rating && market.google_rating > 0 && (
+                            <div className="flex items-center gap-1 ml-2">
+                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                              <span className="text-sm font-medium">{market.google_rating.toFixed(1)}</span>
+                            </div>
                           )}
                         </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                        
+                        <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                          <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          <span className="line-clamp-2">{market.city}, {market.state}</span>
+                        </div>
+                        
+                        {market.distance && (
+                          <Badge variant="secondary" className="text-xs">
+                            {market.distance.toFixed(1)} miles away
+                          </Badge>
+                        )}
+                        
+                        {market.days && market.days.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {market.days.slice(0, 3).map((day: string) => (
+                              <Badge key={day} variant="outline" className="text-xs">
+                                {day}
+                              </Badge>
+                            ))}
+                            {market.days.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{market.days.length - 3}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                        
+                        {market.hours && (
+                          <p className="text-xs text-muted-foreground">{market.hours}</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
             
             <div className="mt-6 text-center">
               <Button variant="outline" onClick={() => {
