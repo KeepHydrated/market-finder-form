@@ -1156,32 +1156,58 @@ const Homepage = () => {
         
         {/* Scope Toggle and View Toggle */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          {/* Search Scope Toggle */}
-          <div className="flex rounded-lg bg-muted p-1">
-            <button
-              onClick={() => setSearchScope('local')}
-              className={cn(
-                "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                searchScope === 'local'
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <MapPin className="h-4 w-4 inline mr-1" />
-              Local
-            </button>
-            <button
-              onClick={() => setSearchScope('nationwide')}
-              className={cn(
-                "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                searchScope === 'nationwide'
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              All of US
-            </button>
-          </div>
+          {/* Search results indicator */}
+          {(searchQuery.trim() || selectedCategories.length > 0) && (
+            <div className="w-full sm:w-auto">
+              <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
+                <span>Showing {filteredSubmissions.length} result{filteredSubmissions.length !== 1 ? 's' : ''}</span>
+                {searchQuery.trim() && (
+                  <Badge variant="secondary" className="gap-1">
+                    Search: "{searchQuery}"
+                  </Badge>
+                )}
+                {selectedCategories.length > 0 && (
+                  <Badge variant="secondary" className="gap-1">
+                    Category: {selectedCategories.join(', ')}
+                  </Badge>
+                )}
+                {searchScope === 'local' && (
+                  <Badge variant="secondary" className="gap-1">
+                    <MapPin className="h-3 w-3" />
+                    Local
+                  </Badge>
+                )}
+              </div>
+            </div>
+          )}
+          
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+            {/* Search Scope Toggle */}
+            <div className="flex rounded-lg bg-muted p-1">
+              <button
+                onClick={() => setSearchScope('local')}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  searchScope === 'local'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <MapPin className="h-4 w-4 inline mr-1" />
+                Local
+              </button>
+              <button
+                onClick={() => setSearchScope('nationwide')}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  searchScope === 'nationwide'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                All of US
+              </button>
+            </div>
 
           {/* View Toggle and Filter */}
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
@@ -1470,8 +1496,8 @@ const Homepage = () => {
                             </div>
                           </div>
                         ))}
-                      </div>
-                    </div>
+            </div>
+          </div>
                   </div>
                 </TabsContent>
                 <TabsContent value="categories" className="px-8 pb-8 pt-8 overflow-y-auto">
@@ -1496,7 +1522,6 @@ const Homepage = () => {
               </Tabs>
             </DialogContent>
           </Dialog>
-          </div>
         </div>
         
         {/* Content based on view mode */}
@@ -2116,6 +2141,7 @@ const Homepage = () => {
           vendorName={currentVendorName}
         />
       </div>
+    </div>
     </div>
   );
 };
