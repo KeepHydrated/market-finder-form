@@ -26,17 +26,32 @@ interface Vendor {
   market_address: string | null;
 }
 
+interface Market {
+  id: number;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  days: string[];
+  hours: string | null;
+  google_rating: number | null;
+  google_rating_count: number | null;
+}
+
 const Test2 = () => {
   const navigate = useNavigate();
   const [recommendedProducts, setRecommendedProducts] = useState<Array<Product & { vendorId: string; vendorName: string }>>([]);
   const [recommendedVendors, setRecommendedVendors] = useState<Vendor[]>([]);
+  const [recommendedMarkets, setRecommendedMarkets] = useState<Market[]>([]);
   const [loading, setLoading] = useState(true);
   const [vendorsLoading, setVendorsLoading] = useState(true);
+  const [marketsLoading, setMarketsLoading] = useState(true);
   const { toggleLike, isLiked } = useLikes();
 
   useEffect(() => {
     fetchRecommendedProducts();
     fetchRecommendedVendors();
+    fetchRecommendedMarkets();
   }, []);
 
   const fetchRecommendedProducts = async () => {
@@ -96,6 +111,25 @@ const Test2 = () => {
       console.error('Error fetching recommended vendors:', error);
     } finally {
       setVendorsLoading(false);
+    }
+  };
+
+  const fetchRecommendedMarkets = async () => {
+    try {
+      const { data: markets, error } = await supabase
+        .from('markets')
+        .select('id, name, address, city, state, days, hours, google_rating, google_rating_count')
+        .limit(20);
+
+      if (error) throw error;
+
+      // Shuffle and take first 6 markets
+      const shuffled = markets?.sort(() => 0.5 - Math.random()) || [];
+      setRecommendedMarkets(shuffled.slice(0, 6) as Market[]);
+    } catch (error) {
+      console.error('Error fetching recommended markets:', error);
+    } finally {
+      setMarketsLoading(false);
     }
   };
 
@@ -405,6 +439,80 @@ const Test2 = () => {
               </div>
             </Card>
           </div>
+        </div>
+
+        {/* Recommended Local Markets Section */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-foreground">Recommended Local Markets</h2>
+            <Button variant="ghost" onClick={() => navigate('/')}>
+              View All
+            </Button>
+          </div>
+
+          {marketsLoading ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Loading markets...</p>
+            </div>
+          ) : recommendedMarkets.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No markets available yet.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recommendedMarkets.map((market) => (
+                <Card
+                  key={market.id}
+                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => navigate('/', { state: { searchTerm: market.name } })}
+                >
+                  {/* Market Image Placeholder */}
+                  <div className="aspect-[4/3] bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900 flex items-center justify-center p-4">
+                    <span className="text-6xl">🏪</span>
+                  </div>
+
+                  {/* Market Info */}
+                  <div className="p-4">
+                    <h3 className="font-semibold text-foreground mb-2 line-clamp-1">
+                      {market.name}
+                    </h3>
+                    
+                    {/* Rating */}
+                    {market.google_rating && (
+                      <div className="flex items-center gap-1 mb-2">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span className="text-sm font-medium">{market.google_rating.toFixed(1)}</span>
+                        {market.google_rating_count && (
+                          <span className="text-sm text-muted-foreground">
+                            ({market.google_rating_count})
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Location */}
+                    <div className="flex items-center gap-1 mb-2">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground line-clamp-1">
+                        {market.city}, {market.state}
+                      </span>
+                    </div>
+
+                    {/* Days Open */}
+                    {market.days && market.days.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {market.days.map((day, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {day}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
