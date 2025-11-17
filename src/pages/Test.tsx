@@ -63,7 +63,7 @@ const SPECIALTY_CATEGORIES = [
 
 const Homepage = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const { toggleLike, isLiked } = useLikes();
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<AcceptedSubmission[]>([]);
@@ -72,7 +72,7 @@ const Homepage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search') || searchParams.get('q') || "");
   const [dayTimeSelections, setDayTimeSelections] = useState<Record<string, {
     startTime: string;
     startPeriod: 'AM' | 'PM';
@@ -1112,9 +1112,13 @@ const Homepage = () => {
           <div className="flex-1">
             <form onSubmit={(e) => {
               e.preventDefault();
+              const params = new URLSearchParams(searchParams);
               if (searchQuery.trim()) {
-                navigate(`/search?search=${encodeURIComponent(searchQuery.trim())}`);
+                params.set('search', searchQuery.trim());
+              } else {
+                params.delete('search');
               }
+              setSearchParams(params);
             }} className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
