@@ -83,12 +83,6 @@ const Homepage = () => {
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [rangeMiles, setRangeMiles] = useState<number[]>([25]);
   const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
-  const [viewMode, setViewMode] = useState<'markets' | 'vendors' | 'products'>('vendors');
-  const [selectedMarket, setSelectedMarket] = useState<{
-    name: string;
-    address: string;
-    vendors: AcceptedSubmission[];
-  } | null>(null);
   
   const [marketDistances, setMarketDistances] = useState<Record<string, string>>({});
   const [isLoadingMarketDistances, setIsLoadingMarketDistances] = useState(false);
@@ -154,11 +148,10 @@ const Homepage = () => {
         selectedCategories.includes(submission.primary_specialty)
       );
       
-      // If this is from the header dropdown, switch to products view and show nationwide results
+      // If this is from the header dropdown, show nationwide results
       if (isNationwideSearch) {
         console.log(`🌍 Showing nationwide results for category: ${selectedCategories.join(', ')}`);
         console.log(`Found ${filtered.length} vendors nationwide in this category`);
-        setViewMode('products'); // Automatically switch to products view for category searches
       }
     }
 
@@ -1152,8 +1145,42 @@ const Homepage = () => {
           </div>
         </div>
         
-        {/* View Toggle and Filter Button */}
-        <div className="flex justify-between items-center mb-6">
+        {/* Featured Vendors */}
+        <div className="flex justify-center mb-6">
+          <h2 className="text-2xl font-bold">Featured Vendors</h2>
+        </div>
+        
+        <div className="flex justify-center">
+          {filteredSubmissions.length === 0 ? (
+            <div className="text-center">
+              <p className="text-muted-foreground">No featured vendors yet.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+              {filteredSubmissions.map((submission) => (
+                 <Card 
+                   key={submission.id} 
+                   className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
+                   onClick={async () => {
+                     const cachedCoords = submission.market_address 
+                       ? await getCoordinatesForAddress(submission.market_address)
+                       : null;
+                     
+                     navigate('/market', { 
+                       state: { 
+                         type: 'vendor', 
+                         selectedVendor: submission,
+                         allVendors: filteredSubmissions,
+                         marketCoordinates: cachedCoords
+                       } 
+                     });
+                   }}
+                >
+                   {/* Product Image */}
+                   <div className="aspect-[4/3] bg-muted relative">
+                     {submission.products && submission.products.length > 0 && submission.products[0].images && submission.products[0].images.length > 0 ? (
+                       <img 
+                         src={submission.products[0].images[0]}
           <div className="flex rounded-lg bg-muted p-1">
             <button
               onClick={() => {
