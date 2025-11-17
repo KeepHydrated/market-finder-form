@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart } from "lucide-react";
+import { Heart, Star, MapPin } from "lucide-react";
 import { useLikes } from "@/hooks/useLikes";
 
 interface Product {
@@ -15,14 +15,28 @@ interface Product {
   category: string;
 }
 
+interface Vendor {
+  id: string;
+  store_name: string;
+  primary_specialty: string;
+  description: string;
+  products: Product[];
+  google_rating: number | null;
+  google_rating_count: number | null;
+  market_address: string | null;
+}
+
 const Test2 = () => {
   const navigate = useNavigate();
   const [recommendedProducts, setRecommendedProducts] = useState<Array<Product & { vendorId: string; vendorName: string }>>([]);
+  const [recommendedVendors, setRecommendedVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [vendorsLoading, setVendorsLoading] = useState(true);
   const { toggleLike, isLiked } = useLikes();
 
   useEffect(() => {
     fetchRecommendedProducts();
+    fetchRecommendedVendors();
   }, []);
 
   const fetchRecommendedProducts = async () => {
@@ -61,6 +75,27 @@ const Test2 = () => {
       console.error('Error fetching recommended products:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRecommendedVendors = async () => {
+    try {
+      const { data: vendors, error } = await supabase
+        .from('submissions')
+        .select('id, store_name, primary_specialty, description, products, google_rating, google_rating_count, market_address')
+        .eq('status', 'accepted')
+        .not('products', 'is', null)
+        .limit(20);
+
+      if (error) throw error;
+
+      // Shuffle and take first 6 vendors
+      const shuffled = vendors?.sort(() => 0.5 - Math.random()) || [];
+      setRecommendedVendors(shuffled.slice(0, 6) as unknown as Vendor[]);
+    } catch (error) {
+      console.error('Error fetching recommended vendors:', error);
+    } finally {
+      setVendorsLoading(false);
     }
   };
 
@@ -162,6 +197,122 @@ const Test2 = () => {
                   </div>
                 </Card>
               ))}
+            </div>
+          )}
+        </div>
+
+        {/* Recommended Local Vendors Section */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-foreground">Recommended Local Vendors</h2>
+            <Button variant="ghost" onClick={() => navigate('/test')}>
+              View All
+            </Button>
+          </div>
+
+          {vendorsLoading ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Loading vendors...</p>
+            </div>
+          ) : recommendedVendors.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No vendors available yet.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recommendedVendors.map((vendor) => {
+                const products = vendor.products as unknown as Product[];
+                const firstProductImage = products?.[0]?.images?.[0];
+                
+                return (
+                  <Card
+                    key={vendor.id}
+                    className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => navigate('/market', { 
+                      state: { 
+                        type: 'vendor', 
+                        selectedVendor: vendor
+                      } 
+                    })}
+                  >
+                    {/* Vendor Image */}
+                    <div className="aspect-[4/3] bg-muted relative">
+                      {firstProductImage ? (
+                        <img
+                          src={firstProductImage}
+                          alt={vendor.store_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <p className="text-muted-foreground">No image</p>
+                        </div>
+                      )}
+                      
+                      {/* Like Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleLike(vendor.id, 'vendor');
+                        }}
+                        className="absolute top-2 right-2 p-2 bg-background/80 backdrop-blur-sm rounded-full hover:bg-background transition-colors"
+                      >
+                        <Heart
+                          className={`h-5 w-5 ${
+                            isLiked(vendor.id, 'vendor')
+                              ? 'fill-red-500 text-red-500'
+                              : 'text-foreground'
+                          }`}
+                        />
+                      </button>
+
+                      {/* Specialty Badge */}
+                      {vendor.primary_specialty && (
+                        <Badge className="absolute bottom-2 left-2 bg-background/80 backdrop-blur-sm">
+                          {vendor.primary_specialty}
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Vendor Info */}
+                    <div className="p-4">
+                      <h3 className="font-semibold text-foreground mb-2 line-clamp-1">
+                        {vendor.store_name}
+                      </h3>
+                      
+                      {/* Rating */}
+                      {vendor.google_rating && (
+                        <div className="flex items-center gap-1 mb-2">
+                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          <span className="text-sm font-medium">{vendor.google_rating.toFixed(1)}</span>
+                          {vendor.google_rating_count && (
+                            <span className="text-sm text-muted-foreground">
+                              ({vendor.google_rating_count})
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Location */}
+                      {vendor.market_address && (
+                        <div className="flex items-center gap-1 mb-2">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground line-clamp-1">
+                            {vendor.market_address}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Description */}
+                      {vendor.description && (
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {vendor.description}
+                        </p>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })}
             </div>
           )}
         </div>
