@@ -1496,8 +1496,8 @@ const Homepage = () => {
                             </div>
                           </div>
                         ))}
-            </div>
-          </div>
+                      </div>
+                    </div>
                   </div>
                 </TabsContent>
                 <TabsContent value="categories" className="px-8 pb-8 pt-8 overflow-y-auto">
@@ -1522,6 +1522,8 @@ const Homepage = () => {
               </Tabs>
             </DialogContent>
           </Dialog>
+          </div>
+          </div>
         </div>
         
         {/* Content based on view mode */}
@@ -2141,7 +2143,6 @@ const Homepage = () => {
           vendorName={currentVendorName}
         />
       </div>
-    </div>
     </div>
   );
 };
