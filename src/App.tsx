@@ -9,6 +9,7 @@ import { ShoppingCartProvider } from "@/contexts/ShoppingCartContext";
 import { ShoppingCart } from "@/components/shopping/ShoppingCart";
 import ScrollToTop from "@/components/ScrollToTop";
 import Homepage from "./pages/Homepage";
+import Test from "./pages/Test";
 import CategoryProducts from "./pages/CategoryProducts";
 import VendorDuplicate from "./pages/VendorDuplicate";
 import Likes from "./pages/Likes";
@@ -43,6 +44,7 @@ const App = () => (
             <main className="flex-1">
               <Routes>
                 <Route path="/" element={<Homepage />} />
+                <Route path="/test" element={<Test />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/search" element={<CategoryProducts />} />
                 <Route path="/market" element={<VendorDuplicate />} />
