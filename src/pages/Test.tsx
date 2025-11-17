@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Heart, Star, Filter, RotateCcw, MapPin, Search, ChevronDown, Store, Package, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, Star, Filter, RotateCcw, MapPin, Search, ChevronDown, Store, Package, ChevronLeft, ChevronRight, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -1162,13 +1162,36 @@ const Homepage = () => {
               <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
                 <span>Showing {filteredSubmissions.length} result{filteredSubmissions.length !== 1 ? 's' : ''}</span>
                 {searchQuery.trim() && (
-                  <Badge variant="secondary" className="gap-1">
+                  <Badge variant="secondary" className="gap-1 pr-1">
                     Search: "{searchQuery}"
+                    <button
+                      onClick={() => {
+                        setSearchQuery('');
+                        const params = new URLSearchParams(location.search);
+                        params.delete('search');
+                        params.delete('q');
+                        navigate(`/test${params.toString() ? `?${params.toString()}` : ''}`, { replace: true });
+                      }}
+                      className="ml-1 hover:bg-muted-foreground/20 rounded-full p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
                   </Badge>
                 )}
                 {selectedCategories.length > 0 && (
-                  <Badge variant="secondary" className="gap-1">
+                  <Badge variant="secondary" className="gap-1 pr-1">
                     Category: {selectedCategories.join(', ')}
+                    <button
+                      onClick={() => {
+                        setSelectedCategories([]);
+                        const params = new URLSearchParams(location.search);
+                        params.delete('category');
+                        navigate(`/test${params.toString() ? `?${params.toString()}` : ''}`, { replace: true });
+                      }}
+                      className="ml-1 hover:bg-muted-foreground/20 rounded-full p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
                   </Badge>
                 )}
                 {searchScope === 'local' && (
@@ -1177,6 +1200,19 @@ const Homepage = () => {
                     Local
                   </Badge>
                 )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCategories([]);
+                    setSearchScope('nationwide');
+                    navigate('/test', { replace: true });
+                  }}
+                  className="h-6 text-xs"
+                >
+                  Clear all
+                </Button>
               </div>
             </div>
           )}
