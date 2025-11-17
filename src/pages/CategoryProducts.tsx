@@ -65,6 +65,7 @@ const CategoryProducts = () => {
   const [locationScope, setLocationScope] = useState<'local' | 'nationwide'>('nationwide');
   const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [viewMode, setViewMode] = useState<'vendors' | 'markets' | 'products'>('products');
   
   const category = searchParams.get('category');
   const searchTerm = searchParams.get('search') || searchParams.get('q');
@@ -192,8 +193,27 @@ const CategoryProducts = () => {
     fetchVendors();
   }, [category, searchTerm, toast]);
 
-  // Get all products from all vendors
-  const allProducts = vendors.flatMap(vendor => {
+  // Get all products from all vendors with location filtering
+  const locationFilteredVendors = vendors.filter(vendor => {
+    if (locationScope === 'nationwide' || !userCoordinates) {
+      return true;
+    }
+    
+    // Filter by distance for local scope (within 50 miles)
+    if (vendor.latitude && vendor.longitude) {
+      const distance = calculateDistance(
+        userCoordinates.lat,
+        userCoordinates.lng,
+        vendor.latitude,
+        vendor.longitude
+      );
+      return distance <= 50;
+    }
+    
+    return false;
+  });
+
+  const allProducts = locationFilteredVendors.flatMap(vendor => {
     let products: Product[] = [];
     
     // Handle products data (could be JSON string or array)
@@ -217,6 +237,46 @@ const CategoryProducts = () => {
         vendorCreatedAt: vendor.created_at
       }));
   });
+
+  // Extract unique markets from locationFilteredVendors
+  const uniqueMarkets = locationFilteredVendors.reduce((acc, vendor) => {
+    const markets = Array.isArray(vendor.selected_markets) 
+      ? vendor.selected_markets 
+      : typeof vendor.selected_markets === 'string'
+      ? JSON.parse(vendor.selected_markets)
+      : vendor.selected_market 
+      ? [{ name: vendor.selected_market, address: vendor.market_address }]
+      : [];
+    
+    markets.forEach((market: any) => {
+      const marketName = typeof market === 'string' ? market : market.name;
+      if (marketName && !acc.find((m: any) => m.name === marketName)) {
+        acc.push({
+          name: marketName,
+          address: typeof market === 'string' ? vendor.market_address : market.address,
+          vendorCount: 1
+        });
+      } else if (marketName) {
+        const existing = acc.find((m: any) => m.name === marketName);
+        if (existing) existing.vendorCount++;
+      }
+    });
+    
+    return acc;
+  }, [] as any[]);
+
+  // Get current result count based on view mode
+  const getResultCount = () => {
+    switch (viewMode) {
+      case 'vendors':
+        return locationFilteredVendors.length;
+      case 'markets':
+        return uniqueMarkets.length;
+      case 'products':
+      default:
+        return searchFilteredProducts.length;
+    }
+  };
 
   // Filter by search term if provided
   const searchFilteredProducts = searchTerm
@@ -414,14 +474,14 @@ const CategoryProducts = () => {
                 <span>{category || 'All'}</span>
                 <span className="text-sm md:text-base font-normal text-muted-foreground">"{searchTerm}"</span>
                 <span className="text-sm md:text-base font-normal text-muted-foreground">
-                  (<span className="md:hidden">{sortedProducts.length}</span><span className="hidden md:inline">{sortedProducts.length} results</span>)
+                  (<span className="md:hidden">{getResultCount()}</span><span className="hidden md:inline">{getResultCount()} results</span>)
                 </span>
               </h1>
             ) : (
               <h1 className="flex flex-wrap items-center text-lg md:text-xl font-bold capitalize mr-auto gap-2">
                 <span>{category || 'All'}</span>
                 <span className="text-sm md:text-base font-normal text-muted-foreground">
-                  (<span className="md:hidden">{sortedProducts.length}</span><span className="hidden md:inline">{sortedProducts.length} results</span>)
+                  (<span className="md:hidden">{getResultCount()}</span><span className="hidden md:inline">{getResultCount()} results</span>)
                 </span>
               </h1>
             )}
@@ -449,36 +509,73 @@ const CategoryProducts = () => {
             </DropdownMenu>
           </div>
 
-          {/* Location Scope Toggle */}
-          <div className="flex rounded-lg bg-muted p-1 w-fit">
-            <button
-              onClick={() => setLocationScope('local')}
-              disabled={isLoadingLocation}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
-                locationScope === 'local'
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <MapPin className="h-4 w-4" />
-              <span>Local</span>
-            </button>
-            <button
-              onClick={() => setLocationScope('nationwide')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
-                locationScope === 'nationwide'
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Globe className="h-4 w-4" />
-              <span>Nationwide</span>
-            </button>
+          {/* View Mode & Location Scope Toggles */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* View Mode Toggle */}
+            <div className="flex rounded-lg bg-muted p-1 w-fit">
+              <button
+                onClick={() => setViewMode('vendors')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  viewMode === 'vendors'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Vendors
+              </button>
+              <button
+                onClick={() => setViewMode('markets')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  viewMode === 'markets'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Markets
+              </button>
+              <button
+                onClick={() => setViewMode('products')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  viewMode === 'products'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Products
+              </button>
+            </div>
+
+            {/* Location Scope Toggle */}
+            <div className="flex rounded-lg bg-muted p-1 w-fit">
+              <button
+                onClick={() => setLocationScope('local')}
+                disabled={isLoadingLocation}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
+                  locationScope === 'local'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <MapPin className="h-4 w-4" />
+                <span>Local</span>
+              </button>
+              <button
+                onClick={() => setLocationScope('nationwide')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
+                  locationScope === 'nationwide'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Globe className="h-4 w-4" />
+                <span>Nationwide</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Products Grid */}
-        {sortedProducts.length === 0 ? (
+        {/* Content Grid - conditional based on view mode */}
+        {viewMode === 'products' && sortedProducts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-lg text-muted-foreground mb-4">
               {searchTerm 
@@ -490,9 +587,27 @@ const CategoryProducts = () => {
               Browse All Products
             </Button>
           </div>
+        ) : viewMode === 'vendors' && locationFilteredVendors.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-lg text-muted-foreground mb-4">
+              No vendors found{category ? ` in ${category}` : ''}.
+            </p>
+            <Button onClick={() => navigate('/')}>
+              Browse All Vendors
+            </Button>
+          </div>
+        ) : viewMode === 'markets' && uniqueMarkets.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-lg text-muted-foreground mb-4">
+              No markets found{category ? ` with ${category} vendors` : ''}.
+            </p>
+            <Button onClick={() => navigate('/')}>
+              Browse All Markets
+            </Button>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {sortedProducts.map((product) => (
+            {viewMode === 'products' && sortedProducts.map((product) => (
               <Card key={`${product.vendorId}-${product.id}`} className="group hover:shadow-lg transition-all duration-300 overflow-hidden bg-card border-0 shadow-sm rounded-lg">
                 <CardContent className="p-0">
                   {/* Product Image with Heart Overlay */}
@@ -559,6 +674,52 @@ const CategoryProducts = () => {
                       </button>
                     </div>
                   </CardContent>
+                </CardContent>
+              </Card>
+            ))}
+
+            {viewMode === 'vendors' && locationFilteredVendors.map((vendor) => (
+              <Card key={vendor.id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden bg-card border-0 shadow-sm rounded-lg cursor-pointer"
+                onClick={() => navigate(`/market?id=${vendor.id}`)}>
+                <CardContent className="p-4">
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-lg text-foreground">{vendor.store_name}</h3>
+                    {vendor.primary_specialty && (
+                      <Badge variant="secondary" className="text-xs">{vendor.primary_specialty}</Badge>
+                    )}
+                    {vendor.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">{vendor.description}</p>
+                    )}
+                    {vendor.google_rating && vendor.google_rating > 0 && (
+                      <div className="flex items-center gap-1">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span className="text-sm font-medium">{vendor.google_rating.toFixed(1)}</span>
+                        {vendor.google_rating_count && (
+                          <span className="text-xs text-muted-foreground">({vendor.google_rating_count})</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            {viewMode === 'markets' && uniqueMarkets.map((market, index) => (
+              <Card key={index} className="group hover:shadow-lg transition-all duration-300 overflow-hidden bg-card border-0 shadow-sm rounded-lg cursor-pointer"
+                onClick={() => navigate(`/market/${encodeURIComponent(market.name)}`)}>
+                <CardContent className="p-4">
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-lg text-foreground">{market.name}</h3>
+                    {market.address && (
+                      <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                        <span className="line-clamp-2">{market.address}</span>
+                      </div>
+                    )}
+                    <p className="text-sm text-muted-foreground">
+                      {market.vendorCount} vendor{market.vendorCount !== 1 ? 's' : ''}
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             ))}
