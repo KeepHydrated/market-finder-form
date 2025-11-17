@@ -316,6 +316,96 @@ const Test2 = () => {
             </div>
           )}
         </div>
+
+        {/* Shop by Category Section */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-foreground">Shop by Category</h2>
+            <Button variant="ghost" onClick={() => navigate('/test')}>
+              View All
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {/* Fresh Flowers & Plants */}
+            <Card
+              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+              onClick={() => navigate('/test?category=Fresh Flowers & Plants')}
+            >
+              <div className="aspect-square bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-900 dark:to-purple-900 flex items-center justify-center p-4">
+                <span className="text-6xl">🌸</span>
+              </div>
+              <div className="p-3 text-center">
+                <h3 className="font-semibold text-sm text-foreground">Fresh Flowers & Plants</h3>
+              </div>
+            </Card>
+
+            {/* Bakery */}
+            <Card
+              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+              onClick={() => navigate('/test?category=Bakery')}
+            >
+              <div className="aspect-square bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900 dark:to-orange-900 flex items-center justify-center p-4">
+                <span className="text-6xl">🥖</span>
+              </div>
+              <div className="p-3 text-center">
+                <h3 className="font-semibold text-sm text-foreground">Bakery</h3>
+              </div>
+            </Card>
+
+            {/* Dairy */}
+            <Card
+              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+              onClick={() => navigate('/test?category=Dairy')}
+            >
+              <div className="aspect-square bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900 flex items-center justify-center p-4">
+                <span className="text-6xl">🧀</span>
+              </div>
+              <div className="p-3 text-center">
+                <h3 className="font-semibold text-sm text-foreground">Dairy</h3>
+              </div>
+            </Card>
+
+            {/* Rancher */}
+            <Card
+              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+              onClick={() => navigate('/test?category=Rancher')}
+            >
+              <div className="aspect-square bg-gradient-to-br from-red-100 to-rose-100 dark:from-red-900 dark:to-rose-900 flex items-center justify-center p-4">
+                <span className="text-6xl">🥩</span>
+              </div>
+              <div className="p-3 text-center">
+                <h3 className="font-semibold text-sm text-foreground">Rancher</h3>
+              </div>
+            </Card>
+
+            {/* Beverages */}
+            <Card
+              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+              onClick={() => navigate('/test?category=Beverages')}
+            >
+              <div className="aspect-square bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900 flex items-center justify-center p-4">
+                <span className="text-6xl">🍹</span>
+              </div>
+              <div className="p-3 text-center">
+                <h3 className="font-semibold text-sm text-foreground">Beverages</h3>
+              </div>
+            </Card>
+
+            {/* Farmers */}
+            <Card
+              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+              onClick={() => navigate('/test?category=Farmers')}
+            >
+              <div className="aspect-square bg-gradient-to-br from-lime-100 to-green-100 dark:from-lime-900 dark:to-green-900 flex items-center justify-center p-4">
+                <span className="text-6xl">🥕</span>
+              </div>
+              <div className="p-3 text-center">
+                <h3 className="font-semibold text-sm text-foreground">Farmers</h3>
+              </div>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
