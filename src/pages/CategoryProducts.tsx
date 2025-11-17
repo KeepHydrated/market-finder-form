@@ -4,12 +4,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Heart, Star, ArrowLeft, ShoppingCart, ChevronDown, Check, Search } from "lucide-react";
+import { Heart, Star, ArrowLeft, ShoppingCart, ChevronDown, Check, Search, MapPin, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLikes } from "@/hooks/useLikes";
 import { useShoppingCart } from "@/contexts/ShoppingCartContext";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
+import { getCoordinatesForAddress, calculateDistance } from "@/lib/geocoding";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,6 +62,9 @@ const CategoryProducts = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product & { vendorName: string; vendorId: string } | null>(null);
   const [sortBy, setSortBy] = useState<'relevancy' | 'lowest-price' | 'highest-price' | 'top-rated' | 'most-recent'>('relevancy');
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [locationScope, setLocationScope] = useState<'local' | 'nationwide'>('nationwide');
+  const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   
   const category = searchParams.get('category');
   const searchTerm = searchParams.get('search') || searchParams.get('q');
@@ -69,6 +73,59 @@ const CategoryProducts = () => {
   useEffect(() => {
     setSearchQuery(searchTerm || "");
   }, [searchTerm]);
+
+  // Get user location when switching to local mode
+  useEffect(() => {
+    if (locationScope === 'local' && !userCoordinates) {
+      getUserLocation();
+    }
+  }, [locationScope]);
+
+  const getUserLocation = async () => {
+    setIsLoadingLocation(true);
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserCoordinates({ lat: latitude, lng: longitude });
+          setIsLoadingLocation(false);
+        },
+        async (error) => {
+          console.warn('GPS location failed, using IP location:', error);
+          try {
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+            setUserCoordinates({ lat: data.latitude, lng: data.longitude });
+          } catch (err) {
+            console.error('Failed to get location:', err);
+            toast({
+              title: "Location unavailable",
+              description: "Using nationwide results instead.",
+              variant: "destructive"
+            });
+            setLocationScope('nationwide');
+          }
+          setIsLoadingLocation(false);
+        }
+      );
+    } else {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        setUserCoordinates({ lat: data.latitude, lng: data.longitude });
+      } catch (err) {
+        console.error('Failed to get location:', err);
+        toast({
+          title: "Location unavailable",
+          description: "Using nationwide results instead.",
+          variant: "destructive"
+        });
+        setLocationScope('nationwide');
+      }
+      setIsLoadingLocation(false);
+    }
+  };
 
   // Scroll to top when search results are loaded
   useEffect(() => {
@@ -349,46 +406,75 @@ const CategoryProducts = () => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 gap-2">
-          {/* Category/Search Title */}
-          {searchTerm ? (
-            <h1 className="flex flex-wrap items-center text-lg md:text-xl font-bold mr-auto gap-2">
-              <span>{category || 'All'}</span>
-              <span className="text-sm md:text-base font-normal text-muted-foreground">"{searchTerm}"</span>
-              <span className="text-sm md:text-base font-normal text-muted-foreground">
-                (<span className="md:hidden">{sortedProducts.length}</span><span className="hidden md:inline">{sortedProducts.length} results</span>)
-              </span>
-            </h1>
-          ) : (
-            <h1 className="flex flex-wrap items-center text-lg md:text-xl font-bold capitalize mr-auto gap-2">
-              <span>{category || 'All'}</span>
-              <span className="text-sm md:text-base font-normal text-muted-foreground">
-                (<span className="md:hidden">{sortedProducts.length}</span><span className="hidden md:inline">{sortedProducts.length} results</span>)
-              </span>
-            </h1>
-          )}
-          
-          {/* Sort Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="md:min-w-[180px] justify-between md:justify-between px-2 md:px-4 py-2">
-                <span className="hidden md:inline">Sort by: {sortOptions.find(opt => opt.value === sortBy)?.label}</span>
-                <ChevronDown className="h-4 w-4 md:ml-2" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[180px] bg-background border shadow-lg z-50">
-              {sortOptions.map((option) => (
-                <DropdownMenuItem
-                  key={option.value}
-                  onClick={() => setSortBy(option.value)}
-                  className="cursor-pointer flex items-center justify-between"
-                >
-                  {option.label}
-                  {sortBy === option.value && <Check className="h-4 w-4" />}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="flex flex-col gap-4 mb-8">
+          <div className="flex items-center justify-between gap-2">
+            {/* Category/Search Title */}
+            {searchTerm ? (
+              <h1 className="flex flex-wrap items-center text-lg md:text-xl font-bold mr-auto gap-2">
+                <span>{category || 'All'}</span>
+                <span className="text-sm md:text-base font-normal text-muted-foreground">"{searchTerm}"</span>
+                <span className="text-sm md:text-base font-normal text-muted-foreground">
+                  (<span className="md:hidden">{sortedProducts.length}</span><span className="hidden md:inline">{sortedProducts.length} results</span>)
+                </span>
+              </h1>
+            ) : (
+              <h1 className="flex flex-wrap items-center text-lg md:text-xl font-bold capitalize mr-auto gap-2">
+                <span>{category || 'All'}</span>
+                <span className="text-sm md:text-base font-normal text-muted-foreground">
+                  (<span className="md:hidden">{sortedProducts.length}</span><span className="hidden md:inline">{sortedProducts.length} results</span>)
+                </span>
+              </h1>
+            )}
+            
+            {/* Sort Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="md:min-w-[180px] justify-between md:justify-between px-2 md:px-4 py-2">
+                  <span className="hidden md:inline">Sort by: {sortOptions.find(opt => opt.value === sortBy)?.label}</span>
+                  <ChevronDown className="h-4 w-4 md:ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[180px] bg-background border shadow-lg z-50">
+                {sortOptions.map((option) => (
+                  <DropdownMenuItem
+                    key={option.value}
+                    onClick={() => setSortBy(option.value)}
+                    className="cursor-pointer flex items-center justify-between"
+                  >
+                    {option.label}
+                    {sortBy === option.value && <Check className="h-4 w-4" />}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Location Scope Toggle */}
+          <div className="flex rounded-lg bg-muted p-1 w-fit">
+            <button
+              onClick={() => setLocationScope('local')}
+              disabled={isLoadingLocation}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
+                locationScope === 'local'
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <MapPin className="h-4 w-4" />
+              <span>Local</span>
+            </button>
+            <button
+              onClick={() => setLocationScope('nationwide')}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
+                locationScope === 'nationwide'
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Globe className="h-4 w-4" />
+              <span>Nationwide</span>
+            </button>
+          </div>
         </div>
 
         {/* Products Grid */}
