@@ -4,18 +4,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Heart, Star, ArrowLeft, ShoppingCart, ChevronDown, Check, Search, MapPin, Globe, Filter, X, Store, Package } from "lucide-react";
+import { Heart, Star, ArrowLeft, ShoppingCart, ChevronDown, Check, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLikes } from "@/hooks/useLikes";
 import { useShoppingCart } from "@/contexts/ShoppingCartContext";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
-import { getCoordinatesForAddress, calculateDistance } from "@/lib/geocoding";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -67,90 +61,14 @@ const CategoryProducts = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product & { vendorName: string; vendorId: string } | null>(null);
   const [sortBy, setSortBy] = useState<'relevancy' | 'lowest-price' | 'highest-price' | 'top-rated' | 'most-recent'>('relevancy');
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [locationScope, setLocationScope] = useState<'local' | 'nationwide'>('nationwide');
-  const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
-  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-  const [viewMode, setViewMode] = useState<'vendors' | 'markets' | 'products'>('products');
-  const [priceRange, setPriceRange] = useState<number[]>([0, 1000]);
-  const [minRating, setMinRating] = useState<number>(0);
-  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   
   const category = searchParams.get('category');
   const searchTerm = searchParams.get('search') || searchParams.get('q');
-
-  const SPECIALTY_CATEGORIES = [
-    "Fresh Flowers & Plants",
-    "Bakery", 
-    "Dairy",
-    "Rancher",
-    "Beverages",
-    "Seasonings & Spices",
-    "Pets",
-    "Home Goods",
-    "Farmers",
-    "Ready to Eat",
-    "Packaged Goods & Snacks",
-    "Artisan"
-  ];
 
   // Initialize search query from URL
   useEffect(() => {
     setSearchQuery(searchTerm || "");
   }, [searchTerm]);
-
-  // Get user location when switching to local mode
-  useEffect(() => {
-    if (locationScope === 'local' && !userCoordinates) {
-      getUserLocation();
-    }
-  }, [locationScope]);
-
-  const getUserLocation = async () => {
-    setIsLoadingLocation(true);
-    
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          setUserCoordinates({ lat: latitude, lng: longitude });
-          setIsLoadingLocation(false);
-        },
-        async (error) => {
-          console.warn('GPS location failed, using IP location:', error);
-          try {
-            const response = await fetch('https://ipapi.co/json/');
-            const data = await response.json();
-            setUserCoordinates({ lat: data.latitude, lng: data.longitude });
-          } catch (err) {
-            console.error('Failed to get location:', err);
-            toast({
-              title: "Location unavailable",
-              description: "Using nationwide results instead.",
-              variant: "destructive"
-            });
-            setLocationScope('nationwide');
-          }
-          setIsLoadingLocation(false);
-        }
-      );
-    } else {
-      try {
-        const response = await fetch('https://ipapi.co/json/');
-        const data = await response.json();
-        setUserCoordinates({ lat: data.latitude, lng: data.longitude });
-      } catch (err) {
-        console.error('Failed to get location:', err);
-        toast({
-          title: "Location unavailable",
-          description: "Using nationwide results instead.",
-          variant: "destructive"
-        });
-        setLocationScope('nationwide');
-      }
-      setIsLoadingLocation(false);
-    }
-  };
 
   // Scroll to top when search results are loaded
   useEffect(() => {
@@ -217,27 +135,8 @@ const CategoryProducts = () => {
     fetchVendors();
   }, [category, searchTerm, toast]);
 
-  // Get all products from all vendors with location filtering
-  const locationFilteredVendors = vendors.filter(vendor => {
-    if (locationScope === 'nationwide' || !userCoordinates) {
-      return true;
-    }
-    
-    // Filter by distance for local scope (within 50 miles)
-    if (vendor.latitude && vendor.longitude) {
-      const distance = calculateDistance(
-        userCoordinates.lat,
-        userCoordinates.lng,
-        vendor.latitude,
-        vendor.longitude
-      );
-      return distance <= 50;
-    }
-    
-    return false;
-  });
-
-  const allProducts = locationFilteredVendors.flatMap(vendor => {
+  // Get all products from all vendors
+  const allProducts = vendors.flatMap(vendor => {
     let products: Product[] = [];
     
     // Handle products data (could be JSON string or array)
@@ -258,52 +157,11 @@ const CategoryProducts = () => {
         vendorName: vendor.store_name,
         vendorId: vendor.id,
         vendorRating: vendor.google_rating || 0,
-        vendorCreatedAt: vendor.created_at,
-        vendorSpecialty: vendor.primary_specialty
+        vendorCreatedAt: vendor.created_at
       }));
   });
 
-  // Extract unique markets from locationFilteredVendors
-  const uniqueMarkets = locationFilteredVendors.reduce((acc, vendor) => {
-    const markets = Array.isArray(vendor.selected_markets) 
-      ? vendor.selected_markets 
-      : typeof vendor.selected_markets === 'string'
-      ? JSON.parse(vendor.selected_markets)
-      : vendor.selected_market 
-      ? [{ name: vendor.selected_market, address: vendor.market_address }]
-      : [];
-    
-    markets.forEach((market: any) => {
-      const marketName = typeof market === 'string' ? market : market.name;
-      if (marketName && !acc.find((m: any) => m.name === marketName)) {
-        acc.push({
-          name: marketName,
-          address: typeof market === 'string' ? vendor.market_address : market.address,
-          vendorCount: 1
-        });
-      } else if (marketName) {
-        const existing = acc.find((m: any) => m.name === marketName);
-        if (existing) existing.vendorCount++;
-      }
-    });
-    
-    return acc;
-  }, [] as any[]);
-
-  // Get current result count based on view mode
-  const getResultCount = () => {
-    switch (viewMode) {
-      case 'vendors':
-        return locationFilteredVendors.length;
-      case 'markets':
-        return uniqueMarkets.length;
-      case 'products':
-      default:
-        return filteredProducts.length;
-    }
-  };
-
-  // Filter by search term and additional filters
+  // Filter by search term if provided
   const searchFilteredProducts = searchTerm
     ? allProducts.filter(product => {
         const searchLower = searchTerm.toLowerCase();
@@ -315,28 +173,8 @@ const CategoryProducts = () => {
       })
     : allProducts;
 
-  // Apply additional filters
-  const filteredProducts = searchFilteredProducts.filter(product => {
-    // Price filter
-    if (product.price < priceRange[0] || product.price > priceRange[1]) {
-      return false;
-    }
-    
-    // Rating filter
-    if (product.vendorRating < minRating) {
-      return false;
-    }
-    
-    // Specialty filter
-    if (selectedSpecialties.length > 0 && !selectedSpecialties.includes(product.vendorSpecialty)) {
-      return false;
-    }
-    
-    return true;
-  });
-
   // Sort products based on selected option
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
+  const sortedProducts = [...searchFilteredProducts].sort((a, b) => {
     switch (sortBy) {
       case 'lowest-price':
         return a.price - b.price;
@@ -510,204 +348,51 @@ const CategoryProducts = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Header with View Mode Tabs */}
-        <div className="flex flex-col gap-4 mb-8">
-          {/* View Mode Toggle Buttons */}
-          <div className="flex justify-between items-center">
-            <div className="flex rounded-lg bg-muted p-1">
-              <button
-                onClick={() => setViewMode('vendors')}
-                className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                  viewMode === 'vendors'
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Store className="h-5 w-5 md:hidden" />
-                <span className="hidden md:inline">Vendors</span>
-              </button>
-              <button
-                onClick={() => setViewMode('markets')}
-                className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                  viewMode === 'markets'
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <MapPin className="h-5 w-5 md:hidden" />
-                <span className="hidden md:inline">Markets</span>
-              </button>
-              <button
-                onClick={() => setViewMode('products')}
-                className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                  viewMode === 'products'
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Package className="h-5 w-5 md:hidden" />
-                <span className="hidden md:inline">Products</span>
-              </button>
-            </div>
-            
-            {/* Filter and Sort Controls */}
-            <div className="flex items-center gap-2">
-              {/* Filter Button */}
-              <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Filter className="h-4 w-4" />
-                    <span className="hidden md:inline">Filter search results</span>
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-                  <SheetHeader>
-                    <SheetTitle>Filter Results</SheetTitle>
-                  </SheetHeader>
-                  
-                  <div className="space-y-6 mt-6">
-                    {/* Price Range Filter */}
-                    <div className="space-y-3">
-                      <Label className="text-base font-semibold">Price Range</Label>
-                      <div className="space-y-2">
-                        <Slider
-                          value={priceRange}
-                          onValueChange={setPriceRange}
-                          max={1000}
-                          step={10}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between text-sm text-muted-foreground">
-                          <span>${priceRange[0]}</span>
-                          <span>${priceRange[1]}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Minimum Rating Filter */}
-                    <div className="space-y-3">
-                      <Label className="text-base font-semibold">Minimum Rating</Label>
-                      <div className="flex gap-2">
-                        {[0, 1, 2, 3, 4, 5].map((rating) => (
-                          <button
-                            key={rating}
-                            onClick={() => setMinRating(rating)}
-                            className={`flex items-center gap-1 px-3 py-2 rounded-md border transition-colors ${
-                              minRating === rating
-                                ? 'bg-primary text-primary-foreground border-primary'
-                                : 'bg-background hover:bg-muted border-border'
-                            }`}
-                          >
-                            <Star className="h-3 w-3" />
-                            <span className="text-sm">{rating}+</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Specialty Categories Filter */}
-                    <div className="space-y-3">
-                      <Label className="text-base font-semibold">Categories</Label>
-                      <div className="space-y-2">
-                        {SPECIALTY_CATEGORIES.map((specialty) => (
-                          <div key={specialty} className="flex items-center space-x-2">
-                            <Checkbox
-                              id={specialty}
-                              checked={selectedSpecialties.includes(specialty)}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setSelectedSpecialties([...selectedSpecialties, specialty]);
-                                } else {
-                                  setSelectedSpecialties(selectedSpecialties.filter(s => s !== specialty));
-                                }
-                              }}
-                            />
-                            <label
-                              htmlFor={specialty}
-                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                            >
-                              {specialty}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Clear Filters Button */}
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => {
-                        setPriceRange([0, 1000]);
-                        setMinRating(0);
-                        setSelectedSpecialties([]);
-                      }}
-                    >
-                      Clear All Filters
-                    </Button>
-                  </div>
-                </SheetContent>
-              </Sheet>
-
-              {/* Sort Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="md:min-w-[180px] justify-between md:justify-between px-2 md:px-4 py-2">
-                    <span className="hidden md:inline">Sort by: {sortOptions.find(opt => opt.value === sortBy)?.label}</span>
-                    <ChevronDown className="h-4 w-4 md:ml-2" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-[180px] bg-background border shadow-lg z-50">
-                  {sortOptions.map((option) => (
-                    <DropdownMenuItem
-                      key={option.value}
-                      onClick={() => setSortBy(option.value)}
-                      className="cursor-pointer flex items-center justify-between"
-                    >
-                      {option.label}
-                      {sortBy === option.value && <Check className="h-4 w-4" />}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-
-          {/* Location Scope Toggle */}
-          <div>
-            <div className="flex rounded-lg bg-muted p-1 w-fit">
-              <button
-                onClick={() => setLocationScope('local')}
-                disabled={isLoadingLocation}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
-                  locationScope === 'local'
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <MapPin className="h-4 w-4" />
-                <span>Local</span>
-              </button>
-              <button
-                onClick={() => setLocationScope('nationwide')}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
-                  locationScope === 'nationwide'
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Globe className="h-4 w-4" />
-                <span>Nationwide</span>
-              </button>
-            </div>
-          </div>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8 gap-2">
+          {/* Category/Search Title */}
+          {searchTerm ? (
+            <h1 className="flex flex-wrap items-center text-lg md:text-xl font-bold mr-auto gap-2">
+              <span>{category || 'All'}</span>
+              <span className="text-sm md:text-base font-normal text-muted-foreground">"{searchTerm}"</span>
+              <span className="text-sm md:text-base font-normal text-muted-foreground">
+                (<span className="md:hidden">{sortedProducts.length}</span><span className="hidden md:inline">{sortedProducts.length} results</span>)
+              </span>
+            </h1>
+          ) : (
+            <h1 className="flex flex-wrap items-center text-lg md:text-xl font-bold capitalize mr-auto gap-2">
+              <span>{category || 'All'}</span>
+              <span className="text-sm md:text-base font-normal text-muted-foreground">
+                (<span className="md:hidden">{sortedProducts.length}</span><span className="hidden md:inline">{sortedProducts.length} results</span>)
+              </span>
+            </h1>
+          )}
+          
+          {/* Sort Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="md:min-w-[180px] justify-between md:justify-between px-2 md:px-4 py-2">
+                <span className="hidden md:inline">Sort by: {sortOptions.find(opt => opt.value === sortBy)?.label}</span>
+                <ChevronDown className="h-4 w-4 md:ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[180px] bg-background border shadow-lg z-50">
+              {sortOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => setSortBy(option.value)}
+                  className="cursor-pointer flex items-center justify-between"
+                >
+                  {option.label}
+                  {sortBy === option.value && <Check className="h-4 w-4" />}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
-        {/* Content Grid - conditional based on view mode */}
-        {viewMode === 'products' && sortedProducts.length === 0 ? (
+        {/* Products Grid */}
+        {sortedProducts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-lg text-muted-foreground mb-4">
               {searchTerm 
@@ -719,27 +404,9 @@ const CategoryProducts = () => {
               Browse All Products
             </Button>
           </div>
-        ) : viewMode === 'vendors' && locationFilteredVendors.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-lg text-muted-foreground mb-4">
-              No vendors found{category ? ` in ${category}` : ''}.
-            </p>
-            <Button onClick={() => navigate('/')}>
-              Browse All Vendors
-            </Button>
-          </div>
-        ) : viewMode === 'markets' && uniqueMarkets.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-lg text-muted-foreground mb-4">
-              No markets found{category ? ` with ${category} vendors` : ''}.
-            </p>
-            <Button onClick={() => navigate('/')}>
-              Browse All Markets
-            </Button>
-          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {viewMode === 'products' && sortedProducts.map((product) => (
+            {sortedProducts.map((product) => (
               <Card key={`${product.vendorId}-${product.id}`} className="group hover:shadow-lg transition-all duration-300 overflow-hidden bg-card border-0 shadow-sm rounded-lg">
                 <CardContent className="p-0">
                   {/* Product Image with Heart Overlay */}
@@ -806,52 +473,6 @@ const CategoryProducts = () => {
                       </button>
                     </div>
                   </CardContent>
-                </CardContent>
-              </Card>
-            ))}
-
-            {viewMode === 'vendors' && locationFilteredVendors.map((vendor) => (
-              <Card key={vendor.id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden bg-card border-0 shadow-sm rounded-lg cursor-pointer"
-                onClick={() => navigate(`/market?id=${vendor.id}`)}>
-                <CardContent className="p-4">
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-lg text-foreground">{vendor.store_name}</h3>
-                    {vendor.primary_specialty && (
-                      <Badge variant="secondary" className="text-xs">{vendor.primary_specialty}</Badge>
-                    )}
-                    {vendor.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">{vendor.description}</p>
-                    )}
-                    {vendor.google_rating && vendor.google_rating > 0 && (
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm font-medium">{vendor.google_rating.toFixed(1)}</span>
-                        {vendor.google_rating_count && (
-                          <span className="text-xs text-muted-foreground">({vendor.google_rating_count})</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-
-            {viewMode === 'markets' && uniqueMarkets.map((market, index) => (
-              <Card key={index} className="group hover:shadow-lg transition-all duration-300 overflow-hidden bg-card border-0 shadow-sm rounded-lg cursor-pointer"
-                onClick={() => navigate(`/market/${encodeURIComponent(market.name)}`)}>
-                <CardContent className="p-4">
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-lg text-foreground">{market.name}</h3>
-                    {market.address && (
-                      <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                        <span className="line-clamp-2">{market.address}</span>
-                      </div>
-                    )}
-                    <p className="text-sm text-muted-foreground">
-                      {market.vendorCount} vendor{market.vendorCount !== 1 ? 's' : ''}
-                    </p>
-                  </div>
                 </CardContent>
               </Card>
             ))}

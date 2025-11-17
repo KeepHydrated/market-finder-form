@@ -1129,27 +1129,6 @@ const Homepage = () => {
           </div>
         </div>
       
-      {/* Market Submission Banner */}
-      <div className="w-full bg-gradient-to-r from-primary/10 via-primary/5 to-background border-y border-border">
-        <div className="container mx-auto px-4 py-8 md:py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-center md:text-left space-y-2">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                Own a Farmers Market?
-              </h2>
-              <p className="text-muted-foreground text-base md:text-lg">
-                Submit your market today and connect with thousands of local shoppers looking for fresh, local products.
-              </p>
-            </div>
-            <Link to="/auth">
-              <Button size="lg" className="whitespace-nowrap">
-                Submit Your Market
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-      
       <div className="container mx-auto px-4 pt-8 pb-6 md:py-6">
         
         {/* View Toggle and Filter Button */}
