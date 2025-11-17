@@ -4,13 +4,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Heart, Star, ArrowLeft, ShoppingCart, ChevronDown, Check, Search, MapPin, Globe } from "lucide-react";
+import { Heart, Star, ArrowLeft, ShoppingCart, ChevronDown, Check, Search, MapPin, Globe, Filter, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLikes } from "@/hooks/useLikes";
 import { useShoppingCart } from "@/contexts/ShoppingCartContext";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
 import { getCoordinatesForAddress, calculateDistance } from "@/lib/geocoding";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,9 +70,28 @@ const CategoryProducts = () => {
   const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [viewMode, setViewMode] = useState<'vendors' | 'markets' | 'products'>('products');
+  const [priceRange, setPriceRange] = useState<number[]>([0, 1000]);
+  const [minRating, setMinRating] = useState<number>(0);
+  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   
   const category = searchParams.get('category');
   const searchTerm = searchParams.get('search') || searchParams.get('q');
+
+  const SPECIALTY_CATEGORIES = [
+    "Fresh Flowers & Plants",
+    "Bakery", 
+    "Dairy",
+    "Rancher",
+    "Beverages",
+    "Seasonings & Spices",
+    "Pets",
+    "Home Goods",
+    "Farmers",
+    "Ready to Eat",
+    "Packaged Goods & Snacks",
+    "Artisan"
+  ];
 
   // Initialize search query from URL
   useEffect(() => {
@@ -234,7 +257,8 @@ const CategoryProducts = () => {
         vendorName: vendor.store_name,
         vendorId: vendor.id,
         vendorRating: vendor.google_rating || 0,
-        vendorCreatedAt: vendor.created_at
+        vendorCreatedAt: vendor.created_at,
+        vendorSpecialty: vendor.primary_specialty
       }));
   });
 
@@ -274,11 +298,11 @@ const CategoryProducts = () => {
         return uniqueMarkets.length;
       case 'products':
       default:
-        return searchFilteredProducts.length;
+        return filteredProducts.length;
     }
   };
 
-  // Filter by search term if provided
+  // Filter by search term and additional filters
   const searchFilteredProducts = searchTerm
     ? allProducts.filter(product => {
         const searchLower = searchTerm.toLowerCase();
@@ -290,8 +314,28 @@ const CategoryProducts = () => {
       })
     : allProducts;
 
+  // Apply additional filters
+  const filteredProducts = searchFilteredProducts.filter(product => {
+    // Price filter
+    if (product.price < priceRange[0] || product.price > priceRange[1]) {
+      return false;
+    }
+    
+    // Rating filter
+    if (product.vendorRating < minRating) {
+      return false;
+    }
+    
+    // Specialty filter
+    if (selectedSpecialties.length > 0 && !selectedSpecialties.includes(product.vendorSpecialty)) {
+      return false;
+    }
+    
+    return true;
+  });
+
   // Sort products based on selected option
-  const sortedProducts = [...searchFilteredProducts].sort((a, b) => {
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
       case 'lowest-price':
         return a.price - b.price;
@@ -486,27 +530,127 @@ const CategoryProducts = () => {
               </h1>
             )}
             
-            {/* Sort Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="md:min-w-[180px] justify-between md:justify-between px-2 md:px-4 py-2">
-                  <span className="hidden md:inline">Sort by: {sortOptions.find(opt => opt.value === sortBy)?.label}</span>
-                  <ChevronDown className="h-4 w-4 md:ml-2" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[180px] bg-background border shadow-lg z-50">
-                {sortOptions.map((option) => (
-                  <DropdownMenuItem
-                    key={option.value}
-                    onClick={() => setSortBy(option.value)}
-                    className="cursor-pointer flex items-center justify-between"
-                  >
-                    {option.label}
-                    {sortBy === option.value && <Check className="h-4 w-4" />}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Sort Dropdown and Filter Button */}
+            <div className="flex items-center gap-2">
+              {/* Filter Button */}
+              <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="bg-[#FFF9E6] hover:bg-[#FFF4D4] border-[#FFE9A0] text-foreground px-4 py-2">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filter search results
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>Filter Results</SheetTitle>
+                  </SheetHeader>
+                  
+                  <div className="space-y-6 mt-6">
+                    {/* Price Range Filter */}
+                    <div className="space-y-3">
+                      <Label className="text-base font-semibold">Price Range</Label>
+                      <div className="space-y-2">
+                        <Slider
+                          value={priceRange}
+                          onValueChange={setPriceRange}
+                          max={1000}
+                          step={10}
+                          className="w-full"
+                        />
+                        <div className="flex justify-between text-sm text-muted-foreground">
+                          <span>${priceRange[0]}</span>
+                          <span>${priceRange[1]}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Minimum Rating Filter */}
+                    <div className="space-y-3">
+                      <Label className="text-base font-semibold">Minimum Rating</Label>
+                      <div className="flex gap-2">
+                        {[0, 1, 2, 3, 4, 5].map((rating) => (
+                          <button
+                            key={rating}
+                            onClick={() => setMinRating(rating)}
+                            className={`flex items-center gap-1 px-3 py-2 rounded-md border transition-colors ${
+                              minRating === rating
+                                ? 'bg-primary text-primary-foreground border-primary'
+                                : 'bg-background hover:bg-muted border-border'
+                            }`}
+                          >
+                            <Star className="h-3 w-3" />
+                            <span className="text-sm">{rating}+</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Specialty Categories Filter */}
+                    <div className="space-y-3">
+                      <Label className="text-base font-semibold">Categories</Label>
+                      <div className="space-y-2">
+                        {SPECIALTY_CATEGORIES.map((specialty) => (
+                          <div key={specialty} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={specialty}
+                              checked={selectedSpecialties.includes(specialty)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedSpecialties([...selectedSpecialties, specialty]);
+                                } else {
+                                  setSelectedSpecialties(selectedSpecialties.filter(s => s !== specialty));
+                                }
+                              }}
+                            />
+                            <label
+                              htmlFor={specialty}
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                            >
+                              {specialty}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Clear Filters Button */}
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        setPriceRange([0, 1000]);
+                        setMinRating(0);
+                        setSelectedSpecialties([]);
+                      }}
+                    >
+                      Clear All Filters
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              {/* Sort Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="md:min-w-[180px] justify-between md:justify-between px-2 md:px-4 py-2">
+                    <span className="hidden md:inline">Sort by: {sortOptions.find(opt => opt.value === sortBy)?.label}</span>
+                    <ChevronDown className="h-4 w-4 md:ml-2" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-[180px] bg-background border shadow-lg z-50">
+                  {sortOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      onClick={() => setSortBy(option.value)}
+                      className="cursor-pointer flex items-center justify-between"
+                    >
+                      {option.label}
+                      {sortBy === option.value && <Check className="h-4 w-4" />}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
           {/* View Mode & Location Scope Toggles */}
