@@ -38,6 +38,8 @@ interface AcceptedSubmission {
   created_at: string;
   latitude?: number;
   longitude?: number;
+  google_rating?: number;
+  google_rating_count?: number;
 }
 
 interface VendorRating {
@@ -107,6 +109,7 @@ const Homepage = () => {
   const [marketAddressesMap, setMarketAddressesMap] = useState<Record<string, string>>({});
   const [vendorMarketIndices, setVendorMarketIndices] = useState<Record<string, number>>({});
   const [searchScope, setSearchScope] = useState<'local' | 'nationwide'>('nationwide');
+  const [sortBy, setSortBy] = useState<'relevancy' | 'lowest-price' | 'highest-price' | 'top-rated' | 'most-recent'>('relevancy');
 
   // Sync search query with URL parameter
   useEffect(() => {
@@ -192,8 +195,51 @@ const Homepage = () => {
 
     // Apply other existing filters here if needed (days, etc.)
     
+    // Apply sorting
+    filtered = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'lowest-price':
+          // Sort by lowest product price
+          const aMinPrice = Math.min(...(a.products || []).map((p: any) => p.price || Infinity));
+          const bMinPrice = Math.min(...(b.products || []).map((p: any) => p.price || Infinity));
+          return aMinPrice - bMinPrice;
+        
+        case 'highest-price':
+          // Sort by highest product price
+          const aMaxPrice = Math.max(...(a.products || []).map((p: any) => p.price || 0));
+          const bMaxPrice = Math.max(...(b.products || []).map((p: any) => p.price || 0));
+          return bMaxPrice - aMaxPrice;
+        
+        case 'top-rated':
+          // Sort by rating (highest first)
+          const aRating = a.google_rating || 0;
+          const bRating = b.google_rating || 0;
+          return bRating - aRating;
+        
+        case 'most-recent':
+          // Sort by creation date (newest first)
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        
+        case 'relevancy':
+        default:
+          // Default sorting (relevancy based on search query)
+          if (searchQuery.trim()) {
+            const getRelevanceScore = (sub: AcceptedSubmission) => {
+              const query = searchQuery.toLowerCase();
+              let score = 0;
+              if (sub.store_name.toLowerCase().includes(query)) score += 10;
+              if (sub.primary_specialty.toLowerCase().includes(query)) score += 5;
+              if (sub.description.toLowerCase().includes(query)) score += 3;
+              return score;
+            };
+            return getRelevanceScore(b) - getRelevanceScore(a);
+          }
+          return 0;
+      }
+    });
+    
     setFilteredSubmissions(filtered);
-  }, [acceptedSubmissions, searchQuery, selectedCategories, searchParams, searchScope, userCoordinates, rangeMiles]);
+  }, [acceptedSubmissions, searchQuery, selectedCategories, searchParams, searchScope, userCoordinates, rangeMiles, sortBy]);
 
   const toggleDay = (day: string) => {
     setSelectedDays(prev => {
@@ -1255,6 +1301,20 @@ const Homepage = () => {
 
           {/* View Toggle and Filter */}
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+            {/* Sort By Dropdown */}
+            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+              <SelectTrigger className="w-[200px] bg-background border shadow-sm">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="relevancy">Relevancy</SelectItem>
+                <SelectItem value="lowest-price">Lowest Price</SelectItem>
+                <SelectItem value="highest-price">Highest Price</SelectItem>
+                <SelectItem value="top-rated">Top Rated Store</SelectItem>
+                <SelectItem value="most-recent">Most Recent</SelectItem>
+              </SelectContent>
+            </Select>
+            
             <div className="flex rounded-lg bg-muted p-1">
               <button
                 onClick={() => {
