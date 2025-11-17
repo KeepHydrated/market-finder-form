@@ -29,17 +29,17 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
   const [newOrdersCount, setNewOrdersCount] = useState(0);
   const isOnOrdersPage = location.pathname === '/my-shop' && location.search.includes('section=orders2');
   
-  // Get current category if on search page
+  // Get current category if on test page
   const searchParams = new URLSearchParams(location.search);
-  const currentCategory = location.pathname === '/search' ? (searchParams.get('category') || 'All') : null;
-  const currentSearchTerm = searchParams.get('q');
+  const currentCategory = location.pathname === '/test' ? (searchParams.get('category') || 'All') : null;
+  const currentSearchTerm = searchParams.get('search') || searchParams.get('q');
   
   // Helper function to build category URLs with preserved search term
   const getCategoryUrl = (category?: string) => {
     const params = new URLSearchParams();
     if (category) params.set('category', category);
-    if (currentSearchTerm) params.set('q', currentSearchTerm);
-    return `/search${params.toString() ? `?${params.toString()}` : ''}`;
+    if (currentSearchTerm) params.set('search', currentSearchTerm);
+    return `/test${params.toString() ? `?${params.toString()}` : ''}`;
   };
 
   useEffect(() => {
@@ -156,10 +156,10 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // If on a search page, include the category in the search
+      // Navigate to test page with search query
       const searchUrl = currentCategory 
-        ? `/search?q=${encodeURIComponent(searchQuery.trim())}&category=${encodeURIComponent(currentCategory)}`
-        : `/search?q=${encodeURIComponent(searchQuery.trim())}`;
+        ? `/test?search=${encodeURIComponent(searchQuery.trim())}&category=${encodeURIComponent(currentCategory)}`
+        : `/test?search=${encodeURIComponent(searchQuery.trim())}`;
       navigate(searchUrl);
     }
   };
