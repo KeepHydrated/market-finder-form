@@ -1131,6 +1131,27 @@ const Homepage = () => {
       
       <div className="container mx-auto px-4 pt-8 pb-6 md:py-6">
         
+        {/* Farmers Market Banner */}
+        <div className="mb-8 rounded-lg bg-gradient-to-r from-primary/10 via-primary/5 to-background border border-primary/20 p-6 md:p-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-center md:text-left">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                Own a Farmers Market?
+              </h2>
+              <p className="text-muted-foreground text-sm md:text-base">
+                List your market and connect with thousands of local shoppers looking for fresh, local products
+              </p>
+            </div>
+            <Button 
+              size="lg"
+              onClick={() => navigate('/submit-market')}
+              className="whitespace-nowrap"
+            >
+              Submit Your Market
+            </Button>
+          </div>
+        </div>
+        
         {/* View Toggle and Filter Button */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex rounded-lg bg-muted p-1">
