@@ -4,8 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Heart, Star, ArrowLeft, ShoppingCart, ChevronDown, Check, Search, MapPin, Globe, Filter, X } from "lucide-react";
+import { Heart, Star, ArrowLeft, ShoppingCart, ChevronDown, Check, Search, MapPin, Globe, Filter, X, Store, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLikes } from "@/hooks/useLikes";
 import { useShoppingCart } from "@/contexts/ShoppingCartContext";
@@ -509,28 +510,50 @@ const CategoryProducts = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+        {/* Header with View Mode Tabs */}
         <div className="flex flex-col gap-4 mb-8">
-          <div className="flex items-center justify-between gap-2">
-            {/* Category/Search Title */}
-            {searchTerm ? (
-              <h1 className="flex flex-wrap items-center text-lg md:text-xl font-bold mr-auto gap-2">
-                <span>{category || 'All'}</span>
-                <span className="text-sm md:text-base font-normal text-muted-foreground">"{searchTerm}"</span>
-                <span className="text-sm md:text-base font-normal text-muted-foreground">
-                  (<span className="md:hidden">{getResultCount()}</span><span className="hidden md:inline">{getResultCount()} results</span>)
-                </span>
-              </h1>
-            ) : (
-              <h1 className="flex flex-wrap items-center text-lg md:text-xl font-bold capitalize mr-auto gap-2">
-                <span>{category || 'All'}</span>
-                <span className="text-sm md:text-base font-normal text-muted-foreground">
-                  (<span className="md:hidden">{getResultCount()}</span><span className="hidden md:inline">{getResultCount()} results</span>)
-                </span>
-              </h1>
-            )}
+          {/* View Mode Toggle Buttons */}
+          <div className="flex justify-between items-center">
+            <div className="flex rounded-lg bg-muted p-1">
+              <button
+                onClick={() => setViewMode('vendors')}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  viewMode === 'vendors'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Store className="h-5 w-5 md:hidden" />
+                <span className="hidden md:inline">Vendors</span>
+              </button>
+              <button
+                onClick={() => setViewMode('markets')}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  viewMode === 'markets'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <MapPin className="h-5 w-5 md:hidden" />
+                <span className="hidden md:inline">Markets</span>
+              </button>
+              <button
+                onClick={() => setViewMode('products')}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  viewMode === 'products'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Package className="h-5 w-5 md:hidden" />
+                <span className="hidden md:inline">Products</span>
+              </button>
+            </div>
             
-            {/* Sort Dropdown and Filter Button */}
+            {/* Filter and Sort Controls */}
             <div className="flex items-center gap-2">
               {/* Filter Button */}
               <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
@@ -653,43 +676,8 @@ const CategoryProducts = () => {
             </div>
           </div>
 
-          {/* View Mode & Location Scope Toggles */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            {/* View Mode Toggle */}
-            <div className="flex rounded-lg bg-muted p-1 w-fit">
-              <button
-                onClick={() => setViewMode('vendors')}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  viewMode === 'vendors'
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Vendors
-              </button>
-              <button
-                onClick={() => setViewMode('markets')}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  viewMode === 'markets'
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Markets
-              </button>
-              <button
-                onClick={() => setViewMode('products')}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  viewMode === 'products'
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Products
-              </button>
-            </div>
-
-            {/* Location Scope Toggle */}
+          {/* Location Scope Toggle */}
+          <div>
             <div className="flex rounded-lg bg-muted p-1 w-fit">
               <button
                 onClick={() => setLocationScope('local')}
