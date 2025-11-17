@@ -152,7 +152,8 @@ const Homepage = () => {
     }
 
     // Apply category filter - show ALL nationwide vendors for selected category
-    if (selectedCategories.length > 0) {
+    // Skip filtering if "All" is selected
+    if (selectedCategories.length > 0 && !selectedCategories.includes('All')) {
       filtered = filtered.filter(submission =>
         selectedCategories.includes(submission.primary_specialty)
       );
@@ -162,6 +163,13 @@ const Homepage = () => {
         console.log(`🌍 Showing nationwide results for category: ${selectedCategories.join(', ')}`);
         console.log(`Found ${filtered.length} vendors nationwide in this category`);
         setViewMode('products'); // Automatically switch to products view for category searches
+      }
+    } else if (selectedCategories.includes('All')) {
+      // When "All" is selected, show everything (no category filter)
+      if (isNationwideSearch) {
+        console.log(`🌍 Showing nationwide results for category: All`);
+        console.log(`Found ${filtered.length} vendors nationwide in this category`);
+        setViewMode('products');
       }
     }
 
