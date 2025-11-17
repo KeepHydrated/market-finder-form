@@ -204,7 +204,7 @@ const Test2 = () => {
         {/* Recommended Local Vendors Section */}
         <div className="mb-12">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Recommended Vendors</h2>
+            <h2 className="text-2xl font-bold text-foreground">Recommended Local Vendors</h2>
             <Button variant="ghost" onClick={() => navigate('/test')}>
               View All
             </Button>
