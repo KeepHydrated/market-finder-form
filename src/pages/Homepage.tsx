@@ -98,33 +98,12 @@ const Homepage = () => {
   const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
   const [isLoadingVendorDistances, setIsLoadingVendorDistances] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const [localMarkets, setLocalMarkets] = useState<any[]>([]);
-  const [isLoadingLocalMarkets, setIsLoadingLocalMarkets] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [currentVendorProducts, setCurrentVendorProducts] = useState<any[]>([]);
   const [currentVendorId, setCurrentVendorId] = useState<string | undefined>(undefined);
   const [currentVendorName, setCurrentVendorName] = useState<string | undefined>(undefined);
   const [marketAddressesMap, setMarketAddressesMap] = useState<Record<string, string>>({});
   const [vendorMarketIndices, setVendorMarketIndices] = useState<Record<string, number>>({});
-
-  // Automatically detect user location on mount
-  useEffect(() => {
-    const detectLocation = async () => {
-      try {
-        // Try IP-based location first (faster and doesn't require permission)
-        const response = await fetch('https://ipapi.co/json/');
-        const data = await response.json();
-        if (data.latitude && data.longitude) {
-          setUserCoordinates({ lat: data.latitude, lng: data.longitude });
-          setLocationMethod('ip');
-        }
-      } catch (error) {
-        console.error('Failed to detect location:', error);
-      }
-    };
-
-    detectLocation();
-  }, []);
 
   // Sync search query with URL parameter
   useEffect(() => {
@@ -1041,65 +1020,6 @@ const Homepage = () => {
     }
   };
 
-  // Fetch local markets based on user location
-  useEffect(() => {
-    const fetchLocalMarkets = async () => {
-      setIsLoadingLocalMarkets(true);
-      try {
-        const { data, error } = await supabase
-          .from('markets')
-          .select('*')
-          .order('google_rating', { ascending: false })
-          .limit(12);
-
-        if (error) throw error;
-
-        if (userCoordinates) {
-          // If we have user location, calculate distances and show nearby markets
-          const marketsWithDistance = await Promise.all((data || []).map(async (market) => {
-            try {
-              const coords = await getCoordinatesForAddress(market.address);
-              if (coords) {
-                const distance = calculateDistance(
-                  userCoordinates.lat,
-                  userCoordinates.lng,
-                  coords.lat,
-                  coords.lng
-                );
-                return { ...market, distance };
-              }
-            } catch (err) {
-              console.error(`Error getting coordinates for ${market.name}:`, err);
-            }
-            return null;
-          }));
-
-          // Filter out nulls and sort by distance, show within 100 miles
-          const validMarkets = marketsWithDistance
-            .filter(m => m !== null && m.distance <= 100)
-            .sort((a, b) => a!.distance - b!.distance)
-            .slice(0, 6);
-
-          if (validMarkets.length > 0) {
-            setLocalMarkets(validMarkets);
-          } else {
-            // If no nearby markets, show top rated markets
-            setLocalMarkets((data || []).slice(0, 6));
-          }
-        } else {
-          // If no location, show top rated markets
-          setLocalMarkets((data || []).slice(0, 6));
-        }
-      } catch (error) {
-        console.error('Error fetching local markets:', error);
-      } finally {
-        setIsLoadingLocalMarkets(false);
-      }
-    };
-
-    fetchLocalMarkets();
-  }, [userCoordinates]);
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -1229,97 +1149,6 @@ const Homepage = () => {
           </div>
         </div>
       </div>
-      
-      {/* Recommended Local Markets Section */}
-      {localMarkets.length > 0 && (
-        <div className="w-full bg-background border-b border-border">
-          <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="mb-6">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                {userCoordinates ? 'Recommended Local Markets' : 'Popular Farmers Markets'}
-              </h2>
-              <p className="text-muted-foreground">
-                {userCoordinates ? 'Discover farmers markets near you' : 'Explore top-rated farmers markets across the country'}
-              </p>
-            </div>
-            
-            {isLoadingLocalMarkets ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <Card key={i} className="animate-pulse">
-                    <CardContent className="p-6">
-                      <div className="space-y-3">
-                        <div className="h-6 bg-muted rounded w-3/4"></div>
-                        <div className="h-4 bg-muted rounded w-full"></div>
-                        <div className="h-4 bg-muted rounded w-1/2"></div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {localMarkets.map((market) => (
-                  <Card key={market.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/market/${encodeURIComponent(market.name)}`)}>
-                    <CardContent className="p-6">
-                      <div className="space-y-3">
-                        <div className="flex items-start justify-between">
-                          <h3 className="font-semibold text-lg text-foreground line-clamp-2">{market.name}</h3>
-                          {market.google_rating && market.google_rating > 0 && (
-                            <div className="flex items-center gap-1 ml-2">
-                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                              <span className="text-sm font-medium">{market.google_rating.toFixed(1)}</span>
-                            </div>
-                          )}
-                        </div>
-                        
-                        <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                          <span className="line-clamp-2">{market.city}, {market.state}</span>
-                        </div>
-                        
-                        {market.distance && (
-                          <Badge variant="secondary" className="text-xs">
-                            {market.distance.toFixed(1)} miles away
-                          </Badge>
-                        )}
-                        
-                        {market.days && market.days.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {market.days.slice(0, 3).map((day: string) => (
-                              <Badge key={day} variant="outline" className="text-xs">
-                                {day}
-                              </Badge>
-                            ))}
-                            {market.days.length > 3 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{market.days.length - 3}
-                              </Badge>
-                            )}
-                          </div>
-                        )}
-                        
-                        {market.hours && (
-                          <p className="text-xs text-muted-foreground">{market.hours}</p>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-            
-            <div className="mt-6 text-center">
-              <Button variant="outline" onClick={() => {
-                setViewMode('markets');
-                window.scrollTo({ top: 600, behavior: 'smooth' });
-              }}>
-                View All Markets
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
       
       <div className="container mx-auto px-4 pt-8 pb-6 md:py-6">
         
