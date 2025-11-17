@@ -36,6 +36,8 @@ interface AcceptedSubmission {
   market_days?: string[];
   market_hours?: Record<string, { start: string; end: string; startPeriod: 'AM' | 'PM'; endPeriod: 'AM' | 'PM' }>;
   created_at: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface VendorRating {
@@ -104,6 +106,7 @@ const Homepage = () => {
   const [currentVendorName, setCurrentVendorName] = useState<string | undefined>(undefined);
   const [marketAddressesMap, setMarketAddressesMap] = useState<Record<string, string>>({});
   const [vendorMarketIndices, setVendorMarketIndices] = useState<Record<string, number>>({});
+  const [searchScope, setSearchScope] = useState<'local' | 'nationwide'>('nationwide');
 
   // Sync search query with URL parameter
   useEffect(() => {
@@ -162,11 +165,27 @@ const Homepage = () => {
       }
     }
 
-    // Apply other existing filters here if needed (days, location, etc.)
-    // Note: When showing nationwide category results, we skip location-based filtering
+    // Apply location-based filtering only if in "local" mode
+    if (searchScope === 'local' && userCoordinates) {
+      // Filter by location radius
+      filtered = filtered.filter(submission => {
+        if (submission.latitude && submission.longitude) {
+          const distance = calculateDistance(
+            userCoordinates.lat,
+            userCoordinates.lng,
+            submission.latitude,
+            submission.longitude
+          );
+          return distance <= rangeMiles[0];
+        }
+        return false;
+      });
+    }
+
+    // Apply other existing filters here if needed (days, etc.)
     
     setFilteredSubmissions(filtered);
-  }, [acceptedSubmissions, searchQuery, selectedCategories, searchParams]);
+  }, [acceptedSubmissions, searchQuery, selectedCategories, searchParams, searchScope, userCoordinates, rangeMiles]);
 
   const toggleDay = (day: string) => {
     setSelectedDays(prev => {
@@ -1135,58 +1154,86 @@ const Homepage = () => {
       
       <div className="container mx-auto px-4 pt-8 pb-6 md:py-6">
         
-        {/* View Toggle and Filter Button */}
-        <div className="flex justify-between items-center mb-6">
+        {/* Scope Toggle and View Toggle */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          {/* Search Scope Toggle */}
           <div className="flex rounded-lg bg-muted p-1">
             <button
-              onClick={() => {
-                setViewMode('vendors');
-                setSelectedMarket(null);
-              }}
+              onClick={() => setSearchScope('local')}
               className={cn(
                 "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                viewMode === 'vendors' && !selectedMarket
+                searchScope === 'local'
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <Store className="h-5 w-5 md:hidden" />
-              <span className="hidden md:inline">Vendors</span>
+              <MapPin className="h-4 w-4 inline mr-1" />
+              Local
             </button>
             <button
-              onClick={() => {
-                setViewMode('markets');
-                setSelectedMarket(null);
-              }}
+              onClick={() => setSearchScope('nationwide')}
               className={cn(
                 "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                viewMode === 'markets'
+                searchScope === 'nationwide'
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <MapPin className="h-5 w-5 md:hidden" />
-              <span className="hidden md:inline">Markets</span>
-            </button>
-            <button
-              onClick={() => {
-                setViewMode('products');
-                setSelectedMarket(null);
-              }}
-              className={cn(
-                "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                viewMode === 'products'
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <Package className="h-5 w-5 md:hidden" />
-              <span className="hidden md:inline">Products</span>
+              All of US
             </button>
           </div>
-          
-          
-          <Dialog>
+
+          {/* View Toggle and Filter */}
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+            <div className="flex rounded-lg bg-muted p-1">
+              <button
+                onClick={() => {
+                  setViewMode('vendors');
+                  setSelectedMarket(null);
+                }}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  viewMode === 'vendors' && !selectedMarket
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Store className="h-5 w-5 md:hidden" />
+                <span className="hidden md:inline">Vendors</span>
+              </button>
+              <button
+                onClick={() => {
+                  setViewMode('markets');
+                  setSelectedMarket(null);
+                }}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  viewMode === 'markets'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <MapPin className="h-5 w-5 md:hidden" />
+                <span className="hidden md:inline">Markets</span>
+              </button>
+              <button
+                onClick={() => {
+                  setViewMode('products');
+                  setSelectedMarket(null);
+                }}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  viewMode === 'products'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Package className="h-5 w-5 md:hidden" />
+                <span className="hidden md:inline">Products</span>
+              </button>
+            </div>
+            
+            <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
@@ -1449,6 +1496,7 @@ const Homepage = () => {
               </Tabs>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
         
         {/* Content based on view mode */}
