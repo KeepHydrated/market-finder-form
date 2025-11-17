@@ -558,9 +558,9 @@ const CategoryProducts = () => {
               {/* Filter Button */}
               <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" className="bg-[#FFF9E6] hover:bg-[#FFF4D4] border-[#FFE9A0] text-foreground px-4 py-2">
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filter search results
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Filter className="h-4 w-4" />
+                    <span className="hidden md:inline">Filter search results</span>
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
