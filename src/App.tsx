@@ -27,6 +27,7 @@ import AccountSettings from "./pages/AccountSettings";
 import Auth from "./pages/Auth";
 import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
+import SubmitMarket from "./pages/SubmitMarket";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ const App = () => (
                 <Route path="/messages/:conversationId" element={<Conversation />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/profile/:userId" element={<Profile />} />
+                <Route path="/submit-market" element={<SubmitMarket />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
