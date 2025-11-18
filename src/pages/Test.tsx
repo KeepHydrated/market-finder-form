@@ -1271,7 +1271,7 @@ const Homepage = () => {
             </div>
           )}
           
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto sm:ml-auto">
           {/* Filter */}
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
             <Dialog>
