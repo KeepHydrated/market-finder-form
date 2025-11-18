@@ -1272,56 +1272,8 @@ const Homepage = () => {
           )}
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
-          {/* View Toggle and Filter */}
+          {/* Filter */}
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-            <div className="flex rounded-lg bg-muted p-1">
-              <button
-                onClick={() => {
-                  setViewMode('vendors');
-                  setSelectedMarket(null);
-                }}
-                className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                  viewMode === 'vendors' && !selectedMarket
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Store className="h-5 w-5 md:hidden" />
-                <span className="hidden md:inline">Vendors</span>
-              </button>
-              <button
-                onClick={() => {
-                  setViewMode('markets');
-                  setSelectedMarket(null);
-                }}
-                className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                  viewMode === 'markets'
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <MapPin className="h-5 w-5 md:hidden" />
-                <span className="hidden md:inline">Markets</span>
-              </button>
-              <button
-                onClick={() => {
-                  setViewMode('products');
-                  setSelectedMarket(null);
-                }}
-                className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                  viewMode === 'products'
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Package className="h-5 w-5 md:hidden" />
-                <span className="hidden md:inline">Products</span>
-              </button>
-            </div>
-            
             <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
