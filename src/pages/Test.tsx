@@ -1301,20 +1301,6 @@ const Homepage = () => {
 
           {/* View Toggle and Filter */}
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-            {/* Sort By Dropdown */}
-            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-              <SelectTrigger className="w-[200px] bg-background border shadow-sm">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border shadow-lg z-50">
-                <SelectItem value="relevancy">Relevancy</SelectItem>
-                <SelectItem value="lowest-price">Lowest Price</SelectItem>
-                <SelectItem value="highest-price">Highest Price</SelectItem>
-                <SelectItem value="top-rated">Top Rated Store</SelectItem>
-                <SelectItem value="most-recent">Most Recent</SelectItem>
-              </SelectContent>
-            </Select>
-            
             <div className="flex rounded-lg bg-muted p-1">
               <button
                 onClick={() => {
@@ -1625,8 +1611,24 @@ const Homepage = () => {
                 </TabsContent>
               </Tabs>
             </DialogContent>
-          </Dialog>
+            </Dialog>
           </div>
+          </div>
+
+          {/* Second Row - Sort By */}
+          <div className="flex items-center gap-3 mt-4">
+            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+              <SelectTrigger className="w-[200px] bg-background border shadow-sm">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="relevancy">Relevancy</SelectItem>
+                <SelectItem value="lowest-price">Lowest Price</SelectItem>
+                <SelectItem value="highest-price">Highest Price</SelectItem>
+                <SelectItem value="top-rated">Top Rated Store</SelectItem>
+                <SelectItem value="most-recent">Most Recent</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         
