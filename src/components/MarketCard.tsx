@@ -71,13 +71,12 @@ export const MarketCard = ({ id, name, address, days, hours, rating, ratingCount
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Clock className="h-4 w-4 text-foreground" />
-          <p className="text-sm text-foreground">{hours}</p>
-        </div>
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1.5">
           {days.map((day) => (
-            <Badge key={day} variant="secondary" className="text-xs">
+            <Badge 
+              key={day} 
+              className="text-xs px-3 py-1 bg-green-100 text-green-700 hover:bg-green-100 border-0"
+            >
               {day}
             </Badge>
           ))}
