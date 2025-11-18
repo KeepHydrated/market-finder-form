@@ -1381,7 +1381,7 @@ const Homepage = () => {
                 <TabsContent value="type" className="px-8 pb-8 pt-8 overflow-y-auto">
                   <div className="space-y-6">
                     {/* Search Scope Toggle */}
-                    <div className="flex justify-center">
+                    <div className="flex justify-start">
                       <div className="flex rounded-lg bg-muted p-1">
                         <button
                           onClick={() => setSearchScope('local')}
@@ -1410,7 +1410,7 @@ const Homepage = () => {
                     </div>
 
                     {/* View Mode Toggle */}
-                    <div className="flex justify-center">
+                    <div className="flex justify-start">
                       <div className="flex rounded-lg bg-muted p-1">
                         <button
                           onClick={() => {
