@@ -69,7 +69,7 @@ const Homepage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
-  const { toggleLike, isLiked } = useLikes();
+  const { toggleLike, isLiked, likes } = useLikes();
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<AcceptedSubmission[]>([]);
   const [filteredSubmissions, setFilteredSubmissions] = useState<AcceptedSubmission[]>([]);
   const [vendorRatings, setVendorRatings] = useState<Record<string, VendorRating>>({});
@@ -197,8 +197,16 @@ const Homepage = () => {
 
     // Apply other existing filters here if needed (days, etc.)
     
-    // Apply sorting
+    // Apply sorting with liked items prioritization
     filtered = [...filtered].sort((a, b) => {
+      // First priority: liked vendors (boost them to the top)
+      const aIsLiked = isLiked(a.id, 'vendor');
+      const bIsLiked = isLiked(b.id, 'vendor');
+      
+      if (aIsLiked && !bIsLiked) return -1;
+      if (!aIsLiked && bIsLiked) return 1;
+      
+      // Then apply normal sorting within liked/unliked groups
       switch (sortBy) {
         case 'lowest-price':
           // Sort by lowest product price
@@ -801,7 +809,22 @@ const Homepage = () => {
       });
     });
 
-    return Object.values(markets);
+    // Convert to array and sort by liked status
+    const marketsArray = Object.values(markets);
+    
+    // Sort markets - liked markets first
+    return marketsArray.sort((a, b) => {
+      // Create a unique market ID from name and address for checking likes
+      const aMarketId = `${a.name}-${a.address}`.replace(/\s+/g, '-').toLowerCase();
+      const bMarketId = `${b.name}-${b.address}`.replace(/\s+/g, '-').toLowerCase();
+      
+      const aIsLiked = isLiked(aMarketId, 'market');
+      const bIsLiked = isLiked(bMarketId, 'market');
+      
+      if (aIsLiked && !bIsLiked) return -1;
+      if (!aIsLiked && bIsLiked) return 1;
+      return 0;
+    });
   };
 
   // Fetch all market addresses from the database
@@ -2291,13 +2314,31 @@ const Homepage = () => {
                 }));
               });
 
-              return allProducts.length === 0 ? (
+              // Sort products - prioritize products from liked vendors
+              const sortedProducts = [...allProducts].sort((a, b) => {
+                const aVendorLiked = isLiked(a.vendorId, 'vendor');
+                const bVendorLiked = isLiked(b.vendorId, 'vendor');
+                
+                if (aVendorLiked && !bVendorLiked) return -1;
+                if (!aVendorLiked && bVendorLiked) return 1;
+                
+                // Also check if product itself is liked
+                const aProductLiked = isLiked(String(a.id), 'product');
+                const bProductLiked = isLiked(String(b.id), 'product');
+                
+                if (aProductLiked && !bProductLiked) return -1;
+                if (!aProductLiked && bProductLiked) return 1;
+                
+                return 0;
+              });
+
+              return sortedProducts.length === 0 ? (
                 <div className="text-center">
                   <p className="text-muted-foreground">No products available yet.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
-                  {allProducts.map((product, index) => (
+                  {sortedProducts.map((product, index) => (
                     <Card 
                       key={`${product.vendorId}-${index}`}
                       className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
