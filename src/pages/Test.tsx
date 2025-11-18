@@ -834,21 +834,30 @@ const Homepage = () => {
 
   // Fetch Google Places details to get opening hours
   const fetchPlaceDetails = async (placeId: string): Promise<string[]> => {
+    console.log('🔍 Fetching place details for place_id:', placeId);
     try {
       const { data: { key } } = await supabase.functions.invoke('get-google-api-key');
-      if (!key) return [];
+      console.log('✅ Got Google API key');
+      if (!key) {
+        console.log('❌ No Google API key available');
+        return [];
+      }
 
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=opening_hours&key=${key}`
-      );
+      const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=opening_hours&key=${key}`;
+      console.log('🌐 Fetching from URL:', url);
+      const response = await fetch(url);
       const data = await response.json();
+      console.log('📦 Google Places API response:', data);
       
       if (data.result?.opening_hours?.weekday_text) {
-        return extractDaysFromWeekdayText(data.result.opening_hours.weekday_text);
+        const days = extractDaysFromWeekdayText(data.result.opening_hours.weekday_text);
+        console.log('✅ Extracted days:', days);
+        return days;
       }
+      console.log('⚠️ No opening hours found in response');
       return [];
     } catch (error) {
-      console.error('Error fetching place details:', error);
+      console.error('❌ Error fetching place details:', error);
       return [];
     }
   };
@@ -884,23 +893,36 @@ const Homepage = () => {
 
   // Fetch days for markets with place_ids
   const enrichMarketDays = async (markets: Record<string, any>) => {
+    console.log('🚀 Starting enrichMarketDays with markets:', markets);
     setLoadingMarketDays(true);
     const updatedDaysMap: Record<string, string[]> = { ...marketDaysMap };
     
     for (const [marketKey, market] of Object.entries(markets)) {
+      console.log('🔍 Processing market:', marketKey, market);
       // Check if we already have days or if we can get them from place_id
-      if (market.days && market.days.length > 1) continue;
+      if (market.days && market.days.length > 1) {
+        console.log('✅ Market already has multiple days:', market.days);
+        continue;
+      }
       
       // Try to get place_id from the market object or from selected_markets
       const placeId = market.place_id;
+      console.log('🔑 Place ID for', market.name, ':', placeId);
       if (placeId && !updatedDaysMap[market.name]) {
+        console.log('📞 Fetching days for:', market.name);
         const days = await fetchPlaceDetails(placeId);
         if (days.length > 0) {
+          console.log('✅ Got days for', market.name, ':', days);
           updatedDaysMap[market.name] = days;
         }
+      } else if (!placeId) {
+        console.log('⚠️ No place_id for:', market.name);
+      } else if (updatedDaysMap[market.name]) {
+        console.log('ℹ️ Already have days for:', market.name);
       }
     }
     
+    console.log('🎯 Final updatedDaysMap:', updatedDaysMap);
     setMarketDaysMap(updatedDaysMap);
     setLoadingMarketDays(false);
   };
