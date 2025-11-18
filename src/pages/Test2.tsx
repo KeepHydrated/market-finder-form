@@ -26,6 +26,7 @@ interface Vendor {
   google_rating: number | null;
   google_rating_count: number | null;
   market_address: string | null;
+  selected_markets?: any;
 }
 
 interface Market {
@@ -306,7 +307,20 @@ const Test2 = () => {
                         </div>
                       )}
                       
-                      {/* Like Button */}
+                      {/* Star Rating Badge - Top Left */}
+                      {vendor.google_rating && (
+                        <Badge className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm shadow-sm flex items-center gap-1 px-2 py-1">
+                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                          <span className="text-sm font-medium">{vendor.google_rating.toFixed(1)}</span>
+                          {vendor.google_rating_count && (
+                            <span className="text-xs text-muted-foreground">
+                              ({vendor.google_rating_count})
+                            </span>
+                          )}
+                        </Badge>
+                      )}
+                      
+                      {/* Like Button - Top Right */}
                       <Button
                         variant="secondary"
                         size="sm"
@@ -326,35 +340,46 @@ const Test2 = () => {
                         />
                       </Button>
 
-                      {/* Specialty Badge */}
+                      {/* Specialty Badge - Bottom Left */}
                       {vendor.primary_specialty && (
-                        <Badge className="absolute bottom-2 left-2 bg-background/80 backdrop-blur-sm">
+                        <Badge className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm shadow-sm text-green-600 border-0">
                           {vendor.primary_specialty}
                         </Badge>
                       )}
+                      
+                      {/* Distance Badge - Bottom Right (placeholder for now) */}
+                      <Badge className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm shadow-sm">
+                        212.8 mi
+                      </Badge>
                     </div>
 
                     {/* Vendor Info */}
-                    <CardContent className="p-4">
-                      <h3 className="font-normal text-base text-black mb-2">
+                    <CardContent className="p-4 space-y-2">
+                      {/* Store Name */}
+                      <h3 className="font-bold text-lg text-black">
                         {vendor.store_name}
                       </h3>
                       
-                      {/* Location */}
+                      {/* Market Name with Navigation - placeholder */}
+                      {vendor.selected_markets && Array.isArray(vendor.selected_markets) && vendor.selected_markets.length > 0 && (
+                        <div className="flex items-center justify-between text-sm font-medium">
+                          <span className="text-foreground">{vendor.selected_markets[0]?.name || 'Market Name'}</span>
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <button className="hover:text-foreground">←</button>
+                            <span className="text-xs">1/{vendor.selected_markets.length}</span>
+                            <button className="hover:text-foreground">→</button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Address */}
                       {vendor.market_address && (
-                        <div className="flex items-start gap-1 mb-2">
+                        <div className="flex items-start gap-1">
                           <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                           <span className="text-sm text-muted-foreground line-clamp-1">
                             {vendor.market_address}
                           </span>
                         </div>
-                      )}
-
-                      {/* Description */}
-                      {vendor.description && (
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {vendor.description}
-                        </p>
                       )}
                     </CardContent>
                   </Card>
