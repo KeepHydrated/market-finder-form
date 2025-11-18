@@ -293,35 +293,38 @@ const Test2 = () => {
                     })}
                   >
                     {/* Vendor Image */}
-                    <div className="aspect-[4/3] bg-muted relative">
+                    <div className="aspect-[4/3] bg-muted relative overflow-hidden group">
                       {firstProductImage ? (
                         <img
                           src={firstProductImage}
                           alt={vendor.store_name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover transition-opacity duration-200"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <p className="text-muted-foreground">No image</p>
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          No Image Available
                         </div>
                       )}
                       
                       {/* Like Button */}
-                      <button
-                        onClick={(e) => {
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                        onClick={async (e) => {
                           e.stopPropagation();
-                          toggleLike(vendor.id, 'vendor');
+                          await toggleLike(vendor.id, 'vendor');
                         }}
-                        className="absolute top-2 right-2 p-2 bg-background/80 backdrop-blur-sm rounded-full hover:bg-background transition-colors"
                       >
-                        <Heart
-                          className={`h-5 w-5 ${
+                        <Heart 
+                          className={cn(
+                            "h-4 w-4 transition-colors",
                             isLiked(vendor.id, 'vendor')
-                              ? 'fill-red-500 text-red-500'
-                              : 'text-foreground'
-                          }`}
+                              ? "text-red-500 fill-current" 
+                              : "text-gray-600"
+                          )}
                         />
-                      </button>
+                      </Button>
 
                       {/* Specialty Badge */}
                       {vendor.primary_specialty && (
@@ -332,28 +335,15 @@ const Test2 = () => {
                     </div>
 
                     {/* Vendor Info */}
-                    <div className="p-4">
-                      <h3 className="font-semibold text-foreground mb-2 line-clamp-1">
+                    <CardContent className="p-4">
+                      <h3 className="font-normal text-base text-black mb-2">
                         {vendor.store_name}
                       </h3>
                       
-                      {/* Rating */}
-                      {vendor.google_rating && (
-                        <div className="flex items-center gap-1 mb-2">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-medium">{vendor.google_rating.toFixed(1)}</span>
-                          {vendor.google_rating_count && (
-                            <span className="text-sm text-muted-foreground">
-                              ({vendor.google_rating_count})
-                            </span>
-                          )}
-                        </div>
-                      )}
-
                       {/* Location */}
                       {vendor.market_address && (
-                        <div className="flex items-center gap-1 mb-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex items-start gap-1 mb-2">
+                          <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                           <span className="text-sm text-muted-foreground line-clamp-1">
                             {vendor.market_address}
                           </span>
@@ -366,7 +356,7 @@ const Test2 = () => {
                           {vendor.description}
                         </p>
                       )}
-                    </div>
+                    </CardContent>
                   </Card>
                 );
               })}
