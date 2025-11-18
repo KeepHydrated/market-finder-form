@@ -1353,7 +1353,7 @@ const Homepage = () => {
             <DialogTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
-                <span className="hidden md:inline">Filter search results</span>
+                <span className="hidden md:inline">Filter</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="w-full md:w-[800px] max-w-none p-0 bg-background border shadow-lg max-h-[80vh] flex flex-col">
