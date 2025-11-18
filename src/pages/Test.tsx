@@ -1330,10 +1330,16 @@ const Homepage = () => {
               </Button>
             </DialogTrigger>
             <DialogContent className="w-full md:w-[800px] max-w-none p-0 bg-background border shadow-lg max-h-[80vh] flex flex-col">
-              <Tabs defaultValue="times" className="w-full flex flex-col overflow-hidden">
+              <Tabs defaultValue="type" className="w-full flex flex-col overflow-hidden">
                 <div className="pt-8 px-4 md:px-8 flex justify-between items-center flex-shrink-0 border-b">
                   <div className="flex-1" />
                   <TabsList className="inline-flex gap-4 md:gap-8 bg-transparent border-0 p-0 h-auto">
+                    <TabsTrigger 
+                      value="type" 
+                      className="py-4 px-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=inactive]:text-muted-foreground font-semibold"
+                    >
+                      Type
+                    </TabsTrigger>
                     <TabsTrigger 
                       value="times" 
                       className="py-4 px-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=inactive]:text-muted-foreground font-semibold"
@@ -1372,10 +1378,10 @@ const Homepage = () => {
                     </Button>
                   </div>
                 </div>
-                <TabsContent value="times" className="px-8 pb-8 pt-8 overflow-y-auto">
+                <TabsContent value="type" className="px-8 pb-8 pt-8 overflow-y-auto">
                   <div className="space-y-4">
                     {/* Search Scope Toggle */}
-                    <div className="flex justify-center mb-6">
+                    <div className="flex justify-center">
                       <div className="flex rounded-lg bg-muted p-1">
                         <button
                           onClick={() => setSearchScope('local')}
@@ -1402,6 +1408,10 @@ const Homepage = () => {
                         </button>
                       </div>
                     </div>
+                  </div>
+                </TabsContent>
+                <TabsContent value="times" className="px-8 pb-8 pt-8 overflow-y-auto">
+                  <div className="space-y-4">
                     {/* Mobile layout - integrated day buttons with time selectors */}
                     <div className="md:hidden space-y-6 max-w-xs mx-auto">
                       {DAYS.map((day) => (
