@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Heart, Star, Filter, RotateCcw, MapPin, Search, ChevronDown, Store, Package, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Heart, Star, Filter, RotateCcw, MapPin, Search, ChevronDown, Store, Package, ChevronLeft, ChevronRight, X, Globe } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -1392,6 +1392,7 @@ const Homepage = () => {
                               : "text-muted-foreground hover:text-foreground"
                           )}
                         >
+                          <Globe className="h-4 w-4 inline mr-1" />
                           All of US
                         </button>
                         <button
