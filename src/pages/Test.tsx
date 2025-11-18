@@ -107,6 +107,7 @@ const Homepage = () => {
   const [currentVendorId, setCurrentVendorId] = useState<string | undefined>(undefined);
   const [currentVendorName, setCurrentVendorName] = useState<string | undefined>(undefined);
   const [marketAddressesMap, setMarketAddressesMap] = useState<Record<string, string>>({});
+  const [marketDaysMap, setMarketDaysMap] = useState<Record<string, string[]>>({});
   const [vendorMarketIndices, setVendorMarketIndices] = useState<Record<string, number>>({});
   const [searchScope, setSearchScope] = useState<'local' | 'nationwide'>('nationwide');
   const [sortBy, setSortBy] = useState<'relevancy' | 'lowest-price' | 'highest-price' | 'top-rated' | 'most-recent'>('relevancy');
@@ -748,6 +749,7 @@ const Homepage = () => {
       name: string;
       address: string;
       vendors: AcceptedSubmission[];
+      days?: string[];
     }> = {};
 
     filteredSubmissions.forEach(submission => {
@@ -783,7 +785,8 @@ const Homepage = () => {
           markets[marketKey] = {
             name: marketName,
             address: marketAddress,
-            vendors: []
+            vendors: [],
+            days: marketDaysMap[marketName] || []
           };
         }
         
@@ -799,7 +802,7 @@ const Homepage = () => {
     try {
       const { data, error } = await supabase
         .from('markets')
-        .select('name, address');
+        .select('name, address, days');
       
       if (error) {
         console.error('Error fetching market addresses:', error);
@@ -808,14 +811,17 @@ const Homepage = () => {
       
       if (data) {
         const addressMap: Record<string, string> = {};
+        const daysMap: Record<string, string[]> = {};
         data.forEach(market => {
           addressMap[market.name] = market.address;
+          daysMap[market.name] = market.days || [];
         });
         setMarketAddressesMap(addressMap);
-        console.log('📍 Loaded market addresses from database:', addressMap);
+        setMarketDaysMap(daysMap);
+        console.log('📍 Loaded market data from database:', { addressMap, daysMap });
       }
     } catch (error) {
-      console.error('Error fetching market addresses:', error);
+      console.error('Error fetching market data:', error);
     }
   };
 
@@ -2120,6 +2126,20 @@ const Homepage = () => {
                           {market.address.replace(/,\s*United States\s*$/i, '').trim()}
                         </p>
                       </div>
+                      
+                      {/* Market Days Badges */}
+                      {market.days && market.days.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {market.days.map((day: string) => (
+                            <Badge 
+                              key={day} 
+                              className="text-xs px-3 py-1 bg-green-100 text-green-700 hover:bg-green-100 border-0"
+                            >
+                              {day}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
                       
                       <p className="text-sm text-foreground">
                         {market.vendors.length} vendor{market.vendors.length !== 1 ? 's' : ''}
