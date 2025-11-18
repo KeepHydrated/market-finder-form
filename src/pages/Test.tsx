@@ -1379,7 +1379,7 @@ const Homepage = () => {
                   </div>
                 </div>
                 <TabsContent value="type" className="px-8 pb-8 pt-8 overflow-y-auto">
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {/* Search Scope Toggle */}
                     <div className="flex justify-center">
                       <div className="flex rounded-lg bg-muted p-1">
@@ -1405,6 +1405,54 @@ const Homepage = () => {
                           )}
                         >
                           All of US
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* View Mode Toggle */}
+                    <div className="flex justify-center">
+                      <div className="flex rounded-lg bg-muted p-1">
+                        <button
+                          onClick={() => {
+                            setViewMode('vendors');
+                            setSelectedMarket(null);
+                          }}
+                          className={cn(
+                            "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                            viewMode === 'vendors' && !selectedMarket
+                              ? "bg-background text-foreground shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          Vendors
+                        </button>
+                        <button
+                          onClick={() => {
+                            setViewMode('markets');
+                            setSelectedMarket(null);
+                          }}
+                          className={cn(
+                            "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                            viewMode === 'markets'
+                              ? "bg-background text-foreground shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          Markets
+                        </button>
+                        <button
+                          onClick={() => {
+                            setViewMode('products');
+                            setSelectedMarket(null);
+                          }}
+                          className={cn(
+                            "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                            viewMode === 'products'
+                              ? "bg-background text-foreground shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          Products
                         </button>
                       </div>
                     </div>
