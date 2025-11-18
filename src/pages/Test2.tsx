@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Heart, Star, MapPin } from "lucide-react";
 import { useLikes } from "@/hooks/useLikes";
+import farmersMarketBanner from "@/assets/farmers-market-banner.jpg";
 
 interface Product {
   id: string;
@@ -137,23 +138,30 @@ const Test2 = () => {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         {/* Farmers Market Banner */}
-        <div className="mb-8 rounded-lg bg-gradient-to-r from-primary/10 via-primary/5 to-background border border-primary/20 p-6 md:p-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-center md:text-left">
+        <div className="mb-8 rounded-lg overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background border border-primary/20">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
+            <div className="flex-1 p-6 md:p-8 text-center md:text-left">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
                 Submit Your Farmers Market for More Exposure
               </h2>
-              <p className="text-muted-foreground text-sm md:text-base">
+              <p className="text-muted-foreground text-sm md:text-base mb-4 md:mb-6">
                 Get your market in front of thousands of local shoppers and help your community discover fresh, local products
               </p>
+              <Button 
+                size="lg"
+                onClick={() => navigate('/submit-market')}
+                className="whitespace-nowrap"
+              >
+                Submit Now
+              </Button>
             </div>
-            <Button 
-              size="lg"
-              onClick={() => navigate('/submit-market')}
-              className="whitespace-nowrap"
-            >
-              Submit Now
-            </Button>
+            <div className="w-full md:w-1/2 h-48 md:h-64">
+              <img 
+                src={farmersMarketBanner} 
+                alt="Fresh farmers market produce" 
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
         </div>
 
