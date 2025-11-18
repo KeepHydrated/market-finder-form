@@ -939,9 +939,24 @@ const Homepage = () => {
 
   // Enrich market days from Google Places API
   useEffect(() => {
+    console.log('🔄 Markets enrichment useEffect triggered', {
+      acceptedSubmissionsLength: acceptedSubmissions.length,
+      marketAddressesMapKeys: Object.keys(marketAddressesMap).length,
+      loadingMarketDays,
+      marketDaysMapKeys: Object.keys(marketDaysMap).length
+    });
+    
     const markets = groupVendorsByMarket();
-    if (Object.keys(markets).length > 0 && !loadingMarketDays && Object.keys(marketDaysMap).length === 0) {
+    console.log('📊 Grouped markets:', Object.keys(markets).length, markets);
+    
+    if (Object.keys(markets).length > 0 && !loadingMarketDays) {
+      console.log('✅ Calling enrichMarketDays...');
       enrichMarketDays(markets);
+    } else {
+      console.log('❌ Skipping enrichMarketDays', {
+        hasMarkets: Object.keys(markets).length > 0,
+        notLoading: !loadingMarketDays
+      });
     }
   }, [acceptedSubmissions, marketAddressesMap]);
 
