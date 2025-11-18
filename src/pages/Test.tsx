@@ -247,14 +247,14 @@ const Homepage = () => {
         ? prev.filter(d => d !== day)
         : [...prev, day];
       
-      // Initialize time selection for newly selected day
+      // Initialize time selection for newly selected day (all day)
       if (!prev.includes(day)) {
         setDayTimeSelections(prevTimes => ({
           ...prevTimes,
           [day]: {
-            startTime: '08:00',
+            startTime: '12:00',
             startPeriod: 'AM',
-            endTime: '02:00',
+            endTime: '11:30',
             endPeriod: 'PM'
           }
         }));
