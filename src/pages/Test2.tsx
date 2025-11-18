@@ -149,7 +149,7 @@ const Test2 = () => {
               </p>
               <Button 
                 size="lg"
-                onClick={() => navigate('/submit-market')}
+                onClick={() => navigate('/my-shop')}
                 className="whitespace-nowrap"
               >
                 Submit Now
