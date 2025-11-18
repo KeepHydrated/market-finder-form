@@ -1272,33 +1272,6 @@ const Homepage = () => {
           )}
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
-            {/* Search Scope Toggle */}
-            <div className="flex rounded-lg bg-muted p-1">
-              <button
-                onClick={() => setSearchScope('local')}
-                className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                  searchScope === 'local'
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <MapPin className="h-4 w-4 inline mr-1" />
-                Local
-              </button>
-              <button
-                onClick={() => setSearchScope('nationwide')}
-                className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                  searchScope === 'nationwide'
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                All of US
-              </button>
-            </div>
-
           {/* View Toggle and Filter */}
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
             <div className="flex rounded-lg bg-muted p-1">
@@ -1401,6 +1374,34 @@ const Homepage = () => {
                 </div>
                 <TabsContent value="times" className="px-8 pb-8 pt-8 overflow-y-auto">
                   <div className="space-y-4">
+                    {/* Search Scope Toggle */}
+                    <div className="flex justify-center mb-6">
+                      <div className="flex rounded-lg bg-muted p-1">
+                        <button
+                          onClick={() => setSearchScope('local')}
+                          className={cn(
+                            "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                            searchScope === 'local'
+                              ? "bg-background text-foreground shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          <MapPin className="h-4 w-4 inline mr-1" />
+                          Local
+                        </button>
+                        <button
+                          onClick={() => setSearchScope('nationwide')}
+                          className={cn(
+                            "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                            searchScope === 'nationwide'
+                              ? "bg-background text-foreground shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          All of US
+                        </button>
+                      </div>
+                    </div>
                     {/* Mobile layout - integrated day buttons with time selectors */}
                     <div className="md:hidden space-y-6 max-w-xs mx-auto">
                       {DAYS.map((day) => (
