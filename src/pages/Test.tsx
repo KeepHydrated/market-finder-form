@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -1282,6 +1282,7 @@ const Homepage = () => {
               </Button>
             </DialogTrigger>
             <DialogContent className="w-full md:w-[800px] max-w-none p-0 bg-background border shadow-lg max-h-[80vh] flex flex-col">
+              <DialogTitle className="sr-only">Filter Options</DialogTitle>
               <Tabs defaultValue="type" className="w-full flex flex-col overflow-hidden">
                 <div className="pt-8 px-4 md:px-8 flex justify-between items-center flex-shrink-0 border-b">
                   <div className="flex-1" />
