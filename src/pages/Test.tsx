@@ -108,6 +108,7 @@ const Homepage = () => {
   const [currentVendorName, setCurrentVendorName] = useState<string | undefined>(undefined);
   const [marketAddressesMap, setMarketAddressesMap] = useState<Record<string, string>>({});
   const [marketDaysMap, setMarketDaysMap] = useState<Record<string, string[]>>({});
+  const [loadingMarketDays, setLoadingMarketDays] = useState(false);
   const [vendorMarketIndices, setVendorMarketIndices] = useState<Record<string, number>>({});
   const [searchScope, setSearchScope] = useState<'local' | 'nationwide'>('nationwide');
   const [sortBy, setSortBy] = useState<'relevancy' | 'lowest-price' | 'highest-price' | 'top-rated' | 'most-recent'>('relevancy');
@@ -750,6 +751,7 @@ const Homepage = () => {
       address: string;
       vendors: AcceptedSubmission[];
       days?: string[];
+      place_id?: string | null;
     }> = {};
 
     filteredSubmissions.forEach(submission => {
@@ -776,13 +778,7 @@ const Homepage = () => {
           // Extract string values from object
           marketName = String(market.name || market.structured_formatting?.main_text || 'Unknown Market');
           marketAddress = String(market.address || market.structured_formatting?.secondary_text || marketAddressesMap[marketName] || submission.market_address || 'Address not available');
-          
-          // Try to extract days from Google Maps opening hours if available
-          if (market.opening_hours && market.opening_hours.weekday_text) {
-            marketDays = extractDaysFromWeekdayText(market.opening_hours.weekday_text);
-          } else {
-            marketDays = marketDaysMap[marketName] || [];
-          }
+          marketDays = marketDaysMap[marketName] || [];
         } else {
           marketName = 'Unknown Market';
           marketAddress = 'Address not available';
@@ -796,7 +792,8 @@ const Homepage = () => {
             name: marketName,
             address: marketAddress,
             vendors: [],
-            days: marketDays.length > 0 ? marketDays : marketDaysMap[marketName] || []
+            days: marketDays.length > 0 ? marketDays : marketDaysMap[marketName] || [],
+            place_id: typeof market === 'object' ? market.place_id : null
           };
         }
         
@@ -835,27 +832,77 @@ const Homepage = () => {
     }
   };
 
+  // Fetch Google Places details to get opening hours
+  const fetchPlaceDetails = async (placeId: string): Promise<string[]> => {
+    try {
+      const { data: { key } } = await supabase.functions.invoke('get-google-api-key');
+      if (!key) return [];
+
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=opening_hours&key=${key}`
+      );
+      const data = await response.json();
+      
+      if (data.result?.opening_hours?.weekday_text) {
+        return extractDaysFromWeekdayText(data.result.opening_hours.weekday_text);
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching place details:', error);
+      return [];
+    }
+  };
+
   // Helper function to extract days from Google Maps weekday_text
   const extractDaysFromWeekdayText = (weekdayText: string[]): string[] => {
     if (!weekdayText || weekdayText.length === 0) return [];
     
     const dayMap: Record<string, string> = {
-      'Monday': 'Monday',
-      'Tuesday': 'Tuesday', 
-      'Wednesday': 'Wednesday',
-      'Thursday': 'Thursday',
-      'Friday': 'Friday',
-      'Saturday': 'Saturday',
-      'Sunday': 'Sunday'
+      'Monday': 'Mon',
+      'Tuesday': 'Tue', 
+      'Wednesday': 'Wed',
+      'Thursday': 'Thu',
+      'Friday': 'Fri',
+      'Saturday': 'Sat',
+      'Sunday': 'Sun'
     };
     
-    return weekdayText
-      .map(text => {
-        // Extract day name from text like "Monday: 7:00 AM – 10:00 PM"
-        const dayName = text.split(':')[0];
-        return dayMap[dayName] || null;
-      })
-      .filter(Boolean) as string[];
+    const openDays: string[] = [];
+    weekdayText.forEach(text => {
+      // Extract day name from text like "Monday: 7:00 AM – 10:00 PM"
+      const dayName = text.split(':')[0].trim();
+      const hours = text.split(':').slice(1).join(':').trim();
+      
+      // Only include days that aren't closed
+      if (!hours.toLowerCase().includes('closed') && dayMap[dayName]) {
+        openDays.push(dayMap[dayName]);
+      }
+    });
+    
+    return openDays;
+  };
+
+  // Fetch days for markets with place_ids
+  const enrichMarketDays = async (markets: Record<string, any>) => {
+    setLoadingMarketDays(true);
+    const updatedDaysMap: Record<string, string[]> = { ...marketDaysMap };
+    
+    for (const [marketKey, market] of Object.entries(markets)) {
+      // Check if we already have days or if we can get them from place_id
+      if (market.days && market.days.length > 1) continue;
+      
+      // Try to get place_id from the market object or from selected_markets
+      const placeId = market.place_id;
+      if (placeId && !updatedDaysMap[market.name]) {
+        const days = await fetchPlaceDetails(placeId);
+        if (days.length > 0) {
+          updatedDaysMap[market.name] = days;
+        }
+      }
+    }
+    
+    setMarketDaysMap(updatedDaysMap);
+    setLoadingMarketDays(false);
   };
 
   useEffect(() => {
@@ -867,6 +914,14 @@ const Homepage = () => {
     console.log('🌐 Starting IP location detection...');
     getLocationFromIP();
   }, []);
+
+  // Enrich market days from Google Places API
+  useEffect(() => {
+    const markets = groupVendorsByMarket();
+    if (Object.keys(markets).length > 0 && !loadingMarketDays && Object.keys(marketDaysMap).length === 0) {
+      enrichMarketDays(markets);
+    }
+  }, [acceptedSubmissions, marketAddressesMap]);
 
   // Initialize cached distances on component mount for instant display
   useEffect(() => {
