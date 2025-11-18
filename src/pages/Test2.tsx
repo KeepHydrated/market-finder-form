@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Heart, Star, MapPin } from "lucide-react";
 import { useLikes } from "@/hooks/useLikes";
+import { cn } from "@/lib/utils";
 import farmersMarketBanner from "@/assets/farmers-market-banner.jpg";
 
 interface Product {
@@ -187,56 +188,70 @@ const Test2 = () => {
               {recommendedProducts.map((product) => (
                 <Card
                   key={`${product.vendorId}-${product.id}`}
-                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                   onClick={() => navigate('/test', { state: { productId: product.id } })}
                 >
                   {/* Product Image */}
-                  <div className="aspect-square bg-muted relative overflow-hidden">
-                    {product.images && product.images.length > 0 && (
+                  <div className="aspect-[4/3] bg-muted relative overflow-hidden group">
+                    {product.images && product.images.length > 0 ? (
                       <img
                         src={product.images[0]}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        alt={product.name || 'Product'}
+                        className="w-full h-full object-cover transition-opacity duration-200"
                       />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                        No Image Available
+                      </div>
                     )}
                     
                     {/* Like Button */}
-                    <button
-                      onClick={(e) => {
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                      onClick={async (e) => {
                         e.stopPropagation();
-                        toggleLike(product.id, 'product');
+                        await toggleLike(`${product.vendorId}-${product.id}`, 'product');
                       }}
-                      className="absolute top-2 right-2 p-2 bg-background/80 backdrop-blur-sm rounded-full hover:bg-background transition-colors"
                     >
-                      <Heart
-                        className={`h-5 w-5 ${
-                          isLiked(product.id, 'product')
-                            ? 'fill-red-500 text-red-500'
-                            : 'text-foreground'
-                        }`}
+                      <Heart 
+                        className={cn(
+                          "h-4 w-4 transition-colors",
+                          isLiked(`${product.vendorId}-${product.id}`, 'product')
+                            ? "text-red-500 fill-current" 
+                            : "text-gray-600"
+                        )}
                       />
-                    </button>
+                    </Button>
+                  </div>
 
-                    {/* Category Badge */}
-                    {product.category && (
-                      <Badge className="absolute bottom-2 left-2 bg-background/80 backdrop-blur-sm">
-                        {product.category}
-                      </Badge>
+                  {/* Product Information */}
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-normal text-sm flex-1 text-black">
+                        {product.name || 'Product'}
+                      </h3>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-muted-foreground">
+                        ${(product.price || 0).toFixed(2)}
+                      </span>
+                    </div>
+                    {product.vendorName && (
+                      <div className="mt-2 pt-2 border-t border-muted">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate('/test');
+                          }}
+                          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {product.vendorName}
+                        </button>
+                      </div>
                     )}
-                  </div>
-
-                  {/* Product Info */}
-                  <div className="p-4">
-                    <h3 className="font-semibold text-foreground mb-1 line-clamp-1">
-                      {product.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
-                      {product.vendorName}
-                    </p>
-                    <p className="text-lg font-bold text-primary">
-                      ${product.price.toFixed(2)}
-                    </p>
-                  </div>
+                  </CardContent>
                 </Card>
               ))}
             </div>
