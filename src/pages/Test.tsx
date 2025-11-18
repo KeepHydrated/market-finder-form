@@ -1876,6 +1876,20 @@ const Homepage = () => {
                                       </p>
                                     </div>
                                   )}
+                                  
+                                  {/* Market Days Badges */}
+                                  {submission.market_days && submission.market_days.length > 0 && (
+                                    <div className="flex flex-wrap gap-1.5 mt-2">
+                                      {submission.market_days.map((day: string) => (
+                                        <Badge 
+                                          key={day} 
+                                          className="text-xs px-3 py-1 bg-green-100 text-green-700 hover:bg-green-100 border-0"
+                                        >
+                                          {day}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </>
