@@ -766,17 +766,27 @@ const Homepage = () => {
         // Handle both string and object formats
         let marketName: string;
         let marketAddress: string;
+        let marketDays: string[] = [];
         
         if (typeof market === 'string') {
           marketName = market;
           marketAddress = marketAddressesMap[marketName] || submission.market_address || 'Address not available';
+          marketDays = marketDaysMap[marketName] || [];
         } else if (market && typeof market === 'object') {
           // Extract string values from object
           marketName = String(market.name || market.structured_formatting?.main_text || 'Unknown Market');
           marketAddress = String(market.address || market.structured_formatting?.secondary_text || marketAddressesMap[marketName] || submission.market_address || 'Address not available');
+          
+          // Try to extract days from Google Maps opening hours if available
+          if (market.opening_hours && market.opening_hours.weekday_text) {
+            marketDays = extractDaysFromWeekdayText(market.opening_hours.weekday_text);
+          } else {
+            marketDays = marketDaysMap[marketName] || [];
+          }
         } else {
           marketName = 'Unknown Market';
           marketAddress = 'Address not available';
+          marketDays = [];
         }
         
         const marketKey = marketName;
@@ -786,7 +796,7 @@ const Homepage = () => {
             name: marketName,
             address: marketAddress,
             vendors: [],
-            days: marketDaysMap[marketName] || []
+            days: marketDays.length > 0 ? marketDays : marketDaysMap[marketName] || []
           };
         }
         
@@ -823,6 +833,29 @@ const Homepage = () => {
     } catch (error) {
       console.error('Error fetching market data:', error);
     }
+  };
+
+  // Helper function to extract days from Google Maps weekday_text
+  const extractDaysFromWeekdayText = (weekdayText: string[]): string[] => {
+    if (!weekdayText || weekdayText.length === 0) return [];
+    
+    const dayMap: Record<string, string> = {
+      'Monday': 'Monday',
+      'Tuesday': 'Tuesday', 
+      'Wednesday': 'Wednesday',
+      'Thursday': 'Thursday',
+      'Friday': 'Friday',
+      'Saturday': 'Saturday',
+      'Sunday': 'Sunday'
+    };
+    
+    return weekdayText
+      .map(text => {
+        // Extract day name from text like "Monday: 7:00 AM – 10:00 PM"
+        const dayName = text.split(':')[0];
+        return dayMap[dayName] || null;
+      })
+      .filter(Boolean) as string[];
   };
 
   useEffect(() => {
