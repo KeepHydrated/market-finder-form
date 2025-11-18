@@ -540,48 +540,79 @@ const Test2 = () => {
                   onClick={() => navigate('/', { state: { searchTerm: market.name } })}
                 >
                   {/* Market Image Placeholder */}
-                  <div className="aspect-[4/3] bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900 flex items-center justify-center p-4">
+                  <div className="aspect-[4/3] bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900 flex items-center justify-center p-4 relative overflow-hidden group">
                     <span className="text-6xl">🏪</span>
-                  </div>
-
-                  {/* Market Info */}
-                  <div className="p-4">
-                    <h3 className="font-semibold text-foreground mb-2 line-clamp-1">
-                      {market.name}
-                    </h3>
                     
-                    {/* Rating */}
+                    {/* Star Rating Badge - Top Left */}
                     {market.google_rating && (
-                      <div className="flex items-center gap-1 mb-2">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <Badge className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm shadow-sm flex items-center gap-1 px-2 py-1">
+                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                         <span className="text-sm font-medium">{market.google_rating.toFixed(1)}</span>
                         {market.google_rating_count && (
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-xs text-muted-foreground">
                             ({market.google_rating_count})
                           </span>
                         )}
-                      </div>
+                      </Badge>
                     )}
+                    
+                    {/* Like Button - Top Right */}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        await toggleLike(market.id.toString(), 'market');
+                      }}
+                    >
+                      <Heart 
+                        className={cn(
+                          "h-4 w-4 transition-colors",
+                          isLiked(market.id.toString(), 'market')
+                            ? "text-red-500 fill-current" 
+                            : "text-gray-600"
+                        )}
+                      />
+                    </Button>
+                    
+                    {/* Distance Badge - Bottom Right (placeholder) */}
+                    <Badge className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm shadow-sm">
+                      212.8 mi
+                    </Badge>
+                  </div>
 
-                    {/* Location */}
-                    <div className="flex items-center gap-1 mb-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                  {/* Market Info */}
+                  <CardContent className="p-4 space-y-2">
+                    {/* Market Name */}
+                    <h3 className="font-bold text-lg text-black">
+                      {market.name}
+                    </h3>
+
+                    {/* Address */}
+                    <div className="flex items-start gap-1">
+                      <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                       <span className="text-sm text-muted-foreground line-clamp-1">
-                        {market.city}, {market.state}
+                        {market.address && `${market.address}, `}{market.city}, {market.state}
                       </span>
                     </div>
 
                     {/* Days Open */}
                     {market.days && market.days.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {market.days.map((day, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
+                      <div className="flex flex-wrap gap-1">
+                        {market.days.slice(0, 3).map((day, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs bg-green-50 text-green-700 border-0">
                             {day}
                           </Badge>
                         ))}
+                        {market.days.length > 3 && (
+                          <Badge variant="secondary" className="text-xs bg-muted">
+                            +{market.days.length - 3}
+                          </Badge>
+                        )}
                       </div>
                     )}
-                  </div>
+                  </CardContent>
                 </Card>
               ))}
             </div>
