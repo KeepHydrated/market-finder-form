@@ -172,11 +172,8 @@ export function UserMenu({ user, profile }: UserMenuProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal p-0">
-          <button
-            onClick={handleProfileClick}
-            className="w-full p-2 text-left hover:bg-muted/50 rounded-md transition-colors"
-          >
+        <DropdownMenuLabel className="font-normal p-2">
+          <div className="cursor-default">
             <div className="flex items-center space-x-3">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={profile?.avatar_url} alt="Avatar" />
@@ -191,7 +188,7 @@ export function UserMenu({ user, profile }: UserMenuProps) {
                 </p>
               </div>
             </div>
-          </button>
+          </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleAccountClick}>
