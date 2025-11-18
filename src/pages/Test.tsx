@@ -1414,6 +1414,20 @@ const Homepage = () => {
                       <div className="flex rounded-lg bg-muted p-1">
                         <button
                           onClick={() => {
+                            setViewMode('products');
+                            setSelectedMarket(null);
+                          }}
+                          className={cn(
+                            "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                            viewMode === 'products'
+                              ? "bg-background text-foreground shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          Products
+                        </button>
+                        <button
+                          onClick={() => {
                             setViewMode('vendors');
                             setSelectedMarket(null);
                           }}
@@ -1439,20 +1453,6 @@ const Homepage = () => {
                           )}
                         >
                           Markets
-                        </button>
-                        <button
-                          onClick={() => {
-                            setViewMode('products');
-                            setSelectedMarket(null);
-                          }}
-                          className={cn(
-                            "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                            viewMode === 'products'
-                              ? "bg-background text-foreground shadow-sm"
-                              : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          Products
                         </button>
                       </div>
                     </div>
