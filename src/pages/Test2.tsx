@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Heart, Star, MapPin } from "lucide-react";
 import { useLikes } from "@/hooks/useLikes";
 import { cn } from "@/lib/utils";
+import { ProductDetailModal } from "@/components/ProductDetailModal";
 import farmersMarketBanner from "@/assets/farmers-market-banner.jpg";
 
 interface Product {
@@ -50,6 +51,13 @@ const Test2 = () => {
   const [vendorsLoading, setVendorsLoading] = useState(true);
   const [marketsLoading, setMarketsLoading] = useState(true);
   const { toggleLike, isLiked } = useLikes();
+  
+  // Product modal state
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [currentVendorProducts, setCurrentVendorProducts] = useState<any[]>([]);
+  const [currentVendorId, setCurrentVendorId] = useState<string | undefined>(undefined);
+  const [currentVendorName, setCurrentVendorName] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     fetchRecommendedProducts();
@@ -190,7 +198,34 @@ const Test2 = () => {
                 <Card
                   key={`${product.vendorId}-${product.id}`}
                   className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => navigate('/test', { state: { productId: product.id } })}
+                  onClick={async () => {
+                    // Fetch the vendor's full product list
+                    const { data: vendor } = await supabase
+                      .from('submissions')
+                      .select('products')
+                      .eq('id', product.vendorId)
+                      .single();
+                    
+                    if (vendor) {
+                      // Set up the product modal
+                      const productWithId = {
+                        ...product,
+                        id: product.id
+                      };
+                      setSelectedProduct(productWithId);
+                      // Store vendor info separately
+                      setCurrentVendorId(product.vendorId);
+                      setCurrentVendorName(product.vendorName);
+                      // Ensure all vendor products have IDs
+                      const vendorProducts = vendor.products as unknown as Product[];
+                      const productsWithIds = (vendorProducts || []).map((p: any, idx: number) => ({
+                        ...p,
+                        id: p.id || idx
+                      }));
+                      setCurrentVendorProducts(productsWithIds);
+                      setIsProductModalOpen(true);
+                    }
+                  }}
                 >
                   {/* Product Image */}
                   <div className="aspect-[4/3] bg-muted relative overflow-hidden group">
@@ -553,6 +588,16 @@ const Test2 = () => {
           )}
         </div>
       </div>
+      
+      {/* Product Detail Modal */}
+      <ProductDetailModal
+        open={isProductModalOpen}
+        onClose={() => setIsProductModalOpen(false)}
+        product={selectedProduct}
+        products={currentVendorProducts}
+        vendorId={currentVendorId}
+        vendorName={currentVendorName}
+      />
     </div>
   );
 };
