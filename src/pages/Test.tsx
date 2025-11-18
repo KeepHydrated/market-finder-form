@@ -1379,7 +1379,7 @@ const Homepage = () => {
                   </div>
                 </div>
                 <TabsContent value="type" className="px-8 pb-8 pt-8 overflow-y-auto">
-                  <div className="space-y-6">
+                  <div className="flex flex-col md:flex-row gap-4">
                     {/* Search Scope Toggle */}
                     <div className="flex justify-start">
                       <div className="flex rounded-lg bg-muted p-1">
