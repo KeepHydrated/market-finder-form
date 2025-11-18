@@ -45,9 +45,9 @@ const App = () => (
             <ShoppingCart />
             <main className="flex-1">
               <Routes>
-                <Route path="/" element={<Homepage />} />
+                <Route path="/" element={<Test2 />} />
                 <Route path="/test" element={<Test />} />
-                <Route path="/test2" element={<Test2 />} />
+                <Route path="/homepage" element={<Homepage />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/search" element={<CategoryProducts />} />
                 <Route path="/market" element={<VendorDuplicate />} />
