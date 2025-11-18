@@ -1384,6 +1384,17 @@ const Homepage = () => {
                     <div className="flex justify-start">
                       <div className="flex rounded-lg bg-muted p-1">
                         <button
+                          onClick={() => setSearchScope('nationwide')}
+                          className={cn(
+                            "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                            searchScope === 'nationwide'
+                              ? "bg-background text-foreground shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          All of US
+                        </button>
+                        <button
                           onClick={() => setSearchScope('local')}
                           className={cn(
                             "px-4 py-2 text-sm font-medium rounded-md transition-colors",
@@ -1394,17 +1405,6 @@ const Homepage = () => {
                         >
                           <MapPin className="h-4 w-4 inline mr-1" />
                           Local
-                        </button>
-                        <button
-                          onClick={() => setSearchScope('nationwide')}
-                          className={cn(
-                            "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                            searchScope === 'nationwide'
-                              ? "bg-background text-foreground shadow-sm"
-                              : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          All of US
                         </button>
                       </div>
                     </div>
