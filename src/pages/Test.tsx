@@ -1271,8 +1271,50 @@ const Homepage = () => {
             </div>
           )}
           
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto justify-between">
-            {/* View Toggle Tabs */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+            {/* Search Scope Toggle */}
+            <div className="flex rounded-lg bg-muted p-1">
+              <button
+                onClick={() => setSearchScope('local')}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  searchScope === 'local'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <MapPin className="h-4 w-4 inline mr-1" />
+                Local
+              </button>
+              <button
+                onClick={() => setSearchScope('nationwide')}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  searchScope === 'nationwide'
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                All of US
+              </button>
+            </div>
+
+          {/* View Toggle and Filter */}
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+            {/* Sort By Dropdown */}
+            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+              <SelectTrigger className="w-[200px] bg-background border shadow-sm">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="relevancy">Relevancy</SelectItem>
+                <SelectItem value="lowest-price">Lowest Price</SelectItem>
+                <SelectItem value="highest-price">Highest Price</SelectItem>
+                <SelectItem value="top-rated">Top Rated Store</SelectItem>
+                <SelectItem value="most-recent">Most Recent</SelectItem>
+              </SelectContent>
+            </Select>
+            
             <div className="flex rounded-lg bg-muted p-1">
               <button
                 onClick={() => {
@@ -1280,14 +1322,14 @@ const Homepage = () => {
                   setSelectedMarket(null);
                 }}
                 className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-1",
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
                   viewMode === 'vendors' && !selectedMarket
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <Store className="h-4 w-4" />
-                <span className="hidden sm:inline">Vendors</span>
+                <Store className="h-5 w-5 md:hidden" />
+                <span className="hidden md:inline">Vendors</span>
               </button>
               <button
                 onClick={() => {
@@ -1295,14 +1337,14 @@ const Homepage = () => {
                   setSelectedMarket(null);
                 }}
                 className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-1",
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
                   viewMode === 'markets'
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <MapPin className="h-4 w-4" />
-                <span className="hidden sm:inline">Markets</span>
+                <MapPin className="h-5 w-5 md:hidden" />
+                <span className="hidden md:inline">Markets</span>
               </button>
               <button
                 onClick={() => {
@@ -1310,69 +1352,31 @@ const Homepage = () => {
                   setSelectedMarket(null);
                 }}
                 className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-1",
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
                   viewMode === 'products'
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <Package className="h-4 w-4" />
-                <span className="hidden sm:inline">Products</span>
+                <Package className="h-5 w-5 md:hidden" />
+                <span className="hidden md:inline">Products</span>
               </button>
             </div>
-
-            {/* Search Scope and Filter */}
-            <div className="flex items-center gap-2">
-              {/* Compact Search Scope Toggle */}
-              <div className="flex rounded-lg border bg-background">
-                <button
-                  onClick={() => setSearchScope('local')}
-                  className={cn(
-                    "px-3 py-2 text-xs font-medium transition-colors flex items-center gap-1",
-                    searchScope === 'local'
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <MapPin className="h-3 w-3" />
-                  <span className="hidden sm:inline">Local</span>
-                </button>
-                <div className="w-px bg-border" />
-                <button
-                  onClick={() => setSearchScope('nationwide')}
-                  className={cn(
-                    "px-3 py-2 text-xs font-medium transition-colors",
-                    searchScope === 'nationwide'
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <span className="hidden sm:inline">All of US</span>
-                  <span className="sm:hidden">All</span>
-                </button>
-              </div>
-              
-              <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="flex items-center gap-1.5">
-                  <Filter className="h-4 w-4" />
-                  <span className="hidden sm:inline">Filters</span>
-                </Button>
-              </DialogTrigger>
             
+            <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                <span className="hidden md:inline">Filter search results</span>
+              </Button>
+            </DialogTrigger>
             <DialogContent className="w-full md:w-[800px] max-w-none p-0 bg-background border shadow-lg max-h-[80vh] flex flex-col">
-              <Tabs defaultValue="sort" className="w-full flex flex-col overflow-hidden">
+              <Tabs defaultValue="times" className="w-full flex flex-col overflow-hidden">
                 <div className="pt-8 px-4 md:px-8 flex justify-between items-center flex-shrink-0 border-b">
                   <div className="flex-1" />
                   <TabsList className="inline-flex gap-4 md:gap-8 bg-transparent border-0 p-0 h-auto">
                     <TabsTrigger 
-                      value="sort" 
-                      className="py-4 px-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=inactive]:text-muted-foreground font-semibold"
-                    >
-                      Sort
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="times"
+                      value="times" 
                       className="py-4 px-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=inactive]:text-muted-foreground font-semibold"
                     >
                       Times
@@ -1409,28 +1413,6 @@ const Homepage = () => {
                     </Button>
                   </div>
                 </div>
-                
-                {/* Sort Tab Content */}
-                <TabsContent value="sort" className="px-8 pb-8 pt-8 overflow-y-auto">
-                  <div className="space-y-4">
-                    <div className="max-w-md mx-auto space-y-3">
-                      <label className="text-sm font-medium text-foreground">Sort Results By</label>
-                      <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-                        <SelectTrigger className="w-full bg-background border">
-                          <SelectValue placeholder="Sort by" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background border shadow-lg z-50">
-                          <SelectItem value="relevancy">Relevancy</SelectItem>
-                          <SelectItem value="lowest-price">Lowest Price</SelectItem>
-                          <SelectItem value="highest-price">Highest Price</SelectItem>
-                          <SelectItem value="top-rated">Top Rated Store</SelectItem>
-                          <SelectItem value="most-recent">Most Recent</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </TabsContent>
-                
                 <TabsContent value="times" className="px-8 pb-8 pt-8 overflow-y-auto">
                   <div className="space-y-4">
                     {/* Mobile layout - integrated day buttons with time selectors */}
@@ -1644,7 +1626,7 @@ const Homepage = () => {
               </Tabs>
             </DialogContent>
           </Dialog>
-            </div>
+          </div>
           </div>
         </div>
         
