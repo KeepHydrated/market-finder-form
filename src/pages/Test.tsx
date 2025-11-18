@@ -1624,11 +1624,8 @@ const Homepage = () => {
               </Tabs>
             </DialogContent>
             </Dialog>
-          </div>
-          </div>
-
-          {/* Second Row - Sort By */}
-          <div className="flex items-center gap-3 mt-4">
+            
+            {/* Sort By */}
             <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
               <SelectTrigger className="w-[200px] bg-background border shadow-sm">
                 <SelectValue placeholder="Sort by" />
@@ -1641,6 +1638,7 @@ const Homepage = () => {
                 <SelectItem value="most-recent">Most Recent</SelectItem>
               </SelectContent>
             </Select>
+          </div>
           </div>
         </div>
         
