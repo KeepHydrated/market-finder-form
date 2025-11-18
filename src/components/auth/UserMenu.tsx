@@ -179,14 +179,9 @@ export function UserMenu({ user, profile }: UserMenuProps) {
                 <AvatarImage src={profile?.avatar_url} alt="Avatar" />
                 <AvatarFallback className="text-xs">{getInitials(profile?.full_name)}</AvatarFallback>
               </Avatar>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">
-                  {profile?.full_name || 'User'}
-                </p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  {user?.email}
-                </p>
-              </div>
+              <p className="text-sm font-medium leading-none">
+                {profile?.full_name || 'User'}
+              </p>
             </div>
           </div>
         </DropdownMenuLabel>
