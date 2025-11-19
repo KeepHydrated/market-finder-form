@@ -993,7 +993,7 @@ const Homepage = () => {
 
   // Enrich market days from Google Places API
   useEffect(() => {
-    console.log('🔄 Markets enrichment useEffect triggered', {
+    console.log('🔄 [v3.0] Markets enrichment useEffect triggered', {
       acceptedSubmissionsLength: acceptedSubmissions.length,
       marketAddressesMapKeys: Object.keys(marketAddressesMap).length,
       loadingMarketDays,
@@ -1001,16 +1001,14 @@ const Homepage = () => {
     });
     
     const markets = groupVendorsByMarket();
-    console.log('📊 Grouped markets:', Object.keys(markets).length, markets);
+    console.log('📊 [v3.0] Grouped markets:', Object.keys(markets).length, markets);
     
-    if (Object.keys(markets).length > 0 && !loadingMarketDays) {
-      console.log('✅ Calling enrichMarketDays...');
+    // ALWAYS call enrichMarketDays when markets are available
+    if (Object.keys(markets).length > 0) {
+      console.log('✅ [v3.0] Calling enrichMarketDays WITHOUT loadingMarketDays check...');
       enrichMarketDays(markets);
     } else {
-      console.log('❌ Skipping enrichMarketDays', {
-        hasMarkets: Object.keys(markets).length > 0,
-        notLoading: !loadingMarketDays
-      });
+      console.log('❌ [v3.0] No markets to enrich');
     }
   }, [acceptedSubmissions, marketAddressesMap]);
 
