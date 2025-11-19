@@ -1901,9 +1901,9 @@ const Homepage = () => {
                       </Button>
 
                       {/* Distance Badge - Bottom Right */}
-                      {submission.distance !== undefined && (
+                      {vendorDistances[submission.id] && vendorDistances[submission.id] !== '-- mi' && (
                         <Badge className="absolute bottom-3 right-3 bg-white backdrop-blur-sm shadow-lg border-0 rounded-full px-3 py-1.5">
-                          <span className="font-semibold text-sm text-gray-900">{submission.distance.toFixed(1)} mi</span>
+                          <span className="font-semibold text-sm text-gray-900">{vendorDistances[submission.id]}</span>
                         </Badge>
                       )}
 
