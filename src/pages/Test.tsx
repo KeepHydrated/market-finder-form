@@ -930,32 +930,49 @@ const Homepage = () => {
 
   // Fetch days for markets with place_ids
   const enrichMarketDays = async (markets: Record<string, any>) => {
-    console.log('🚀 Starting enrichMarketDays with markets:', markets);
+    console.log('🚀 Starting enrichMarketDays - ALWAYS fetching fresh data from Google Places');
+    console.log('📊 Processing', Object.keys(markets).length, 'markets');
     setLoadingMarketDays(true);
     const updatedDaysMap: Record<string, string[]> = { ...marketDaysMap };
     
     for (const [marketKey, market] of Object.entries(markets)) {
       console.log('🔍 Processing market:', marketKey, market);
-      // Check if we already have days or if we can get them from place_id
-      if (market.days && market.days.length > 1) {
-        console.log('✅ Market already has multiple days:', market.days);
-        continue;
-      }
       
       // Try to get place_id from the market object or from selected_markets
       const placeId = market.place_id;
       console.log('🔑 Place ID for', market.name, ':', placeId);
-      if (placeId && !updatedDaysMap[market.name]) {
-        console.log('📞 Fetching days for:', market.name);
+      
+      if (placeId) {
+        console.log('📞 Fetching FRESH days from Google Places for:', market.name);
         const days = await fetchPlaceDetails(placeId);
+        
         if (days.length > 0) {
-          console.log('✅ Got days for', market.name, ':', days);
+          console.log('✅ Got fresh days for', market.name, ':', days);
           updatedDaysMap[market.name] = days;
+          
+          // Update the database with fresh days
+          try {
+            const { error: updateError } = await supabase
+              .from('markets')
+              .update({ days })
+              .match({ 
+                name: market.name,
+                address: market.address 
+              });
+
+            if (updateError) {
+              console.error(`❌ Failed to update days in database for ${market.name}:`, updateError);
+            } else {
+              console.log(`💾 Updated days in database for ${market.name}`);
+            }
+          } catch (dbError) {
+            console.error(`❌ Database error for ${market.name}:`, dbError);
+          }
+        } else {
+          console.log('⚠️ No days returned from Google Places for:', market.name);
         }
-      } else if (!placeId) {
-        console.log('⚠️ No place_id for:', market.name);
-      } else if (updatedDaysMap[market.name]) {
-        console.log('ℹ️ Already have days for:', market.name);
+      } else {
+        console.log('⚠️ No place_id available for:', market.name);
       }
     }
     
@@ -2284,17 +2301,14 @@ const Homepage = () => {
                       {/* Market Days Badges */}
                       {market.days && market.days.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
-                          {(() => {
-                            console.log('Market days for', market.name, ':', market.days);
-                            return market.days.map((day: string) => (
-                              <Badge 
-                                key={day} 
-                                className="text-xs px-3 py-1 bg-green-100 text-green-700 hover:bg-green-100 border-0"
-                              >
-                                {day}
-                              </Badge>
-                            ));
-                          })()}
+                          {market.days.map((day: string) => (
+                            <Badge 
+                              key={day} 
+                              className="text-xs px-3 py-1 bg-green-100 text-green-700 hover:bg-green-100 border-0"
+                            >
+                              {day}
+                            </Badge>
+                          ))}
                         </div>
                       )}
                     </div>
