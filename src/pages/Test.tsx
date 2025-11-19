@@ -40,6 +40,7 @@ interface AcceptedSubmission {
   longitude?: number;
   google_rating?: number;
   google_rating_count?: number;
+  distance?: number;
 }
 
 interface VendorRating {
@@ -1848,7 +1849,7 @@ const Homepage = () => {
                      }}
                   >
                     {/* Product Image */}
-                    <div className="aspect-[4/3] bg-muted relative">
+                    <div className="aspect-[4/3] bg-muted relative overflow-hidden rounded-t-xl">
                       {submission.products && submission.products.length > 0 && submission.products[0].images && submission.products[0].images.length > 0 ? (
                         <img 
                           src={submission.products[0].images[0]} 
@@ -1863,26 +1864,19 @@ const Homepage = () => {
                       
                       {/* Star Rating Badge - Top Left */}
                       {((submission.google_rating && submission.google_rating > 0) || (vendorRatings[submission.id]?.totalReviews > 0)) && (
-                        <Badge className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm shadow-sm flex items-center gap-1 px-2 py-1">
-                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-medium">
+                        <Badge className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm shadow-md flex items-center gap-1 px-2.5 py-1.5 border-0">
+                          <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" />
+                          <span className="text-sm font-semibold">
                             {submission.google_rating && submission.google_rating > 0
                               ? submission.google_rating.toFixed(1)
                               : vendorRatings[submission.id]?.averageRating.toFixed(1)
                             }
                           </span>
                           {(submission.google_rating_count || vendorRatings[submission.id]?.totalReviews) && (
-                            <span className="text-xs text-muted-foreground">
+                            <span className="text-sm text-muted-foreground">
                               ({submission.google_rating_count || vendorRatings[submission.id]?.totalReviews || 0})
                             </span>
                           )}
-                        </Badge>
-                      )}
-                      
-                      {/* Specialty Badge - Bottom Left */}
-                      {submission.primary_specialty && (
-                        <Badge className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm shadow-sm text-green-600 border-0">
-                          {submission.primary_specialty}
                         </Badge>
                       )}
                       
@@ -1890,7 +1884,7 @@ const Homepage = () => {
                       <Button
                         variant="secondary"
                         size="sm"
-                        className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                        className="absolute top-3 right-3 h-10 w-10 p-0 bg-white/95 hover:bg-white rounded-full shadow-md hover:scale-110 transition-transform border-0"
                         onClick={async (e) => {
                           e.stopPropagation();
                           await toggleLike(submission.id, 'vendor');
@@ -1898,13 +1892,20 @@ const Homepage = () => {
                       >
                         <Heart 
                           className={cn(
-                            "h-4 w-4 transition-colors",
+                            "h-5 w-5 transition-colors",
                             isLiked(submission.id, 'vendor')
                               ? "text-red-500 fill-current" 
                               : "text-gray-600"
                           )}
                         />
                       </Button>
+
+                      {/* Distance Badge - Bottom Right */}
+                      {submission.distance !== undefined && (
+                        <Badge className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm shadow-md border-0">
+                          <span className="font-medium text-sm">{submission.distance.toFixed(1)} mi</span>
+                        </Badge>
+                      )}
 
                     </div>
                     
