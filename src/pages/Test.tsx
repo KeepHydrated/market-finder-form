@@ -869,32 +869,33 @@ const Homepage = () => {
     }
   };
 
-  // Fetch Google Places details to get opening hours
+  // Fetch Google Places details to get opening hours via edge function
   const fetchPlaceDetails = async (placeId: string): Promise<string[]> => {
-    console.log('🔍 Fetching place details for place_id:', placeId);
+    console.log('🔍 [v3.0] Fetching place details for place_id:', placeId);
     try {
-      const { data: { key } } = await supabase.functions.invoke('get-google-api-key');
-      console.log('✅ Got Google API key');
-      if (!key) {
-        console.log('❌ No Google API key available');
+      // Use the farmers-market-search edge function with place_id
+      const { data, error } = await supabase.functions.invoke('farmers-market-search', {
+        body: { place_id: placeId }
+      });
+
+      console.log('📦 [v3.0] Edge function response:', { data, error });
+      
+      if (error) {
+        console.error('❌ [v3.0] Edge function error:', error);
         return [];
       }
 
-      const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=opening_hours&key=${key}`;
-      console.log('🌐 Fetching from URL:', url);
-      const response = await fetch(url);
-      const data = await response.json();
-      console.log('📦 Google Places API response:', data);
-      
-      if (data.result?.opening_hours?.weekday_text) {
-        const days = extractDaysFromWeekdayText(data.result.opening_hours.weekday_text);
-        console.log('✅ Extracted days:', days);
+      // The edge function returns the result directly, not wrapped
+      if (data?.opening_hours?.weekday_text) {
+        const days = extractDaysFromWeekdayText(data.opening_hours.weekday_text);
+        console.log('✅ [v3.0] Extracted days from place details:', days);
         return days;
       }
-      console.log('⚠️ No opening hours found in response');
+      
+      console.log('⚠️ [v3.0] No opening hours found in response, full data:', data);
       return [];
     } catch (error) {
-      console.error('❌ Error fetching place details:', error);
+      console.error('❌ [v3.0] Error fetching place details:', error);
       return [];
     }
   };
