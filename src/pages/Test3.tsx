@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Star, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useLikes } from "@/hooks/useLikes";
 import { getCoordinatesForAddress, calculateDistance } from "@/lib/geocoding";
+import { ProductDetailModal } from "@/components/ProductDetailModal";
 
 interface AcceptedSubmission {
   id: string;
@@ -40,15 +41,25 @@ const Test3 = () => {
   const navigate = useNavigate();
   const { toggleLike, isLiked } = useLikes();
   const [recommendedVendors, setRecommendedVendors] = useState<AcceptedSubmission[]>([]);
+  const [recommendedProducts, setRecommendedProducts] = useState<Array<any & { vendorId: string; vendorName: string }>>([]);
   const [vendorRatings, setVendorRatings] = useState<Record<string, VendorRating>>({});
   const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
   const [vendorMarketIndices, setVendorMarketIndices] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
+  const [productsLoading, setProductsLoading] = useState(true);
   const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
+  
+  // Product modal state
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [currentVendorProducts, setCurrentVendorProducts] = useState<any[]>([]);
+  const [currentVendorId, setCurrentVendorId] = useState<string | undefined>(undefined);
+  const [currentVendorName, setCurrentVendorName] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     getUserLocation();
     fetchRecommendedVendors();
+    fetchRecommendedProducts();
   }, []);
 
   const getUserLocation = async () => {
@@ -151,7 +162,44 @@ const Test3 = () => {
     setVendorDistances(distances);
   };
 
-  if (loading) {
+  const fetchRecommendedProducts = async () => {
+    try {
+      const { data: vendors, error } = await supabase
+        .from('submissions')
+        .select('id, store_name, products')
+        .eq('status', 'accepted')
+        .not('products', 'is', null)
+        .limit(12);
+
+      if (error) throw error;
+
+      const allProducts: Array<any & { vendorId: string; vendorName: string }> = [];
+      
+      vendors?.forEach((vendor: any) => {
+        const products = vendor.products as any[];
+        if (products && Array.isArray(products)) {
+          products.forEach((product: any) => {
+            if (product.images && product.images.length > 0) {
+              allProducts.push({
+                ...product,
+                vendorId: vendor.id,
+                vendorName: vendor.store_name,
+              });
+            }
+          });
+        }
+      });
+
+      const shuffled = allProducts.sort(() => 0.5 - Math.random());
+      setRecommendedProducts(shuffled.slice(0, 8));
+    } catch (error) {
+      console.error('Error fetching recommended products:', error);
+    } finally {
+      setProductsLoading(false);
+    }
+  };
+
+  if (loading || productsLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Loading recommended vendors...</p>
@@ -162,6 +210,113 @@ const Test3 = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
+        {/* Recommended Products Section */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold mb-6">Recommended Products</h2>
+          {recommendedProducts.length === 0 ? (
+            <div className="text-center">
+              <p className="text-muted-foreground">No recommended products available yet.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {recommendedProducts.map((product, index) => (
+                <Card 
+                  key={`${product.vendorId}-${index}`}
+                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => {
+                    const productWithId = {
+                      ...product,
+                      id: product.id || index
+                    };
+                    setSelectedProduct(productWithId);
+                    setCurrentVendorId(product.vendorId);
+                    setCurrentVendorName(product.vendorName);
+                    
+                    const vendor = recommendedVendors.find(v => v.id === product.vendorId);
+                    if (vendor) {
+                      const productsWithIds = (vendor.products || []).map((p: any, idx: number) => ({
+                        ...p,
+                        id: p.id || idx
+                      }));
+                      setCurrentVendorProducts(productsWithIds);
+                    }
+                    setIsProductModalOpen(true);
+                  }}
+                >
+                  <div className="aspect-[4/3] bg-muted relative overflow-hidden group">
+                    {product.images && product.images.length > 0 ? (
+                      <img 
+                        src={product.images[0]} 
+                        alt={product.name || 'Product'} 
+                        className="w-full h-full object-cover transition-opacity duration-200"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                        No Image Available
+                      </div>
+                    )}
+                    
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        await toggleLike(`${product.vendorId}-${product.id}`, 'product');
+                      }}
+                    >
+                      <Heart 
+                        className={cn(
+                          "h-4 w-4 transition-colors",
+                          isLiked(`${product.vendorId}-${product.id}`, 'product')
+                            ? "text-red-500 fill-current" 
+                            : "text-gray-600"
+                        )}
+                      />
+                    </Button>
+                  </div>
+                  
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-normal text-sm flex-1 text-black">
+                        {product.name || 'Product'}
+                      </h3>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-muted-foreground">
+                        ${(product.price || 0).toFixed(2)}
+                      </span>
+                    </div>
+                    {product.vendorName && (
+                      <div className="mt-2 pt-2 border-t border-muted">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const vendor = recommendedVendors.find(v => v.id === product.vendorId);
+                            if (vendor) {
+                              navigate('/market', { 
+                                state: { 
+                                  type: 'vendor', 
+                                  selectedVendor: vendor,
+                                  allVendors: recommendedVendors
+                                } 
+                              });
+                            }
+                          }}
+                          className="text-xs text-black hover:underline cursor-pointer"
+                        >
+                          {product.vendorName}
+                        </button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Recommended Vendors Section */}
         <h1 className="text-3xl font-bold mb-8">Recommended Vendors</h1>
         
         {recommendedVendors.length === 0 ? (
@@ -364,6 +519,23 @@ const Test3 = () => {
             ))}
           </div>
         )}
+        
+        {/* Product Detail Modal */}
+        <ProductDetailModal
+          product={selectedProduct}
+          products={currentVendorProducts}
+          open={isProductModalOpen}
+          onClose={() => {
+            setIsProductModalOpen(false);
+            setSelectedProduct(null);
+            setCurrentVendorProducts([]);
+            setCurrentVendorId(undefined);
+            setCurrentVendorName(undefined);
+          }}
+          onProductChange={setSelectedProduct}
+          vendorId={currentVendorId}
+          vendorName={currentVendorName}
+        />
       </div>
     </div>
   );
