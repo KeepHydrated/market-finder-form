@@ -810,6 +810,19 @@ const Homepage = () => {
       });
     });
 
+    // Aggregate days from all vendors in each market
+    Object.values(markets).forEach(market => {
+      const allDays = new Set<string>();
+      market.vendors.forEach(vendor => {
+        if (vendor.market_days && Array.isArray(vendor.market_days)) {
+          vendor.market_days.forEach(day => allDays.add(day));
+        }
+      });
+      if (allDays.size > 0) {
+        market.days = Array.from(allDays);
+      }
+    });
+
     // Convert to array and sort by liked status
     const marketsArray = Object.values(markets);
     
