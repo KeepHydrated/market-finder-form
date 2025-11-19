@@ -1906,17 +1906,6 @@ const Homepage = () => {
                         />
                       </Button>
 
-                      {/* Distance Badge - Bottom Right */}
-                      <div className="absolute bottom-2 right-2">
-                        <Badge variant="secondary" className="text-xs bg-white/90 hover:bg-white/90">
-                          {isLoadingVendorDistances ? (
-                            <span className="animate-pulse">Loading...</span>
-                          ) : (
-                            vendorDistances[submission.id] || '-- mi'
-                          )}
-                        </Badge>
-                      </div>
-
                     </div>
                     
                     {/* Store Information */}
