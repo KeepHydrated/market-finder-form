@@ -1861,38 +1861,36 @@ const Homepage = () => {
                         </div>
                       )}
                       
-                      {/* Rating Badge - Top Left */}
+                      {/* Star Rating Badge - Top Left */}
                       {((submission.google_rating && submission.google_rating > 0) || (vendorRatings[submission.id]?.totalReviews > 0)) && (
-                        <div className="absolute top-2 left-2">
-                          <Badge variant="secondary" className="text-xs bg-white/90 hover:bg-white/90 flex items-center gap-1">
-                            <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                            <span className="font-medium">
-                              {submission.google_rating && submission.google_rating > 0
-                                ? submission.google_rating.toFixed(1)
-                                : vendorRatings[submission.id]?.averageRating.toFixed(1)
-                              }
-                            </span>
-                            <span className="text-gray-600">
+                        <Badge className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm shadow-sm flex items-center gap-1 px-2 py-1">
+                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                          <span className="text-sm font-medium">
+                            {submission.google_rating && submission.google_rating > 0
+                              ? submission.google_rating.toFixed(1)
+                              : vendorRatings[submission.id]?.averageRating.toFixed(1)
+                            }
+                          </span>
+                          {(submission.google_rating_count || vendorRatings[submission.id]?.totalReviews) && (
+                            <span className="text-xs text-muted-foreground">
                               ({submission.google_rating_count || vendorRatings[submission.id]?.totalReviews || 0})
                             </span>
-                          </Badge>
-                        </div>
+                          )}
+                        </Badge>
                       )}
                       
-                      {/* Category Badge - Bottom Left */}
+                      {/* Specialty Badge - Bottom Left */}
                       {submission.primary_specialty && (
-                        <div className="absolute bottom-2 left-2">
-                          <Badge variant="secondary" className="text-xs bg-white/90 hover:bg-white/90">
-                            {submission.primary_specialty}
-                          </Badge>
-                        </div>
+                        <Badge className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm shadow-sm text-green-600 border-0">
+                          {submission.primary_specialty}
+                        </Badge>
                       )}
                       
                       {/* Like Button - Top Right */}
                       <Button
                         variant="secondary"
-                        size="icon"
-                        className="absolute top-2 right-2 h-10 w-10 p-0 bg-white/90 hover:bg-white rounded-full"
+                        size="sm"
+                        className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
                         onClick={async (e) => {
                           e.stopPropagation();
                           await toggleLike(submission.id, 'vendor');
@@ -1900,11 +1898,11 @@ const Homepage = () => {
                       >
                         <Heart 
                           className={cn(
-                            "h-5 w-5 transition-colors",
-                            isLiked(submission.id, 'vendor') 
+                            "h-4 w-4 transition-colors",
+                            isLiked(submission.id, 'vendor')
                               ? "text-red-500 fill-current" 
                               : "text-gray-600"
-                          )} 
+                          )}
                         />
                       </Button>
 
