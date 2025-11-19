@@ -2284,14 +2284,17 @@ const Homepage = () => {
                       {/* Market Days Badges */}
                       {market.days && market.days.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
-                          {market.days.map((day: string) => (
-                            <Badge 
-                              key={day} 
-                              className="text-xs px-3 py-1 bg-green-100 text-green-700 hover:bg-green-100 border-0"
-                            >
-                              {day}
-                            </Badge>
-                          ))}
+                          {(() => {
+                            console.log('Market days for', market.name, ':', market.days);
+                            return market.days.map((day: string) => (
+                              <Badge 
+                                key={day} 
+                                className="text-xs px-3 py-1 bg-green-100 text-green-700 hover:bg-green-100 border-0"
+                              >
+                                {day}
+                              </Badge>
+                            ));
+                          })()}
                         </div>
                       )}
                     </div>
