@@ -1864,7 +1864,7 @@ const Homepage = () => {
                       
                       {/* Star Rating Badge - Top Left */}
                       {((submission.google_rating && submission.google_rating > 0) || (vendorRatings[submission.id]?.totalReviews > 0)) && (
-                        <Badge className="absolute top-3 left-3 bg-white backdrop-blur-sm shadow-lg flex items-center gap-1.5 px-3 py-1.5 border-0 rounded-full">
+                        <Badge className="absolute top-3 left-3 bg-white backdrop-blur-sm shadow-lg flex items-center gap-1.5 px-3 py-1.5 border-0 rounded-full hover:bg-white">
                           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                           <span className="text-sm font-semibold text-gray-900">
                             {submission.google_rating && submission.google_rating > 0
@@ -1884,7 +1884,7 @@ const Homepage = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="absolute top-3 right-3 h-11 w-11 p-0 bg-white hover:bg-white rounded-full shadow-lg hover:scale-105 transition-transform border-0"
+                        className="absolute top-3 right-3 h-11 w-11 p-0 bg-white hover:bg-white rounded-full shadow-lg border-0"
                         onClick={async (e) => {
                           e.stopPropagation();
                           await toggleLike(submission.id, 'vendor');
@@ -1902,7 +1902,7 @@ const Homepage = () => {
 
                       {/* Distance Badge - Bottom Right */}
                       {vendorDistances[submission.id] && vendorDistances[submission.id] !== '-- mi' && (
-                        <Badge className="absolute bottom-3 right-3 bg-white backdrop-blur-sm shadow-lg border-0 rounded-full px-3 py-1.5">
+                        <Badge className="absolute bottom-3 right-3 bg-white backdrop-blur-sm shadow-lg border-0 rounded-full px-3 py-1.5 hover:bg-white">
                           <span className="font-semibold text-sm text-gray-900">{vendorDistances[submission.id]}</span>
                         </Badge>
                       )}
