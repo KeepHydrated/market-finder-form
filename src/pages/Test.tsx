@@ -2281,10 +2281,6 @@ const Homepage = () => {
                           ))}
                         </div>
                       )}
-                      
-                      <p className="text-sm text-foreground">
-                        {market.vendors.length} vendor{market.vendors.length !== 1 ? 's' : ''}
-                      </p>
                     </div>
                   </Card>
                 ))}
