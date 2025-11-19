@@ -1908,15 +1908,15 @@ const Homepage = () => {
                         />
                       </Button>
 
-                      {/* Distance Badge */}
-                      <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                        <span className="text-xs font-medium text-gray-700">
+                      {/* Distance Badge - Bottom Right */}
+                      <div className="absolute bottom-2 right-2">
+                        <Badge variant="secondary" className="text-xs bg-white/90 hover:bg-white/90">
                           {isLoadingVendorDistances ? (
                             <span className="animate-pulse">Loading...</span>
                           ) : (
                             vendorDistances[submission.id] || '-- mi'
                           )}
-                        </span>
+                        </Badge>
                       </div>
 
                     </div>
