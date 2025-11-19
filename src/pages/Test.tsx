@@ -1861,21 +1861,21 @@ const Homepage = () => {
                         </div>
                       )}
                       
-                      {/* Rating - Top Left - Show Google rating if available, otherwise review rating */}
+                      {/* Rating Badge - Top Left */}
                       {((submission.google_rating && submission.google_rating > 0) || (vendorRatings[submission.id]?.totalReviews > 0)) && (
-                        <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                          <div className="flex items-center gap-1">
+                        <div className="absolute top-2 left-2">
+                          <Badge variant="secondary" className="text-xs bg-white/90 hover:bg-white/90 flex items-center gap-1">
                             <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                            <span className="text-xs font-medium">
+                            <span className="font-medium">
                               {submission.google_rating && submission.google_rating > 0
                                 ? submission.google_rating.toFixed(1)
                                 : vendorRatings[submission.id]?.averageRating.toFixed(1)
                               }
                             </span>
-                            <span className="text-xs text-gray-600">
+                            <span className="text-gray-600">
                               ({submission.google_rating_count || vendorRatings[submission.id]?.totalReviews || 0})
                             </span>
-                          </div>
+                          </Badge>
                         </div>
                       )}
                       
@@ -1888,11 +1888,11 @@ const Homepage = () => {
                         </div>
                       )}
                       
-                      {/* Like Button */}
+                      {/* Like Button - Top Right */}
                       <Button
                         variant="secondary"
-                        size="sm"
-                        className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                        size="icon"
+                        className="absolute top-2 right-2 h-10 w-10 p-0 bg-white/90 hover:bg-white rounded-full"
                         onClick={async (e) => {
                           e.stopPropagation();
                           await toggleLike(submission.id, 'vendor');
@@ -1900,7 +1900,7 @@ const Homepage = () => {
                       >
                         <Heart 
                           className={cn(
-                            "h-4 w-4 transition-colors",
+                            "h-5 w-5 transition-colors",
                             isLiked(submission.id, 'vendor') 
                               ? "text-red-500 fill-current" 
                               : "text-gray-600"
