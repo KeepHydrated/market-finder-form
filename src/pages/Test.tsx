@@ -1879,6 +1879,15 @@ const Homepage = () => {
                         </div>
                       )}
                       
+                      {/* Category Badge - Bottom Left */}
+                      {submission.primary_specialty && (
+                        <div className="absolute bottom-2 left-2">
+                          <Badge variant="secondary" className="text-xs bg-white/90 hover:bg-white/90">
+                            {submission.primary_specialty}
+                          </Badge>
+                        </div>
+                      )}
+                      
                       {/* Like Button */}
                       <Button
                         variant="secondary"
@@ -1920,12 +1929,6 @@ const Homepage = () => {
                           : submission.store_name
                         }
                       </h3>
-                      
-                      {submission.primary_specialty && (
-                        <Badge variant="secondary" className="text-xs">
-                          {submission.primary_specialty}
-                        </Badge>
-                      )}
 
                       {/* Market Details Section with Carousel */}
                       <div className="mt-2">
