@@ -11,6 +11,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import Homepage from "./pages/Homepage";
 import Test from "./pages/Test";
 import Test2 from "./pages/Test2";
+import Test3 from "./pages/Test3";
 import CategoryProducts from "./pages/CategoryProducts";
 import VendorDuplicate from "./pages/VendorDuplicate";
 import Likes from "./pages/Likes";
@@ -49,6 +50,7 @@ const App = () => (
                 <Route path="/home" element={<Test2 />} />
                 <Route path="/test" element={<Test />} />
                 <Route path="/test2" element={<Test2 />} />
+                <Route path="/test3" element={<Test3 />} />
                 <Route path="/homepage" element={<Homepage />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/search" element={<CategoryProducts />} />
