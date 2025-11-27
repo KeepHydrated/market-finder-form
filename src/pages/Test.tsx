@@ -1893,27 +1893,29 @@ const Homepage = () => {
                       
                       {/* Star Rating Badge - Top Left */}
                       {((submission.google_rating && submission.google_rating > 0) || (vendorRatings[submission.id]?.totalReviews > 0)) && (
-                        <Badge className="absolute top-3 left-3 bg-white backdrop-blur-sm shadow-lg flex items-center gap-1.5 px-3 py-1.5 border-0 rounded-full hover:bg-white">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-semibold text-gray-900">
-                            {submission.google_rating && submission.google_rating > 0
-                              ? submission.google_rating.toFixed(1)
-                              : vendorRatings[submission.id]?.averageRating.toFixed(1)
-                            }
-                          </span>
-                          {(submission.google_rating_count || vendorRatings[submission.id]?.totalReviews) && (
-                            <span className="text-sm text-gray-600">
-                              ({submission.google_rating_count || vendorRatings[submission.id]?.totalReviews || 0})
+                        <div className="absolute top-2 left-2 z-10 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                          <div className="flex items-center gap-1">
+                            <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                            <span className="text-xs font-medium">
+                              {submission.google_rating && submission.google_rating > 0
+                                ? submission.google_rating.toFixed(1)
+                                : vendorRatings[submission.id]?.averageRating.toFixed(1)
+                              }
                             </span>
-                          )}
-                        </Badge>
+                            {(submission.google_rating_count || vendorRatings[submission.id]?.totalReviews) && (
+                              <span className="text-xs text-gray-600">
+                                ({submission.google_rating_count || vendorRatings[submission.id]?.totalReviews || 0})
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       )}
                       
                       {/* Like Button - Top Right */}
                       <Button
-                        variant="ghost"
+                        variant="secondary"
                         size="sm"
-                        className="absolute top-3 right-3 h-11 w-11 p-0 bg-white hover:bg-white rounded-full shadow-lg border-0"
+                        className="absolute top-2 right-2 z-10 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
                         onClick={async (e) => {
                           e.stopPropagation();
                           await toggleLike(submission.id, 'vendor');
@@ -1921,10 +1923,10 @@ const Homepage = () => {
                       >
                         <Heart 
                           className={cn(
-                            "h-5 w-5 transition-colors",
+                            "h-4 w-4 transition-colors",
                             isLiked(submission.id, 'vendor')
-                              ? "text-red-500 fill-red-500" 
-                              : "text-red-500"
+                              ? "text-red-500 fill-current" 
+                              : "text-gray-600"
                           )}
                         />
                       </Button>
