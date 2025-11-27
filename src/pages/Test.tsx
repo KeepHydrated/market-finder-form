@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -113,6 +113,7 @@ const Homepage = () => {
   const [vendorMarketIndices, setVendorMarketIndices] = useState<Record<string, number>>({});
   const [searchScope, setSearchScope] = useState<'local' | 'nationwide'>('nationwide');
   const [sortBy, setSortBy] = useState<'relevancy' | 'lowest-price' | 'highest-price' | 'top-rated' | 'most-recent'>('relevancy');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Sync search query with URL parameter
   useEffect(() => {
@@ -1458,14 +1459,35 @@ const Homepage = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto sm:ml-auto">
           {/* Filter */}
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-            <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                <span className="hidden md:inline">Filter</span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[800px] p-0 bg-background border shadow-lg max-h-[80vh] flex flex-col z-50" align="end">
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+            >
+              <Filter className="h-4 w-4" />
+              <span className="hidden md:inline">Filter</span>
+              <ChevronDown className={cn("h-4 w-4 transition-transform", isFilterOpen && "rotate-180")} />
+            </Button>
+          </div>
+            
+            {/* Sort By */}
+            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+              <SelectTrigger className="w-[200px] bg-background border shadow-sm">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="relevancy">Relevancy</SelectItem>
+                <SelectItem value="lowest-price">Lowest Price</SelectItem>
+                <SelectItem value="highest-price">Highest Price</SelectItem>
+                <SelectItem value="top-rated">Top Rated Store</SelectItem>
+                <SelectItem value="most-recent">Most Recent</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filter Content - Collapsible */}
+          {isFilterOpen && (
+            <div className="w-full border rounded-lg bg-background shadow-lg mt-4 mb-6">
               <Tabs defaultValue="type" className="w-full flex flex-col overflow-hidden">
                 <div className="pt-8 px-4 md:px-8 flex justify-between items-center flex-shrink-0 border-b">
                   <div className="flex-1" />
@@ -1803,27 +1825,11 @@ const Homepage = () => {
                         </Button>
                       ))}
                     </div>
-                  </div>
+                   </div>
                 </TabsContent>
               </Tabs>
-            </PopoverContent>
-            </Popover>
-            
-            {/* Sort By */}
-            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-              <SelectTrigger className="w-[200px] bg-background border shadow-sm">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border shadow-lg z-50">
-                <SelectItem value="relevancy">Relevancy</SelectItem>
-                <SelectItem value="lowest-price">Lowest Price</SelectItem>
-                <SelectItem value="highest-price">Highest Price</SelectItem>
-                <SelectItem value="top-rated">Top Rated Store</SelectItem>
-                <SelectItem value="most-recent">Most Recent</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          </div>
+            </div>
+          )}
         </div>
         
         {/* Content based on view mode */}
