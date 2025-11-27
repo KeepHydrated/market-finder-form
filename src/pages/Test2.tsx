@@ -9,6 +9,12 @@ import { useLikes } from "@/hooks/useLikes";
 import { cn } from "@/lib/utils";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
 import farmersMarketBanner from "@/assets/farmers-market-banner.jpg";
+import categoryFlowers from "@/assets/category-flowers.jpg";
+import categoryBakery from "@/assets/category-bakery.jpg";
+import categoryDairy from "@/assets/category-dairy.jpg";
+import categoryRancher from "@/assets/category-rancher.jpg";
+import categoryBeverages from "@/assets/category-beverages.jpg";
+import categoryFarmers from "@/assets/category-farmers.jpg";
 
 interface Product {
   id: string;
@@ -492,8 +498,12 @@ const Test2 = () => {
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
               onClick={() => navigate('/test?category=Fresh Flowers & Plants')}
             >
-              <div className="aspect-square bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-900 dark:to-purple-900 flex items-center justify-center p-4">
-                <span className="text-6xl">🌸</span>
+              <div className="aspect-square bg-muted overflow-hidden">
+                <img 
+                  src={categoryFlowers} 
+                  alt="Fresh Flowers & Plants" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
               <div className="p-3 text-center">
                 <h3 className="font-semibold text-sm text-foreground">Fresh Flowers & Plants</h3>
@@ -505,8 +515,12 @@ const Test2 = () => {
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
               onClick={() => navigate('/test?category=Bakery')}
             >
-              <div className="aspect-square bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900 dark:to-orange-900 flex items-center justify-center p-4">
-                <span className="text-6xl">🥖</span>
+              <div className="aspect-square bg-muted overflow-hidden">
+                <img 
+                  src={categoryBakery} 
+                  alt="Bakery" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
               <div className="p-3 text-center">
                 <h3 className="font-semibold text-sm text-foreground">Bakery</h3>
@@ -518,8 +532,12 @@ const Test2 = () => {
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
               onClick={() => navigate('/test?category=Dairy')}
             >
-              <div className="aspect-square bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900 flex items-center justify-center p-4">
-                <span className="text-6xl">🧀</span>
+              <div className="aspect-square bg-muted overflow-hidden">
+                <img 
+                  src={categoryDairy} 
+                  alt="Dairy" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
               <div className="p-3 text-center">
                 <h3 className="font-semibold text-sm text-foreground">Dairy</h3>
@@ -531,8 +549,12 @@ const Test2 = () => {
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
               onClick={() => navigate('/test?category=Rancher')}
             >
-              <div className="aspect-square bg-gradient-to-br from-red-100 to-rose-100 dark:from-red-900 dark:to-rose-900 flex items-center justify-center p-4">
-                <span className="text-6xl">🥩</span>
+              <div className="aspect-square bg-muted overflow-hidden">
+                <img 
+                  src={categoryRancher} 
+                  alt="Rancher" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
               <div className="p-3 text-center">
                 <h3 className="font-semibold text-sm text-foreground">Rancher</h3>
@@ -544,8 +566,12 @@ const Test2 = () => {
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
               onClick={() => navigate('/test?category=Beverages')}
             >
-              <div className="aspect-square bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900 flex items-center justify-center p-4">
-                <span className="text-6xl">🍹</span>
+              <div className="aspect-square bg-muted overflow-hidden">
+                <img 
+                  src={categoryBeverages} 
+                  alt="Beverages" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
               <div className="p-3 text-center">
                 <h3 className="font-semibold text-sm text-foreground">Beverages</h3>
@@ -557,8 +583,12 @@ const Test2 = () => {
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
               onClick={() => navigate('/test?category=Farmers')}
             >
-              <div className="aspect-square bg-gradient-to-br from-lime-100 to-green-100 dark:from-lime-900 dark:to-green-900 flex items-center justify-center p-4">
-                <span className="text-6xl">🥕</span>
+              <div className="aspect-square bg-muted overflow-hidden">
+                <img 
+                  src={categoryFarmers} 
+                  alt="Farmers" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
               <div className="p-3 text-center">
                 <h3 className="font-semibold text-sm text-foreground">Farmers</h3>
