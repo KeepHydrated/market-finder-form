@@ -73,6 +73,7 @@ const Likes = () => {
   const [currentVendorInfo, setCurrentVendorInfo] = useState<{id: string; name: string} | null>(null);
   const [marketAddressesMap, setMarketAddressesMap] = useState<Record<string, string>>({});
   const [marketGoogleRatings, setMarketGoogleRatings] = useState<Record<string, {rating: number; reviewCount: number}>>({});
+  const [marketDaysMap, setMarketDaysMap] = useState<Record<string, string[]>>({});
   const [vendorMarketIndices, setVendorMarketIndices] = useState<Record<string, number>>({});
 
   const tabs = [
@@ -81,12 +82,12 @@ const Likes = () => {
     { id: "products" as TabType, title: "Products", icon: Package },
   ];
 
-  // Fetch market addresses and ratings from database
+  // Fetch market addresses, ratings, and days from database
   const fetchMarketAddresses = async () => {
     try {
       const { data, error } = await supabase
         .from('markets')
-        .select('name, address, google_rating, google_rating_count');
+        .select('name, address, google_rating, google_rating_count, days');
       
       if (error) {
         console.error('Error fetching market addresses:', error);
@@ -96,6 +97,7 @@ const Likes = () => {
       if (data) {
         const addressMap: Record<string, string> = {};
         const ratingsMap: Record<string, {rating: number; reviewCount: number}> = {};
+        const daysMap: Record<string, string[]> = {};
         data.forEach(market => {
           addressMap[market.name] = market.address;
           const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
@@ -105,9 +107,13 @@ const Likes = () => {
               reviewCount: market.google_rating_count
             };
           }
+          if (market.days && market.days.length > 0) {
+            daysMap[marketId] = market.days;
+          }
         });
         setMarketAddressesMap(addressMap);
         setMarketGoogleRatings(ratingsMap);
+        setMarketDaysMap(daysMap);
       }
     } catch (error) {
       console.error('Error fetching market addresses:', error);
@@ -377,7 +383,7 @@ const Likes = () => {
             name: marketKey,
             address: marketAddress,
             vendors: [],
-            days: submission.market_days || [],
+            days: marketDaysMap[marketId] || submission.market_days || [],
             google_rating: ratingInfo?.rating,
             google_rating_count: ratingInfo?.reviewCount
           };
