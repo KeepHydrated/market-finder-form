@@ -281,7 +281,7 @@ const Test2 = () => {
                             e.stopPropagation();
                             navigate('/test');
                           }}
-                          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                          className="text-xs text-black hover:underline cursor-pointer"
                         >
                           {product.vendorName}
                         </button>
