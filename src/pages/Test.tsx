@@ -1457,8 +1457,7 @@ const Homepage = () => {
           )}
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto sm:ml-auto">
-          {/* Filter */}
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+            {/* Filter */}
             <Button 
               variant="outline" 
               className="flex items-center gap-2"
@@ -1468,7 +1467,6 @@ const Homepage = () => {
               <span className="hidden md:inline">Filter</span>
               <ChevronDown className={cn("h-4 w-4 transition-transform", isFilterOpen && "rotate-180")} />
             </Button>
-          </div>
             
             {/* Sort By */}
             <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
@@ -1484,10 +1482,11 @@ const Homepage = () => {
               </SelectContent>
             </Select>
           </div>
+        </div>
 
-          {/* Filter Content - Collapsible */}
-          {isFilterOpen && (
-            <div className="w-full border rounded-lg bg-background shadow-lg mt-4 mb-6">
+        {/* Filter Content - Collapsible */}
+        {isFilterOpen && (
+          <div className="w-full border rounded-lg bg-background shadow-lg mb-6 animate-accordion-down">
               <Tabs defaultValue="type" className="w-full flex flex-col overflow-hidden">
                 <div className="pt-8 px-4 md:px-8 flex justify-between items-center flex-shrink-0 border-b">
                   <div className="flex-1" />
@@ -1830,7 +1829,6 @@ const Homepage = () => {
               </Tabs>
             </div>
           )}
-        </div>
         
         {/* Content based on view mode */}
         {viewMode === 'vendors' ? (
