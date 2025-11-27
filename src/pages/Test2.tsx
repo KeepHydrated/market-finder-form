@@ -40,6 +40,7 @@ interface Market {
   hours: string | null;
   google_rating: number | null;
   google_rating_count: number | null;
+  vendors?: Vendor[];
 }
 
 const Test2 = () => {
@@ -127,16 +128,55 @@ const Test2 = () => {
 
   const fetchRecommendedMarkets = async () => {
     try {
-      const { data: markets, error } = await supabase
+      // First fetch markets
+      const { data: markets, error: marketsError } = await supabase
         .from('markets')
         .select('id, name, address, city, state, days, hours, google_rating, google_rating_count')
         .limit(20);
 
-      if (error) throw error;
+      if (marketsError) throw marketsError;
 
-      // Shuffle and take first 6 markets
-      const shuffled = markets?.sort(() => 0.5 - Math.random()) || [];
-      setRecommendedMarkets(shuffled.slice(0, 6) as Market[]);
+      if (!markets || markets.length === 0) {
+        setRecommendedMarkets([]);
+        return;
+      }
+
+      // Fetch all vendors
+      const { data: vendors, error: vendorsError } = await supabase
+        .from('submissions')
+        .select('id, store_name, products, selected_markets, market_address')
+        .eq('status', 'accepted');
+
+      if (vendorsError) throw vendorsError;
+
+      // Group vendors by market
+      const marketsWithVendors = markets.map(market => {
+        const marketVendors = vendors?.filter(vendor => {
+          // Check if vendor's selected_markets includes this market
+          const selectedMarkets = vendor.selected_markets;
+          if (!selectedMarkets) return false;
+          
+          // Handle different data structures
+          if (Array.isArray(selectedMarkets)) {
+            return selectedMarkets.some((m: any) => {
+              const marketName = typeof m === 'string' ? m : (m?.name || '');
+              return marketName.toLowerCase().includes(market.name.toLowerCase()) ||
+                     market.name.toLowerCase().includes(marketName.toLowerCase());
+            });
+          }
+          return false;
+        }) || [];
+
+        return {
+          ...market,
+          vendors: marketVendors
+        };
+      });
+
+      // Filter out markets with no vendors and shuffle
+      const marketsWithVendorsOnly = marketsWithVendors.filter(m => m.vendors.length > 0);
+      const shuffled = marketsWithVendorsOnly.sort(() => 0.5 - Math.random());
+      setRecommendedMarkets(shuffled.slice(0, 6) as any);
     } catch (error) {
       console.error('Error fetching recommended markets:', error);
     } finally {
@@ -536,46 +576,206 @@ const Test2 = () => {
               {recommendedMarkets.map((market) => (
                 <Card
                   key={market.id}
-                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => navigate('/', { state: { searchTerm: market.name } })}
+                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer rounded-2xl"
+                  onClick={() => navigate('/test', { state: { searchTerm: market.name } })}
                 >
-                  {/* Market Image Placeholder */}
-                  <div className="aspect-[4/3] bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900 flex items-center justify-center p-4">
-                    <span className="text-6xl">🏪</span>
-                  </div>
-
-                  {/* Market Info */}
-                  <div className="p-4">
-                    <h3 className="font-semibold text-foreground mb-2 line-clamp-1">
-                      {market.name}
-                    </h3>
-                    
-                    {/* Rating */}
+                  {/* Vendor Images Collage */}
+                  <div className="aspect-[4/3] bg-muted relative overflow-hidden">
+                    {/* Google Rating Badge - Top Left */}
                     {market.google_rating && (
-                      <div className="flex items-center gap-1 mb-2">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm font-medium">{market.google_rating.toFixed(1)}</span>
-                        {market.google_rating_count && (
-                          <span className="text-sm text-muted-foreground">
-                            ({market.google_rating_count})
+                      <div className="absolute top-2 left-2 z-10 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                        <div className="flex items-center gap-1">
+                          <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                          <span className="text-xs font-medium">
+                            {market.google_rating.toFixed(1)}
                           </span>
-                        )}
+                          {market.google_rating_count && (
+                            <span className="text-xs text-gray-600">
+                              ({market.google_rating_count})
+                            </span>
+                          )}
+                        </div>
                       </div>
                     )}
 
-                    {/* Location */}
-                    <div className="flex items-center gap-1 mb-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground line-clamp-1">
-                        {market.city}, {market.state}
+                    {/* Like Button - Top Right */}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 z-10 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+                        await toggleLike(marketId, 'market');
+                      }}
+                    >
+                      <Heart 
+                        className={cn(
+                          "h-4 w-4 transition-colors",
+                          (() => {
+                            const marketId = `${market.name}-${market.address}`.replace(/\s+/g, '-').toLowerCase();
+                            return isLiked(marketId, 'market') 
+                              ? "text-red-500 fill-current" 
+                              : "text-gray-600";
+                          })()
+                        )} 
+                      />
+                    </Button>
+                    
+                    {/* Vendor Image Collage */}
+                    {!market.vendors || market.vendors.length === 0 ? (
+                      // No vendors - show placeholder
+                      <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
+                        <span className="text-6xl">🏪</span>
+                      </div>
+                    ) : market.vendors.length === 1 ? (
+                      // Single vendor
+                      <div className="w-full h-full">
+                        {market.vendors[0].products && 
+                         Array.isArray(market.vendors[0].products) &&
+                         market.vendors[0].products.length > 0 && 
+                         market.vendors[0].products[0].images && 
+                         market.vendors[0].products[0].images.length > 0 ? (
+                          <img 
+                            src={market.vendors[0].products[0].images[0]}
+                            alt={market.vendors[0].store_name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
+                            <div className="text-green-600 text-lg font-medium">
+                              {market.vendors[0].store_name}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : market.vendors.length === 2 ? (
+                      // Two vendors - split layout
+                      <div className="grid grid-cols-2 h-full gap-0.5">
+                        {market.vendors.slice(0, 2).map((vendor, vendorIndex) => (
+                          <div key={vendorIndex} className="relative overflow-hidden">
+                            {vendor.products && 
+                             Array.isArray(vendor.products) &&
+                             vendor.products.length > 0 && 
+                             vendor.products[0].images && 
+                             vendor.products[0].images.length > 0 ? (
+                              <img 
+                                src={vendor.products[0].images[0]}
+                                alt={vendor.store_name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
+                                <div className="text-green-600 text-sm font-medium text-center">
+                                  {vendor.store_name}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : market.vendors.length === 3 ? (
+                      // Three vendors - one large, two small
+                      <div className="grid grid-cols-2 h-full gap-0.5">
+                        <div className="relative overflow-hidden">
+                          {market.vendors[0].products && 
+                           Array.isArray(market.vendors[0].products) &&
+                           market.vendors[0].products.length > 0 && 
+                           market.vendors[0].products[0].images && 
+                           market.vendors[0].products[0].images.length > 0 ? (
+                            <img 
+                              src={market.vendors[0].products[0].images[0]}
+                              alt={market.vendors[0].store_name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
+                              <div className="text-green-600 text-sm font-medium text-center">
+                                {market.vendors[0].store_name}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <div className="grid grid-rows-2 gap-0.5">
+                          {market.vendors.slice(1, 3).map((vendor, vendorIndex) => (
+                            <div key={vendorIndex} className="relative overflow-hidden">
+                              {vendor.products && 
+                               Array.isArray(vendor.products) &&
+                               vendor.products.length > 0 && 
+                               vendor.products[0].images && 
+                               vendor.products[0].images.length > 0 ? (
+                                <img 
+                                  src={vendor.products[0].images[0]}
+                                  alt={vendor.store_name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
+                                  <div className="text-green-600 text-xs font-medium text-center p-1">
+                                    {vendor.store_name}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      // Four or more vendors - 2x2 grid
+                      <div className="grid grid-cols-2 grid-rows-2 h-full gap-0.5">
+                        {market.vendors.slice(0, 4).map((vendor, vendorIndex) => (
+                          <div key={vendorIndex} className="relative overflow-hidden">
+                            {vendor.products && 
+                             Array.isArray(vendor.products) &&
+                             vendor.products.length > 0 && 
+                             vendor.products[0].images && 
+                             vendor.products[0].images.length > 0 ? (
+                              <img 
+                                src={vendor.products[0].images[0]}
+                                alt={vendor.store_name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
+                                <div className="text-green-600 text-xs font-medium text-center p-1">
+                                  {vendor.store_name}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Distance Badge - Bottom Right (placeholder) */}
+                    <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                      <span className="text-xs font-medium text-gray-700">
+                        -- miles
                       </span>
                     </div>
+                  </div>
 
-                    {/* Days Open */}
+                  {/* Market Info */}
+                  <div className="p-4 space-y-3">
+                    <h3 className="text-base font-semibold text-foreground text-left">
+                      {market.name}
+                    </h3>
+                    
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <p className="text-sm text-muted-foreground">
+                        {market.address.replace(/,\s*United States\s*$/i, '').trim()}
+                      </p>
+                    </div>
+
+                    {/* Market Days Badges */}
                     {market.days && market.days.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {market.days.map((day, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
+                      <div className="flex flex-wrap gap-1.5">
+                        {market.days.map((day: string) => (
+                          <Badge 
+                            key={day} 
+                            className="text-xs px-3 py-1 bg-green-100 text-green-700 hover:bg-green-100 border-0"
+                          >
                             {day}
                           </Badge>
                         ))}
