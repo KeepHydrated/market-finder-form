@@ -346,9 +346,24 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
                 <div className="mt-auto pt-3 border-t border-gray-200">
                   <div className="flex justify-start">
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         onClose();
-                        navigate(`/market?id=${vendorId}`);
+                        // Fetch the vendor data to navigate to their store
+                        const { supabase } = await import("@/integrations/supabase/client");
+                        const { data: vendor } = await supabase
+                          .from('submissions')
+                          .select('*')
+                          .eq('id', vendorId)
+                          .maybeSingle();
+                        
+                        if (vendor) {
+                          navigate('/market', { 
+                            state: { 
+                              type: 'vendor', 
+                              selectedVendor: vendor
+                            } 
+                          });
+                        }
                       }}
                       className="text-sm text-black hover:underline cursor-pointer"
                     >
