@@ -595,9 +595,9 @@ const Test2 = () => {
 
                       {/* Distance Badge - Bottom Right */}
                       {vendorDistances[vendor.id] && vendorDistances[vendor.id] !== '-- mi' && (
-                        <Badge className="absolute bottom-3 right-3 bg-white backdrop-blur-sm shadow-lg border-0 rounded-full px-3 py-1.5 hover:bg-white">
-                          <span className="font-semibold text-sm text-gray-900">{vendorDistances[vendor.id]}</span>
-                        </Badge>
+                        <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                          <span className="text-xs font-medium text-gray-700">{vendorDistances[vendor.id]}</span>
+                        </div>
                       )}
 
                       {/* Category Badge - Bottom Left */}
