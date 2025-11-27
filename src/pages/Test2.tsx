@@ -81,20 +81,58 @@ const Test2 = () => {
     getUserLocation();
   }, []);
 
-  // Get user's current location
-  const getUserLocation = () => {
+  // Get user's current location with fallback to profile zipcode
+  const getUserLocation = async () => {
+    // Try GPS first
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log('📍 Got GPS location:', position.coords);
           setUserCoordinates({
             lat: position.coords.latitude,
             lng: position.coords.longitude
           });
         },
-        (error) => {
-          console.log('Location permission denied or unavailable');
+        async (error) => {
+          console.log('GPS location denied, trying profile zipcode fallback');
+          // Fallback to profile zipcode
+          await getLocationFromProfile();
         }
       );
+    } else {
+      // No geolocation support, try profile zipcode
+      await getLocationFromProfile();
+    }
+  };
+
+  // Get location from user's profile zipcode
+  const getLocationFromProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('zipcode')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profile?.zipcode) {
+        console.log('📍 Using profile zipcode:', profile.zipcode);
+        const { data, error } = await supabase.functions.invoke('geocode-distance', {
+          body: { address: profile.zipcode }
+        });
+
+        if (!error && data?.latitude && data?.longitude) {
+          console.log('📍 Got coordinates from zipcode:', data);
+          setUserCoordinates({
+            lat: data.latitude,
+            lng: data.longitude
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error getting location from profile:', error);
     }
   };
 
