@@ -149,21 +149,35 @@ const Test2 = () => {
 
       if (vendorsError) throw vendorsError;
 
-      // Group vendors by market
+      // Group vendors by market - use more flexible matching
       const marketsWithVendors = markets.map(market => {
         const marketVendors = vendors?.filter(vendor => {
-          // Check if vendor's selected_markets includes this market
+          // Check if vendor's selected_markets or market_address matches this market
           const selectedMarkets = vendor.selected_markets;
-          if (!selectedMarkets) return false;
+          const marketAddress = vendor.market_address;
           
-          // Handle different data structures
-          if (Array.isArray(selectedMarkets)) {
-            return selectedMarkets.some((m: any) => {
+          // Try matching by selected_markets
+          if (selectedMarkets && Array.isArray(selectedMarkets)) {
+            const hasMatch = selectedMarkets.some((m: any) => {
               const marketName = typeof m === 'string' ? m : (m?.name || '');
+              const marketAddr = typeof m === 'string' ? '' : (m?.address || '');
+              
+              // Match by name or address
               return marketName.toLowerCase().includes(market.name.toLowerCase()) ||
-                     market.name.toLowerCase().includes(marketName.toLowerCase());
+                     market.name.toLowerCase().includes(marketName.toLowerCase()) ||
+                     (marketAddr && market.address.toLowerCase().includes(marketAddr.toLowerCase())) ||
+                     (marketAddr && marketAddr.toLowerCase().includes(market.address.toLowerCase()));
             });
+            if (hasMatch) return true;
           }
+          
+          // Try matching by market_address
+          if (marketAddress) {
+            return market.address.toLowerCase().includes(marketAddress.toLowerCase()) ||
+                   marketAddress.toLowerCase().includes(market.address.toLowerCase()) ||
+                   market.name.toLowerCase().includes(marketAddress.toLowerCase());
+          }
+          
           return false;
         }) || [];
 
@@ -173,9 +187,8 @@ const Test2 = () => {
         };
       });
 
-      // Filter out markets with no vendors and shuffle
-      const marketsWithVendorsOnly = marketsWithVendors.filter(m => m.vendors.length > 0);
-      const shuffled = marketsWithVendorsOnly.sort(() => 0.5 - Math.random());
+      // Show all markets, even without vendors (will show placeholder)
+      const shuffled = marketsWithVendors.sort(() => 0.5 - Math.random());
       setRecommendedMarkets(shuffled.slice(0, 6) as any);
     } catch (error) {
       console.error('Error fetching recommended markets:', error);
