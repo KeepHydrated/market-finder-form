@@ -1946,6 +1946,13 @@ const Homepage = () => {
                         </Badge>
                       )}
 
+                      {/* Distance Badge - Bottom Right */}
+                      {vendorDistances[submission.id] && (
+                        <Badge className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm shadow-sm border-0 rounded-full px-3 py-1.5 hover:bg-white/90">
+                          <span className="font-medium text-sm text-gray-700">{vendorDistances[submission.id]}</span>
+                        </Badge>
+                      )}
+
                     </div>
                     
                     {/* Store Information */}
