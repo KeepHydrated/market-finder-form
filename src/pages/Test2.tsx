@@ -585,11 +585,11 @@ const Test2 = () => {
               <p className="text-muted-foreground">No markets available yet.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="flex overflow-x-auto gap-6 pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
               {recommendedMarkets.map((market) => (
                 <Card
                   key={market.id}
-                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer rounded-2xl"
+                  className="flex-none w-[280px] md:w-[320px] overflow-hidden hover:shadow-lg transition-shadow cursor-pointer rounded-2xl snap-start"
                   onClick={() => navigate('/test', { state: { searchTerm: market.name } })}
                 >
                   {/* Vendor Images Collage */}
