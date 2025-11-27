@@ -703,43 +703,41 @@ const Homepage = () => {
     
     for (const vendor of vendors) {
       try {
-        if (vendor.market_address) {
-          // Get coordinates for vendor's market
-          const marketCoords = await getCoordinatesForAddress(vendor.market_address);
+        // Use vendor's stored latitude/longitude directly if available
+        if (vendor.latitude && vendor.longitude) {
+          const vendorCoords = {
+            lat: Number(vendor.latitude),
+            lng: Number(vendor.longitude)
+          };
           
-          if (marketCoords) {
-            // Try Google Maps distance first
-            const googleDistance = await getGoogleMapsDistance(
+          // Try Google Maps distance first
+          const googleDistance = await getGoogleMapsDistance(
+            userCoords.lat, 
+            userCoords.lng, 
+            vendorCoords.lat, 
+            vendorCoords.lng
+          );
+          
+          let finalDistance = '-- mi';
+          
+          if (googleDistance && googleDistance.distanceMiles) {
+            finalDistance = `${googleDistance.distanceMiles.toFixed(1)} mi`;
+            console.log(`✅ Google Maps distance for ${vendor.store_name}: ${finalDistance}`);
+          } else {
+            // Fallback to straight-line distance
+            const distanceInMiles = calculateDistance(
               userCoords.lat, 
               userCoords.lng, 
-              marketCoords.lat, 
-              marketCoords.lng
+              vendorCoords.lat, 
+              vendorCoords.lng
             );
-            
-            let finalDistance = '-- mi';
-            
-            if (googleDistance && googleDistance.distanceMiles) {
-              finalDistance = `${googleDistance.distanceMiles.toFixed(1)} mi`;
-              console.log(`✅ Google Maps distance for ${vendor.store_name}: ${finalDistance}`);
-            } else {
-              // Fallback to straight-line distance
-              const distanceInMiles = calculateDistance(
-                userCoords.lat, 
-                userCoords.lng, 
-                marketCoords.lat, 
-                marketCoords.lng
-              );
-              finalDistance = `${distanceInMiles.toFixed(1)} mi`;
-              console.log(`⚠️ Fallback distance for ${vendor.store_name}: ${finalDistance}`);
-            }
-            
-            newDistances[vendor.id] = finalDistance;
-          } else {
-            console.log(`⚠️ Could not get coordinates for ${vendor.store_name}`);
-            newDistances[vendor.id] = '-- mi';
+            finalDistance = `${distanceInMiles.toFixed(1)} mi`;
+            console.log(`⚠️ Fallback distance for ${vendor.store_name}: ${finalDistance}`);
           }
+          
+          newDistances[vendor.id] = finalDistance;
         } else {
-          console.log(`⚠️ No market address for ${vendor.store_name}`);
+          console.log(`⚠️ No coordinates for ${vendor.store_name}`);
           newDistances[vendor.id] = '-- mi';
         }
       } catch (error) {
