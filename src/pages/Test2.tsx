@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, Star, MapPin } from "lucide-react";
+import { Heart, Star, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLikes } from "@/hooks/useLikes";
 import { cn } from "@/lib/utils";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
@@ -36,6 +36,7 @@ interface Vendor {
   latitude: number | null;
   longitude: number | null;
   selected_markets?: any;
+  market_days?: string[];
 }
 
 interface Market {
@@ -71,6 +72,7 @@ const Test2 = () => {
   // Distance calculation state
   const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
   const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
+  const [vendorMarketIndices, setVendorMarketIndices] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetchRecommendedProducts();
@@ -230,7 +232,7 @@ const Test2 = () => {
     try {
       const { data: vendors, error } = await supabase
         .from('submissions')
-        .select('id, store_name, primary_specialty, description, products, google_rating, google_rating_count, market_address, latitude, longitude')
+        .select('id, store_name, primary_specialty, description, products, google_rating, google_rating_count, market_address, latitude, longitude, selected_markets, market_days')
         .eq('status', 'accepted')
         .not('products', 'is', null)
         .limit(20);
@@ -517,23 +519,27 @@ const Test2 = () => {
                       )}
                       
                       {/* Star Rating Badge - Top Left */}
-                      {vendor.google_rating && (
-                        <Badge className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm shadow-sm flex items-center gap-1 px-2 py-1">
-                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-medium">{vendor.google_rating.toFixed(1)}</span>
-                          {vendor.google_rating_count && (
-                            <span className="text-xs text-muted-foreground">
-                              ({vendor.google_rating_count})
+                      {vendor.google_rating && vendor.google_rating > 0 && (
+                        <div className="absolute top-2 left-2 z-10 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                          <div className="flex items-center gap-1">
+                            <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                            <span className="text-xs font-medium">
+                              {vendor.google_rating.toFixed(1)}
                             </span>
-                          )}
-                        </Badge>
+                            {vendor.google_rating_count && (
+                              <span className="text-xs text-gray-600">
+                                ({vendor.google_rating_count})
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       )}
                       
                       {/* Like Button - Top Right */}
                       <Button
                         variant="secondary"
                         size="sm"
-                        className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                        className="absolute top-2 right-2 z-10 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
                         onClick={async (e) => {
                           e.stopPropagation();
                           await toggleLike(vendor.id, 'vendor');
@@ -549,50 +555,157 @@ const Test2 = () => {
                         />
                       </Button>
 
-                      {/* Specialty Badge - Bottom Left */}
-                      {vendor.primary_specialty && (
-                        <Badge className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm shadow-sm text-green-600 border-0">
-                          {vendor.primary_specialty}
-                        </Badge>
-                      )}
-                      
                       {/* Distance Badge - Bottom Right */}
-                      {vendorDistances[vendor.id] && (
-                        <Badge className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm shadow-sm">
-                          {vendorDistances[vendor.id]}
+                      {vendorDistances[vendor.id] && vendorDistances[vendor.id] !== '-- mi' && (
+                        <Badge className="absolute bottom-3 right-3 bg-white backdrop-blur-sm shadow-lg border-0 rounded-full px-3 py-1.5 hover:bg-white">
+                          <span className="font-semibold text-sm text-gray-900">{vendorDistances[vendor.id]}</span>
                         </Badge>
                       )}
+
+                      {/* Category Badge - Bottom Left */}
+                      {vendor.primary_specialty && (
+                        <Badge className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm shadow-sm border-0 rounded-full px-3 py-1.5 hover:bg-white/90">
+                          <span className="font-medium text-sm text-green-600">{vendor.primary_specialty}</span>
+                        </Badge>
+                      )}
+
                     </div>
-
-                    {/* Vendor Info */}
-                    <CardContent className="p-4 space-y-2">
-                      {/* Store Name */}
-                      <h3 className="font-bold text-lg text-black">
-                        {vendor.store_name}
+                    
+                    {/* Store Information */}
+                    <div className="p-4 space-y-3">
+                      <h3 className="text-lg font-semibold text-foreground text-left">
+                        {vendor.store_name.length > 20 
+                          ? `${vendor.store_name.slice(0, 20)}...`
+                          : vendor.store_name
+                        }
                       </h3>
-                      
-                      {/* Market Name with Navigation - placeholder */}
-                      {vendor.selected_markets && Array.isArray(vendor.selected_markets) && vendor.selected_markets.length > 0 && (
-                        <div className="flex items-center justify-between text-sm font-medium">
-                          <span className="text-foreground">{vendor.selected_markets[0]?.name || 'Market Name'}</span>
-                          <div className="flex items-center gap-1 text-muted-foreground">
-                            <button className="hover:text-foreground">←</button>
-                            <span className="text-xs">1/{vendor.selected_markets.length}</span>
-                            <button className="hover:text-foreground">→</button>
-                          </div>
-                        </div>
-                      )}
 
-                      {/* Address */}
-                      {vendor.market_address && (
-                        <div className="flex items-start gap-1">
-                          <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-                          <span className="text-sm text-muted-foreground line-clamp-1">
-                            {vendor.market_address}
-                          </span>
-                        </div>
-                      )}
-                    </CardContent>
+                      {/* Market Details Section with Carousel */}
+                      <div className="mt-2">
+                        {(() => {
+                          // Get all markets for this vendor - handle various data structures
+                          let allMarkets = [];
+                          
+                          try {
+                            let marketsData = vendor.selected_markets;
+                            
+                            // If it's a string, parse it
+                            if (typeof marketsData === 'string') {
+                              try {
+                                marketsData = JSON.parse(marketsData);
+                              } catch (e) {
+                                console.error('Failed to parse markets JSON:', e);
+                                marketsData = null;
+                              }
+                            }
+                            
+                            if (marketsData && Array.isArray(marketsData)) {
+                              allMarkets = marketsData.map((market: any) => {
+                                // Handle string format (old format)
+                                if (typeof market === 'string') {
+                                  return { name: market, address: vendor.market_address || '' };
+                                }
+                                // Handle object format (new format)
+                                if (market && typeof market === 'object') {
+                                  // Ensure we extract strings, not objects
+                                  const marketName = String(market.name || market.structured_formatting?.main_text || 'Farmers Market');
+                                  const marketAddress = String(market.address || market.structured_formatting?.secondary_text || vendor.market_address || '');
+                                  return { name: marketName, address: marketAddress };
+                                }
+                                // Fallback
+                                return { name: String(market), address: vendor.market_address || '' };
+                              });
+                            } else {
+                              // Fallback to single market
+                              allMarkets = [{ 
+                                name: String(vendor.market_address || "Farmers Market"),
+                                address: String(vendor.market_address || '')
+                              }];
+                            }
+                          } catch (error) {
+                            console.error('Error parsing markets:', error);
+                            // Ultimate fallback
+                            allMarkets = [{ 
+                              name: String(vendor.market_address || "Farmers Market"),
+                              address: String(vendor.market_address || '')
+                            }];
+                          }
+                          
+                          const currentIndex = vendorMarketIndices[vendor.id] || 0;
+                          const currentMarket = allMarkets[currentIndex] || allMarkets[0] || { name: 'Farmers Market', address: '' };
+                          const hasMultipleMarkets = allMarkets.length > 1;
+
+                          return (
+                            <>
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between gap-2 mb-1">
+                                    <h4 className="text-sm font-semibold text-foreground">
+                                      {String(currentMarket.name || 'Farmers Market')}
+                                    </h4>
+                                    {hasMultipleMarkets && (
+                                      <div className="flex items-center gap-1 flex-shrink-0">
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setVendorMarketIndices(prev => ({
+                                              ...prev,
+                                              [vendor.id]: (currentIndex - 1 + allMarkets.length) % allMarkets.length
+                                            }));
+                                          }}
+                                          className="p-1 hover:bg-muted rounded transition-colors"
+                                          aria-label="Previous market"
+                                        >
+                                          <ChevronLeft className="h-4 w-4" />
+                                        </button>
+                                        <span className="text-xs text-muted-foreground">
+                                          {currentIndex + 1}/{allMarkets.length}
+                                        </span>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setVendorMarketIndices(prev => ({
+                                              ...prev,
+                                              [vendor.id]: (currentIndex + 1) % allMarkets.length
+                                            }));
+                                          }}
+                                          className="p-1 hover:bg-muted rounded transition-colors"
+                                          aria-label="Next market"
+                                        >
+                                          <ChevronRight className="h-4 w-4" />
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                  {currentMarket.address && (
+                                    <div className="flex items-start gap-2">
+                                      <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                                      <p className="text-sm text-muted-foreground">
+                                        {String(currentMarket.address).replace(/,\s*United States\s*$/i, '').trim()}
+                                      </p>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Market Days Badges */}
+                                  {vendor.market_days && vendor.market_days.length > 0 && (
+                                    <div className="flex flex-wrap gap-1.5 mt-2">
+                                      {vendor.market_days.map((day: string) => (
+                                        <Badge 
+                                          key={day} 
+                                          className="text-xs px-3 py-1 bg-green-100 text-green-700 hover:bg-green-100 border-0"
+                                        >
+                                          {day}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
                   </Card>
                 );
               })}
