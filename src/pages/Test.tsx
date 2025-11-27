@@ -1187,6 +1187,19 @@ const Homepage = () => {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
+  // Automatically get location on page load
+  useEffect(() => {
+    if (!userCoordinates) {
+      console.log('🌍 No user coordinates found, attempting automatic location detection...');
+      tryGPSLocationFirst();
+    }
+  }, []);
+
+  // Fetch submissions on initial page load
+  useEffect(() => {
+    fetchAcceptedSubmissions();
+  }, []);
+
   const fetchVendorRatings = async (vendorIds: string[]) => {
     if (vendorIds.length === 0) return;
 
