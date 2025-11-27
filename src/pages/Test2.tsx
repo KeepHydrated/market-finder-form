@@ -33,6 +33,8 @@ interface Vendor {
   google_rating: number | null;
   google_rating_count: number | null;
   market_address: string | null;
+  latitude: number | null;
+  longitude: number | null;
   selected_markets?: any;
 }
 
@@ -65,12 +67,125 @@ const Test2 = () => {
   const [currentVendorProducts, setCurrentVendorProducts] = useState<any[]>([]);
   const [currentVendorId, setCurrentVendorId] = useState<string | undefined>(undefined);
   const [currentVendorName, setCurrentVendorName] = useState<string | undefined>(undefined);
+  
+  // Distance calculation state
+  const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
+  const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchRecommendedProducts();
     fetchRecommendedVendors();
     fetchRecommendedMarkets();
+    getUserLocation();
   }, []);
+
+  // Get user's current location
+  const getUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserCoordinates({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.log('Location permission denied or unavailable');
+        }
+      );
+    }
+  };
+
+  // Calculate straight-line distance between two coordinates (Haversine formula)
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 3959; // Earth's radius in miles
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
+  // Get Google Maps driving distance
+  const getGoogleMapsDistance = async (
+    originLat: number, 
+    originLng: number, 
+    destLat: number, 
+    destLng: number
+  ) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('get-distance', {
+        body: {
+          origin: { lat: originLat, lng: originLng },
+          destination: { lat: destLat, lng: destLng }
+        }
+      });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error getting Google Maps distance:', error);
+      return null;
+    }
+  };
+
+  // Calculate distances for vendors
+  const calculateVendorDistances = async (vendors: Vendor[], userCoords: {lat: number, lng: number}) => {
+    const newDistances: Record<string, string> = {};
+    
+    for (const vendor of vendors) {
+      try {
+        if (vendor.latitude && vendor.longitude) {
+          const vendorCoords = {
+            lat: Number(vendor.latitude),
+            lng: Number(vendor.longitude)
+          };
+          
+          // Try Google Maps distance first
+          const googleDistance = await getGoogleMapsDistance(
+            userCoords.lat, 
+            userCoords.lng, 
+            vendorCoords.lat, 
+            vendorCoords.lng
+          );
+          
+          let finalDistance = '-- mi';
+          
+          if (googleDistance && googleDistance.distanceMiles) {
+            finalDistance = `${googleDistance.distanceMiles.toFixed(1)} mi`;
+          } else {
+            // Fallback to straight-line distance
+            const distanceInMiles = calculateDistance(
+              userCoords.lat, 
+              userCoords.lng, 
+              vendorCoords.lat, 
+              vendorCoords.lng
+            );
+            finalDistance = `${distanceInMiles.toFixed(1)} mi`;
+          }
+          
+          newDistances[vendor.id] = finalDistance;
+        } else {
+          newDistances[vendor.id] = '-- mi';
+        }
+      } catch (error) {
+        console.error(`Error calculating distance for ${vendor.store_name}:`, error);
+        newDistances[vendor.id] = '-- mi';
+      }
+    }
+    
+    setVendorDistances(newDistances);
+  };
+
+  // Calculate distances when vendors and location are available
+  useEffect(() => {
+    if (recommendedVendors.length > 0 && userCoordinates) {
+      calculateVendorDistances(recommendedVendors, userCoordinates);
+    }
+  }, [recommendedVendors, userCoordinates]);
 
   const fetchRecommendedProducts = async () => {
     try {
@@ -115,7 +230,7 @@ const Test2 = () => {
     try {
       const { data: vendors, error } = await supabase
         .from('submissions')
-        .select('id, store_name, primary_specialty, description, products, google_rating, google_rating_count, market_address')
+        .select('id, store_name, primary_specialty, description, products, google_rating, google_rating_count, market_address, latitude, longitude')
         .eq('status', 'accepted')
         .not('products', 'is', null)
         .limit(20);
@@ -441,10 +556,12 @@ const Test2 = () => {
                         </Badge>
                       )}
                       
-                      {/* Distance Badge - Bottom Right (placeholder for now) */}
-                      <Badge className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm shadow-sm">
-                        212.8 mi
-                      </Badge>
+                      {/* Distance Badge - Bottom Right */}
+                      {vendorDistances[vendor.id] && (
+                        <Badge className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm shadow-sm">
+                          {vendorDistances[vendor.id]}
+                        </Badge>
+                      )}
                     </div>
 
                     {/* Vendor Info */}
