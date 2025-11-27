@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Heart, Star, Filter, RotateCcw, MapPin, Search, ChevronDown, Store, Package, ChevronLeft, ChevronRight, X, Globe } from "lucide-react";
+import { Heart, Star, Filter, RotateCcw, MapPin, Search, ChevronDown, Store, Package, ChevronLeft, ChevronRight, X, Globe, ShoppingCart } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLikes } from "@/hooks/useLikes";
+import { useShoppingCart } from "@/contexts/ShoppingCartContext";
 import { calculateDistance, getGoogleMapsDistance, getCoordinatesForAddress } from "@/lib/geocoding";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
 
@@ -71,6 +72,7 @@ const Homepage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const { toggleLike, isLiked, likes } = useLikes();
+  const { addItem } = useShoppingCart();
   const [acceptedSubmissions, setAcceptedSubmissions] = useState<AcceptedSubmission[]>([]);
   const [filteredSubmissions, setFilteredSubmissions] = useState<AcceptedSubmission[]>([]);
   const [vendorRatings, setVendorRatings] = useState<Record<string, VendorRating>>({});
@@ -2359,99 +2361,106 @@ const Homepage = () => {
                   {sortedProducts.map((product, index) => (
                     <Card 
                       key={`${product.vendorId}-${index}`}
-                      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                      onClick={() => {
-                        const vendor = filteredSubmissions.find(v => v.id === product.vendorId);
-                        if (vendor) {
-                          // Set up the product modal
-                          const productWithId = {
-                            ...product,
-                            id: product.id || index
-                          };
-                          setSelectedProduct(productWithId);
-                          // Store vendor info separately
-                          setCurrentVendorId(product.vendorId);
-                          setCurrentVendorName(product.vendorName);
-                          // Ensure all vendor products have IDs
-                          const productsWithIds = (vendor.products || []).map((p: any, idx: number) => ({
-                            ...p,
-                            id: p.id || idx
-                          }));
-                          setCurrentVendorProducts(productsWithIds);
-                          setIsProductModalOpen(true);
-                        }
-                      }}
+                      className="group hover:shadow-lg transition-all duration-300 overflow-hidden bg-card border-0 shadow-sm rounded-lg"
                     >
-                      {/* Product Image */}
-                      <div className="aspect-[4/3] bg-muted relative overflow-hidden group">
-                        {product.images && product.images.length > 0 ? (
-                          <img 
-                            src={product.images[0]} 
-                            alt={product.name || 'Product'} 
-                            className="w-full h-full object-cover transition-opacity duration-200"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                            No Image Available
-                          </div>
-                        )}
-                        
-                        
-                        {/* Like Button */}
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            await toggleLike(`${product.vendorId}-${product.id}`, 'product');
+                      <CardContent className="p-0">
+                        {/* Product Image with Heart Overlay */}
+                        <div 
+                          className="aspect-[4/3] bg-muted relative overflow-hidden group cursor-pointer"
+                          onClick={() => {
+                            const vendor = filteredSubmissions.find(v => v.id === product.vendorId);
+                            if (vendor) {
+                              const productWithId = {
+                                ...product,
+                                id: product.id || index
+                              };
+                              setSelectedProduct(productWithId);
+                              setCurrentVendorId(product.vendorId);
+                              setCurrentVendorName(product.vendorName);
+                              const productsWithIds = (vendor.products || []).map((p: any, idx: number) => ({
+                                ...p,
+                                id: p.id || idx
+                              }));
+                              setCurrentVendorProducts(productsWithIds);
+                              setIsProductModalOpen(true);
+                            }
                           }}
                         >
-                          <Heart 
-                            className={cn(
-                              "h-4 w-4 transition-colors",
-                              isLiked(`${product.vendorId}-${product.id}`, 'product')
-                                ? "text-red-500 fill-current" 
-                                : "text-gray-600"
-                            )}
-                          />
-                        </Button>
-                      </div>
-                      
-                      {/* Product Information */}
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between mb-2">
-                          <h3 className="font-normal text-sm flex-1 text-black">
-                            {product.name || 'Product'}
-                          </h3>
+                          {product.images && product.images.length > 0 ? (
+                            <img 
+                              src={product.images[0]} 
+                              alt={product.name || 'Product'} 
+                              className="w-full h-full object-cover transition-opacity duration-200"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                              No Image Available
+                            </div>
+                          )}
+                          
+                          {/* Like Button */}
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="absolute top-2 right-2 h-8 w-8 p-0 bg-white/90 hover:bg-white rounded-full shadow-sm"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              await toggleLike(`${product.vendorId}-${product.id}`, 'product');
+                            }}
+                          >
+                            <Heart 
+                              className={cn(
+                                "h-4 w-4 transition-colors",
+                                isLiked(`${product.vendorId}-${product.id}`, 'product')
+                                  ? "text-red-500 fill-current" 
+                                  : "text-gray-600"
+                              )}
+                            />
+                          </Button>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-muted-foreground">
-                            ${(product.price || 0).toFixed(2)}
-                          </span>
-                        </div>
-                        {product.vendorName && (
-                          <div className="mt-2 pt-2 border-t border-muted">
-                            <button
+                        
+                        {/* Product Information */}
+                        <div className="p-4 space-y-3">
+                          <div className="space-y-1">
+                            <h3 className="font-medium text-base line-clamp-2">
+                              {product.name || 'Product'}
+                            </h3>
+                            <p className="text-sm text-muted-foreground line-clamp-1">
+                              {product.vendorName}
+                            </p>
+                          </div>
+                          
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-lg font-semibold">
+                              ${(product.price || 0).toFixed(2)}
+                            </span>
+                            
+                            <Button
+                              variant="default"
+                              size="sm"
+                              className="gap-2"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const vendor = filteredSubmissions.find(v => v.id === product.vendorId);
-                                if (vendor) {
-                                  navigate('/market', { 
-                                    state: { 
-                                      type: 'vendor', 
-                                      selectedVendor: vendor,
-                                      allVendors: filteredSubmissions
-                                    } 
-                                  });
-                                }
+                                addItem({
+                                  id: `${product.vendorId}-${product.id || index}`,
+                                  product_name: product.name,
+                                  product_description: product.description,
+                                  unit_price: (product.price || 0) * 100,
+                                  vendor_id: product.vendorId,
+                                  vendor_name: product.vendorName,
+                                  product_image: product.images?.[0]
+                                });
+                                toast({
+                                  title: "Added to cart",
+                                  description: `${product.name} has been added to your cart`
+                                });
                               }}
-                              className="text-xs text-black hover:underline cursor-pointer"
                             >
-                              {product.vendorName}
-                            </button>
+                              <ShoppingCart className="h-4 w-4" />
+                              Add
+                            </Button>
                           </div>
-                        )}
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
