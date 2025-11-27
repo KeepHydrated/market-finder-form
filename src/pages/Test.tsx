@@ -1617,7 +1617,6 @@ const Homepage = () => {
                   </div>
                 </TabsContent>
                 <TabsContent value="times" className="px-8 pb-8 pt-8 overflow-y-auto">
-                  <div className="space-y-4">
                     {/* Mobile layout - integrated day buttons with time selectors */}
                     <div className="md:hidden space-y-6 max-w-xs mx-auto">
                       {DAYS.map((day) => (
@@ -1704,7 +1703,7 @@ const Homepage = () => {
                     </div>
                     
                     {/* Desktop layout - separate sections */}
-                    <div className="hidden md:block space-y-4">
+                    <div className="hidden md:block">
                       <div className="flex flex-row gap-2">
                         {DAYS.map((day) => (
                           <Button
@@ -1805,7 +1804,6 @@ const Homepage = () => {
                         ))}
                       </div>
                     </div>
-                  </div>
                 </TabsContent>
                 <TabsContent value="categories" className="px-8 pb-8 pt-8 overflow-y-auto">
                   <div className="space-y-4">
