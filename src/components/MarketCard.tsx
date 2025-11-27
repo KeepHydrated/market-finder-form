@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, MapPin, Star, Heart } from "lucide-react";
 import { useLikes } from "@/hooks/useLikes";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MarketCardProps {
   id: string;
@@ -12,10 +14,44 @@ interface MarketCardProps {
   hours: string;
   rating?: number;
   ratingCount?: number;
+  placeId?: string;
 }
 
-export const MarketCard = ({ id, name, address, days, hours, rating, ratingCount }: MarketCardProps) => {
+export const MarketCard = ({ id, name, address, days, hours, rating, ratingCount, placeId }: MarketCardProps) => {
   const { toggleLike, isLiked } = useLikes();
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [isLoadingPhoto, setIsLoadingPhoto] = useState(true);
+
+  useEffect(() => {
+    const fetchPhoto = async () => {
+      if (!placeId) {
+        setIsLoadingPhoto(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.functions.invoke('get-place-photo', {
+          body: { place_id: placeId }
+        });
+
+        if (error) {
+          console.error('Error fetching place photo:', error);
+          setIsLoadingPhoto(false);
+          return;
+        }
+
+        if (data?.photoUrl) {
+          setPhotoUrl(data.photoUrl);
+        }
+      } catch (error) {
+        console.error('Error fetching place photo:', error);
+      } finally {
+        setIsLoadingPhoto(false);
+      }
+    };
+
+    fetchPhoto();
+  }, [placeId]);
 
   const handleLike = () => {
     toggleLike(id, 'market');
@@ -23,6 +59,22 @@ export const MarketCard = ({ id, name, address, days, hours, rating, ratingCount
 
   return (
     <Card className="relative hover:shadow-lg transition-shadow overflow-hidden">
+      {/* Market Photo */}
+      {photoUrl && (
+        <div className="w-full h-48 overflow-hidden">
+          <img 
+            src={photoUrl} 
+            alt={name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+      {!photoUrl && !isLoadingPhoto && (
+        <div className="w-full h-48 bg-gradient-to-br from-green-100 to-green-200" />
+      )}
+      {isLoadingPhoto && (
+        <div className="w-full h-48 bg-gray-200 animate-pulse" />
+      )}
       {/* Rating Badge - Top Left */}
       {rating && (
         <div className="absolute top-3 left-3 z-10">
