@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, MapPin, Store, Package, Star } from "lucide-react";
+import { Heart, MapPin, Store, Package, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   Sidebar,
@@ -73,6 +73,7 @@ const Likes = () => {
   const [currentVendorInfo, setCurrentVendorInfo] = useState<{id: string; name: string} | null>(null);
   const [marketAddressesMap, setMarketAddressesMap] = useState<Record<string, string>>({});
   const [marketGoogleRatings, setMarketGoogleRatings] = useState<Record<string, {rating: number; reviewCount: number}>>({});
+  const [vendorMarketIndices, setVendorMarketIndices] = useState<Record<string, number>>({});
 
   const tabs = [
     { id: "vendors" as TabType, title: "Vendors", icon: Store },
@@ -661,17 +662,19 @@ const Likes = () => {
               )}
               
               {/* Rating - Top Left */}
-              <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                <div className="flex items-center gap-1">
-                  <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                  <span className="text-xs font-medium">
-                    {vendorRatings[vendor.id]?.totalReviews > 0 ? vendorRatings[vendor.id]?.averageRating.toFixed(1) : '0.0'}
-                  </span>
-                  <span className="text-xs text-gray-600">
-                    ({vendorRatings[vendor.id]?.totalReviews || 0})
-                  </span>
+              {vendorRatings[vendor.id]?.totalReviews > 0 && (
+                <div className="absolute top-2 left-2 z-10 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                  <div className="flex items-center gap-1">
+                    <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                    <span className="text-xs font-medium">
+                      {vendorRatings[vendor.id]?.averageRating.toFixed(1)}
+                    </span>
+                    <span className="text-xs text-gray-600">
+                      ({vendorRatings[vendor.id]?.totalReviews})
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
               
               {/* Like Button */}
               <Button
@@ -693,12 +696,19 @@ const Likes = () => {
                 />
               </Button>
 
-              {/* Distance Badge */}
-              <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                <span className="text-xs font-medium text-gray-700">
-                  {vendorDistances[vendor.id] || '-- miles'}
-                </span>
-              </div>
+              {/* Distance Badge - Bottom Right */}
+              {vendorDistances[vendor.id] && vendorDistances[vendor.id] !== '-- mi' && vendorDistances[vendor.id] !== '-- miles' && (
+                <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                  <span className="text-xs font-medium text-gray-700">{vendorDistances[vendor.id]}</span>
+                </div>
+              )}
+
+              {/* Category Badge - Bottom Left */}
+              {vendor.primary_specialty && (
+                <Badge className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm shadow-sm border-0 rounded-full px-3 py-1.5 hover:bg-white/90">
+                  <span className="font-medium text-sm text-green-600">{vendor.primary_specialty}</span>
+                </Badge>
+              )}
             </div>
             
             {/* Store Information */}
@@ -709,26 +719,129 @@ const Likes = () => {
                   : vendor.store_name
                 }
               </h3>
-              
-              {vendor.primary_specialty && (
-                <Badge variant="secondary" className="text-xs">
-                  {vendor.primary_specialty}
-                </Badge>
-              )}
 
-              {/* Market Details Section - Moved to bottom */}
+              {/* Market Details Section with Carousel */}
               <div className="mt-2">
-                <h4 className="text-sm font-semibold text-foreground mb-1">
-                  {vendor.selected_market || vendor.search_term || "Farmers Market"}
-                </h4>
-                {vendor.market_address && (
-                  <div className="flex items-start gap-2">
-                    <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-muted-foreground">
-                      {vendor.market_address.replace(/,\s*United States\s*$/i, '').trim()}
-                    </p>
-                  </div>
-                )}
+                {(() => {
+                  // Get all markets for this vendor - handle various data structures
+                  let allMarkets: {name: string; address: string}[] = [];
+                  
+                  try {
+                    let marketsData = (vendor as any).selected_markets;
+                    
+                    // If it's a string, parse it
+                    if (typeof marketsData === 'string') {
+                      try {
+                        marketsData = JSON.parse(marketsData);
+                      } catch (e) {
+                        console.error('Failed to parse markets JSON:', e);
+                        marketsData = null;
+                      }
+                    }
+                    
+                    if (marketsData && Array.isArray(marketsData)) {
+                      allMarkets = marketsData.map((market: any) => {
+                        // Handle string format (old format)
+                        if (typeof market === 'string') {
+                          return { name: market, address: vendor.market_address || '' };
+                        }
+                        // Handle object format (new format)
+                        if (market && typeof market === 'object') {
+                          const marketName = String(market.name || market.structured_formatting?.main_text || 'Farmers Market');
+                          const marketAddress = String(market.address || market.structured_formatting?.secondary_text || vendor.market_address || '');
+                          return { name: marketName, address: marketAddress };
+                        }
+                        // Fallback
+                        return { name: String(market), address: vendor.market_address || '' };
+                      });
+                    } else {
+                      // Fallback to single market
+                      allMarkets = [{ 
+                        name: String(vendor.selected_market || vendor.search_term || "Farmers Market"),
+                        address: String(vendor.market_address || '')
+                      }];
+                    }
+                  } catch (error) {
+                    console.error('Error parsing markets:', error);
+                    allMarkets = [{ 
+                      name: String(vendor.selected_market || vendor.search_term || "Farmers Market"),
+                      address: String(vendor.market_address || '')
+                    }];
+                  }
+                  
+                  const currentIndex = vendorMarketIndices[vendor.id] || 0;
+                  const currentMarket = allMarkets[currentIndex] || allMarkets[0] || { name: 'Farmers Market', address: '' };
+                  const hasMultipleMarkets = allMarkets.length > 1;
+
+                  return (
+                    <>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <h4 className="text-sm font-semibold text-foreground">
+                              {String(currentMarket.name || 'Farmers Market')}
+                            </h4>
+                            {hasMultipleMarkets && (
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setVendorMarketIndices(prev => ({
+                                      ...prev,
+                                      [vendor.id]: (currentIndex - 1 + allMarkets.length) % allMarkets.length
+                                    }));
+                                  }}
+                                  className="p-1 hover:bg-muted rounded transition-colors"
+                                  aria-label="Previous market"
+                                >
+                                  <ChevronLeft className="h-4 w-4" />
+                                </button>
+                                <span className="text-xs text-muted-foreground">
+                                  {currentIndex + 1}/{allMarkets.length}
+                                </span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setVendorMarketIndices(prev => ({
+                                      ...prev,
+                                      [vendor.id]: (currentIndex + 1) % allMarkets.length
+                                    }));
+                                  }}
+                                  className="p-1 hover:bg-muted rounded transition-colors"
+                                  aria-label="Next market"
+                                >
+                                  <ChevronRight className="h-4 w-4" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                          {currentMarket.address && (
+                            <div className="flex items-start gap-2">
+                              <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                              <p className="text-sm text-muted-foreground">
+                                {String(currentMarket.address).replace(/,\s*United States\s*$/i, '').trim()}
+                              </p>
+                            </div>
+                          )}
+                          
+                          {/* Market Days Badges */}
+                          {vendor.market_days && vendor.market_days.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mt-2">
+                              {vendor.market_days.map((day: string) => (
+                                <Badge 
+                                  key={day} 
+                                  className="text-xs px-3 py-1 bg-green-100 text-green-700 hover:bg-green-100 border-0"
+                                >
+                                  {day}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </Card>
