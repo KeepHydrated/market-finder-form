@@ -1407,49 +1407,49 @@ const Homepage = () => {
         {/* Scope Toggle and View Toggle */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           {/* Search results indicator */}
-          {(searchQuery.trim() || selectedCategories.length > 0) && (
-            <div className="w-full sm:w-auto">
-              <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
-                <span>Showing {filteredSubmissions.length} result{filteredSubmissions.length !== 1 ? 's' : ''}</span>
-                {searchQuery.trim() && (
-                  <Badge variant="secondary" className="gap-1 pr-1">
-                    Search: "{searchQuery}"
-                    <button
-                      onClick={() => {
-                        setSearchQuery('');
-                        const params = new URLSearchParams(location.search);
-                        params.delete('search');
-                        params.delete('q');
-                        navigate(`/search${params.toString() ? `?${params.toString()}` : ''}`, { replace: true });
-                      }}
-                      className="ml-1 hover:bg-muted-foreground/20 rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
+          <div className="w-full sm:w-auto">
+            <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
+              <span>Showing {filteredSubmissions.length} result{filteredSubmissions.length !== 1 ? 's' : ''}</span>
+              {searchQuery.trim() && (
+                <Badge variant="secondary" className="gap-1 pr-1">
+                  Search: "{searchQuery}"
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      const params = new URLSearchParams(location.search);
+                      params.delete('search');
+                      params.delete('q');
+                      navigate(`/search${params.toString() ? `?${params.toString()}` : ''}`, { replace: true });
+                    }}
+                    className="ml-1 hover:bg-muted-foreground/20 rounded-full p-0.5"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              <Badge variant="secondary" className="gap-1 pr-1">
+                Category: {selectedCategories.length > 0 ? selectedCategories.join(', ') : 'All'}
                 {selectedCategories.length > 0 && (
-                  <Badge variant="secondary" className="gap-1 pr-1">
-                    Category: {selectedCategories.join(', ')}
-                    <button
-                      onClick={() => {
-                        setSelectedCategories([]);
-                        const params = new URLSearchParams(location.search);
-                        params.delete('category');
-                        navigate(`/search${params.toString() ? `?${params.toString()}` : ''}`, { replace: true });
-                      }}
-                      className="ml-1 hover:bg-muted-foreground/20 rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
+                  <button
+                    onClick={() => {
+                      setSelectedCategories([]);
+                      const params = new URLSearchParams(location.search);
+                      params.delete('category');
+                      navigate(`/search${params.toString() ? `?${params.toString()}` : ''}`, { replace: true });
+                    }}
+                    className="ml-1 hover:bg-muted-foreground/20 rounded-full p-0.5"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
                 )}
-                {searchScope === 'local' && (
-                  <Badge variant="secondary" className="gap-1">
-                    <MapPin className="h-3 w-3" />
-                    Local
-                  </Badge>
-                )}
+              </Badge>
+              {searchScope === 'local' && (
+                <Badge variant="secondary" className="gap-1">
+                  <MapPin className="h-3 w-3" />
+                  Local
+                </Badge>
+              )}
+              {(searchQuery.trim() || selectedCategories.length > 0) && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -1463,9 +1463,9 @@ const Homepage = () => {
                 >
                   Clear all
                 </Button>
-              </div>
+              )}
             </div>
-          )}
+          </div>
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto sm:ml-auto">
             {/* Filter */}
