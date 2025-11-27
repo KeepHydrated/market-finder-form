@@ -1428,7 +1428,7 @@ const Homepage = () => {
                     </button>
                   </Badge>
                 )}
-                {selectedCategories.length > 0 && !selectedCategories.includes('All') && (
+                {selectedCategories.length > 0 && (
                   <Badge variant="secondary" className="gap-1 pr-1">
                     Category: {selectedCategories.join(', ')}
                     <button
