@@ -491,9 +491,23 @@ const Test2 = () => {
                     {product.vendorName && (
                       <div className="mt-2 pt-2 border-t border-muted">
                         <button
-                          onClick={(e) => {
+                          onClick={async (e) => {
                             e.stopPropagation();
-                            navigate('/test');
+                            // Fetch the vendor data to navigate to their store
+                            const { data: vendor } = await supabase
+                              .from('submissions')
+                              .select('*')
+                              .eq('id', product.vendorId)
+                              .single();
+                            
+                            if (vendor) {
+                              navigate('/market', { 
+                                state: { 
+                                  type: 'vendor', 
+                                  selectedVendor: vendor
+                                } 
+                              });
+                            }
                           }}
                           className="text-xs text-black hover:underline cursor-pointer"
                         >
