@@ -1281,7 +1281,7 @@ export default function AccountSettings() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="bg-red-600 hover:bg-red-700 text-white">
+                  <Button className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white">
                     Delete Account
                   </Button>
                 </CardContent>
