@@ -88,7 +88,7 @@ const Homepage = () => {
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [rangeMiles, setRangeMiles] = useState<number[]>([25]);
   const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
-  const [viewMode, setViewMode] = useState<'markets' | 'vendors' | 'products'>('vendors');
+  const [viewMode, setViewMode] = useState<'markets' | 'vendors' | 'products'>('products');
   const [selectedMarket, setSelectedMarket] = useState<{
     name: string;
     address: string;
