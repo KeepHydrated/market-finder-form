@@ -24,7 +24,7 @@ export default function SecuritySection({ isSaving, onDeleteAccount }: SecurityS
             <Button 
               variant="destructive" 
               disabled={isSaving}
-              className="w-full"
+              className="w-full sm:w-auto"
             >
               <Trash2 className="mr-2 h-4 w-4" />
               Delete Account
