@@ -11,7 +11,6 @@ import ScrollToTop from "@/components/ScrollToTop";
 import Homepage from "./pages/Homepage";
 import Test from "./pages/Test";
 import Test2 from "./pages/Test2";
-import CategoryProducts from "./pages/CategoryProducts";
 import VendorDuplicate from "./pages/VendorDuplicate";
 import Likes from "./pages/Likes";
 import Orders from "./pages/Orders";
@@ -50,7 +49,6 @@ const App = () => (
                 <Route path="/test" element={<Test />} />
                 <Route path="/homepage" element={<Homepage />} />
                 <Route path="/auth" element={<Auth />} />
-                <Route path="/search" element={<CategoryProducts />} />
                 <Route path="/market" element={<VendorDuplicate />} />
                 <Route path="/market/:marketSlug" element={<VendorDuplicate />} />
                 <Route path="/vendor/:vendorSlug" element={<VendorDuplicate />} />
