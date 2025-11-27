@@ -123,12 +123,12 @@ const Homepage = () => {
     }
   }, [searchParams]);
 
-  // Handle category selection from URL - keep it on search page
+  // Handle category selection from URL - keep it on test page
   useEffect(() => {
     const categoryParam = searchParams.get('category');
     
     if (categoryParam) {
-      // Stay on search page, just update the selected categories
+      // Stay on test page, just update the selected categories
       setSelectedCategories([categoryParam]);
     }
   }, [searchParams]);
@@ -1310,67 +1310,67 @@ const Homepage = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
               <DropdownMenuItem>
-                <Link to="/search" className="w-full font-semibold">
+                <Link to="/test" className="w-full font-semibold">
                   All
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/search?category=Fresh Flowers & Plants" className="w-full">
+                <Link to="/test?category=Fresh Flowers & Plants" className="w-full">
                   Fresh Flowers & Plants
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/search?category=Bakery" className="w-full">
+                <Link to="/test?category=Bakery" className="w-full">
                   Bakery
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/search?category=Dairy" className="w-full">
+                <Link to="/test?category=Dairy" className="w-full">
                   Dairy
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/search?category=Rancher" className="w-full">
+                <Link to="/test?category=Rancher" className="w-full">
                   Rancher
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/search?category=Beverages" className="w-full">
+                <Link to="/test?category=Beverages" className="w-full">
                   Beverages
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/search?category=Seasonings & Spices" className="w-full">
+                <Link to="/test?category=Seasonings & Spices" className="w-full">
                   Seasonings & Spices
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/search?category=Pets" className="w-full">
+                <Link to="/test?category=Pets" className="w-full">
                   Pets
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/search?category=Home Goods" className="w-full">
+                <Link to="/test?category=Home Goods" className="w-full">
                   Home Goods
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/search?category=Farmers" className="w-full">
+                <Link to="/test?category=Farmers" className="w-full">
                   Farmers
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/search?category=Ready to Eat" className="w-full">
+                <Link to="/test?category=Ready to Eat" className="w-full">
                   Ready to Eat
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/search?category=Packaged Goods & Snacks" className="w-full">
+                <Link to="/test?category=Packaged Goods & Snacks" className="w-full">
                   Packaged Goods & Snacks
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/search?category=Artisan" className="w-full">
+                <Link to="/test?category=Artisan" className="w-full">
                   Artisan
                 </Link>
               </DropdownMenuItem>
@@ -1420,7 +1420,7 @@ const Homepage = () => {
                         const params = new URLSearchParams(location.search);
                         params.delete('search');
                         params.delete('q');
-                        navigate(`/search${params.toString() ? `?${params.toString()}` : ''}`, { replace: true });
+                        navigate(`/test${params.toString() ? `?${params.toString()}` : ''}`, { replace: true });
                       }}
                       className="ml-1 hover:bg-muted-foreground/20 rounded-full p-0.5"
                     >
@@ -1436,7 +1436,7 @@ const Homepage = () => {
                         setSelectedCategories([]);
                         const params = new URLSearchParams(location.search);
                         params.delete('category');
-                        navigate(`/search${params.toString() ? `?${params.toString()}` : ''}`, { replace: true });
+                        navigate(`/test${params.toString() ? `?${params.toString()}` : ''}`, { replace: true });
                       }}
                       className="ml-1 hover:bg-muted-foreground/20 rounded-full p-0.5"
                     >
@@ -1457,7 +1457,7 @@ const Homepage = () => {
                     setSearchQuery('');
                     setSelectedCategories([]);
                     setSearchScope('nationwide');
-                    navigate('/search', { replace: true });
+                    navigate('/test', { replace: true });
                   }}
                   className="h-6 text-xs"
                 >
