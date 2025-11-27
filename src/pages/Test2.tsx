@@ -195,7 +195,7 @@ const Test2 = () => {
 
       // Show all markets, even without vendors (will show placeholder)
       const shuffled = marketsWithVendors.sort(() => 0.5 - Math.random());
-      setRecommendedMarkets(shuffled.slice(0, 6) as any);
+      setRecommendedMarkets(shuffled.slice(0, 3) as any);
     } catch (error) {
       console.error('Error fetching recommended markets:', error);
     } finally {
