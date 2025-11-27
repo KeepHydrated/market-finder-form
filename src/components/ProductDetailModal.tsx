@@ -350,7 +350,7 @@ export const ProductDetailModal = ({ product, products = [], open, onClose, onPr
                         onClose();
                         navigate(`/market?id=${vendorId}`);
                       }}
-                      className="text-sm text-black hover:text-gray-800"
+                      className="text-sm text-black hover:underline cursor-pointer"
                     >
                       {vendorName}
                     </button>
