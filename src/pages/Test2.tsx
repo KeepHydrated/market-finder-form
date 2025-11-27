@@ -902,7 +902,12 @@ const Test2 = () => {
                 <Card
                   key={market.id}
                   className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer rounded-2xl"
-                  onClick={() => navigate('/test', { state: { searchTerm: market.name } })}
+                  onClick={() => navigate('/market', { 
+                    state: { 
+                      type: 'market', 
+                      selectedMarket: market 
+                    } 
+                  })}
                 >
                   {/* Vendor Images Collage */}
                   <div className="aspect-[4/3] bg-muted relative overflow-hidden">
