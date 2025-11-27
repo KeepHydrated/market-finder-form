@@ -1939,6 +1939,13 @@ const Homepage = () => {
                         </Badge>
                       )}
 
+                      {/* Category Badge - Bottom Left */}
+                      {submission.primary_specialty && (
+                        <Badge className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm shadow-sm border-0 rounded-full px-3 py-1.5 hover:bg-white/90">
+                          <span className="font-medium text-sm text-green-600">{submission.primary_specialty}</span>
+                        </Badge>
+                      )}
+
                     </div>
                     
                     {/* Store Information */}
