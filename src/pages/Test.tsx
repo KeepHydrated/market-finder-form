@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -1458,15 +1458,14 @@ const Homepage = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto sm:ml-auto">
           {/* Filter */}
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-            <Dialog>
-            <DialogTrigger asChild>
+            <Popover>
+            <PopoverTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
                 <span className="hidden md:inline">Filter</span>
               </Button>
-            </DialogTrigger>
-            <DialogContent className="w-full md:w-[800px] max-w-none p-0 bg-background border shadow-lg max-h-[80vh] flex flex-col">
-              <DialogTitle className="sr-only">Filter Options</DialogTitle>
+            </PopoverTrigger>
+            <PopoverContent className="w-[800px] p-0 bg-background border shadow-lg max-h-[80vh] flex flex-col z-50" align="end">
               <Tabs defaultValue="type" className="w-full flex flex-col overflow-hidden">
                 <div className="pt-8 px-4 md:px-8 flex justify-between items-center flex-shrink-0 border-b">
                   <div className="flex-1" />
@@ -1807,8 +1806,8 @@ const Homepage = () => {
                   </div>
                 </TabsContent>
               </Tabs>
-            </DialogContent>
-            </Dialog>
+            </PopoverContent>
+            </Popover>
             
             {/* Sort By */}
             <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
