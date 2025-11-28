@@ -1334,9 +1334,9 @@ const VendorDuplicate = () => {
 
             {/* Vendor Details */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2 md:gap-0">
+                <h1 className="text-xl font-bold text-foreground">{selectedVendor.store_name}</h1>
                 <div className="flex items-center gap-2 md:gap-4">
-                  <h1 className="text-xl font-bold text-foreground">{selectedVendor.store_name}</h1>
                   <div 
                     className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
                     onClick={() => setIsReviewModalOpen(true)}
@@ -1349,9 +1349,7 @@ const VendorDuplicate = () => {
                       ({vendorReviews?.reviewCount ?? 0})
                     </span>
                   </div>
-                </div>
-                <div className="flex items-center gap-0 md:gap-2">
-                  {/* Report button */}
+                   {/* Report button */}
                   {selectedVendor && (
                     <Button
                       variant="ghost"
@@ -1422,7 +1420,6 @@ const VendorDuplicate = () => {
                   </Button>
                 </div>
               </div>
-
                {/* Category badges */}
                <div className="flex gap-2 mb-4">
                  {selectedVendor.primary_specialty && (
