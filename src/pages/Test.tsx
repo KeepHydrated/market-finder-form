@@ -1741,7 +1741,7 @@ const Homepage = () => {
                           const dayOrder = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
                           return dayOrder.indexOf(a) - dayOrder.indexOf(b);
                         }).map((day) => (
-                          <div key={day} className="flex items-center gap-6 border-t pt-4">
+                          <div key={day} className="flex items-center gap-3 border-t pt-4">
                             <h5 className="font-semibold text-base mb-0 text-left min-w-[100px]">
                               {day === 'Mon' ? 'Monday' : 
                                day === 'Tue' ? 'Tuesday' :
