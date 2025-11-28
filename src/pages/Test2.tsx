@@ -73,6 +73,9 @@ const Test2 = () => {
   const [userCoordinates, setUserCoordinates] = useState<{lat: number, lng: number} | null>(null);
   const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
   const [vendorMarketIndices, setVendorMarketIndices] = useState<Record<string, number>>({});
+  
+  // Vendor ratings from reviews
+  const [vendorRatings, setVendorRatings] = useState<Record<string, {averageRating: number; totalReviews: number}>>({});
 
   useEffect(() => {
     fetchRecommendedProducts();
@@ -279,11 +282,57 @@ const Test2 = () => {
 
       // Shuffle and take first 6 vendors
       const shuffled = vendors?.sort(() => 0.5 - Math.random()) || [];
-      setRecommendedVendors(shuffled.slice(0, 6) as unknown as Vendor[]);
+      const selectedVendors = shuffled.slice(0, 6) as unknown as Vendor[];
+      setRecommendedVendors(selectedVendors);
+      
+      // Fetch ratings for these vendors
+      if (selectedVendors.length > 0) {
+        fetchVendorRatings(selectedVendors.map(v => v.id));
+      }
     } catch (error) {
       console.error('Error fetching recommended vendors:', error);
     } finally {
       setVendorsLoading(false);
+    }
+  };
+
+  const fetchVendorRatings = async (vendorIds: string[]) => {
+    if (vendorIds.length === 0) return;
+
+    try {
+      const { data: reviews, error } = await supabase
+        .from('reviews')
+        .select('vendor_id, rating')
+        .in('vendor_id', vendorIds);
+
+      if (error) throw error;
+
+      const ratingsMap: Record<string, {averageRating: number; totalReviews: number}> = {};
+      
+      vendorIds.forEach(vendorId => {
+        const vendorReviews = reviews?.filter(review => review.vendor_id === vendorId) || [];
+        
+        if (vendorReviews.length > 0) {
+          const reviewsWithRatings = vendorReviews.filter(review => review.rating && review.rating > 0);
+          if (reviewsWithRatings.length > 0) {
+            const totalRating = reviewsWithRatings.reduce((sum, review) => sum + review.rating!, 0);
+            const averageRating = totalRating / reviewsWithRatings.length;
+            
+            ratingsMap[vendorId] = {
+              averageRating: Math.round(averageRating * 10) / 10,
+              totalReviews: vendorReviews.length
+            };
+          } else {
+            ratingsMap[vendorId] = { averageRating: 0, totalReviews: vendorReviews.length };
+          }
+        } else {
+          ratingsMap[vendorId] = { averageRating: 0, totalReviews: 0 };
+        }
+      });
+
+      setVendorRatings(ratingsMap);
+    } catch (error) {
+      console.error('Error fetching vendor ratings:', error);
     }
   };
 
@@ -575,10 +624,10 @@ const Test2 = () => {
                         <div className="flex items-center gap-1">
                           <Star className="h-3 w-3 text-yellow-500 fill-current" />
                           <span className="text-xs font-medium">
-                            {(vendor.google_rating || 0).toFixed(1)}
+                            {(vendorRatings[vendor.id]?.averageRating || 0).toFixed(1)}
                           </span>
                           <span className="text-xs text-gray-600">
-                            ({vendor.google_rating_count || 0})
+                            ({vendorRatings[vendor.id]?.totalReviews || 0})
                           </span>
                         </div>
                       </div>
