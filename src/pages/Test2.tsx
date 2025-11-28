@@ -769,7 +769,7 @@ const Test2 = () => {
         <div className="mb-12">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-foreground">Shop by Category</h2>
-            <Button variant="ghost" onClick={() => navigate('/test')}>
+            <Button variant="ghost" onClick={() => navigate('/search')}>
               View All
             </Button>
           </div>
@@ -778,7 +778,7 @@ const Test2 = () => {
             {/* Fresh Flowers & Plants */}
             <Card
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-              onClick={() => navigate('/test?category=Fresh Flowers & Plants')}
+              onClick={() => navigate('/search?category=Fresh Flowers & Plants')}
             >
               <div className="aspect-square bg-muted overflow-hidden">
                 <img 
@@ -795,7 +795,7 @@ const Test2 = () => {
             {/* Bakery */}
             <Card
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-              onClick={() => navigate('/test?category=Bakery')}
+              onClick={() => navigate('/search?category=Bakery')}
             >
               <div className="aspect-square bg-muted overflow-hidden">
                 <img 
@@ -812,7 +812,7 @@ const Test2 = () => {
             {/* Dairy */}
             <Card
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-              onClick={() => navigate('/test?category=Dairy')}
+              onClick={() => navigate('/search?category=Dairy')}
             >
               <div className="aspect-square bg-muted overflow-hidden">
                 <img 
@@ -829,7 +829,7 @@ const Test2 = () => {
             {/* Rancher */}
             <Card
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-              onClick={() => navigate('/test?category=Rancher')}
+              onClick={() => navigate('/search?category=Rancher')}
             >
               <div className="aspect-square bg-muted overflow-hidden">
                 <img 
@@ -846,7 +846,7 @@ const Test2 = () => {
             {/* Beverages */}
             <Card
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-              onClick={() => navigate('/test?category=Beverages')}
+              onClick={() => navigate('/search?category=Beverages')}
             >
               <div className="aspect-square bg-muted overflow-hidden">
                 <img 
@@ -863,7 +863,7 @@ const Test2 = () => {
             {/* Farmers */}
             <Card
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-              onClick={() => navigate('/test?category=Farmers')}
+              onClick={() => navigate('/search?category=Farmers')}
             >
               <div className="aspect-square bg-muted overflow-hidden">
                 <img 
