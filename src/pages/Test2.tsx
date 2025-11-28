@@ -570,12 +570,23 @@ const Test2 = () => {
                         </div>
                       )}
                       
-                      {/* Star Rating Badge - Top Left */}
+                      {/* Rating Badge - Top Left */}
                       <div className="absolute top-3 left-3 z-10">
-                        <div className="flex items-center gap-1.5 bg-[#e8f5e9] rounded-full px-3 py-1">
-                          <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                          <span className="text-sm text-gray-600">
-                            {(vendor.google_rating || 0).toFixed(1)} <span className="text-gray-400">({vendor.google_rating_count || 0})</span>
+                        <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5">
+                          <div className="flex gap-0.5">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star 
+                                key={star}
+                                className={`h-3.5 w-3.5 fill-current ${
+                                  star <= (vendor.google_rating || 0)
+                                    ? 'text-yellow-400' 
+                                    : 'text-gray-300'
+                                } ${star > 1 ? 'hidden md:block' : ''}`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm font-semibold">
+                            {(vendor.google_rating || 0).toFixed(1)} {`(${vendor.google_rating_count || 0})`}
                           </span>
                         </div>
                       </div>
