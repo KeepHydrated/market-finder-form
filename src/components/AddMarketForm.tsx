@@ -542,15 +542,15 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                 {DAYS_OF_WEEK.filter(day => formData.days.includes(day)).map((day) => (
-                  <div key={day} className="space-y-3 border-t pt-4 min-w-0">
-                    <h5 className="font-medium text-sm">{day}</h5>
-                    <div className="flex items-center justify-between">
+                  <div key={day} className="border-t pt-4 min-w-0">
+                    <div className="flex items-center gap-3">
+                      <h5 className="font-medium text-sm w-20 shrink-0">{day}</h5>
                       <div className="flex items-center gap-1">
                         <Select 
                           value={dayTimeSelections[day]?.startTime || '08:00'}
                           onValueChange={(value) => updateTimeSelection(day, 'startTime', value)}
                         >
-                          <SelectTrigger className="w-20 bg-background">
+                          <SelectTrigger className="w-[70px] bg-background">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-background border shadow-md z-50">
@@ -564,7 +564,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
                           value={dayTimeSelections[day]?.startPeriod || 'AM'}
                           onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'startPeriod', value)}
                         >
-                          <SelectTrigger className="w-16 bg-background">
+                          <SelectTrigger className="w-14 bg-background">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-background border shadow-md z-50">
@@ -581,7 +581,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
                           value={dayTimeSelections[day]?.endTime || '02:00'}
                           onValueChange={(value) => updateTimeSelection(day, 'endTime', value)}
                         >
-                          <SelectTrigger className="w-20 bg-background">
+                          <SelectTrigger className="w-[70px] bg-background">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-background border shadow-md z-50">
@@ -595,7 +595,7 @@ export const AddMarketForm = ({ open, onClose, onMarketAdded, editingMarket, use
                           value={dayTimeSelections[day]?.endPeriod || 'PM'}
                           onValueChange={(value: 'AM' | 'PM') => updateTimeSelection(day, 'endPeriod', value)}
                         >
-                          <SelectTrigger className="w-16 bg-background">
+                          <SelectTrigger className="w-14 bg-background">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-background border shadow-md z-50">
