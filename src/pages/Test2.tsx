@@ -572,9 +572,9 @@ const Test2 = () => {
                       
                       {/* Star Rating Badge - Top Left */}
                       <div className="absolute top-3 left-3 z-10">
-                        <div className="flex items-center gap-1.5 bg-green-50/90 backdrop-blur-sm rounded-full px-3 py-1.5">
+                        <div className="flex items-center gap-1.5 bg-green-100 border border-green-200 rounded-full px-3 py-1">
                           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-sm font-medium text-gray-600">
                             {(vendor.google_rating || 0).toFixed(1)} ({vendor.google_rating_count || 0})
                           </span>
                         </div>
