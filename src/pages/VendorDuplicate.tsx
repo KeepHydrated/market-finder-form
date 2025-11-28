@@ -1334,18 +1334,18 @@ const VendorDuplicate = () => {
 
             {/* Vendor Details */}
             <div className="mb-6">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2 md:gap-0">
-                <h1 className="text-xl font-bold text-foreground w-full md:w-auto">{selectedVendor.store_name}</h1>
-                <div className="flex items-center gap-0 md:gap-4 w-full md:w-auto">
+              <div className="flex items-center justify-between mb-4 gap-1 md:gap-0">
+                <h1 className="text-lg md:text-xl font-bold text-foreground truncate flex-1 min-w-0">{selectedVendor.store_name}</h1>
+                <div className="flex items-center gap-0 md:gap-2 flex-shrink-0">
                   <div 
-                    className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
+                    className="flex items-center gap-1 md:gap-2 cursor-pointer hover:bg-muted/50 px-1 md:px-2 py-1 rounded-md transition-colors"
                     onClick={() => setIsReviewModalOpen(true)}
                   >
-                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                    <span className="text-foreground font-medium">
+                    <Star className="h-3.5 w-3.5 md:h-4 md:w-4 text-yellow-400 fill-current" />
+                    <span className="text-foreground font-medium text-sm md:text-base">
                       {vendorReviews?.rating ? Number(vendorReviews.rating).toFixed(1) : '0.0'}
                     </span>
-                    <span className="text-muted-foreground">
+                    <span className="text-muted-foreground text-sm md:text-base">
                       ({vendorReviews?.reviewCount ?? 0})
                     </span>
                   </div>
@@ -1365,9 +1365,9 @@ const VendorDuplicate = () => {
                         }
                         setIsReportDialogOpen(true);
                       }}
-                      className="text-muted-foreground hover:text-foreground transition-colors -mr-2 md:mr-3"
+                      className="text-muted-foreground hover:text-foreground transition-colors p-1 md:p-2 h-auto"
                     >
-                      <Flag className="h-5 w-5" />
+                      <Flag className="h-4 w-4 md:h-5 md:w-5" />
                     </Button>
                   )}
 
@@ -1390,9 +1390,9 @@ const VendorDuplicate = () => {
                         setChatVendorName(selectedVendor.store_name);
                         setIsChatOpen(true);
                       }}
-                      className="text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-muted-foreground hover:text-foreground transition-colors p-1 md:p-2 h-auto"
                     >
-                      <MessageSquare className="h-6 w-6" />
+                      <MessageSquare className="h-4 w-4 md:h-6 md:w-6" />
                     </Button>
                   )}
                   
@@ -1405,7 +1405,7 @@ const VendorDuplicate = () => {
                       }
                     }}
                     className={cn(
-                      "transition-colors",
+                      "transition-colors p-1 md:p-2 h-auto",
                       selectedVendor && isLiked(selectedVendor.id, 'vendor')
                         ? "text-red-500 hover:text-red-600"
                         : "text-muted-foreground hover:text-foreground"
@@ -1413,7 +1413,7 @@ const VendorDuplicate = () => {
                   >
                     <Heart 
                       className={cn(
-                        "h-6 w-6 transition-colors",
+                        "h-4 w-4 md:h-6 md:w-6 transition-colors",
                         selectedVendor && isLiked(selectedVendor.id, 'vendor') && "fill-current"
                       )} 
                     />
