@@ -1778,7 +1778,31 @@ const VendorDuplicate = () => {
                     {/* Vendor Details */}
                     <div className="mb-6">
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
-                        <h1 className="text-xl font-bold text-foreground">{selectedVendor.store_name}</h1>
+                        <div className="flex items-center justify-between">
+                          <h1 className="text-xl font-bold text-foreground">{selectedVendor.store_name}</h1>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className={cn(
+                              "transition-colors md:hidden",
+                              selectedVendor && isLiked(selectedVendor.id, 'vendor')
+                                ? "text-red-500 hover:text-red-600"
+                                : "text-muted-foreground hover:text-foreground"
+                            )}
+                            onClick={async () => {
+                              if (selectedVendor) {
+                                await toggleLike(selectedVendor.id, 'vendor');
+                              }
+                            }}
+                          >
+                            <Heart 
+                              className={cn(
+                                "h-6 w-6 transition-colors",
+                                selectedVendor && isLiked(selectedVendor.id, 'vendor') && "fill-current"
+                              )} 
+                            />
+                          </Button>
+                        </div>
                         <div className="flex items-center justify-between md:justify-end gap-2 md:gap-4">
                           <div 
                             className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
@@ -1848,7 +1872,7 @@ const VendorDuplicate = () => {
                                 }
                               }}
                               className={cn(
-                                "transition-colors",
+                                "transition-colors hidden md:flex",
                                 selectedVendor && isLiked(selectedVendor.id, 'vendor')
                                   ? "text-red-500 hover:text-red-600"
                                   : "text-muted-foreground hover:text-foreground"
