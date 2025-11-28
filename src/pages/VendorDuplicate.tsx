@@ -1777,9 +1777,9 @@ const VendorDuplicate = () => {
                   <div className="space-y-6">
                     {/* Vendor Details */}
                     <div className="mb-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-4">
-                          <h1 className="text-xl font-bold text-foreground">{selectedVendor.store_name}</h1>
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
+                        <h1 className="text-xl font-bold text-foreground">{selectedVendor.store_name}</h1>
+                        <div className="flex items-center justify-between md:justify-end gap-2 md:gap-4">
                           <div 
                             className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded-md transition-colors"
                             onClick={() => setIsReviewModalOpen(true)}
@@ -1792,76 +1792,76 @@ const VendorDuplicate = () => {
                               ({vendorReviews?.reviewCount ?? 0})
                             </span>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {/* Report button */}
-                          {selectedVendor && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                if (!user) {
-                                  toast({
-                                    title: "Authentication required",
-                                    description: "Please log in to report vendors",
-                                    variant: "destructive",
-                                  });
-                                  return;
-                                }
-                                setIsReportDialogOpen(true);
-                              }}
-                              className="text-muted-foreground hover:text-foreground transition-colors mr-3"
-                            >
-                              <Flag className="h-5 w-5" />
-                            </Button>
-                          )}
-
-                          {selectedVendor && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                if (!user) {
-                                  toast({
-                                    title: "Authentication required",
-                                    description: "Please log in to message vendors",
-                                    variant: "destructive",
-                                  });
-                                  return;
-                                }
-                                
-                                setChatVendorId(selectedVendor.id);
-                                setChatVendorName(selectedVendor.store_name);
-                                setIsChatOpen(true);
-                              }}
-                              className="text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                              <MessageSquare className="h-6 w-6" />
-                            </Button>
-                          )}
-                          
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={async () => {
-                              if (selectedVendor) {
-                                await toggleLike(selectedVendor.id, 'vendor');
-                              }
-                            }}
-                            className={cn(
-                              "transition-colors",
-                              selectedVendor && isLiked(selectedVendor.id, 'vendor')
-                                ? "text-red-500 hover:text-red-600"
-                                : "text-muted-foreground hover:text-foreground"
+                          <div className="flex items-center gap-2">
+                            {/* Report button */}
+                            {selectedVendor && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  if (!user) {
+                                    toast({
+                                      title: "Authentication required",
+                                      description: "Please log in to report vendors",
+                                      variant: "destructive",
+                                    });
+                                    return;
+                                  }
+                                  setIsReportDialogOpen(true);
+                                }}
+                                className="text-muted-foreground hover:text-foreground transition-colors mr-3"
+                              >
+                                <Flag className="h-5 w-5" />
+                              </Button>
                             )}
-                          >
-                            <Heart 
+
+                            {selectedVendor && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  if (!user) {
+                                    toast({
+                                      title: "Authentication required",
+                                      description: "Please log in to message vendors",
+                                      variant: "destructive",
+                                    });
+                                    return;
+                                  }
+                                  
+                                  setChatVendorId(selectedVendor.id);
+                                  setChatVendorName(selectedVendor.store_name);
+                                  setIsChatOpen(true);
+                                }}
+                                className="text-muted-foreground hover:text-foreground transition-colors"
+                              >
+                                <MessageSquare className="h-6 w-6" />
+                              </Button>
+                            )}
+                            
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={async () => {
+                                if (selectedVendor) {
+                                  await toggleLike(selectedVendor.id, 'vendor');
+                                }
+                              }}
                               className={cn(
-                                "h-6 w-6 transition-colors",
-                                selectedVendor && isLiked(selectedVendor.id, 'vendor') && "fill-current"
-                              )} 
-                            />
-                          </Button>
+                                "transition-colors",
+                                selectedVendor && isLiked(selectedVendor.id, 'vendor')
+                                  ? "text-red-500 hover:text-red-600"
+                                  : "text-muted-foreground hover:text-foreground"
+                              )}
+                            >
+                              <Heart 
+                                className={cn(
+                                  "h-6 w-6 transition-colors",
+                                  selectedVendor && isLiked(selectedVendor.id, 'vendor') && "fill-current"
+                                )} 
+                              />
+                            </Button>
+                          </div>
                         </div>
                       </div>
 
