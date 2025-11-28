@@ -492,6 +492,10 @@ const VendorDuplicate = () => {
         setNavigationMarketsOrder(marketNames);
       }
       
+      // Set vendor state
+      setAcceptedSubmission(matchingVendor);
+      setSelectedVendor(matchingVendor);
+      setAllVendors([matchingVendor]);
       setLoadingData(false);
       
       // Fetch ratings for this vendor
