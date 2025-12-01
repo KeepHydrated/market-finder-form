@@ -28,6 +28,8 @@ import Auth from "./pages/Auth";
 import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
 import SubmitMarket from "./pages/SubmitMarket";
+import AdminInvites from "./pages/AdminInvites";
+import VendorSignup from "./pages/VendorSignup";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +68,8 @@ const App = () => (
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/profile/:userId" element={<Profile />} />
                 <Route path="/submit-market" element={<SubmitMarket />} />
+                <Route path="/admin/invites" element={<AdminInvites />} />
+                <Route path="/vendor-signup" element={<VendorSignup />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
