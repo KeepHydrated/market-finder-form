@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
 export const useAdmin = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -12,11 +12,18 @@ export const useAdmin = () => {
     userId: user?.id,
     userEmail: user?.email,
     isAdmin, 
-    loading 
+    loading,
+    authLoading
   });
 
   useEffect(() => {
     const checkAdminStatus = async () => {
+      // Wait for auth to finish loading first
+      if (authLoading) {
+        console.log("useAdmin: Auth still loading, waiting...");
+        return;
+      }
+
       console.log("useAdmin: checkAdminStatus called", { 
         hasUser: !!user, 
         userId: user?.id,
@@ -61,7 +68,7 @@ export const useAdmin = () => {
     };
 
     checkAdminStatus();
-  }, [user]);
+  }, [user, authLoading]);
 
-  return { isAdmin, loading };
+  return { isAdmin, loading: loading || authLoading };
 };

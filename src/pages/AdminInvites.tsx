@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdmin } from "@/hooks/useAdmin";
-import { Copy, Link, Search, MapPin, ExternalLink, Plus } from "lucide-react";
+import { Copy, Link2, Search, MapPin, ExternalLink, Plus } from "lucide-react";
 
 interface Market {
   id: number;
@@ -141,7 +141,7 @@ export default function AdminInvites() {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Link className="h-5 w-5" />
+              <Link2 className="h-5 w-5" />
               Generate Invite Link
             </CardTitle>
             <CardDescription>
