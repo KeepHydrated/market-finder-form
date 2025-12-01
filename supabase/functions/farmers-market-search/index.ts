@@ -62,9 +62,11 @@ serve(async (req) => {
       });
     }
 
-    // Build the search query to specifically find farmers markets
-    const searchQuery = `farmers market ${query}`;
-    let url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&key=${apiKey}&type=establishment`;
+    // Build the search query - only prepend "farmers market" if the query doesn't already contain market-related terms
+    const lowerQuery = query.toLowerCase();
+    const hasMarketTerm = lowerQuery.includes('market') || lowerQuery.includes('farm') || lowerQuery.includes('stand');
+    const searchQuery = hasMarketTerm ? query : `farmers market ${query}`;
+    let url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&key=${apiKey}`;
     
     // Add location bias if provided and rank by distance (not radius, they're incompatible)
     if (location && location.lat && location.lng) {
