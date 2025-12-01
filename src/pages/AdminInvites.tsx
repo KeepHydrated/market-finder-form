@@ -327,24 +327,6 @@ export default function AdminInvites() {
           </CardContent>
         </Card>
 
-        {/* Quick Stats */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Markets Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-muted/50 rounded-lg text-center">
-                <div className="text-3xl font-bold text-foreground">{markets.length}</div>
-                <div className="text-sm text-muted-foreground">Total Markets</div>
-              </div>
-              <div className="p-4 bg-muted/50 rounded-lg text-center">
-                <div className="text-3xl font-bold text-foreground">{filteredMarkets.length}</div>
-                <div className="text-sm text-muted-foreground">Filtered Results</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
