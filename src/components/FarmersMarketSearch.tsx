@@ -393,7 +393,11 @@ export const FarmersMarketSearch = ({
             ref={suggestionsRef}
             className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 max-h-96 overflow-y-auto mt-1"
           >
-            {(searchQuery ? suggestions : filteredSuggestions).map((market) => (
+            {(searchQuery ? suggestions : filteredSuggestions).length === 0 && !loading ? (
+              <div className="p-4 text-center text-muted-foreground">
+                No farmers markets found for "{searchQuery}". Try a different search term.
+              </div>
+            ) : (searchQuery ? suggestions : filteredSuggestions).map((market) => (
               <div
                 key={market.place_id}
                 className="flex items-start p-4 hover:bg-muted cursor-pointer border-b border-border last:border-b-0"
