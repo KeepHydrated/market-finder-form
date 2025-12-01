@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdmin } from "@/hooks/useAdmin";
-import { Copy, Link2, Search, MapPin, ExternalLink, Plus } from "lucide-react";
+import { Copy, Link2, Search, MapPin, ExternalLink, Plus, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Market {
   id: number;
@@ -29,6 +29,9 @@ export default function AdminInvites() {
   const [searchTerm, setSearchTerm] = useState("");
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
   const [isLoadingMarkets, setIsLoadingMarkets] = useState(true);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isAdminLoading && !isAdmin) {
@@ -67,7 +70,20 @@ export default function AdminInvites() {
     }
   }, [isAdmin, toast]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const filteredMarkets = markets.filter(market => {
+    if (!searchTerm.trim()) return true;
     const search = searchTerm.toLowerCase();
     return (
       market.name.toLowerCase().includes(search) ||
@@ -77,9 +93,15 @@ export default function AdminInvites() {
     );
   });
 
-  const handleSelectMarket = (marketId: string) => {
-    const market = markets.find(m => m.id.toString() === marketId);
-    setSelectedMarket(market || null);
+  const handleSelectMarket = (market: Market) => {
+    setSelectedMarket(market);
+    setSearchTerm("");
+    setIsDropdownOpen(false);
+    setGeneratedLink(null);
+  };
+
+  const handleRemoveMarket = () => {
+    setSelectedMarket(null);
     setGeneratedLink(null);
   };
 
@@ -149,46 +171,93 @@ export default function AdminInvites() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Market Search */}
+            {/* Market Search - Similar to MarketSearch component */}
             <div className="space-y-2">
-              <Label>Search Markets</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by name, city, or state..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
+              <Label className="text-sm font-medium text-foreground">
+                Select a farmers market *
+              </Label>
 
-            {/* Market Select */}
-            <div className="space-y-2">
-              <Label>Select Market</Label>
-              {isLoadingMarkets ? (
-                <div className="text-sm text-muted-foreground">Loading markets...</div>
-              ) : (
-                <Select 
-                  value={selectedMarket?.id.toString() || ""} 
-                  onValueChange={handleSelectMarket}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose a market" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filteredMarkets.map((market) => (
-                      <SelectItem key={market.id} value={market.id.toString()}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{market.name}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {market.city}, {market.state}
-                          </span>
+              {/* Selected Market as Pill */}
+              {selectedMarket && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground border border-primary">
+                    <MapPin className="h-4 w-4" />
+                    <span className="text-sm font-medium">{selectedMarket.name}</span>
+                    <button
+                      onClick={handleRemoveMarket}
+                      className="rounded-full p-0.5 hover:bg-primary-foreground/20 transition-colors"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Search Input with Dropdown */}
+              <div className="relative w-full" ref={dropdownRef}>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    ref={inputRef}
+                    type="text"
+                    placeholder={selectedMarket ? "Change market..." : "Search for a farmers market..."}
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setIsDropdownOpen(true);
+                    }}
+                    onFocus={() => setIsDropdownOpen(true)}
+                    className="pl-10 h-14 text-lg border-2 border-border rounded-xl"
+                    disabled={isLoadingMarkets}
+                  />
+                </div>
+
+                {/* Dropdown Results */}
+                {isDropdownOpen && !isLoadingMarkets && (
+                  <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
+                    <div className="max-h-60 overflow-y-auto">
+                      {filteredMarkets.length === 0 ? (
+                        <div className="px-4 py-3 text-sm text-muted-foreground">
+                          No markets found matching your search.
                         </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                      ) : (
+                        filteredMarkets.map((market) => {
+                          const isSelected = selectedMarket?.id === market.id;
+                          return (
+                            <button
+                              key={market.id}
+                              onClick={() => handleSelectMarket(market)}
+                              className={cn(
+                                "w-full px-4 py-3 text-left transition-colors hover:bg-muted cursor-pointer",
+                                isSelected && "bg-primary/10 border-l-4 border-l-primary"
+                              )}
+                            >
+                              <div className={cn(
+                                "font-medium text-foreground text-base mb-1",
+                                isSelected && "text-primary font-semibold"
+                              )}>
+                                {market.name}
+                                {isSelected && <span className="ml-2 text-xs text-primary">(Selected)</span>}
+                              </div>
+                              <div className="text-sm text-muted-foreground mb-1">
+                                📍 {market.address}, {market.city}, {market.state}
+                              </div>
+                              {market.days && market.days.length > 0 && (
+                                <div className="text-sm text-muted-foreground">
+                                  📅 {market.days.join(', ')}
+                                </div>
+                              )}
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
+                  </Card>
+                )}
+              </div>
+
+              {isLoadingMarkets && (
+                <div className="text-sm text-muted-foreground">Loading markets...</div>
               )}
             </div>
 
