@@ -112,6 +112,8 @@ export default function ShopManager() {
   useEffect(() => {
     if (user) {
       fetchShopData();
+    } else {
+      setLoadingShop(false);
     }
   }, [user]);
 
