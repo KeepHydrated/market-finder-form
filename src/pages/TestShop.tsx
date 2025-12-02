@@ -7,7 +7,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { X, MapPin, Plus } from "lucide-react";
-import { ShopSidebar } from "@/components/ShopSidebar";
 import { ShopMobileNav } from "@/components/ShopMobileNav";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ProductGrid } from "@/components/ProductGrid";
@@ -71,7 +70,19 @@ export default function TestShop() {
         <ShopMobileNav />
         
         <div className="flex w-full">
-          <ShopSidebar hasShopData={false} />
+          {/* Static sidebar for test page */}
+          <div className="hidden sm:block w-48 border-r bg-background">
+            <div className="pt-24 md:pt-40 lg:pt-24 p-4">
+              <div className="space-y-2">
+                <div className="bg-primary text-primary-foreground font-medium rounded-md px-3 py-2 flex items-center gap-2">
+                  <span className="text-sm">Setup</span>
+                </div>
+                <div className="text-muted-foreground rounded-md px-3 py-2 flex items-center gap-2">
+                  <span className="text-sm">Products</span>
+                </div>
+              </div>
+            </div>
+          </div>
         
           <main className="flex-1 p-4 md:p-8">
             <div className="max-w-2xl mx-auto">
