@@ -31,7 +31,6 @@ interface ShopData {
   id: string;
   store_name: string;
   primary_specialty: string;
-  website: string;
   description: string;
   products: any[];
   selected_markets: any[];
@@ -102,7 +101,6 @@ export default function ShopManager() {
   const [formData, setFormData] = useState({
     store_name: '',
     primary_specialty: '',
-    website: '',
     description: '',
   });
 
@@ -214,7 +212,6 @@ export default function ShopManager() {
         setFormData({
           store_name: parsedData.store_name || '',
           primary_specialty: parsedData.primary_specialty || '',
-          website: parsedData.website || '',
           description: parsedData.description || '',
         });
       }
@@ -334,7 +331,6 @@ export default function ShopManager() {
         user_id: user.id,
         store_name: formData.store_name.trim(),
         primary_specialty: formData.primary_specialty,
-        website: formData.website.trim(),
         description: formData.description.trim(),
         products: products,
         selected_markets: selectedFarmersMarkets.map(m => ({
@@ -613,18 +609,6 @@ export default function ShopManager() {
               <p className="text-muted-foreground text-lg">{formData.description}</p>
             )}
 
-            {/* Website */}
-            {formData.website && (
-              <a 
-                href={formData.website} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-green-600 hover:text-green-700 text-lg font-medium inline-block"
-              >
-                {formData.website}
-              </a>
-            )}
-
             {/* Markets */}
             {selectedFarmersMarkets.length > 0 && (
               <div className="pt-4 border-t">
@@ -773,18 +757,6 @@ export default function ShopManager() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="website">Website</Label>
-            <Input
-              id="website"
-              type="url"
-              value={formData.website}
-              onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
-              placeholder="https://example.com"
-              disabled={shopData && !isEditMode}
-            />
           </div>
 
           <div className="space-y-2">
@@ -1090,7 +1062,6 @@ export default function ShopManager() {
                   setFormData({
                     store_name: '',
                     primary_specialty: '',
-                    website: '',
                     description: '',
                   });
                   
