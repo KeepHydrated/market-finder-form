@@ -104,18 +104,51 @@ export default function AdminInvites() {
     const selectedMarket = selectedMarkets[0];
     
     // Find the market in database by google_place_id or name
-    const dbMarket = allMarkets.find(m => 
+    let dbMarket = allMarkets.find(m => 
       (m.google_place_id && m.google_place_id === selectedMarket.place_id) ||
       m.name.toLowerCase() === (selectedMarket.structured_formatting?.main_text || selectedMarket.name).toLowerCase()
     );
 
+    // If market doesn't exist, add it to the database
     if (!dbMarket) {
+      const marketName = selectedMarket.structured_formatting?.main_text || selectedMarket.name;
+      const addressParts = (selectedMarket.structured_formatting?.secondary_text || selectedMarket.address || "").split(", ");
+      
+      const newMarket = {
+        name: marketName,
+        address: selectedMarket.address || addressParts[0] || "",
+        city: addressParts[addressParts.length - 2] || "",
+        state: addressParts[addressParts.length - 1] || "",
+        google_place_id: selectedMarket.place_id,
+        days: selectedMarket.opening_hours?.weekday_text?.map(day => day.split(":")[0]) || [],
+        hours: selectedMarket.opening_hours?.weekday_text?.[0]?.split(": ")[1] || null,
+        google_rating: selectedMarket.rating || null,
+        google_rating_count: selectedMarket.user_ratings_total || null,
+      };
+
+      const { data: insertedMarket, error } = await supabase
+        .from("markets")
+        .insert(newMarket)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error adding market:", error);
+        toast({
+          title: "Error",
+          description: "Failed to add market to database.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      dbMarket = insertedMarket as Market;
+      setAllMarkets([...allMarkets, dbMarket]);
+      
       toast({
-        title: "Market Not Found",
-        description: "This market hasn't been added to the database yet. Please add it first.",
-        variant: "destructive"
+        title: "Market Added",
+        description: `${marketName} has been added to the database.`,
       });
-      return;
     }
 
     const baseUrl = window.location.origin;
