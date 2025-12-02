@@ -156,10 +156,6 @@ export default function AdminInvites() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-3xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Vendor Invites</h1>
-        </div>
-
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
