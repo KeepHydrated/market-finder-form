@@ -1237,14 +1237,6 @@ export default function ShopManager() {
     );
   }
 
-  if (!user) {
-    return (
-      <div className="container mx-auto px-6 py-8">
-        <AuthForm />
-      </div>
-    );
-  }
-
   return (
     <>
       <SidebarProvider>
