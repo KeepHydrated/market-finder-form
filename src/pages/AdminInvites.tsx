@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdmin } from "@/hooks/useAdmin";
-import { Copy, Link2, Search, MapPin, ExternalLink, Plus, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Copy, Link2, MapPin, ExternalLink, Plus } from "lucide-react";
+import { FarmersMarketSearch } from "@/components/FarmersMarketSearch";
 
 interface Market {
   id: number;
@@ -18,20 +18,41 @@ interface Market {
   state: string;
   days: string[];
   hours: string | null;
+  google_place_id: string | null;
+}
+
+interface SelectedMarket {
+  place_id: string;
+  name: string;
+  address: string;
+  description: string;
+  structured_formatting?: {
+    main_text: string;
+    secondary_text: string;
+  };
+  rating?: number;
+  user_ratings_total?: number;
+  opening_hours?: {
+    open_now: boolean;
+    weekday_text: string[];
+  };
+  photos?: { photo_reference: string }[];
+  geometry?: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
 }
 
 export default function AdminInvites() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isAdmin, loading: isAdminLoading } = useAdmin();
-  const [markets, setMarkets] = useState<Market[]>([]);
-  const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [allMarkets, setAllMarkets] = useState<Market[]>([]);
+  const [selectedMarkets, setSelectedMarkets] = useState<SelectedMarket[]>([]);
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
   const [isLoadingMarkets, setIsLoadingMarkets] = useState(true);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isAdminLoading && !isAdmin) {
@@ -60,7 +81,7 @@ export default function AdminInvites() {
           variant: "destructive"
         });
       } else {
-        setMarkets(data || []);
+        setAllMarkets(data || []);
       }
       setIsLoadingMarkets(false);
     };
@@ -70,43 +91,8 @@ export default function AdminInvites() {
     }
   }, [isAdmin, toast]);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const filteredMarkets = markets.filter(market => {
-    if (!searchTerm.trim()) return true;
-    const search = searchTerm.toLowerCase();
-    return (
-      market.name.toLowerCase().includes(search) ||
-      market.city.toLowerCase().includes(search) ||
-      market.state.toLowerCase().includes(search) ||
-      market.address.toLowerCase().includes(search)
-    );
-  });
-
-  const handleSelectMarket = (market: Market) => {
-    setSelectedMarket(market);
-    setSearchTerm("");
-    setIsDropdownOpen(false);
-    setGeneratedLink(null);
-  };
-
-  const handleRemoveMarket = () => {
-    setSelectedMarket(null);
-    setGeneratedLink(null);
-  };
-
-  const generateInviteLink = () => {
-    if (!selectedMarket) {
+  const generateInviteLink = async () => {
+    if (selectedMarkets.length === 0) {
       toast({
         title: "No Market Selected",
         description: "Please select a market first.",
@@ -115,8 +101,25 @@ export default function AdminInvites() {
       return;
     }
 
+    const selectedMarket = selectedMarkets[0];
+    
+    // Find the market in database by google_place_id or name
+    const dbMarket = allMarkets.find(m => 
+      (m.google_place_id && m.google_place_id === selectedMarket.place_id) ||
+      m.name.toLowerCase() === (selectedMarket.structured_formatting?.main_text || selectedMarket.name).toLowerCase()
+    );
+
+    if (!dbMarket) {
+      toast({
+        title: "Market Not Found",
+        description: "This market hasn't been added to the database yet. Please add it first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const baseUrl = window.location.origin;
-    const link = `${baseUrl}/vendor-signup?market=${selectedMarket.id}`;
+    const link = `${baseUrl}/vendor-signup?market=${dbMarket.id}`;
     setGeneratedLink(link);
   };
 
@@ -171,127 +174,58 @@ export default function AdminInvites() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Market Search - Similar to MarketSearch component */}
+            {/* Market Search using FarmersMarketSearch component */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-foreground">
-                Select a farmers market *
-              </Label>
-
-              {/* Selected Market as Pill */}
-              {selectedMarket && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground border border-primary">
-                    <MapPin className="h-4 w-4" />
-                    <span className="text-sm font-medium">{selectedMarket.name}</span>
-                    <button
-                      onClick={handleRemoveMarket}
-                      className="rounded-full p-0.5 hover:bg-primary-foreground/20 transition-colors"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Search Input with Dropdown */}
-              <div className="relative w-full" ref={dropdownRef}>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    ref={inputRef}
-                    type="text"
-                    placeholder={selectedMarket ? "Change market..." : "Search for a farmers market..."}
-                    value={searchTerm}
-                    onChange={(e) => {
-                      setSearchTerm(e.target.value);
-                      setIsDropdownOpen(true);
-                    }}
-                    onFocus={() => setIsDropdownOpen(true)}
-                    className="pl-10 h-14 text-lg border-2 border-border rounded-xl"
-                    disabled={isLoadingMarkets}
-                  />
-                </div>
-
-                {/* Dropdown Results */}
-                {isDropdownOpen && !isLoadingMarkets && (
-                  <Card className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-lg z-50">
-                    <div className="max-h-60 overflow-y-auto">
-                      {filteredMarkets.length === 0 ? (
-                        <div className="px-4 py-3 text-sm text-muted-foreground">
-                          No markets found matching your search.
-                        </div>
-                      ) : (
-                        filteredMarkets.map((market) => {
-                          const isSelected = selectedMarket?.id === market.id;
-                          return (
-                            <button
-                              key={market.id}
-                              onClick={() => handleSelectMarket(market)}
-                              className={cn(
-                                "w-full px-4 py-3 text-left transition-colors hover:bg-muted cursor-pointer",
-                                isSelected && "bg-primary/10 border-l-4 border-l-primary"
-                              )}
-                            >
-                              <div className={cn(
-                                "font-medium text-foreground text-base mb-1",
-                                isSelected && "text-primary font-semibold"
-                              )}>
-                                {market.name}
-                                {isSelected && <span className="ml-2 text-xs text-primary">(Selected)</span>}
-                              </div>
-                              <div className="text-sm text-muted-foreground mb-1">
-                                📍 {market.address}, {market.city}, {market.state}
-                              </div>
-                              {market.days && market.days.length > 0 && (
-                                <div className="text-sm text-muted-foreground">
-                                  📅 {market.days.join(', ')}
-                                </div>
-                              )}
-                            </button>
-                          );
-                        })
-                      )}
-                    </div>
-                  </Card>
-                )}
-              </div>
-
-              {isLoadingMarkets && (
-                <div className="text-sm text-muted-foreground">Loading markets...</div>
-              )}
+              <FarmersMarketSearch
+                selectedMarkets={selectedMarkets}
+                onMarketsChange={(markets) => {
+                  setSelectedMarkets(markets);
+                  setGeneratedLink(null);
+                }}
+                maxMarkets={1}
+                isEditing={true}
+              />
             </div>
 
             {/* Selected Market Details */}
-            {selectedMarket && (
-              <Card className="bg-muted/50 border-border">
-                <CardContent className="pt-4">
-                  <div className="flex items-start gap-3">
-                    <MapPin className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
-                      <h3 className="font-semibold text-foreground">{selectedMarket.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedMarket.address}, {selectedMarket.city}, {selectedMarket.state}
-                      </p>
-                      {selectedMarket.days && selectedMarket.days.length > 0 && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          📅 {selectedMarket.days.join(", ")}
-                        </p>
-                      )}
-                      {selectedMarket.hours && (
+            {selectedMarkets.length > 0 && (() => {
+              const selectedMarket = selectedMarkets[0];
+              const dbMarket = allMarkets.find(m => 
+                (m.google_place_id && m.google_place_id === selectedMarket.place_id) ||
+                m.name.toLowerCase() === (selectedMarket.structured_formatting?.main_text || selectedMarket.name).toLowerCase()
+              );
+              
+              return dbMarket ? (
+                <Card className="bg-muted/50 border-border">
+                  <CardContent className="pt-4">
+                    <div className="flex items-start gap-3">
+                      <MapPin className="h-5 w-5 text-primary mt-0.5" />
+                      <div>
+                        <h3 className="font-semibold text-foreground">{dbMarket.name}</h3>
                         <p className="text-sm text-muted-foreground">
-                          🕒 {selectedMarket.hours}
+                          {dbMarket.address}, {dbMarket.city}, {dbMarket.state}
                         </p>
-                      )}
+                        {dbMarket.days && dbMarket.days.length > 0 && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            📅 {dbMarket.days.join(", ")}
+                          </p>
+                        )}
+                        {dbMarket.hours && (
+                          <p className="text-sm text-muted-foreground">
+                            🕒 {dbMarket.hours}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                  </CardContent>
+                </Card>
+              ) : null;
+            })()}
 
             {/* Generate Button */}
             <Button 
               onClick={generateInviteLink} 
-              disabled={!selectedMarket}
+              disabled={selectedMarkets.length === 0}
               className="w-full"
             >
               <Plus className="h-4 w-4 mr-2" />
