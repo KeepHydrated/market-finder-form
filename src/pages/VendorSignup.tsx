@@ -9,6 +9,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Plus, MapPin, CheckCircle, LogIn } from "lucide-react";
+import { GlobalHeader } from "@/components/GlobalHeader";
+import { ShopSidebar } from "@/components/ShopSidebar";
+import { ShopMobileNav } from "@/components/ShopMobileNav";
 
 interface Market {
   id: number;
@@ -283,14 +286,21 @@ export default function VendorSignup() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-foreground">Join as a Vendor</h1>
-          <p className="text-muted-foreground mt-2">
-            Complete your profile to start selling at this market.
-          </p>
-        </div>
+    <div className="min-h-screen bg-background">
+      <GlobalHeader />
+      <ShopMobileNav />
+      
+      <div className="flex">
+        <ShopSidebar />
+        
+        <main className="flex-1 p-4 md:p-8">
+          <div className="max-w-2xl mx-auto">
+            <div className="mb-8 text-center">
+              <h1 className="text-3xl font-bold text-foreground">Join as a Vendor</h1>
+              <p className="text-muted-foreground mt-2">
+                Complete your profile to start selling at this market.
+              </p>
+            </div>
 
         {/* Pre-filled Market Display */}
         {market && (
@@ -363,29 +373,31 @@ export default function VendorSignup() {
           </CardContent>
         </Card>
 
-        {/* Submit Button - Changes text based on auth status */}
-        <div className="flex justify-center">
-          <Button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            size="lg"
-            className="px-12"
-          >
-            {isSubmitting ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Submitting...
-              </>
-            ) : user ? (
-              "Submit Application"
-            ) : (
-              <>
-                <LogIn className="h-4 w-4 mr-2" />
-                Sign In / Sign Up to Submit
-              </>
-            )}
-          </Button>
-        </div>
+            {/* Submit Button - Changes text based on auth status */}
+            <div className="flex justify-center">
+              <Button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                size="lg"
+                className="px-12"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Submitting...
+                  </>
+                ) : user ? (
+                  "Submit Application"
+                ) : (
+                  <>
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Sign In / Sign Up to Submit
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </main>
       </div>
 
       {/* Add Product Form Modal */}
