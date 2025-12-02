@@ -181,8 +181,17 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
               </Button>
             )}
             <Link to="/" className="hover:opacity-80 transition-opacity">
-              <h1 className="text-2xl font-bold cursor-pointer hidden md:block">
-                {user?.email === 'nadiachibri@gmail.com' ? 'From Farmers Marketsi' : 'From Farmers Markets'}
+              <h1 className="text-2xl font-bold cursor-pointer hidden md:flex items-center gap-1">
+                From Farmers Markets
+                {user?.email === 'nadiachibri@gmail.com' && (
+                  <Link 
+                    to="/admin/invites" 
+                    className="text-xs bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center hover:bg-primary/90 transition-colors font-normal"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    i
+                  </Link>
+                )}
               </h1>
             </Link>
             
