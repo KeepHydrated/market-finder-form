@@ -12,6 +12,7 @@ import { Plus, MapPin, CheckCircle, LogIn } from "lucide-react";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { ShopSidebar } from "@/components/ShopSidebar";
 import { ShopMobileNav } from "@/components/ShopMobileNav";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 interface Market {
   id: number;
@@ -286,12 +287,13 @@ export default function VendorSignup() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <GlobalHeader />
-      <ShopMobileNav />
-      
-      <div className="flex">
-        <ShopSidebar />
+    <SidebarProvider>
+      <div className="min-h-screen bg-background w-full">
+        <GlobalHeader />
+        <ShopMobileNav />
+        
+        <div className="flex w-full">
+          <ShopSidebar />
         
         <main className="flex-1 p-4 md:p-8">
           <div className="max-w-2xl mx-auto">
@@ -420,6 +422,7 @@ export default function VendorSignup() {
           setShowAddProductForm(false);
         }}
       />
-    </div>
+      </div>
+    </SidebarProvider>
   );
 }
