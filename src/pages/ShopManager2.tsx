@@ -121,10 +121,17 @@ export default function ShopManager() {
   // Pre-fill market from URL parameter
   useEffect(() => {
     const prefilMarket = async () => {
+      console.log('Checking prefill market:', { prefilledMarketId, selectedMarketsLength: selectedFarmersMarkets.length });
+      
       if (prefilledMarketId && selectedFarmersMarkets.length === 0) {
         try {
           const marketId = parseInt(prefilledMarketId, 10);
-          if (isNaN(marketId)) return;
+          console.log('Attempting to prefill market ID:', marketId);
+          
+          if (isNaN(marketId)) {
+            console.log('Invalid market ID');
+            return;
+          }
 
           const { data: market, error } = await supabase
             .from('markets')
@@ -132,7 +139,12 @@ export default function ShopManager() {
             .eq('id', marketId)
             .single();
 
-          if (error) throw error;
+          if (error) {
+            console.error('Error fetching market:', error);
+            throw error;
+          }
+
+          console.log('Found market:', market);
 
           if (market) {
             const formattedMarket = {
