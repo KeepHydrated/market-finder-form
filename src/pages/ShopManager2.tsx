@@ -185,7 +185,9 @@ export default function ShopManager() {
     if (!isSavingRef.current && !loadingShop) {
       const newSection = shopData ? currentSection : 'setup';
       if (newSection !== currentSection) {
-        navigate(`/my-shop?section=${newSection}`, { replace: true });
+        // Preserve the market parameter when navigating
+        const marketParam = prefilledMarketId ? `&market=${prefilledMarketId}` : '';
+        navigate(`/my-shop?section=${newSection}${marketParam}`, { replace: true });
       }
     } else if (isSavingRef.current) {
       isSavingRef.current = false;
@@ -836,7 +838,10 @@ export default function ShopManager() {
           <div className="pt-6 border-t flex gap-4">
             {!shopData && (
               <Button 
-                onClick={() => navigate('/my-shop?section=products')}
+                onClick={() => {
+                  const marketParam = prefilledMarketId ? `&market=${prefilledMarketId}` : '';
+                  navigate(`/my-shop?section=products${marketParam}`);
+                }}
                 className="flex-1"
               >
                 Continue to Products
