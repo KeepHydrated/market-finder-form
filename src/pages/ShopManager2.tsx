@@ -67,6 +67,7 @@ export default function ShopManager() {
   // Get current section from URL params
   const urlParams = new URLSearchParams(location.search);
   const currentSection = urlParams.get('section') || 'setup';
+  const prefilledMarketId = urlParams.get('market');
   
   const [shopData, setShopData] = useState<ShopData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,6 +117,48 @@ export default function ShopManager() {
       setLoadingShop(false);
     }
   }, [user]);
+
+  // Pre-fill market from URL parameter
+  useEffect(() => {
+    const prefilMarket = async () => {
+      if (prefilledMarketId && selectedFarmersMarkets.length === 0) {
+        try {
+          const marketId = parseInt(prefilledMarketId, 10);
+          if (isNaN(marketId)) return;
+
+          const { data: market, error } = await supabase
+            .from('markets')
+            .select('*')
+            .eq('id', marketId)
+            .single();
+
+          if (error) throw error;
+
+          if (market) {
+            const formattedMarket = {
+              place_id: market.google_place_id || `market-${market.id}`,
+              name: market.name,
+              address: market.address,
+              structured_formatting: {
+                main_text: market.name,
+                secondary_text: market.address
+              }
+            };
+            setSelectedFarmersMarkets([formattedMarket]);
+            
+            toast({
+              title: "Market Pre-filled",
+              description: `${market.name} has been added to your markets.`,
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching prefilled market:', error);
+        }
+      }
+    };
+
+    prefilMarket();
+  }, [prefilledMarketId]);
 
   useEffect(() => {
     if (shopData) {
