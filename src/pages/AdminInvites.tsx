@@ -158,9 +158,6 @@ export default function AdminInvites() {
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">Vendor Invites</h1>
-          <p className="text-muted-foreground mt-2">
-            Generate invite links for vendors to easily sign up for specific markets.
-          </p>
         </div>
 
         <Card className="mb-6">
