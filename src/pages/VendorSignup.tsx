@@ -51,6 +51,25 @@ export default function VendorSignup() {
 
   const marketId = searchParams.get("market");
 
+  // Restore saved form data on mount (after auth redirect)
+  useEffect(() => {
+    const savedData = sessionStorage.getItem('pendingVendorApplication');
+    if (savedData && user) {
+      try {
+        const parsed = JSON.parse(savedData);
+        setVendorApplicationData(parsed.vendorApplicationData);
+        setProducts(parsed.products);
+        
+        toast({
+          title: "Welcome back!",
+          description: "Your application has been restored. Click submit to complete.",
+        });
+      } catch (error) {
+        console.error("Error restoring form data:", error);
+      }
+    }
+  }, [user, toast]);
+
   // Fetch market data from URL param
   useEffect(() => {
     const fetchMarket = async () => {
@@ -107,15 +126,7 @@ export default function VendorSignup() {
   }, [toast]);
 
   const handleSubmit = useCallback(async () => {
-    if (!user) {
-      toast({
-        title: "Sign In Required",
-        description: "Please sign in to submit your application.",
-        variant: "destructive"
-      });
-      return;
-    }
-
+    // Validate form data first
     if (!market) {
       toast({
         title: "No Market",
@@ -152,6 +163,18 @@ export default function VendorSignup() {
       return;
     }
 
+    // If not authenticated, save data and redirect to auth
+    if (!user) {
+      const formData = {
+        vendorApplicationData,
+        products,
+        marketId: market.id
+      };
+      sessionStorage.setItem('pendingVendorApplication', JSON.stringify(formData));
+      navigate(`/auth?redirect=${encodeURIComponent(`/vendor-signup?market=${marketId}`)}`);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -183,6 +206,9 @@ export default function VendorSignup() {
 
       if (error) throw error;
 
+      // Clear saved data after successful submission
+      sessionStorage.removeItem('pendingVendorApplication');
+      
       setIsSubmitted(true);
       toast({
         title: "Application Submitted!",
@@ -198,7 +224,7 @@ export default function VendorSignup() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [user, market, vendorApplicationData, products, toast]);
+  }, [user, market, vendorApplicationData, products, toast, marketId, navigate]);
 
   // Loading state
   if (authLoading || isLoadingMarket) {
@@ -296,83 +322,70 @@ export default function VendorSignup() {
           </Card>
         )}
 
-        {/* Auth Check */}
-        {!user ? (
-          <Card className="mb-6">
-            <CardContent className="pt-6 text-center">
-              <LogIn className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">Sign In Required</h3>
-              <p className="text-muted-foreground mb-4">
-                Please sign in or create an account to complete your vendor application.
-              </p>
-              <Button onClick={() => navigate(`/auth?redirect=/vendor-signup?market=${marketId}`)}>
-                Sign In / Sign Up
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <>
-            {/* Vendor Application Form */}
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Shop Details</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <VendorApplication
-                  data={vendorApplicationData}
-                  onChange={setVendorApplicationData}
-                  readOnly={false}
-                />
-              </CardContent>
-            </Card>
+        {/* Vendor Application Form - Always visible */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Shop Details</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <VendorApplication
+              data={vendorApplicationData}
+              onChange={setVendorApplicationData}
+              readOnly={false}
+            />
+          </CardContent>
+        </Card>
 
-            {/* Products Section */}
-            <Card className="mb-6">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Products</CardTitle>
-                  <Button onClick={handleAddProduct} size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Product
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {products.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <p>No products added yet.</p>
-                    <p className="text-sm">Add your products to showcase what you sell.</p>
-                  </div>
-                ) : (
-                  <ProductGrid
-                    products={products}
-                    onDeleteProduct={handleDeleteProduct}
-                    onDuplicateProduct={handleDuplicateProduct}
-                  />
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Submit Button */}
-            <div className="flex justify-center">
-              <Button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                size="lg"
-                className="px-12"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Submitting...
-                  </>
-                ) : (
-                  "Submit Application"
-                )}
+        {/* Products Section */}
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Products</CardTitle>
+              <Button onClick={handleAddProduct} size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Product
               </Button>
             </div>
-          </>
-        )}
+          </CardHeader>
+          <CardContent>
+            {products.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>No products added yet.</p>
+                <p className="text-sm">Add your products to showcase what you sell.</p>
+              </div>
+            ) : (
+              <ProductGrid
+                products={products}
+                onDeleteProduct={handleDeleteProduct}
+                onDuplicateProduct={handleDuplicateProduct}
+              />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Submit Button - Changes text based on auth status */}
+        <div className="flex justify-center">
+          <Button
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            size="lg"
+            className="px-12"
+          >
+            {isSubmitting ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Submitting...
+              </>
+            ) : user ? (
+              "Submit Application"
+            ) : (
+              <>
+                <LogIn className="h-4 w-4 mr-2" />
+                Sign In / Sign Up to Submit
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Add Product Form Modal */}
