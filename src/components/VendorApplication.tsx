@@ -117,21 +117,6 @@ export const VendorApplication = ({ data, onChange, readOnly = false }: VendorAp
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="website" className="text-lg font-medium text-foreground">
-            Website (Optional)
-          </Label>
-          <Input
-            id="website"
-            value={currentData.website}
-            onChange={(e) => updateData('website', e.target.value)}
-            placeholder="https://yourwebsite.com"
-            type="url"
-            className="h-14 text-lg border-2 border-border rounded-xl"
-            disabled={readOnly}
-          />
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor="description" className="text-lg font-medium text-foreground">
             Description *
           </Label>
