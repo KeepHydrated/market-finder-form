@@ -318,21 +318,19 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 <CartButton />
               </div>
               
-              {user && (
-                <Link to="/my-shop?section=overview">
-                  <Button variant="ghost" size="sm" className="relative">
-                    <Store className="h-5 w-5" />
-                    {newOrdersCount > 0 && (
-                      <Badge 
-                        variant="destructive" 
-                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs rounded-full"
-                      >
-                        {newOrdersCount > 9 ? '9+' : newOrdersCount}
-                      </Badge>
-                    )}
-                  </Button>
-                </Link>
-              )}
+              <Link to="/my-shop?section=overview">
+                <Button variant="ghost" size="sm" className="relative">
+                  <Store className="h-5 w-5" />
+                  {user && newOrdersCount > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs rounded-full"
+                    >
+                      {newOrdersCount > 9 ? '9+' : newOrdersCount}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
               {user ? (
                 <UserMenu user={user} profile={profile} />
               ) : location.pathname === '/vendor-signup' ? (
