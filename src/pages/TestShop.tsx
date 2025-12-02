@@ -67,12 +67,14 @@ export default function TestShop() {
 
   return (
     <SidebarProvider>
-      <div className="flex w-full min-h-screen">
-        <ShopSidebar hasShopData={false} />
+      <div className="min-h-screen w-full">
         <ShopMobileNav />
         
-        <main className="flex-1 p-4 md:p-8 pt-24 md:pt-32">
-          <div className="max-w-4xl mx-auto space-y-6">
+        <div className="flex w-full">
+          <ShopSidebar hasShopData={false} />
+        
+          <main className="flex-1 p-4 md:p-8 pt-24 md:pt-32">
+            <div className="max-w-4xl mx-auto space-y-6">
               {/* Market Search Section */}
               <Card>
                 <CardHeader>
@@ -186,9 +188,10 @@ export default function TestShop() {
                   Continue to Products
                   <span className="ml-2">→</span>
                 </Button>
+              </div>
             </div>
-          </div>
-        </main>
+          </main>
+        </div>
 
         {/* Add Product Modal */}
         <AddProductForm
