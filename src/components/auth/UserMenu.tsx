@@ -25,9 +25,10 @@ import { useAdmin } from '@/hooks/useAdmin';
 interface UserMenuProps {
   user: any;
   profile?: any;
+  isMockUser?: boolean;
 }
 
-export function UserMenu({ user, profile }: UserMenuProps) {
+export function UserMenu({ user, profile, isMockUser = false }: UserMenuProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -71,6 +72,40 @@ export function UserMenu({ user, profile }: UserMenuProps) {
   // Don't render the menu if user is null
   if (!user) {
     return null;
+  }
+
+  // Mock user renders differently - just show avatar with login option
+  if (isMockUser) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+            <Avatar className="h-10 w-10">
+              <AvatarFallback>NT</AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" align="end" forceMount>
+          <DropdownMenuLabel className="font-normal p-2">
+            <div className="cursor-default">
+              <div className="flex items-center space-x-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="text-xs">NT</AvatarFallback>
+                </Avatar>
+                <p className="text-sm font-medium leading-none">
+                  Sample Account
+                </p>
+              </div>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => navigate('/auth')}>
+            <User className="mr-2 h-4 w-4" />
+            <span>Log in</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
   }
 
   // Mobile version - Sheet sidebar
