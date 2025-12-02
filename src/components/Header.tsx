@@ -335,6 +335,12 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
               )}
               {user ? (
                 <UserMenu user={user} profile={profile} />
+              ) : location.pathname === '/vendor-signup' ? (
+                <UserMenu 
+                  user={{ email: 'sample@example.com' }} 
+                  profile={{ full_name: 'Sample Account' }} 
+                  isMockUser={true}
+                />
               ) : (
                 <Link to="/auth">
                   <Button variant="default" size="sm">
