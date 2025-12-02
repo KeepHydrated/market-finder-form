@@ -73,8 +73,8 @@ export default function TestShop() {
         <div className="flex w-full">
           <ShopSidebar hasShopData={false} />
         
-        <main className="flex-1 p-4 md:p-8">
-          <div className="max-w-2xl mx-auto">
+          <main className="flex-1 p-4 md:p-8">
+            <div className="max-w-2xl mx-auto">
             {/* Market Search Section */}
             <Card className="mb-6">
               <CardHeader>
@@ -191,14 +191,14 @@ export default function TestShop() {
             </div>
           </div>
         </main>
-      </div>
+        </div>
 
-      {/* Add Product Modal */}
-      <AddProductForm
-        open={showAddProduct}
-        onClose={() => setShowAddProduct(false)}
-        onProductAdded={handleAddProduct}
-      />
+        {/* Add Product Modal */}
+        <AddProductForm
+          open={showAddProduct}
+          onClose={() => setShowAddProduct(false)}
+          onProductAdded={handleAddProduct}
+        />
       </div>
     </SidebarProvider>
   );
