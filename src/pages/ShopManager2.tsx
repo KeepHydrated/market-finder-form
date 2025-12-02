@@ -121,9 +121,10 @@ export default function ShopManager() {
   // Pre-fill market from URL parameter
   useEffect(() => {
     const prefilMarket = async () => {
-      console.log('Checking prefill market:', { prefilledMarketId, selectedMarketsLength: selectedFarmersMarkets.length });
+      console.log('Checking prefill market:', { prefilledMarketId, selectedMarketsLength: selectedFarmersMarkets.length, loadingShop });
       
-      if (prefilledMarketId && selectedFarmersMarkets.length === 0) {
+      // Only prefill if there's a market ID, we're not loading, and no markets are selected yet
+      if (prefilledMarketId && !loadingShop && selectedFarmersMarkets.length === 0) {
         try {
           const marketId = parseInt(prefilledMarketId, 10);
           console.log('Attempting to prefill market ID:', marketId);
@@ -156,6 +157,7 @@ export default function ShopManager() {
                 secondary_text: market.address
               }
             };
+            console.log('Setting formatted market:', formattedMarket);
             setSelectedFarmersMarkets([formattedMarket]);
             
             toast({
@@ -170,7 +172,7 @@ export default function ShopManager() {
     };
 
     prefilMarket();
-  }, [prefilledMarketId]);
+  }, [prefilledMarketId, loadingShop, selectedFarmersMarkets.length]);
 
   useEffect(() => {
     if (shopData) {
