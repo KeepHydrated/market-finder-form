@@ -6,14 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X, MapPin } from "lucide-react";
-import { GlobalHeader } from "@/components/GlobalHeader";
+import { X, MapPin, Plus } from "lucide-react";
 import { ShopSidebar } from "@/components/ShopSidebar";
 import { ShopMobileNav } from "@/components/ShopMobileNav";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ProductGrid } from "@/components/ProductGrid";
 import { AddProductForm } from "@/components/AddProductForm";
-import { Plus } from "lucide-react";
 
 const SPECIALTY_CATEGORIES = [
   "Fresh Flowers & Plants",
@@ -69,15 +67,12 @@ export default function TestShop() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen bg-background w-full">
-        <GlobalHeader />
+      <div className="flex w-full min-h-screen">
+        <ShopSidebar hasShopData={false} />
         <ShopMobileNav />
         
-        <div className="flex w-full">
-          <ShopSidebar hasShopData={false} />
-          
-          <main className="flex-1 p-4 md:p-8">
-            <div className="max-w-4xl mx-auto space-y-6">
+        <main className="flex-1 p-4 md:p-8 pt-24 md:pt-32">
+          <div className="max-w-4xl mx-auto space-y-6">
               {/* Market Search Section */}
               <Card>
                 <CardHeader>
@@ -191,10 +186,9 @@ export default function TestShop() {
                   Continue to Products
                   <span className="ml-2">→</span>
                 </Button>
-              </div>
             </div>
-          </main>
-        </div>
+          </div>
+        </main>
 
         {/* Add Product Modal */}
         <AddProductForm
