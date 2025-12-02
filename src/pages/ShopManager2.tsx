@@ -149,7 +149,10 @@ export default function ShopManager() {
   }, [currentSection]);
 
   const fetchShopData = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoadingShop(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase
