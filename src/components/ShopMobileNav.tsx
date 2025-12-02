@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useMatch } from "react-router-dom";
 import { 
   Package, 
   Settings, 
@@ -63,6 +63,10 @@ export function ShopMobileNav({ hasShopData = false }: ShopMobileNavProps) {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   
+  // Detect which shop page we're on
+  const isMyShop2 = useMatch('/my-shop2');
+  const basePath = isMyShop2 ? '/my-shop2' : '/my-shop';
+  
   const urlParams = new URLSearchParams(location.search);
   const currentSection = urlParams.get('section') || 'setup';
 
@@ -85,7 +89,7 @@ export function ShopMobileNav({ hasShopData = false }: ShopMobileNavProps) {
             {availableItems.map((item) => (
               <NavLink
                 key={item.section}
-                to={`/my-shop?section=${item.section}`}
+                to={`${basePath}?section=${item.section}`}
                 onClick={() => setOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                   isActive(item.section)

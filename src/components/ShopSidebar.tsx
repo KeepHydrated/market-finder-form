@@ -7,7 +7,7 @@ import {
   TestTube,
   Wrench
 } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useMatch } from "react-router-dom";
 
 import {
   Sidebar,
@@ -68,6 +68,10 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
   const location = useLocation();
   const collapsed = state === "collapsed";
   
+  // Detect which shop page we're on
+  const isMyShop2 = useMatch('/my-shop2');
+  const basePath = isMyShop2 ? '/my-shop2' : '/my-shop';
+  
   // Get current section from URL params or default
   const urlParams = new URLSearchParams(location.search);
   const currentSection = urlParams.get('section') || 'setup';
@@ -97,7 +101,7 @@ export function ShopSidebar({ hasShopData = false }: ShopSidebarProps) {
                 <SidebarMenuItem key={item.section}>
                   <SidebarMenuButton asChild className={getNavClasses(isActive(item.section), item.section)}>
                     <NavLink 
-                      to={`/my-shop?section=${item.section}`}
+                      to={`${basePath}?section=${item.section}`}
                     >
                       <item.icon className="h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
