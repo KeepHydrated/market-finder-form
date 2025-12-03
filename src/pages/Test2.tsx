@@ -50,6 +50,7 @@ interface Market {
   hours: string | null;
   google_rating: number | null;
   google_rating_count: number | null;
+  google_place_id: string | null;
   vendors?: Vendor[];
   distance?: number;
   latitude?: number;
@@ -78,6 +79,9 @@ const Test2 = () => {
   const [vendorDistances, setVendorDistances] = useState<Record<string, string>>({});
   const [vendorMarketIndices, setVendorMarketIndices] = useState<Record<string, number>>({});
   
+  // Market photos from Google
+  const [marketPhotos, setMarketPhotos] = useState<Record<number, string | null>>({});
+  
   // Vendor ratings from reviews
   const [vendorRatings, setVendorRatings] = useState<Record<string, {averageRating: number; totalReviews: number}>>({});
 
@@ -91,6 +95,30 @@ const Test2 = () => {
   useEffect(() => {
     fetchRecommendedMarkets();
   }, [userCoordinates]);
+
+  // Fetch photos for markets when they're loaded
+  useEffect(() => {
+    const fetchMarketPhotos = async () => {
+      for (const market of recommendedMarkets) {
+        if (market.google_place_id && !marketPhotos[market.id]) {
+          try {
+            const { data, error } = await supabase.functions.invoke('get-place-photo', {
+              body: { place_id: market.google_place_id }
+            });
+            if (!error && data?.photoUrl) {
+              setMarketPhotos(prev => ({ ...prev, [market.id]: data.photoUrl }));
+            }
+          } catch (error) {
+            console.error('Error fetching market photo:', error);
+          }
+        }
+      }
+    };
+    
+    if (recommendedMarkets.length > 0) {
+      fetchMarketPhotos();
+    }
+  }, [recommendedMarkets]);
 
   // Get user's current location with fallback to profile zipcode
   const getUserLocation = async () => {
@@ -348,10 +376,10 @@ const Test2 = () => {
     try {
       setMarketsLoading(true);
       
-      // First fetch markets with their coordinates
+      // First fetch markets with their coordinates and place_id
       const { data: markets, error: marketsError } = await supabase
         .from('markets')
-        .select('id, name, address, city, state, days, hours, google_rating, google_rating_count, latitude, longitude')
+        .select('id, name, address, city, state, days, hours, google_rating, google_rating_count, latitude, longitude, google_place_id')
         .limit(50); // Fetch more to find closest ones
 
       if (marketsError) throw marketsError;
@@ -1039,128 +1067,16 @@ const Test2 = () => {
                       />
                     </Button>
                     
-                    {/* Vendor Image Collage */}
-                    {!market.vendors || market.vendors.length === 0 ? (
-                      // No vendors - show placeholder
+                    {/* Google Maps Photo */}
+                    {marketPhotos[market.id] ? (
+                      <img 
+                        src={marketPhotos[market.id]!}
+                        alt={market.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
                       <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
                         <span className="text-6xl">🏪</span>
-                      </div>
-                    ) : market.vendors.length === 1 ? (
-                      // Single vendor
-                      <div className="w-full h-full">
-                        {market.vendors[0].products && 
-                         Array.isArray(market.vendors[0].products) &&
-                         market.vendors[0].products.length > 0 && 
-                         market.vendors[0].products[0].images && 
-                         market.vendors[0].products[0].images.length > 0 ? (
-                          <img 
-                            src={market.vendors[0].products[0].images[0]}
-                            alt={market.vendors[0].store_name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
-                            <div className="text-green-600 text-lg font-medium">
-                              {market.vendors[0].store_name}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : market.vendors.length === 2 ? (
-                      // Two vendors - split layout
-                      <div className="grid grid-cols-2 h-full gap-0.5">
-                        {market.vendors.slice(0, 2).map((vendor, vendorIndex) => (
-                          <div key={vendorIndex} className="relative overflow-hidden">
-                            {vendor.products && 
-                             Array.isArray(vendor.products) &&
-                             vendor.products.length > 0 && 
-                             vendor.products[0].images && 
-                             vendor.products[0].images.length > 0 ? (
-                              <img 
-                                src={vendor.products[0].images[0]}
-                                alt={vendor.store_name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
-                                <div className="text-green-600 text-sm font-medium text-center">
-                                  {vendor.store_name}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    ) : market.vendors.length === 3 ? (
-                      // Three vendors - one large, two small
-                      <div className="grid grid-cols-2 h-full gap-0.5">
-                        <div className="relative overflow-hidden">
-                          {market.vendors[0].products && 
-                           Array.isArray(market.vendors[0].products) &&
-                           market.vendors[0].products.length > 0 && 
-                           market.vendors[0].products[0].images && 
-                           market.vendors[0].products[0].images.length > 0 ? (
-                            <img 
-                              src={market.vendors[0].products[0].images[0]}
-                              alt={market.vendors[0].store_name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
-                              <div className="text-green-600 text-sm font-medium text-center">
-                                {market.vendors[0].store_name}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        <div className="grid grid-rows-2 gap-0.5">
-                          {market.vendors.slice(1, 3).map((vendor, vendorIndex) => (
-                            <div key={vendorIndex} className="relative overflow-hidden">
-                              {vendor.products && 
-                               Array.isArray(vendor.products) &&
-                               vendor.products.length > 0 && 
-                               vendor.products[0].images && 
-                               vendor.products[0].images.length > 0 ? (
-                                <img 
-                                  src={vendor.products[0].images[0]}
-                                  alt={vendor.store_name}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
-                                  <div className="text-green-600 text-xs font-medium text-center p-1">
-                                    {vendor.store_name}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      // Four or more vendors - 2x2 grid
-                      <div className="grid grid-cols-2 grid-rows-2 h-full gap-0.5">
-                        {market.vendors.slice(0, 4).map((vendor, vendorIndex) => (
-                          <div key={vendorIndex} className="relative overflow-hidden">
-                            {vendor.products && 
-                             Array.isArray(vendor.products) &&
-                             vendor.products.length > 0 && 
-                             vendor.products[0].images && 
-                             vendor.products[0].images.length > 0 ? (
-                              <img 
-                                src={vendor.products[0].images[0]}
-                                alt={vendor.store_name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
-                                <div className="text-green-600 text-xs font-medium text-center p-1">
-                                  {vendor.store_name}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        ))}
                       </div>
                     )}
 
