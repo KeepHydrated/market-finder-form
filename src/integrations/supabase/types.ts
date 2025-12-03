@@ -497,6 +497,7 @@ export type Database = {
           google_rating: number | null
           google_rating_count: number | null
           id: string
+          is_sample: boolean | null
           latitude: number | null
           longitude: number | null
           market_address: string | null
@@ -520,6 +521,7 @@ export type Database = {
           google_rating?: number | null
           google_rating_count?: number | null
           id?: string
+          is_sample?: boolean | null
           latitude?: number | null
           longitude?: number | null
           market_address?: string | null
@@ -543,6 +545,7 @@ export type Database = {
           google_rating?: number | null
           google_rating_count?: number | null
           id?: string
+          is_sample?: boolean | null
           latitude?: number | null
           longitude?: number | null
           market_address?: string | null

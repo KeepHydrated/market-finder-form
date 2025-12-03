@@ -41,6 +41,7 @@ interface AcceptedSubmission {
   google_rating?: number;
   google_rating_count?: number;
   distance?: number;
+  is_sample?: boolean;
 }
 
 interface VendorRating {
@@ -2348,7 +2349,8 @@ const Homepage = () => {
                   vendorId: submission.id,
                   vendorName: submission.store_name,
                   vendorSpecialty: submission.primary_specialty,
-                  vendorDistance: undefined
+                  vendorDistance: undefined,
+                  isSample: submission.is_sample
                 }));
               });
 
@@ -2416,6 +2418,15 @@ const Homepage = () => {
                           </div>
                         )}
                         
+                        
+                        {/* Sample Badge */}
+                        {product.isSample && (
+                          <Badge 
+                            className="absolute top-2 left-2 bg-amber-500 hover:bg-amber-500 text-white text-xs font-semibold px-2 py-1"
+                          >
+                            Sample
+                          </Badge>
+                        )}
                         
                         {/* Like Button */}
                         <Button
