@@ -66,11 +66,11 @@ serve(async (req) => {
     const searchQuery = `${query} farmers market`;
     let autocompleteUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(searchQuery)}&key=${apiKey}&types=establishment`;
     
-    // Add location bias if provided - use smaller radius and strictbounds for local results
+    // Add location bias if provided
     if (location && location.lat && location.lng) {
-      // Use 25km (~15 miles) radius with strictbounds to prioritize local results
-      autocompleteUrl += `&location=${location.lat},${location.lng}&radius=25000&strictbounds=true`;
-      console.log(`Using location bias: ${location.lat}, ${location.lng} with strictbounds`);
+      // Use 80km (~50 miles) radius as a bias (not strict) to prefer local results
+      autocompleteUrl += `&location=${location.lat},${location.lng}&radius=80000`;
+      console.log(`Using location bias: ${location.lat}, ${location.lng}`);
     }
     
     console.log('Searching with autocomplete for:', searchQuery);
