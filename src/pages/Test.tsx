@@ -1500,7 +1500,6 @@ const Homepage = () => {
           <div className="w-full border rounded-lg bg-background shadow-lg mb-6 animate-accordion-down">
               <Tabs defaultValue="type" className="w-full flex flex-col overflow-hidden">
                 <div className="pt-4 px-4 md:px-8 flex justify-between items-center flex-shrink-0 border-b">
-                  <div className="flex-1" />
                   <TabsList className="inline-flex gap-4 md:gap-8 bg-transparent border-0 p-0 h-auto">
                     <TabsTrigger 
                       value="type" 
@@ -1521,7 +1520,7 @@ const Homepage = () => {
                       Categories
                     </TabsTrigger>
                   </TabsList>
-                  <div className="flex-1 flex justify-end">
+                  <div className="flex items-center">
                     <Button
                       variant="ghost"
                       size="sm"
