@@ -1406,9 +1406,37 @@ const Homepage = () => {
         
         {/* Scope Toggle and View Toggle */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          {/* Filter and Sort */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+            {/* Filter */}
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+            >
+              <Filter className="h-4 w-4" />
+              <span className="hidden md:inline">Filter</span>
+              <ChevronDown className={cn("h-4 w-4 transition-transform", isFilterOpen && "rotate-180")} />
+            </Button>
+            
+            {/* Sort By */}
+            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+              <SelectTrigger className="w-[200px] bg-background border shadow-sm">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border shadow-lg z-50">
+                <SelectItem value="relevancy">Relevancy</SelectItem>
+                <SelectItem value="lowest-price">Lowest Price</SelectItem>
+                <SelectItem value="highest-price">Highest Price</SelectItem>
+                <SelectItem value="top-rated">Top Rated Store</SelectItem>
+                <SelectItem value="most-recent">Most Recent</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Search results indicator */}
-          <div className="w-full sm:w-auto">
-            <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
+          <div className="w-full sm:w-auto sm:ml-auto">
+            <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap justify-end">
               <span>Showing {filteredSubmissions.length} result{filteredSubmissions.length !== 1 ? 's' : ''}</span>
               {searchQuery.trim() && (
                 <Badge variant="secondary" className="gap-1 pr-1">
@@ -1465,33 +1493,6 @@ const Homepage = () => {
                 </Button>
               )}
             </div>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto sm:ml-auto">
-            {/* Filter */}
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-            >
-              <Filter className="h-4 w-4" />
-              <span className="hidden md:inline">Filter</span>
-              <ChevronDown className={cn("h-4 w-4 transition-transform", isFilterOpen && "rotate-180")} />
-            </Button>
-            
-            {/* Sort By */}
-            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-              <SelectTrigger className="w-[200px] bg-background border shadow-sm">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border shadow-lg z-50">
-                <SelectItem value="relevancy">Relevancy</SelectItem>
-                <SelectItem value="lowest-price">Lowest Price</SelectItem>
-                <SelectItem value="highest-price">Highest Price</SelectItem>
-                <SelectItem value="top-rated">Top Rated Store</SelectItem>
-                <SelectItem value="most-recent">Most Recent</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
