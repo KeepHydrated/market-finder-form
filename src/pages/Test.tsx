@@ -1414,8 +1414,7 @@ const Homepage = () => {
               className="flex items-center gap-2"
               onClick={() => setIsFilterOpen(!isFilterOpen)}
             >
-              <Filter className="h-4 w-4" />
-              <span className="hidden md:inline">Filter</span>
+              <span>Filter</span>
               <ChevronDown className={cn("h-4 w-4 transition-transform", isFilterOpen && "rotate-180")} />
             </Button>
             
