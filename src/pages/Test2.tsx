@@ -416,12 +416,12 @@ const Test2 = () => {
         return {
           id: index + 1, // Temporary ID for display
           name: place.name || 'Farmers Market',
-          address: place.formatted_address || place.vicinity || '',
+          address: place.address || place.formatted_address || place.vicinity || '',
           city: '', // Not always available from Places API
           state: '',
           days: [], // Not available from Places API
           hours: place.opening_hours?.weekday_text?.join(', ') || null,
-          google_rating: place.rating || null,
+          google_rating: place.rating || place.user_ratings_total ? place.rating : null,
           google_rating_count: place.user_ratings_total || null,
           google_place_id: place.place_id,
           vendors: [],
