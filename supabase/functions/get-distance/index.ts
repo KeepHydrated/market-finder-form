@@ -38,21 +38,44 @@ serve(async (req) => {
     const response = await fetch(distanceUrl);
     const data = await response.json();
     
+    // Calculate straight-line (Haversine) distance as fallback
+    const calculateHaversine = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+      const R = 3959; // Earth's radius in miles
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    };
+
+    // If API fails, fall back to straight-line distance
     if (data.status !== 'OK' || !data.rows || data.rows.length === 0 || !data.rows[0].elements || data.rows[0].elements.length === 0) {
-      console.log(`Distance Matrix API failed: ${data.status}`);
+      console.log(`Distance Matrix API failed: ${data.status}, using straight-line fallback`);
+      const fallbackDistance = calculateHaversine(origin.lat, origin.lng, destination.lat, destination.lng);
       return new Response(
-        JSON.stringify({ error: 'Could not calculate distance' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ 
+          distance: `${fallbackDistance.toFixed(1)} mi`,
+          distanceMiles: parseFloat(fallbackDistance.toFixed(1)),
+          fallback: true
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     const element = data.rows[0].elements[0];
     
     if (element.status !== 'OK') {
-      console.log(`Distance calculation failed: ${element.status}`);
+      console.log(`Distance calculation failed: ${element.status}, using straight-line fallback`);
+      const fallbackDistance = calculateHaversine(origin.lat, origin.lng, destination.lat, destination.lng);
       return new Response(
-        JSON.stringify({ error: 'Could not calculate distance between locations' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ 
+          distance: `${fallbackDistance.toFixed(1)} mi`,
+          distanceMiles: parseFloat(fallbackDistance.toFixed(1)),
+          fallback: true
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
