@@ -8,6 +8,7 @@ import { Heart, Star, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLikes } from "@/hooks/useLikes";
 import { cn } from "@/lib/utils";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
+import { getCoordinatesForAddress, calculateDistance } from "@/lib/geocoding";
 import farmersMarketBanner from "@/assets/farmers-market-banner.jpg";
 import categoryFlowers from "@/assets/category-flowers.jpg";
 import categoryBakery from "@/assets/category-bakery.jpg";
@@ -50,6 +51,7 @@ interface Market {
   google_rating: number | null;
   google_rating_count: number | null;
   vendors?: Vendor[];
+  distance?: number;
 }
 
 const Test2 = () => {
@@ -80,9 +82,13 @@ const Test2 = () => {
   useEffect(() => {
     fetchRecommendedProducts();
     fetchRecommendedVendors();
-    fetchRecommendedMarkets();
     getUserLocation();
   }, []);
+
+  // Fetch markets when user coordinates are available
+  useEffect(() => {
+    fetchRecommendedMarkets();
+  }, [userCoordinates]);
 
   // Get user's current location with fallback to profile zipcode
   const getUserLocation = async () => {
@@ -338,11 +344,13 @@ const Test2 = () => {
 
   const fetchRecommendedMarkets = async () => {
     try {
+      setMarketsLoading(true);
+      
       // First fetch markets
       const { data: markets, error: marketsError } = await supabase
         .from('markets')
         .select('id, name, address, city, state, days, hours, google_rating, google_rating_count')
-        .limit(20);
+        .limit(50); // Fetch more to find closest ones
 
       if (marketsError) throw marketsError;
 
@@ -393,13 +401,54 @@ const Test2 = () => {
 
         return {
           ...market,
-          vendors: marketVendors
+          vendors: marketVendors,
+          distance: undefined as number | undefined
         };
       });
 
-      // Show all markets, even without vendors (will show placeholder)
-      const shuffled = marketsWithVendors.sort(() => 0.5 - Math.random());
-      setRecommendedMarkets(shuffled.slice(0, 3) as any);
+      // If we have user coordinates, calculate distances and sort by closest
+      if (userCoordinates) {
+        console.log('📍 Calculating distances for markets from user location:', userCoordinates);
+        
+        // Calculate distances for all markets (in parallel, but limit concurrency)
+        const marketsWithDistances = await Promise.all(
+          marketsWithVendors.map(async (market) => {
+            try {
+              const fullAddress = `${market.address}, ${market.city}, ${market.state}`;
+              const coords = await getCoordinatesForAddress(fullAddress);
+              
+              if (coords) {
+                const distance = calculateDistance(
+                  userCoordinates.lat,
+                  userCoordinates.lng,
+                  coords.lat,
+                  coords.lng
+                );
+                return { ...market, distance };
+              }
+            } catch (error) {
+              console.error(`Error getting coordinates for ${market.name}:`, error);
+            }
+            return { ...market, distance: Infinity };
+          })
+        );
+
+        // Sort by distance (closest first)
+        const sortedMarkets = marketsWithDistances.sort((a, b) => 
+          (a.distance ?? Infinity) - (b.distance ?? Infinity)
+        );
+        
+        console.log('📍 Closest markets:', sortedMarkets.slice(0, 3).map(m => ({
+          name: m.name,
+          distance: m.distance?.toFixed(1) + ' mi'
+        })));
+
+        setRecommendedMarkets(sortedMarkets.slice(0, 3) as any);
+      } else {
+        // No user coordinates - show random markets
+        const shuffled = marketsWithVendors.sort(() => 0.5 - Math.random());
+        setRecommendedMarkets(shuffled.slice(0, 3) as any);
+      }
     } catch (error) {
       console.error('Error fetching recommended markets:', error);
     } finally {
@@ -1122,12 +1171,14 @@ const Test2 = () => {
                       </div>
                     )}
 
-                    {/* Distance Badge - Bottom Right (placeholder) */}
-                    <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
-                      <span className="text-xs font-medium text-gray-700">
-                        -- miles
-                      </span>
-                    </div>
+                    {/* Distance Badge - Bottom Right */}
+                    {market.distance !== undefined && market.distance !== Infinity && (
+                      <div className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 rounded-full shadow-sm">
+                        <span className="text-xs font-medium text-gray-700">
+                          {market.distance.toFixed(1)} mi
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Market Info */}
