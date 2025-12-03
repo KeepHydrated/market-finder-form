@@ -80,28 +80,36 @@ export function UserMenu({ user, profile, isMockUser = false }: UserMenuProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback>NT</AvatarFallback>
+            <Avatar className="h-10 w-10 border-2 border-dashed border-amber-500">
+              <AvatarFallback className="bg-amber-100 text-amber-700">NT</AvatarFallback>
             </Avatar>
+            <span className="absolute -bottom-1 -right-1 bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+              Demo
+            </span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal p-2">
             <div className="cursor-default">
               <div className="flex items-center space-x-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="text-xs">NT</AvatarFallback>
+                <Avatar className="h-8 w-8 border-2 border-dashed border-amber-500">
+                  <AvatarFallback className="text-xs bg-amber-100 text-amber-700">NT</AvatarFallback>
                 </Avatar>
-                <p className="text-sm font-medium leading-none">
-                  Sample Account
-                </p>
+                <div>
+                  <p className="text-sm font-medium leading-none">
+                    Sample Account
+                  </p>
+                  <p className="text-xs text-amber-600 mt-1">
+                    Preview mode
+                  </p>
+                </div>
               </div>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => navigate('/auth')}>
             <User className="mr-2 h-4 w-4" />
-            <span>Log in</span>
+            <span>Log in to save your store</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
