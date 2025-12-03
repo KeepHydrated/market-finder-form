@@ -1499,7 +1499,7 @@ const Homepage = () => {
         {isFilterOpen && (
           <div className="w-full border rounded-lg bg-background shadow-lg mb-6 animate-accordion-down">
               <Tabs defaultValue="type" className="w-full flex flex-col overflow-hidden">
-                <div className="pt-4 px-8 flex items-center gap-6 md:gap-10 flex-shrink-0 border-b">
+                <div className="pt-4 px-8 pl-9 flex items-center gap-6 md:gap-10 flex-shrink-0 border-b">
                   <TabsList className="inline-flex gap-4 md:gap-8 bg-transparent border-0 p-0 h-auto">
                     <TabsTrigger 
                       value="type" 
