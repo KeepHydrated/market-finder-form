@@ -414,8 +414,8 @@ const Test2 = () => {
         const marketsWithDistances = await Promise.all(
           marketsWithVendors.map(async (market) => {
             try {
-              const fullAddress = `${market.address}, ${market.city}, ${market.state}`;
-              const coords = await getCoordinatesForAddress(fullAddress);
+              // Use just the address - don't append city/state as it's usually already in the address
+              const coords = await getCoordinatesForAddress(market.address);
               
               if (coords) {
                 const distance = calculateDistance(
