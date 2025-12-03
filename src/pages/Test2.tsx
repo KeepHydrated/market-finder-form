@@ -8,7 +8,7 @@ import { Heart, Star, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLikes } from "@/hooks/useLikes";
 import { cn } from "@/lib/utils";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
-import { getCoordinatesForAddress, calculateDistance } from "@/lib/geocoding";
+import { calculateDistance } from "@/lib/geocoding";
 import farmersMarketBanner from "@/assets/farmers-market-banner.jpg";
 import categoryFlowers from "@/assets/category-flowers.jpg";
 import categoryBakery from "@/assets/category-bakery.jpg";
@@ -52,6 +52,8 @@ interface Market {
   google_rating_count: number | null;
   vendors?: Vendor[];
   distance?: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 const Test2 = () => {
@@ -346,10 +348,10 @@ const Test2 = () => {
     try {
       setMarketsLoading(true);
       
-      // First fetch markets
+      // First fetch markets with their coordinates
       const { data: markets, error: marketsError } = await supabase
         .from('markets')
-        .select('id, name, address, city, state, days, hours, google_rating, google_rating_count')
+        .select('id, name, address, city, state, days, hours, google_rating, google_rating_count, latitude, longitude')
         .limit(50); // Fetch more to find closest ones
 
       if (marketsError) throw marketsError;
@@ -368,7 +370,7 @@ const Test2 = () => {
       if (vendorsError) throw vendorsError;
 
       // Group vendors by market - use more flexible matching
-      const marketsWithVendors = markets.map(market => {
+      const marketsWithVendors = (markets as any[]).map(market => {
         const marketVendors = vendors?.filter(vendor => {
           // Check if vendor's selected_markets or market_address matches this market
           const selectedMarkets = vendor.selected_markets;
@@ -410,28 +412,19 @@ const Test2 = () => {
       if (userCoordinates) {
         console.log('📍 Calculating distances for markets from user location:', userCoordinates);
         
-        // Calculate distances for all markets (in parallel, but limit concurrency)
-        const marketsWithDistances = await Promise.all(
-          marketsWithVendors.map(async (market) => {
-            try {
-              // Use just the address - don't append city/state as it's usually already in the address
-              const coords = await getCoordinatesForAddress(market.address);
-              
-              if (coords) {
-                const distance = calculateDistance(
-                  userCoordinates.lat,
-                  userCoordinates.lng,
-                  coords.lat,
-                  coords.lng
-                );
-                return { ...market, distance };
-              }
-            } catch (error) {
-              console.error(`Error getting coordinates for ${market.name}:`, error);
-            }
-            return { ...market, distance: Infinity };
-          })
-        );
+        // Calculate distances using stored coordinates
+        const marketsWithDistances = marketsWithVendors.map((market) => {
+          if (market.latitude && market.longitude) {
+            const distance = calculateDistance(
+              userCoordinates.lat,
+              userCoordinates.lng,
+              market.latitude,
+              market.longitude
+            );
+            return { ...market, distance };
+          }
+          return { ...market, distance: Infinity };
+        });
 
         // Sort by distance (closest first)
         const sortedMarkets = marketsWithDistances.sort((a, b) => 
@@ -440,7 +433,7 @@ const Test2 = () => {
         
         console.log('📍 Closest markets:', sortedMarkets.slice(0, 3).map(m => ({
           name: m.name,
-          distance: m.distance?.toFixed(1) + ' mi'
+          distance: m.distance !== Infinity ? m.distance?.toFixed(1) + ' mi' : 'unknown'
         })));
 
         setRecommendedMarkets(sortedMarkets.slice(0, 3) as any);

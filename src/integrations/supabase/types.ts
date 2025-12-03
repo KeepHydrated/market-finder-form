@@ -148,6 +148,8 @@ export type Database = {
           hours: string | null
           id: number
           last_rating_update: string | null
+          latitude: number | null
+          longitude: number | null
           name: string
           state: string
           updated_at: string
@@ -164,6 +166,8 @@ export type Database = {
           hours?: string | null
           id?: number
           last_rating_update?: string | null
+          latitude?: number | null
+          longitude?: number | null
           name: string
           state: string
           updated_at?: string
@@ -180,6 +184,8 @@ export type Database = {
           hours?: string | null
           id?: number
           last_rating_update?: string | null
+          latitude?: number | null
+          longitude?: number | null
           name?: string
           state?: string
           updated_at?: string
