@@ -413,15 +413,35 @@ const Test2 = () => {
           distance = calculateDistance(userCoordinates.lat, userCoordinates.lng, lat, lng);
         }
 
+        // Parse open days from opening_hours
+        let openDays: string[] = [];
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        if (place.opening_hours?.periods) {
+          // Get unique days from periods
+          const dayIndices = new Set<number>();
+          place.opening_hours.periods.forEach((period: any) => {
+            if (period.open?.day !== undefined) {
+              dayIndices.add(period.open.day);
+            }
+          });
+          openDays = Array.from(dayIndices).sort().map(dayIndex => dayNames[dayIndex]);
+        } else if (place.opening_hours?.weekday_text) {
+          // Parse from weekday_text - filter out "Closed" days
+          openDays = place.opening_hours.weekday_text
+            .filter((text: string) => !text.toLowerCase().includes('closed'))
+            .map((text: string) => text.split(':')[0].trim());
+        }
+
         return {
           id: index + 1, // Temporary ID for display
           name: place.name || 'Farmers Market',
           address: place.address || place.formatted_address || place.vicinity || '',
           city: '', // Not always available from Places API
           state: '',
-          days: [], // Not available from Places API
+          days: openDays,
           hours: place.opening_hours?.weekday_text?.join(', ') || null,
-          google_rating: place.rating || place.user_ratings_total ? place.rating : null,
+          google_rating: place.rating || null,
           google_rating_count: place.user_ratings_total || null,
           google_place_id: place.place_id,
           vendors: [],
