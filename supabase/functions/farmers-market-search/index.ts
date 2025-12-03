@@ -53,8 +53,93 @@ serve(async (req) => {
         });
       }
     }
+
+    // If location is provided, use Nearby Search API for better local results
+    if (location && location.lat && location.lng) {
+      console.log(`🎯 Using Nearby Search for location: ${location.lat}, ${location.lng}`);
+      
+      // Use Text Search API with location bias for better results
+      const searchQuery = query || 'farmers market';
+      const textSearchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&location=${location.lat},${location.lng}&radius=80000&key=${apiKey}`;
+      
+      console.log('Text Search URL (masked):', textSearchUrl.replace(apiKey, 'API_KEY'));
+      
+      const searchResponse = await fetch(textSearchUrl);
+      const searchData = await searchResponse.json();
+
+      if (!searchResponse.ok || searchData.status === 'REQUEST_DENIED') {
+        console.error('Google Places Text Search API error:', searchData);
+        return new Response(JSON.stringify({ 
+          error: 'Google Places Text Search API error', 
+          details: searchData 
+        }), {
+          status: searchResponse.status,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const results = searchData.results || [];
+      console.log(`📍 Text Search returned ${results.length} results`);
+
+      // Fetch additional details for each result to get opening hours
+      const farmersMarkets = await Promise.all(
+        results.slice(0, 8).map(async (place: any) => {
+          try {
+            // Fetch detailed info including opening hours
+            const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=opening_hours,photos&key=${apiKey}`;
+            const detailsResponse = await fetch(detailsUrl);
+            const detailsData = await detailsResponse.json();
+            const details = detailsData.result || {};
+
+            return {
+              place_id: place.place_id,
+              name: place.name,
+              address: place.formatted_address,
+              rating: place.rating,
+              user_ratings_total: place.user_ratings_total,
+              opening_hours: details.opening_hours || place.opening_hours,
+              photos: details.photos?.[0] ? [{
+                photo_reference: details.photos[0].photo_reference
+              }] : (place.photos?.[0] ? [{
+                photo_reference: place.photos[0].photo_reference
+              }] : []),
+              geometry: place.geometry,
+              description: `${place.name}, ${place.formatted_address}`,
+              structured_formatting: {
+                main_text: place.name,
+                secondary_text: place.formatted_address
+              }
+            };
+          } catch (error) {
+            console.error('Error fetching details for', place.name, error);
+            return {
+              place_id: place.place_id,
+              name: place.name,
+              address: place.formatted_address,
+              rating: place.rating,
+              user_ratings_total: place.user_ratings_total,
+              geometry: place.geometry,
+              description: `${place.name}, ${place.formatted_address}`,
+              structured_formatting: {
+                main_text: place.name,
+                secondary_text: place.formatted_address
+              }
+            };
+          }
+        })
+      );
+
+      console.log(`✅ Returning ${farmersMarkets.length} farmers markets near location`);
+
+      return new Response(JSON.stringify({ 
+        predictions: farmersMarkets,
+        status: 'OK'
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
     
-    // Original query-based search logic
+    // Fallback to Autocomplete for text-based searches without location
     if (!query || query.length < 2) {
       return new Response(JSON.stringify({ error: 'Query must be at least 2 characters' }), {
         status: 400,
@@ -62,16 +147,8 @@ serve(async (req) => {
       });
     }
 
-    // Use Places Autocomplete API for real-time suggestions (like Google Maps)
     const searchQuery = `${query} farmers market`;
-    let autocompleteUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(searchQuery)}&key=${apiKey}&types=establishment&components=country:us`;
-    
-    // Add location bias if provided
-    if (location && location.lat && location.lng) {
-      // Use 80km (~50 miles) radius as a bias (not strict) to prefer local results
-      autocompleteUrl += `&location=${location.lat},${location.lng}&radius=80000`;
-      console.log(`Using location bias: ${location.lat}, ${location.lng}`);
-    }
+    const autocompleteUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(searchQuery)}&key=${apiKey}&types=establishment&components=country:us`;
     
     console.log('Searching with autocomplete for:', searchQuery);
     
@@ -92,7 +169,7 @@ serve(async (req) => {
     const predictions = autocompleteData.predictions || [];
     console.log(`Autocomplete returned ${predictions.length} predictions`);
 
-    // Fetch details for each prediction to get full info
+    // Fetch details for each prediction
     const farmersMarkets = await Promise.all(
       predictions.slice(0, 8).map(async (prediction: any) => {
         try {
