@@ -64,7 +64,7 @@ serve(async (req) => {
 
     // Use Places Autocomplete API for real-time suggestions (like Google Maps)
     const searchQuery = `${query} farmers market`;
-    let autocompleteUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(searchQuery)}&key=${apiKey}&types=establishment`;
+    let autocompleteUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(searchQuery)}&key=${apiKey}&types=establishment&components=country:us`;
     
     // Add location bias if provided
     if (location && location.lat && location.lng) {
