@@ -990,7 +990,7 @@ const Test2 = () => {
         {/* Recommended Local Markets Section */}
         <div className="mb-12">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Recommended Local Markets</h2>
+            <h2 className="text-2xl font-bold text-foreground">Markets Near You</h2>
             <Button variant="ghost" onClick={() => navigate('/')}>
               View All
             </Button>
