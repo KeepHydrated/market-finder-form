@@ -376,102 +376,75 @@ const Test2 = () => {
     try {
       setMarketsLoading(true);
       
-      // First fetch markets with their coordinates and place_id
-      const { data: markets, error: marketsError } = await supabase
-        .from('markets')
-        .select('id, name, address, city, state, days, hours, google_rating, google_rating_count, latitude, longitude, google_place_id')
-        .limit(50); // Fetch more to find closest ones
-
-      if (marketsError) throw marketsError;
-
-      if (!markets || markets.length === 0) {
+      if (!userCoordinates) {
+        console.log('📍 No user coordinates yet, skipping market fetch');
         setRecommendedMarkets([]);
         return;
       }
 
-      // Fetch all vendors
-      const { data: vendors, error: vendorsError } = await supabase
-        .from('submissions')
-        .select('id, store_name, products, selected_markets, market_address')
-        .eq('status', 'accepted');
+      console.log('📍 Fetching nearby farmers markets from Google Places API for:', userCoordinates);
+      
+      // Use Google Places API to find nearby farmers markets
+      const { data, error } = await supabase.functions.invoke('farmers-market-search', {
+        body: {
+          query: 'farmers market',
+          location: userCoordinates
+        }
+      });
 
-      if (vendorsError) throw vendorsError;
+      if (error) throw error;
 
-      // Group vendors by market - use more flexible matching
-      const marketsWithVendors = (markets as any[]).map(market => {
-        const marketVendors = vendors?.filter(vendor => {
-          // Check if vendor's selected_markets or market_address matches this market
-          const selectedMarkets = vendor.selected_markets;
-          const marketAddress = vendor.market_address;
-          
-          // Try matching by selected_markets
-          if (selectedMarkets && Array.isArray(selectedMarkets)) {
-            const hasMatch = selectedMarkets.some((m: any) => {
-              const marketName = typeof m === 'string' ? m : (m?.name || '');
-              const marketAddr = typeof m === 'string' ? '' : (m?.address || '');
-              
-              // Match by name or address
-              return marketName.toLowerCase().includes(market.name.toLowerCase()) ||
-                     market.name.toLowerCase().includes(marketName.toLowerCase()) ||
-                     (marketAddr && market.address.toLowerCase().includes(marketAddr.toLowerCase())) ||
-                     (marketAddr && marketAddr.toLowerCase().includes(market.address.toLowerCase()));
-            });
-            if (hasMatch) return true;
-          }
-          
-          // Try matching by market_address
-          if (marketAddress) {
-            return market.address.toLowerCase().includes(marketAddress.toLowerCase()) ||
-                   marketAddress.toLowerCase().includes(market.address.toLowerCase()) ||
-                   market.name.toLowerCase().includes(marketAddress.toLowerCase());
-          }
-          
-          return false;
-        }) || [];
+      if (!data?.predictions || data.predictions.length === 0) {
+        console.log('📍 No nearby markets found from Google Places');
+        setRecommendedMarkets([]);
+        return;
+      }
+
+      console.log('📍 Found markets from Google:', data.predictions.length);
+
+      // Transform Google Places results to our Market format
+      const marketsFromGoogle: Market[] = data.predictions.slice(0, 6).map((place: any, index: number) => {
+        const lat = place.geometry?.location?.lat;
+        const lng = place.geometry?.location?.lng;
+        
+        // Calculate distance if we have coordinates
+        let distance: number | undefined;
+        if (lat && lng && userCoordinates) {
+          distance = calculateDistance(userCoordinates.lat, userCoordinates.lng, lat, lng);
+        }
 
         return {
-          ...market,
-          vendors: marketVendors,
-          distance: undefined as number | undefined
+          id: index + 1, // Temporary ID for display
+          name: place.name || 'Farmers Market',
+          address: place.formatted_address || place.vicinity || '',
+          city: '', // Not always available from Places API
+          state: '',
+          days: [], // Not available from Places API
+          hours: place.opening_hours?.weekday_text?.join(', ') || null,
+          google_rating: place.rating || null,
+          google_rating_count: place.user_ratings_total || null,
+          google_place_id: place.place_id,
+          vendors: [],
+          distance,
+          latitude: lat,
+          longitude: lng
         };
       });
 
-      // If we have user coordinates, calculate distances and sort by closest
-      if (userCoordinates) {
-        console.log('📍 Calculating distances for markets from user location:', userCoordinates);
-        
-        // Calculate distances using stored coordinates
-        const marketsWithDistances = marketsWithVendors.map((market) => {
-          if (market.latitude && market.longitude) {
-            const distance = calculateDistance(
-              userCoordinates.lat,
-              userCoordinates.lng,
-              market.latitude,
-              market.longitude
-            );
-            return { ...market, distance };
-          }
-          return { ...market, distance: Infinity };
-        });
+      // Sort by distance
+      const sortedMarkets = marketsFromGoogle.sort((a, b) => 
+        (a.distance ?? Infinity) - (b.distance ?? Infinity)
+      );
 
-        // Sort by distance (closest first)
-        const sortedMarkets = marketsWithDistances.sort((a, b) => 
-          (a.distance ?? Infinity) - (b.distance ?? Infinity)
-        );
-        
-        console.log('📍 Closest markets:', sortedMarkets.slice(0, 3).map(m => ({
-          name: m.name,
-          distance: m.distance !== Infinity ? m.distance?.toFixed(1) + ' mi' : 'unknown'
-        })));
+      console.log('📍 Closest markets:', sortedMarkets.slice(0, 3).map(m => ({
+        name: m.name,
+        distance: m.distance !== undefined ? m.distance.toFixed(1) + ' mi' : 'unknown'
+      })));
 
-        setRecommendedMarkets(sortedMarkets.slice(0, 3) as any);
-      } else {
-        // No user coordinates - show random markets
-        const shuffled = marketsWithVendors.sort(() => 0.5 - Math.random());
-        setRecommendedMarkets(shuffled.slice(0, 3) as any);
-      }
+      setRecommendedMarkets(sortedMarkets.slice(0, 3));
     } catch (error) {
       console.error('Error fetching recommended markets:', error);
+      setRecommendedMarkets([]);
     } finally {
       setMarketsLoading(false);
     }
