@@ -157,9 +157,17 @@ const Test2 = () => {
     }
   }, [recommendedMarkets]);
 
-  // Fast location detection - prioritizes browser GPS like Google Search does
+  // Fast location detection - prioritizes profile zipcode, then GPS, then IP
   const getUserLocationFast = async () => {
-    // Try browser GPS first (this is what Google Search uses for "near me" queries)
+    // FIRST: Check if logged-in user has a zipcode in their profile
+    const profileLocation = await getLocationFromProfile();
+    if (profileLocation) {
+      console.log('📍 Using profile zipcode location:', profileLocation.lat, profileLocation.lng);
+      setUserCoordinates(profileLocation);
+      return;
+    }
+
+    // SECOND: Try browser GPS (this is what Google Search uses for "near me" queries)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
