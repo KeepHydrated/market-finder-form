@@ -126,30 +126,20 @@ const Test2 = () => {
     }
   };
 
-  // Save detected zipcode to user's profile
+  // Save detected zipcode to user's profile (always update with current location)
   const saveZipcodeToProfile = async (zipcode: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Check if user already has a zipcode
-      const { data: profile } = await supabase
+      console.log('📍 Updating profile zipcode to:', zipcode);
+      const { error } = await supabase
         .from('profiles')
-        .select('zipcode')
-        .eq('user_id', user.id)
-        .single();
+        .update({ zipcode })
+        .eq('user_id', user.id);
 
-      // Only save if they don't have one already
-      if (!profile?.zipcode) {
-        console.log('📍 Auto-saving detected zipcode to profile:', zipcode);
-        const { error } = await supabase
-          .from('profiles')
-          .update({ zipcode })
-          .eq('user_id', user.id);
-
-        if (!error) {
-          console.log('✅ Zipcode saved to profile successfully');
-        }
+      if (!error) {
+        console.log('✅ Zipcode updated in profile successfully');
       }
     } catch (error) {
       console.error('Error saving zipcode to profile:', error);
@@ -190,19 +180,9 @@ const Test2 = () => {
     }
   }, [recommendedMarkets]);
 
-  // Fast location detection - prioritizes profile zipcode, then GPS, then IP
+  // Fast location detection - ALWAYS detect current location via GPS/IP
   const getUserLocationFast = async () => {
-    // FIRST: Check if logged-in user has a zipcode in their profile
-    const profileLocation = await getLocationFromProfile();
-    if (profileLocation) {
-      console.log('📍 Using profile zipcode location:', profileLocation.lat, profileLocation.lng);
-      setUserCoordinates(profileLocation);
-      // Also detect location name for display
-      detectLocationName(profileLocation.lat, profileLocation.lng, false);
-      return;
-    }
-
-    // SECOND: Try browser GPS (this is what Google Search uses for "near me" queries)
+    // ALWAYS try browser GPS first (most accurate, like Google "near me" queries)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
