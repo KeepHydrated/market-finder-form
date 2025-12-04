@@ -182,6 +182,25 @@ const Test2 = () => {
 
   // Fast location detection - ALWAYS detect current location via GPS/IP
   const getUserLocationFast = async () => {
+    // Helper function to use Google's Geolocation API (Wi-Fi/IP based, more accurate than free services)
+    const tryGoogleGeolocation = async () => {
+      try {
+        console.log('📍 Trying Google Geolocation API (Wi-Fi/IP based)');
+        const { data, error } = await supabase.functions.invoke('wifi-geolocation');
+        if (!error && data?.lat && data?.lng) {
+          console.log('📍 Google Geolocation success:', data.lat, data.lng, 'accuracy:', data.accuracy, 'm');
+          const coords = { lat: data.lat, lng: data.lng };
+          setUserCoordinates(coords);
+          detectLocationName(coords.lat, coords.lng, true);
+          return true;
+        }
+        console.log('📍 Google Geolocation failed:', error);
+      } catch (err) {
+        console.log('📍 Google Geolocation error:', err);
+      }
+      return false;
+    };
+
     // ALWAYS try browser GPS first (most accurate, like Google "near me" queries)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -196,62 +215,27 @@ const Test2 = () => {
           detectLocationName(coords.lat, coords.lng, true);
         },
         async (error) => {
-          console.log('📍 GPS denied or failed, trying IP geolocation');
-          // Fallback to IP-based geolocation (free service, no permission needed)
-          try {
-            const response = await fetch('https://ipapi.co/json/');
-            const data = await response.json();
-            if (data.latitude && data.longitude) {
-              console.log('📍 IP geolocation:', data.latitude, data.longitude, data.city, data.region, data.postal);
-              const coords = { lat: data.latitude, lng: data.longitude };
-              setUserCoordinates(coords);
-              // Use IP data directly instead of calling geocode API
-              if (data.city && data.region) {
-                setDetectedLocation({ city: data.city, state: data.region });
-              }
-              if (data.postal) {
-                setZipcodeInput(data.postal);
-                await saveZipcodeToProfile(data.postal);
-              }
-              return;
-            }
-          } catch (ipError) {
-            console.log('📍 IP geolocation failed');
+          console.log('📍 GPS denied or failed, trying Google Geolocation API');
+          // Use Google's Geolocation API (more accurate than free IP services)
+          const success = await tryGoogleGeolocation();
+          if (!success) {
+            // Last resort: default location
+            console.log('📍 Using default San Antonio location');
+            const defaultCoords = { lat: 29.4241, lng: -98.4936 };
+            setUserCoordinates(defaultCoords);
+            detectLocationName(defaultCoords.lat, defaultCoords.lng, false);
           }
-          
-          // Last resort: default location
-          console.log('📍 Using default San Antonio location');
-          const defaultCoords = { lat: 29.4241, lng: -98.4936 };
-          setUserCoordinates(defaultCoords);
-          detectLocationName(defaultCoords.lat, defaultCoords.lng, false);
         },
         { timeout: 5000, enableHighAccuracy: false } // Fast, approximate location
       );
     } else {
-      // No geolocation API - try IP fallback
-      try {
-        const response = await fetch('https://ipapi.co/json/');
-        const data = await response.json();
-        if (data.latitude && data.longitude) {
-          console.log('📍 IP geolocation (no GPS):', data.latitude, data.longitude, data.city, data.region, data.postal);
-          const coords = { lat: data.latitude, lng: data.longitude };
-          setUserCoordinates(coords);
-          // Use IP data directly instead of calling geocode API
-          if (data.city && data.region) {
-            setDetectedLocation({ city: data.city, state: data.region });
-          }
-          if (data.postal) {
-            setZipcodeInput(data.postal);
-            await saveZipcodeToProfile(data.postal);
-          }
-          return;
-        }
-      } catch (error) {
-        console.log('📍 All location methods failed');
+      // No browser geolocation API - try Google Geolocation
+      const success = await tryGoogleGeolocation();
+      if (!success) {
+        const defaultCoords = { lat: 29.4241, lng: -98.4936 };
+        setUserCoordinates(defaultCoords);
+        detectLocationName(defaultCoords.lat, defaultCoords.lng, false);
       }
-      const defaultCoords = { lat: 29.4241, lng: -98.4936 };
-      setUserCoordinates(defaultCoords);
-      detectLocationName(defaultCoords.lat, defaultCoords.lng, false);
     }
   };
 
