@@ -219,11 +219,17 @@ const Test2 = () => {
           // Use Google's Geolocation API (more accurate than free IP services)
           const success = await tryGoogleGeolocation();
           if (!success) {
-            // Last resort: default location
-            console.log('📍 Using default San Antonio location');
-            const defaultCoords = { lat: 29.4241, lng: -98.4936 };
-            setUserCoordinates(defaultCoords);
-            detectLocationName(defaultCoords.lat, defaultCoords.lng, false);
+            // Try profile zipcode as last resort
+            console.log('📍 Geolocation failed, trying profile zipcode');
+            const profileLocation = await getLocationFromProfile();
+            if (profileLocation) {
+              console.log('📍 Using profile zipcode location:', profileLocation);
+              setUserCoordinates(profileLocation);
+              detectLocationName(profileLocation.lat, profileLocation.lng, false);
+            } else {
+              console.log('📍 No location available - user needs to enable GPS or set zipcode');
+              // Don't set default - markets section will show prompt to enable location
+            }
           }
         },
         { timeout: 5000, enableHighAccuracy: false } // Fast, approximate location
@@ -232,9 +238,12 @@ const Test2 = () => {
       // No browser geolocation API - try Google Geolocation
       const success = await tryGoogleGeolocation();
       if (!success) {
-        const defaultCoords = { lat: 29.4241, lng: -98.4936 };
-        setUserCoordinates(defaultCoords);
-        detectLocationName(defaultCoords.lat, defaultCoords.lng, false);
+        // Try profile zipcode as last resort
+        const profileLocation = await getLocationFromProfile();
+        if (profileLocation) {
+          setUserCoordinates(profileLocation);
+          detectLocationName(profileLocation.lat, profileLocation.lng, false);
+        }
       }
     }
   };

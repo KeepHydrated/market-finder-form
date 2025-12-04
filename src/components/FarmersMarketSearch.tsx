@@ -93,15 +93,15 @@ export const FarmersMarketSearch = ({
                 lng: position.coords.longitude
               });
             },
-            (error) => {
-              console.log('All location methods failed, using default');
-              setUserLocation({ lat: 29.4241, lng: -98.4936 });
-            }
-          );
-        } else {
-          console.log('No location method available, using default');
-          setUserLocation({ lat: 29.4241, lng: -98.4936 });
-        }
+          (error) => {
+            console.log('All location methods failed');
+            // Don't set default - search will work without location
+          }
+        );
+      } else {
+        console.log('No location method available');
+        // Don't set default - search will work without location
+      }
       }
     });
   }, []);
