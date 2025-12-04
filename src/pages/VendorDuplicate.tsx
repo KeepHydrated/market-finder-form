@@ -1485,6 +1485,24 @@ const VendorDuplicate = () => {
               )}
             </div>
           </div>
+        ) : allVendors.length === 0 ? (
+          // Empty state when no vendors at this market
+          <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-6">
+              <Store className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">No Vendors on the Website Yet</h3>
+            <p className="text-muted-foreground max-w-md mb-6">
+              No vendors from this market have joined our website yet. Be the first to set up your shop here!
+            </p>
+            <Button 
+              onClick={() => navigate('/my-shop', { state: { prefillMarket: selectedMarketName } })}
+              className="bg-primary hover:bg-primary/90"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Become a Vendor
+            </Button>
+          </div>
         ) : (
           // Show vendor cards grid
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
