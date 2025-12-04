@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, Star, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, Star, MapPin, ChevronLeft, ChevronRight, Search, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { useLikes } from "@/hooks/useLikes";
 import { cn } from "@/lib/utils";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
@@ -84,6 +85,10 @@ const Test2 = () => {
   
   // Vendor ratings from reviews
   const [vendorRatings, setVendorRatings] = useState<Record<string, {averageRating: number; totalReviews: number}>>({});
+  
+  // Zipcode override
+  const [zipcodeInput, setZipcodeInput] = useState('');
+  const [isGeocoding, setIsGeocoding] = useState(false);
 
   useEffect(() => {
     fetchRecommendedProducts();
@@ -504,6 +509,30 @@ const Test2 = () => {
       setRecommendedMarkets([]);
     } finally {
       setMarketsLoading(false);
+    }
+  };
+
+  // Handle zipcode search
+  const handleZipcodeSearch = async () => {
+    const trimmed = zipcodeInput.trim();
+    if (!trimmed || trimmed.length < 5) return;
+    
+    setIsGeocoding(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('geocode-distance', {
+        body: { address: trimmed }
+      });
+      
+      if (!error && data?.latitude && data?.longitude) {
+        console.log('📍 Geocoded zipcode:', trimmed, '->', data.latitude, data.longitude);
+        setUserCoordinates({ lat: data.latitude, lng: data.longitude });
+      } else {
+        console.log('📍 Failed to geocode zipcode:', trimmed);
+      }
+    } catch (error) {
+      console.error('Error geocoding zipcode:', error);
+    } finally {
+      setIsGeocoding(false);
     }
   };
 
@@ -1026,11 +1055,35 @@ const Test2 = () => {
 
         {/* Recommended Local Markets Section */}
         <div className="mb-12">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <h2 className="text-2xl font-bold text-foreground">Markets Near You</h2>
-            <Button variant="ghost" onClick={() => navigate('/')}>
-              View All
-            </Button>
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Enter zipcode"
+                  value={zipcodeInput}
+                  onChange={(e) => setZipcodeInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleZipcodeSearch()}
+                  className="w-32 h-9 pr-8 text-sm"
+                  maxLength={10}
+                />
+                <button
+                  onClick={handleZipcodeSearch}
+                  disabled={isGeocoding || zipcodeInput.trim().length < 5}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                >
+                  {isGeocoding ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Search className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+              <Button variant="ghost" onClick={() => navigate('/')}>
+                View All
+              </Button>
+            </div>
           </div>
 
           {marketsLoading ? (
