@@ -94,7 +94,7 @@ serve(async (req) => {
             return {
               place_id: place.place_id,
               name: place.name,
-              address: place.formatted_address,
+              address: place.vicinity || place.formatted_address,
               rating: place.rating,
               user_ratings_total: place.user_ratings_total,
               opening_hours: details.opening_hours || place.opening_hours,
@@ -104,10 +104,10 @@ serve(async (req) => {
                 photo_reference: place.photos[0].photo_reference
               }] : []),
               geometry: place.geometry,
-              description: `${place.name}, ${place.formatted_address}`,
+              description: `${place.name}, ${place.vicinity || place.formatted_address}`,
               structured_formatting: {
                 main_text: place.name,
-                secondary_text: place.formatted_address
+                secondary_text: place.vicinity || place.formatted_address
               }
             };
           } catch (error) {
@@ -115,14 +115,14 @@ serve(async (req) => {
             return {
               place_id: place.place_id,
               name: place.name,
-              address: place.formatted_address,
+              address: place.vicinity || place.formatted_address,
               rating: place.rating,
               user_ratings_total: place.user_ratings_total,
               geometry: place.geometry,
-              description: `${place.name}, ${place.formatted_address}`,
+              description: `${place.name}, ${place.vicinity || place.formatted_address}`,
               structured_formatting: {
                 main_text: place.name,
-                secondary_text: place.formatted_address
+                secondary_text: place.vicinity || place.formatted_address
               }
             };
           }
