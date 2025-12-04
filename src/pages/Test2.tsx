@@ -132,37 +132,53 @@ const Test2 = () => {
     }
   }, [recommendedMarkets]);
 
-  // Fast location detection - prioritizes profile zipcode over GPS (no prompt delay)
+  // Fast location detection - prioritizes browser GPS like Google Search does
   const getUserLocationFast = async () => {
-    // First, try profile zipcode immediately (no user prompt needed)
-    const profileLocation = await getLocationFromProfile();
-    if (profileLocation) {
-      console.log('📍 Using profile zipcode location');
-      setUserCoordinates(profileLocation);
-      return;
-    }
-
-    // If no profile, use a default fallback location immediately for fast loading
-    // Then try GPS in background (may prompt user)
-    const defaultLocation = { lat: 29.4241, lng: -98.4936 }; // San Antonio fallback
-    console.log('📍 Using default location while waiting for GPS');
-    setUserCoordinates(defaultLocation);
-
-    // Try GPS in background - will update if user allows
+    // Try browser GPS first (this is what Google Search uses for "near me" queries)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          console.log('📍 GPS location received, updating:', position.coords);
+          console.log('📍 GPS location received:', position.coords.latitude, position.coords.longitude);
           setUserCoordinates({
             lat: position.coords.latitude,
             lng: position.coords.longitude
           });
         },
-        (error) => {
-          console.log('📍 GPS denied, keeping default location');
+        async (error) => {
+          console.log('📍 GPS denied or failed, trying IP geolocation');
+          // Fallback to IP-based geolocation (free service, no permission needed)
+          try {
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+            if (data.latitude && data.longitude) {
+              console.log('📍 IP geolocation:', data.latitude, data.longitude, data.city, data.region);
+              setUserCoordinates({ lat: data.latitude, lng: data.longitude });
+              return;
+            }
+          } catch (ipError) {
+            console.log('📍 IP geolocation failed');
+          }
+          
+          // Last resort: default location
+          console.log('📍 Using default San Antonio location');
+          setUserCoordinates({ lat: 29.4241, lng: -98.4936 });
         },
-        { timeout: 5000 } // Don't wait more than 5 seconds for GPS
+        { timeout: 5000, enableHighAccuracy: false } // Fast, approximate location
       );
+    } else {
+      // No geolocation API - try IP fallback
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        if (data.latitude && data.longitude) {
+          console.log('📍 IP geolocation (no GPS):', data.latitude, data.longitude);
+          setUserCoordinates({ lat: data.latitude, lng: data.longitude });
+          return;
+        }
+      } catch (error) {
+        console.log('📍 All location methods failed');
+      }
+      setUserCoordinates({ lat: 29.4241, lng: -98.4936 });
     }
   };
 
