@@ -1013,7 +1013,10 @@ const Test2 = () => {
                   onClick={() => navigate('/market', { 
                     state: { 
                       type: 'market', 
-                      selectedMarket: market 
+                      selectedMarket: {
+                        ...market,
+                        vendors: [] // Empty vendors array - no vendors have joined yet
+                      }
                     } 
                   })}
                 >

@@ -187,22 +187,43 @@ const VendorDuplicate = () => {
       console.log('Found selectedMarket in location.state:', location.state.selectedMarket);
       const selectedMarket = location.state.selectedMarket as any;
       
-      // Ensure selectedMarket has the vendors array
-      if (selectedMarket && selectedMarket.vendors) {
-        console.log('Selected market vendors:', selectedMarket.vendors.length);
+      // Handle market with or without vendors
+      if (selectedMarket) {
+        const vendors = selectedMarket.vendors || [];
+        console.log('Selected market vendors:', vendors.length);
         
-        setAllVendors(selectedMarket.vendors);
+        setAllVendors(vendors);
         setSelectedMarketName(selectedMarket.name);
+        setSelectedMarketAddress(selectedMarket.address || '');
         setActualSelectedMarket(selectedMarket);
         
-        // Use the first vendor as the market representative for fetching hours/reviews
-        setAcceptedSubmission(selectedMarket.vendors[0]);
+        // Use the first vendor as the market representative for fetching hours/reviews (if any)
+        if (vendors.length > 0) {
+          setAcceptedSubmission(vendors[0]);
+          // Fetch ratings for all vendors
+          const vendorIds = vendors.map((v: any) => v.id);
+          fetchVendorRatings(vendorIds);
+        } else {
+          // Create a minimal acceptedSubmission for market info display
+          setAcceptedSubmission({
+            id: `market-${selectedMarket.id || selectedMarket.name}`,
+            user_id: '',
+            store_name: selectedMarket.name,
+            primary_specialty: '',
+            website: '',
+            description: '',
+            products: [],
+            selected_market: selectedMarket.name,
+            market_address: selectedMarket.address,
+            market_days: selectedMarket.days || [],
+            google_rating: selectedMarket.google_rating,
+            google_rating_count: selectedMarket.google_rating_count,
+            search_term: '',
+            created_at: new Date().toISOString()
+          });
+        }
         setSelectedVendor(null); // Start with vendor grid view
         setLoadingData(false); // Clear loading state
-        
-        // Fetch ratings for all vendors
-        const vendorIds = selectedMarket.vendors.map((v: any) => v.id);
-        fetchVendorRatings(vendorIds);
         
         // Update URL with market name immediately
         const slug = marketNameToSlug(selectedMarket.name);
@@ -1928,6 +1949,24 @@ const VendorDuplicate = () => {
                         </div>
                       )}
                     </div>
+                  </div>
+                ) : allVendors.length === 0 ? (
+                  // Empty state when no vendors at this market
+                  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                    <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-6">
+                      <Store className="h-10 w-10 text-muted-foreground" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">No Vendors Yet</h3>
+                    <p className="text-muted-foreground max-w-md mb-6">
+                      No vendors have joined this market on our platform yet. Be the first to set up shop here!
+                    </p>
+                    <Button 
+                      onClick={() => navigate('/my-shop', { state: { prefillMarket: selectedMarketName } })}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Become a Vendor
+                    </Button>
                   </div>
                 ) : (
                   // Show vendor cards grid
