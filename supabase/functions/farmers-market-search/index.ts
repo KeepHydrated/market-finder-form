@@ -54,23 +54,23 @@ serve(async (req) => {
       }
     }
 
-    // If location is provided, use Nearby Search API for better local results
+    // If location is provided, use Nearby Search API with rankby=distance for results like Google Search
     if (location && location.lat && location.lng) {
       console.log(`🎯 Using Nearby Search for location: ${location.lat}, ${location.lng}`);
       
-      // Use Text Search API with location bias for better results
-      const searchQuery = query || 'farmers market';
-      const textSearchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&location=${location.lat},${location.lng}&radius=80000&key=${apiKey}`;
+      // Use Nearby Search API with rankby=distance to get closest results first (like Google Search)
+      // keyword parameter searches for "farmers market" in name, type, and address
+      const nearbySearchUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.lat},${location.lng}&rankby=distance&keyword=farmers%20market&key=${apiKey}`;
       
-      console.log('Text Search URL (masked):', textSearchUrl.replace(apiKey, 'API_KEY'));
+      console.log('Nearby Search URL (masked):', nearbySearchUrl.replace(apiKey, 'API_KEY'));
       
-      const searchResponse = await fetch(textSearchUrl);
+      const searchResponse = await fetch(nearbySearchUrl);
       const searchData = await searchResponse.json();
 
       if (!searchResponse.ok || searchData.status === 'REQUEST_DENIED') {
-        console.error('Google Places Text Search API error:', searchData);
+        console.error('Google Places Nearby Search API error:', searchData);
         return new Response(JSON.stringify({ 
-          error: 'Google Places Text Search API error', 
+          error: 'Google Places Nearby Search API error', 
           details: searchData 
         }), {
           status: searchResponse.status,
@@ -79,7 +79,7 @@ serve(async (req) => {
       }
 
       const results = searchData.results || [];
-      console.log(`📍 Text Search returned ${results.length} results`);
+      console.log(`📍 Nearby Search returned ${results.length} results`);
 
       // Fetch additional details for each result to get opening hours
       const farmersMarkets = await Promise.all(
