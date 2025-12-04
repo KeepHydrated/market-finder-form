@@ -97,29 +97,62 @@ const Test2 = () => {
     getUserLocationFast();
   }, []);
 
-  // Fetch markets and detect location name when user coordinates are available
+  // Fetch markets when user coordinates are available
   useEffect(() => {
     if (userCoordinates) {
       fetchRecommendedMarkets();
-      // Reverse geocode to get location name
-      detectLocationName(userCoordinates.lat, userCoordinates.lng);
     }
   }, [userCoordinates]);
 
-  const detectLocationName = async (lat: number, lng: number) => {
+  const detectLocationName = async (lat: number, lng: number, shouldSaveToProfile: boolean = false) => {
     try {
       const { data, error } = await supabase.functions.invoke('geocode-distance', {
         body: { lat, lng }
       });
       if (!error && data?.city && data?.state) {
-        console.log('📍 Detected location:', data.city, data.state);
+        console.log('📍 Detected location:', data.city, data.state, data.zipcode);
         setDetectedLocation({ city: data.city, state: data.state });
         if (data.zipcode) {
           setZipcodeInput(data.zipcode);
+          
+          // Auto-save zipcode to profile if requested and user is logged in
+          if (shouldSaveToProfile) {
+            await saveZipcodeToProfile(data.zipcode);
+          }
         }
       }
     } catch (error) {
       console.error('Error detecting location name:', error);
+    }
+  };
+
+  // Save detected zipcode to user's profile
+  const saveZipcodeToProfile = async (zipcode: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Check if user already has a zipcode
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('zipcode')
+        .eq('user_id', user.id)
+        .single();
+
+      // Only save if they don't have one already
+      if (!profile?.zipcode) {
+        console.log('📍 Auto-saving detected zipcode to profile:', zipcode);
+        const { error } = await supabase
+          .from('profiles')
+          .update({ zipcode })
+          .eq('user_id', user.id);
+
+        if (!error) {
+          console.log('✅ Zipcode saved to profile successfully');
+        }
+      }
+    } catch (error) {
+      console.error('Error saving zipcode to profile:', error);
     }
   };
 
@@ -170,12 +203,15 @@ const Test2 = () => {
     // SECOND: Try browser GPS (this is what Google Search uses for "near me" queries)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           console.log('📍 GPS location received:', position.coords.latitude, position.coords.longitude);
-          setUserCoordinates({
+          const coords = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
-          });
+          };
+          setUserCoordinates(coords);
+          // Auto-detect and save zipcode to profile
+          detectLocationName(coords.lat, coords.lng, true);
         },
         async (error) => {
           console.log('📍 GPS denied or failed, trying IP geolocation');
@@ -185,7 +221,10 @@ const Test2 = () => {
             const data = await response.json();
             if (data.latitude && data.longitude) {
               console.log('📍 IP geolocation:', data.latitude, data.longitude, data.city, data.region);
-              setUserCoordinates({ lat: data.latitude, lng: data.longitude });
+              const coords = { lat: data.latitude, lng: data.longitude };
+              setUserCoordinates(coords);
+              // Auto-detect and save zipcode to profile
+              detectLocationName(coords.lat, coords.lng, true);
               return;
             }
           } catch (ipError) {
