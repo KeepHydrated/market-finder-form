@@ -89,6 +89,7 @@ const Test2 = () => {
   // Zipcode override
   const [zipcodeInput, setZipcodeInput] = useState('');
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const [detectedLocation, setDetectedLocation] = useState<{city: string; state: string} | null>(null);
 
   useEffect(() => {
     fetchRecommendedProducts();
@@ -96,12 +97,31 @@ const Test2 = () => {
     getUserLocationFast();
   }, []);
 
-  // Fetch markets when user coordinates are available
+  // Fetch markets and detect location name when user coordinates are available
   useEffect(() => {
     if (userCoordinates) {
       fetchRecommendedMarkets();
+      // Reverse geocode to get location name
+      detectLocationName(userCoordinates.lat, userCoordinates.lng);
     }
   }, [userCoordinates]);
+
+  const detectLocationName = async (lat: number, lng: number) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('geocode-distance', {
+        body: { lat, lng }
+      });
+      if (!error && data?.city && data?.state) {
+        console.log('📍 Detected location:', data.city, data.state);
+        setDetectedLocation({ city: data.city, state: data.state });
+        if (data.zipcode) {
+          setZipcodeInput(data.zipcode);
+        }
+      }
+    } catch (error) {
+      console.error('Error detecting location name:', error);
+    }
+  };
 
   // Fetch photos for markets when they're loaded - fetch in parallel
   useEffect(() => {
@@ -1056,7 +1076,15 @@ const Test2 = () => {
         {/* Recommended Local Markets Section */}
         <div className="mb-12">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Markets Near You</h2>
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">Markets Near You</h2>
+              {detectedLocation && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  <MapPin className="h-3 w-3 inline mr-1" />
+                  {detectedLocation.city}, {detectedLocation.state}
+                </p>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               <div className="relative">
                 <Input
