@@ -296,20 +296,12 @@ const Likes = () => {
         });
         setLocationMethod('ip');
       } else {
-        // Set a default location (San Antonio area) for testing
-        setUserCoordinates({ 
-          lat: 29.4241, 
-          lng: -98.4936 
-        });
+        // Don't set default - let user enter zipcode manually
         setLocationMethod('ip');
       }
     } catch (error) {
-      console.log('IP geolocation failed, using default location');
-      // Set a default location (San Antonio area) for testing
-      setUserCoordinates({ 
-        lat: 29.4241, 
-        lng: -98.4936 
-      });
+      console.log('IP geolocation failed');
+      // Don't set default - let user enter zipcode manually
       setLocationMethod('ip');
     }
   };

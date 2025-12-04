@@ -1088,23 +1088,13 @@ const Homepage = () => {
         setLocationZipcode(data.postal || '');
         setLocationMethod('ip');
       } else {
-        console.log('❌ IP geolocation data missing coordinates, using default location');
-        // Set a default location (San Antonio area) for testing
-        console.log('🏠 Using default San Antonio coordinates for testing');
-        setUserCoordinates({ 
-          lat: 29.4241, 
-          lng: -98.4936 
-        });
+        console.log('❌ IP geolocation data missing coordinates');
+        // Don't set default - let user enter zipcode manually
         setLocationMethod('ip');
       }
     } catch (error) {
       console.log('❌ IP geolocation failed:', error);
-      // Set a default location (San Antonio area) for testing
-      console.log('🏠 Using default San Antonio coordinates for testing');
-      setUserCoordinates({ 
-        lat: 29.4241, 
-        lng: -98.4936 
-      });
+      // Don't set default - let user enter zipcode manually
       setLocationMethod('ip');
     }
   };
