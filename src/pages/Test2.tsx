@@ -88,30 +88,42 @@ const Test2 = () => {
   useEffect(() => {
     fetchRecommendedProducts();
     fetchRecommendedVendors();
-    getUserLocation();
+    getUserLocationFast();
   }, []);
 
   // Fetch markets when user coordinates are available
   useEffect(() => {
-    fetchRecommendedMarkets();
+    if (userCoordinates) {
+      fetchRecommendedMarkets();
+    }
   }, [userCoordinates]);
 
-  // Fetch photos for markets when they're loaded
+  // Fetch photos for markets when they're loaded - fetch in parallel
   useEffect(() => {
     const fetchMarketPhotos = async () => {
-      for (const market of recommendedMarkets) {
-        if (market.google_place_id && !marketPhotos[market.id]) {
+      const photoPromises = recommendedMarkets
+        .filter(market => market.google_place_id && !marketPhotos[market.id])
+        .map(async (market) => {
           try {
             const { data, error } = await supabase.functions.invoke('get-place-photo', {
               body: { place_id: market.google_place_id }
             });
             if (!error && data?.photoUrl) {
-              setMarketPhotos(prev => ({ ...prev, [market.id]: data.photoUrl }));
+              return { id: market.id, url: data.photoUrl };
             }
           } catch (error) {
             console.error('Error fetching market photo:', error);
           }
-        }
+          return null;
+        });
+      
+      const results = await Promise.all(photoPromises);
+      const newPhotos: Record<number, string | null> = {};
+      results.forEach(result => {
+        if (result) newPhotos[result.id] = result.url;
+      });
+      if (Object.keys(newPhotos).length > 0) {
+        setMarketPhotos(prev => ({ ...prev, ...newPhotos }));
       }
     };
     
@@ -120,35 +132,45 @@ const Test2 = () => {
     }
   }, [recommendedMarkets]);
 
-  // Get user's current location with fallback to profile zipcode
-  const getUserLocation = async () => {
-    // Try GPS first
+  // Fast location detection - prioritizes profile zipcode over GPS (no prompt delay)
+  const getUserLocationFast = async () => {
+    // First, try profile zipcode immediately (no user prompt needed)
+    const profileLocation = await getLocationFromProfile();
+    if (profileLocation) {
+      console.log('📍 Using profile zipcode location');
+      setUserCoordinates(profileLocation);
+      return;
+    }
+
+    // If no profile, use a default fallback location immediately for fast loading
+    // Then try GPS in background (may prompt user)
+    const defaultLocation = { lat: 29.4241, lng: -98.4936 }; // San Antonio fallback
+    console.log('📍 Using default location while waiting for GPS');
+    setUserCoordinates(defaultLocation);
+
+    // Try GPS in background - will update if user allows
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          console.log('📍 Got GPS location:', position.coords);
+          console.log('📍 GPS location received, updating:', position.coords);
           setUserCoordinates({
             lat: position.coords.latitude,
             lng: position.coords.longitude
           });
         },
-        async (error) => {
-          console.log('GPS location denied, trying profile zipcode fallback');
-          // Fallback to profile zipcode
-          await getLocationFromProfile();
-        }
+        (error) => {
+          console.log('📍 GPS denied, keeping default location');
+        },
+        { timeout: 5000 } // Don't wait more than 5 seconds for GPS
       );
-    } else {
-      // No geolocation support, try profile zipcode
-      await getLocationFromProfile();
     }
   };
 
-  // Get location from user's profile zipcode
-  const getLocationFromProfile = async () => {
+  // Get location from user's profile zipcode - returns coordinates or null
+  const getLocationFromProfile = async (): Promise<{lat: number, lng: number} | null> => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) return null;
 
       const { data: profile } = await supabase
         .from('profiles')
@@ -157,21 +179,20 @@ const Test2 = () => {
         .single();
 
       if (profile?.zipcode) {
-        console.log('📍 Using profile zipcode:', profile.zipcode);
+        console.log('📍 Found profile zipcode:', profile.zipcode);
         const { data, error } = await supabase.functions.invoke('geocode-distance', {
           body: { address: profile.zipcode }
         });
 
         if (!error && data?.latitude && data?.longitude) {
           console.log('📍 Got coordinates from zipcode:', data);
-          setUserCoordinates({
-            lat: data.latitude,
-            lng: data.longitude
-          });
+          return { lat: data.latitude, lng: data.longitude };
         }
       }
+      return null;
     } catch (error) {
       console.error('Error getting location from profile:', error);
+      return null;
     }
   };
 
