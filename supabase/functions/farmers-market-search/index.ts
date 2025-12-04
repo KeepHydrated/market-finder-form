@@ -79,12 +79,17 @@ serve(async (req) => {
         });
       }
 
-      const results = searchData.results || [];
-      console.log(`📍 Text Search returned ${results.length} results`);
+      // Sort by review count (prominence) to match Google's ranking which prioritizes popular markets
+      const sortedResults = (searchData.results || []).sort((a: any, b: any) => {
+        const aScore = (a.user_ratings_total || 0);
+        const bScore = (b.user_ratings_total || 0);
+        return bScore - aScore; // Higher review count first
+      });
+      console.log(`📍 Text Search returned ${sortedResults.length} results, sorted by prominence`);
 
       // Fetch additional details for each result to get opening hours
       const farmersMarkets = await Promise.all(
-        results.slice(0, 8).map(async (place: any) => {
+        sortedResults.slice(0, 8).map(async (place: any) => {
           try {
             // Fetch detailed info including opening hours
             const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=opening_hours,photos&key=${apiKey}`;
