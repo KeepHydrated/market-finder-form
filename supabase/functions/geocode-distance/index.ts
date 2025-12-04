@@ -23,17 +23,13 @@ serve(async (req) => {
 
     const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
     if (!apiKey) {
-      console.log('No Google Maps API key found, returning mock coordinates');
-      // Return mock coordinates for testing
-      const mockLat = 29.4241 + (Math.random() - 0.5) * 0.1; // Around San Antonio
-      const mockLng = -98.4936 + (Math.random() - 0.5) * 0.1;
-      
+      console.log('No Google Maps API key found, returning null coordinates');
       return new Response(
         JSON.stringify({ 
-          latitude: mockLat, 
-          longitude: mockLng,
-          cached: false,
-          mock: true 
+          latitude: null, 
+          longitude: null,
+          error: 'API key not configured',
+          cached: false
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -47,11 +43,19 @@ serve(async (req) => {
     const response = await fetch(geocodeUrl);
     const data = await response.json();
     
+    console.log(`Geocoding response status: ${data.status}`);
+    
     if (data.status !== 'OK' || !data.results || data.results.length === 0) {
-      console.log(`Geocoding failed: ${data.status}`);
+      console.log(`Geocoding failed: ${data.status}, error_message: ${data.error_message || 'none'}`);
+      // Return null coordinates instead of error - let frontend handle gracefully
       return new Response(
-        JSON.stringify({ error: 'Could not geocode address' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ 
+          latitude: null, 
+          longitude: null,
+          error: `Geocoding failed: ${data.status}`,
+          cached: false 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -70,9 +74,15 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in geocode-distance function:', error);
+    // Return null coordinates on error instead of 500
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ 
+        latitude: null, 
+        longitude: null,
+        error: 'Internal server error',
+        cached: false 
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 })
