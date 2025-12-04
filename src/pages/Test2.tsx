@@ -197,6 +197,8 @@ const Test2 = () => {
     if (profileLocation) {
       console.log('📍 Using profile zipcode location:', profileLocation.lat, profileLocation.lng);
       setUserCoordinates(profileLocation);
+      // Also detect location name for display
+      detectLocationName(profileLocation.lat, profileLocation.lng, false);
       return;
     }
 
@@ -233,7 +235,9 @@ const Test2 = () => {
           
           // Last resort: default location
           console.log('📍 Using default San Antonio location');
-          setUserCoordinates({ lat: 29.4241, lng: -98.4936 });
+          const defaultCoords = { lat: 29.4241, lng: -98.4936 };
+          setUserCoordinates(defaultCoords);
+          detectLocationName(defaultCoords.lat, defaultCoords.lng, false);
         },
         { timeout: 5000, enableHighAccuracy: false } // Fast, approximate location
       );
@@ -244,13 +248,18 @@ const Test2 = () => {
         const data = await response.json();
         if (data.latitude && data.longitude) {
           console.log('📍 IP geolocation (no GPS):', data.latitude, data.longitude);
-          setUserCoordinates({ lat: data.latitude, lng: data.longitude });
+          const coords = { lat: data.latitude, lng: data.longitude };
+          setUserCoordinates(coords);
+          // Auto-detect and save zipcode to profile
+          detectLocationName(coords.lat, coords.lng, true);
           return;
         }
       } catch (error) {
         console.log('📍 All location methods failed');
       }
-      setUserCoordinates({ lat: 29.4241, lng: -98.4936 });
+      const defaultCoords = { lat: 29.4241, lng: -98.4936 };
+      setUserCoordinates(defaultCoords);
+      detectLocationName(defaultCoords.lat, defaultCoords.lng, false);
     }
   };
 
