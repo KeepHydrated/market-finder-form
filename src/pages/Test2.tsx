@@ -202,11 +202,17 @@ const Test2 = () => {
             const response = await fetch('https://ipapi.co/json/');
             const data = await response.json();
             if (data.latitude && data.longitude) {
-              console.log('📍 IP geolocation:', data.latitude, data.longitude, data.city, data.region);
+              console.log('📍 IP geolocation:', data.latitude, data.longitude, data.city, data.region, data.postal);
               const coords = { lat: data.latitude, lng: data.longitude };
               setUserCoordinates(coords);
-              // Auto-detect and save zipcode to profile
-              detectLocationName(coords.lat, coords.lng, true);
+              // Use IP data directly instead of calling geocode API
+              if (data.city && data.region) {
+                setDetectedLocation({ city: data.city, state: data.region });
+              }
+              if (data.postal) {
+                setZipcodeInput(data.postal);
+                await saveZipcodeToProfile(data.postal);
+              }
               return;
             }
           } catch (ipError) {
@@ -227,11 +233,17 @@ const Test2 = () => {
         const response = await fetch('https://ipapi.co/json/');
         const data = await response.json();
         if (data.latitude && data.longitude) {
-          console.log('📍 IP geolocation (no GPS):', data.latitude, data.longitude);
+          console.log('📍 IP geolocation (no GPS):', data.latitude, data.longitude, data.city, data.region, data.postal);
           const coords = { lat: data.latitude, lng: data.longitude };
           setUserCoordinates(coords);
-          // Auto-detect and save zipcode to profile
-          detectLocationName(coords.lat, coords.lng, true);
+          // Use IP data directly instead of calling geocode API
+          if (data.city && data.region) {
+            setDetectedLocation({ city: data.city, state: data.region });
+          }
+          if (data.postal) {
+            setZipcodeInput(data.postal);
+            await saveZipcodeToProfile(data.postal);
+          }
           return;
         }
       } catch (error) {
