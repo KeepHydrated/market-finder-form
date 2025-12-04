@@ -1956,9 +1956,9 @@ const VendorDuplicate = () => {
                     <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-6">
                       <Store className="h-10 w-10 text-muted-foreground" />
                     </div>
-                    <h3 className="text-xl font-semibold text-foreground mb-2">No Vendors Yet</h3>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">No Vendors on the Website Yet</h3>
                     <p className="text-muted-foreground max-w-md mb-6">
-                      No vendors have joined this market on our platform yet. Be the first to set up shop here!
+                      No vendors from this market have joined our website yet. Be the first to set up your shop here!
                     </p>
                     <Button 
                       onClick={() => navigate('/my-shop', { state: { prefillMarket: selectedMarketName } })}
