@@ -1612,29 +1612,6 @@ const VendorDuplicate = () => {
                          <MessageSquare className="h-4 w-4 text-muted-foreground" />
                        </Button>
 
-                       {/* Report Button */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 mr-3"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (!user) {
-                              toast({
-                                title: "Authentication required",
-                                description: "Please log in to report vendors",
-                                variant: "destructive",
-                              });
-                              return;
-                            }
-                            setAcceptedSubmission(vendor);
-                            setSelectedVendor(vendor);
-                            setIsReportDialogOpen(true);
-                          }}
-                        >
-                          <Flag className="h-4 w-4 text-muted-foreground" />
-                        </Button>
-
                        {/* Like Button */}
                        <Button
                          variant="ghost"
