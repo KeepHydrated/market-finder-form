@@ -6,8 +6,24 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect } from 'react';
-import { Users, Store, MapPin, Package, ChevronDown, ShoppingCart, DollarSign, TrendingUp } from 'lucide-react';
-import { format } from 'date-fns';
+import { Users, Store, MapPin, Package, ChevronDown, ShoppingCart, DollarSign, TrendingUp, Eye, Monitor, Smartphone, Globe } from 'lucide-react';
+import { format, subDays, startOfWeek, startOfMonth, endOfWeek, endOfMonth, subWeeks, subMonths } from 'date-fns';
+
+interface PageViewData {
+  today: number;
+  yesterday: number;
+  thisWeek: number;
+  lastWeek: number;
+  thisMonth: number;
+  lastMonth: number;
+  total: number;
+  visitors: number;
+  bounceRate: number;
+  avgSessionDuration: number;
+  topPages: { page: string; views: number }[];
+  devices: { device: string; count: number }[];
+  countries: { country: string; count: number }[];
+}
 
 const Analytics = () => {
   const { user, loading: authLoading } = useAuth();
@@ -25,6 +41,33 @@ const Analytics = () => {
     averageOrderValue: 0,
     pendingOrders: 0,
     completedOrders: 0
+  });
+  const [pageViewData, setPageViewData] = useState<PageViewData>({
+    today: 49,
+    yesterday: 5,
+    thisWeek: 150,
+    lastWeek: 0,
+    thisMonth: 150,
+    lastMonth: 0,
+    total: 150,
+    visitors: 30,
+    bounceRate: 51,
+    avgSessionDuration: 1363,
+    topPages: [
+      { page: '/', views: 22 },
+      { page: '/my-shop', views: 8 },
+      { page: '/search', views: 5 },
+      { page: '/auth', views: 4 },
+      { page: '/vendor/sweet-treats-bakery', views: 3 },
+    ],
+    devices: [
+      { device: 'desktop', count: 20 },
+      { device: 'mobile', count: 9 },
+    ],
+    countries: [
+      { country: 'US', count: 24 },
+      { country: 'Unknown', count: 5 },
+    ],
   });
   const [loading, setLoading] = useState(true);
   const [recentUsers, setRecentUsers] = useState<any[]>([]);
@@ -246,8 +289,8 @@ const Analytics = () => {
               <CardTitle className="text-sm font-medium text-muted-foreground">Today</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-1">7</div>
-              <p className="text-xs text-muted-foreground">vs 21 yesterday</p>
+              <div className="text-3xl font-bold mb-1">{pageViewData.today}</div>
+              <p className="text-xs text-muted-foreground">vs {pageViewData.yesterday} yesterday</p>
             </CardContent>
           </Card>
 
@@ -256,8 +299,8 @@ const Analytics = () => {
               <CardTitle className="text-sm font-medium text-muted-foreground">This Week</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-1">57</div>
-              <p className="text-xs text-muted-foreground">vs 126 last week</p>
+              <div className="text-3xl font-bold mb-1">{pageViewData.thisWeek}</div>
+              <p className="text-xs text-muted-foreground">vs {pageViewData.lastWeek} last week</p>
             </CardContent>
           </Card>
 
@@ -266,23 +309,92 @@ const Analytics = () => {
               <CardTitle className="text-sm font-medium text-muted-foreground">This Month</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-1">355</div>
-              <p className="text-xs text-muted-foreground">vs 3042 last month</p>
+              <div className="text-3xl font-bold mb-1">{pageViewData.thisMonth}</div>
+              <p className="text-xs text-muted-foreground">vs {pageViewData.lastMonth} last month</p>
             </CardContent>
           </Card>
 
           <Card className="min-w-[200px] flex-shrink-0">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Views</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Unique Visitors</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-1">3397</div>
-              <p className="text-xs text-muted-foreground">All time page views</p>
+              <div className="text-3xl font-bold mb-1">{pageViewData.visitors}</div>
+              <p className="text-xs text-muted-foreground">This week</p>
+            </CardContent>
+          </Card>
+
+          <Card className="min-w-[200px] flex-shrink-0">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Bounce Rate</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">{pageViewData.bounceRate}%</div>
+              <p className="text-xs text-muted-foreground">Avg. this week</p>
             </CardContent>
           </Card>
         </div>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
+
+      {/* Top Pages & Device Breakdown */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Eye className="h-5 w-5" />
+              Top Pages
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {pageViewData.topPages.map((page, index) => (
+                <div key={page.page} className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground truncate max-w-[200px]">{page.page}</span>
+                  <span className="font-medium">{page.views}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Monitor className="h-5 w-5" />
+              Devices & Countries
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Devices</p>
+                <div className="flex gap-4">
+                  {pageViewData.devices.map((device) => (
+                    <div key={device.device} className="flex items-center gap-2">
+                      {device.device === 'desktop' ? <Monitor className="h-4 w-4" /> : <Smartphone className="h-4 w-4" />}
+                      <span className="text-sm capitalize">{device.device}</span>
+                      <span className="font-medium">{device.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Countries</p>
+                <div className="flex gap-4">
+                  {pageViewData.countries.map((country) => (
+                    <div key={country.country} className="flex items-center gap-2">
+                      <Globe className="h-4 w-4" />
+                      <span className="text-sm">{country.country}</span>
+                      <span className="font-medium">{country.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-4">Platform Statistics</h2>
