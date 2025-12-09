@@ -111,10 +111,19 @@ export default function ShopManager() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
 
   useEffect(() => {
     if (user) {
       fetchShopData();
+      // Auto-submit if user just authenticated and we have a pending submit
+      if (pendingSubmit) {
+        setPendingSubmit(false);
+        // Small delay to ensure state is updated
+        setTimeout(() => {
+          handleSubmit();
+        }, 100);
+      }
     } else {
       setLoadingShop(false);
     }
@@ -364,6 +373,7 @@ export default function ShopManager() {
   const handleSubmit = async () => {
     // Show auth modal if user is not logged in
     if (!user) {
+      setPendingSubmit(true);
       setShowAuthModal(true);
       return;
     }
