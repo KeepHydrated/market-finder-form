@@ -21,6 +21,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { BusinessCards } from '@/components/BusinessCards';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -109,6 +110,7 @@ export default function ShopManager() {
   const [selectedFarmersMarkets, setSelectedFarmersMarkets] = useState<any[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -360,7 +362,11 @@ export default function ShopManager() {
   };
 
   const handleSubmit = async () => {
-    if (!user) return;
+    // Show auth modal if user is not logged in
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
 
     if (!formData.store_name.trim()) {
       toast({
@@ -1342,6 +1348,22 @@ export default function ShopManager() {
           orderItems={chatOrderItems}
         />
       )}
+
+      {/* Auth Modal for unauthenticated vendors */}
+      <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Sign in to publish your shop</DialogTitle>
+            <DialogDescription>
+              Create an account or sign in to publish your shop and start selling.
+            </DialogDescription>
+          </DialogHeader>
+          <AuthForm onSuccess={() => {
+            setShowAuthModal(false);
+            // The submit will be triggered again after auth state updates
+          }} />
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
