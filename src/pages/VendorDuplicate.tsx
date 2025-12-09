@@ -1359,6 +1359,21 @@ const VendorDuplicate = () => {
               <div className="flex items-center justify-between mb-4 gap-1 md:gap-0">
                 <div className="flex items-center gap-2">
                   <h1 className="text-lg md:text-xl font-bold text-foreground truncate">{selectedVendor.store_name}</h1>
+                  {/* Rating */}
+                  <div 
+                    className="flex items-center gap-1 md:gap-2 cursor-pointer hover:bg-muted/50 px-1 md:px-2 py-1 rounded-md transition-colors"
+                    onClick={() => setIsReviewModalOpen(true)}
+                  >
+                    <Star className="h-3.5 w-3.5 md:h-4 md:w-4 text-yellow-400 fill-current" />
+                    <span className="text-foreground font-medium text-sm md:text-base">
+                      {vendorReviews?.rating ? Number(vendorReviews.rating).toFixed(1) : '0.0'}
+                    </span>
+                    <span className="text-muted-foreground text-sm md:text-base">
+                      ({vendorReviews?.reviewCount ?? 0})
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-0 md:gap-2 flex-shrink-0">
                   {/* 3-dot Menu */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -1366,7 +1381,7 @@ const VendorDuplicate = () => {
                         <MoreHorizontal className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="bg-background border shadow-md">
+                    <DropdownMenuContent align="end" className="bg-background border shadow-md">
                       <DropdownMenuItem
                         onClick={() => {
                           const vendorSlug = selectedVendor.store_name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
@@ -1417,20 +1432,6 @@ const VendorDuplicate = () => {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </div>
-                <div className="flex items-center gap-0 md:gap-2 flex-shrink-0">
-                  <div 
-                    className="flex items-center gap-1 md:gap-2 cursor-pointer hover:bg-muted/50 px-1 md:px-2 py-1 rounded-md transition-colors"
-                    onClick={() => setIsReviewModalOpen(true)}
-                  >
-                    <Star className="h-3.5 w-3.5 md:h-4 md:w-4 text-yellow-400 fill-current" />
-                    <span className="text-foreground font-medium text-sm md:text-base">
-                      {vendorReviews?.rating ? Number(vendorReviews.rating).toFixed(1) : '0.0'}
-                    </span>
-                    <span className="text-muted-foreground text-sm md:text-base">
-                      ({vendorReviews?.reviewCount ?? 0})
-                    </span>
-                  </div>
                   
                   {/* Message Button */}
                   <Button
