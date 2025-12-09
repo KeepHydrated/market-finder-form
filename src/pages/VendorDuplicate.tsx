@@ -1357,7 +1357,53 @@ const VendorDuplicate = () => {
             {/* Vendor Details */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4 gap-1 md:gap-0">
-                <h1 className="text-lg md:text-xl font-bold text-foreground truncate flex-1 min-w-0">{selectedVendor.store_name}</h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-lg md:text-xl font-bold text-foreground truncate">{selectedVendor.store_name}</h1>
+                  {/* 3-dot Menu */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground">
+                        <MoreHorizontal className="h-5 w-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="bg-background border shadow-md">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          if (!user) {
+                            toast({
+                              title: "Authentication required",
+                              description: "Please log in to message vendors",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+                          setChatVendorId(selectedVendor.id);
+                          setChatVendorName(selectedVendor.store_name);
+                          setIsChatOpen(true);
+                        }}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Message
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          if (!user) {
+                            toast({
+                              title: "Authentication required",
+                              description: "Please log in to report vendors",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+                          setIsReportDialogOpen(true);
+                        }}
+                      >
+                        <Flag className="h-4 w-4 mr-2" />
+                        Report
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
                 <div className="flex items-center gap-0 md:gap-2 flex-shrink-0">
                   <div 
                     className="flex items-center gap-1 md:gap-2 cursor-pointer hover:bg-muted/50 px-1 md:px-2 py-1 rounded-md transition-colors"
@@ -1371,52 +1417,6 @@ const VendorDuplicate = () => {
                       ({vendorReviews?.reviewCount ?? 0})
                     </span>
                   </div>
-                   {/* Report button */}
-                  {selectedVendor && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        if (!user) {
-                          toast({
-                            title: "Authentication required",
-                            description: "Please log in to report vendors",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-                        setIsReportDialogOpen(true);
-                      }}
-                      className="text-muted-foreground hover:text-foreground transition-colors p-1 md:p-2 h-auto"
-                    >
-                      <Flag className="h-4 w-4 md:h-5 md:w-5" />
-                    </Button>
-                  )}
-
-                  {/* Message button - TEMPORARILY showing for all vendors for testing */}
-                  {selectedVendor && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        if (!user) {
-                          toast({
-                            title: "Authentication required",
-                            description: "Please log in to message vendors",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-                        
-                        setChatVendorId(selectedVendor.id);  // Use submission ID, not user_id
-                        setChatVendorName(selectedVendor.store_name);
-                        setIsChatOpen(true);
-                      }}
-                      className="text-muted-foreground hover:text-foreground transition-colors p-1 md:p-2 h-auto"
-                    >
-                      <MessageSquare className="h-4 w-4 md:h-6 md:w-6" />
-                    </Button>
-                  )}
                   
                   <Button
                     variant="ghost"
