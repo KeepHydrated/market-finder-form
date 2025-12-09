@@ -384,7 +384,18 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
   };
 
   const uploadImages = async (imageFiles: File[]): Promise<string[]> => {
-    if (!user) return [];
+    // If user is not logged in, convert images to base64 data URLs for temporary storage
+    if (!user) {
+      const dataUrlPromises = imageFiles.map(async (image) => {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(image);
+        });
+      });
+      return Promise.all(dataUrlPromises);
+    }
     
     const uploadPromises = imageFiles.map(async (image, index) => {
       const fileExt = image.name.split('.').pop();
@@ -416,14 +427,7 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
       return;
     }
 
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to duplicate products.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Allow unauthenticated users to duplicate products (they'll be stored locally until signup)
 
     // Check if any changes have been made
     if (duplicateProduct) {
@@ -499,14 +503,7 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
       return;
     }
 
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to edit products.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Allow unauthenticated users to edit products (they'll be stored locally until signup)
 
     setIsUploading(true);
     
