@@ -1860,50 +1860,51 @@ const VendorDuplicate = () => {
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            {/* Report button */}
+                            {/* 3-dot Menu */}
                             {selectedVendor && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  if (!user) {
-                                    toast({
-                                      title: "Authentication required",
-                                      description: "Please log in to report vendors",
-                                      variant: "destructive",
-                                    });
-                                    return;
-                                  }
-                                  setIsReportDialogOpen(true);
-                                }}
-                                className="text-muted-foreground hover:text-foreground transition-colors mr-3"
-                              >
-                                <Flag className="h-5 w-5" />
-                              </Button>
-                            )}
-
-                            {selectedVendor && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  if (!user) {
-                                    toast({
-                                      title: "Authentication required",
-                                      description: "Please log in to message vendors",
-                                      variant: "destructive",
-                                    });
-                                    return;
-                                  }
-                                  
-                                  setChatVendorId(selectedVendor.id);
-                                  setChatVendorName(selectedVendor.store_name);
-                                  setIsChatOpen(true);
-                                }}
-                                className="text-muted-foreground hover:text-foreground transition-colors"
-                              >
-                                <MessageSquare className="h-6 w-6" />
-                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground transition-colors">
+                                    <MoreHorizontal className="h-5 w-5" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      if (!user) {
+                                        toast({
+                                          title: "Authentication required",
+                                          description: "Please log in to message vendors",
+                                          variant: "destructive",
+                                        });
+                                        return;
+                                      }
+                                      setChatVendorId(selectedVendor.id);
+                                      setChatVendorName(selectedVendor.store_name);
+                                      setIsChatOpen(true);
+                                    }}
+                                  >
+                                    <MessageSquare className="h-4 w-4 mr-2" />
+                                    Message
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      if (!user) {
+                                        toast({
+                                          title: "Authentication required",
+                                          description: "Please log in to report vendors",
+                                          variant: "destructive",
+                                        });
+                                        return;
+                                      }
+                                      setIsReportDialogOpen(true);
+                                    }}
+                                  >
+                                    <Flag className="h-4 w-4 mr-2" />
+                                    Report
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             )}
                             
                             <Button
