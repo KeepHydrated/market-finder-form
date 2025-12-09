@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation, useSearchParams, useParams } from "react-router-dom";
-import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight, MessageSquare, ArrowUp, Flag } from "lucide-react";
+import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight, MessageSquare, ArrowUp, Flag, MoreHorizontal } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { FloatingChat } from "@/components/FloatingChat";
 import { ReportVendorDialog } from "@/components/ReportVendorDialog";
 import { Input } from "@/components/ui/input";
@@ -1589,28 +1590,54 @@ const VendorDuplicate = () => {
                      
                      {/* Action Buttons */}
                      <div className="flex items-center gap-1">
-                       {/* Message Button */}
-                       <Button
-                         variant="ghost"
-                         size="sm"
-                         className="h-8 w-8 p-0"
-                         onClick={(e) => {
-                           e.stopPropagation();
-                           if (!user) {
-                             toast({
-                               title: "Authentication required",
-                               description: "Please log in to message vendors",
-                               variant: "destructive",
-                             });
-                             return;
-                           }
-                           setChatVendorId(vendor.id);
-                           setChatVendorName(vendor.store_name);
-                           setIsChatOpen(true);
-                         }}
-                       >
-                         <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                       </Button>
+                       {/* 3-dot Menu */}
+                       <DropdownMenu>
+                         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                           <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                             <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                           </Button>
+                         </DropdownMenuTrigger>
+                         <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                           <DropdownMenuItem
+                             onClick={(e) => {
+                               e.stopPropagation();
+                               if (!user) {
+                                 toast({
+                                   title: "Authentication required",
+                                   description: "Please log in to message vendors",
+                                   variant: "destructive",
+                                 });
+                                 return;
+                               }
+                               setChatVendorId(vendor.id);
+                               setChatVendorName(vendor.store_name);
+                               setIsChatOpen(true);
+                             }}
+                           >
+                             <MessageSquare className="h-4 w-4 mr-2" />
+                             Message
+                           </DropdownMenuItem>
+                           <DropdownMenuItem
+                             onClick={(e) => {
+                               e.stopPropagation();
+                               if (!user) {
+                                 toast({
+                                   title: "Authentication required",
+                                   description: "Please log in to report vendors",
+                                   variant: "destructive",
+                                 });
+                                 return;
+                               }
+                               setAcceptedSubmission(vendor);
+                               setSelectedVendor(vendor);
+                               setIsReportDialogOpen(true);
+                             }}
+                           >
+                             <Flag className="h-4 w-4 mr-2" />
+                             Report
+                           </DropdownMenuItem>
+                         </DropdownMenuContent>
+                       </DropdownMenu>
 
                        {/* Like Button */}
                        <Button
