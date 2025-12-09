@@ -1385,7 +1385,10 @@ const VendorDuplicate = () => {
                       <DropdownMenuItem
                         onClick={() => {
                           const vendorSlug = selectedVendor.store_name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                          const url = `${window.location.origin}/vendor/${vendorSlug}`;
+                          const baseUrl = window.location.hostname.includes('lovable.app') 
+                            ? 'https://www.fromfarmersmarkets.com' 
+                            : window.location.origin;
+                          const url = `${baseUrl}/vendor/${vendorSlug}`;
                           navigator.clipboard.writeText(url);
                           toast({
                             title: "Link copied",
