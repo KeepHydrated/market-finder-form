@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation, useSearchParams, useParams } from "react-router-dom";
-import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight, MessageSquare, ArrowUp, Flag, MoreHorizontal } from "lucide-react";
+import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight, MessageSquare, ArrowUp, Flag, MoreHorizontal, Link } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { FloatingChat } from "@/components/FloatingChat";
 import { ReportVendorDialog } from "@/components/ReportVendorDialog";
@@ -1367,6 +1367,20 @@ const VendorDuplicate = () => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="bg-background border shadow-md">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          const vendorSlug = selectedVendor.store_name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                          const url = `${window.location.origin}/vendor/${vendorSlug}`;
+                          navigator.clipboard.writeText(url);
+                          toast({
+                            title: "Link copied",
+                            description: "Vendor link copied to clipboard",
+                          });
+                        }}
+                      >
+                        <Link className="h-4 w-4 mr-2" />
+                        Copy link
+                      </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
                           if (!user) {
