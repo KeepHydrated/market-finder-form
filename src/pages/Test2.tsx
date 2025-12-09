@@ -605,10 +605,10 @@ const Test2 = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
             <div className="flex-1 p-6 md:p-8 text-center md:text-left">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                Submit Your Farmers Market for More Exposure
+                Help Us Get Started
               </h2>
               <p className="text-muted-foreground text-sm md:text-base mb-4 md:mb-6">
-                Get your market in front of thousands of local shoppers and help your community discover fresh, local products
+                Submit your farmers market to help grow our community empowering small businesses and local vendors
               </p>
               <Button 
                 size="lg"
