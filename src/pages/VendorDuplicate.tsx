@@ -1401,24 +1401,6 @@ const VendorDuplicate = () => {
                           if (!user) {
                             toast({
                               title: "Authentication required",
-                              description: "Please log in to message vendors",
-                              variant: "destructive",
-                            });
-                            return;
-                          }
-                          setChatVendorId(selectedVendor.id);
-                          setChatVendorName(selectedVendor.store_name);
-                          setIsChatOpen(true);
-                        }}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Message
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          if (!user) {
-                            toast({
-                              title: "Authentication required",
                               description: "Please log in to report vendors",
                               variant: "destructive",
                             });
@@ -1432,6 +1414,28 @@ const VendorDuplicate = () => {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
+
+                  {/* Message Button */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (!user) {
+                        toast({
+                          title: "Authentication required",
+                          description: "Please log in to message vendors",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      setChatVendorId(selectedVendor.id);
+                      setChatVendorName(selectedVendor.store_name);
+                      setIsChatOpen(true);
+                    }}
+                    className="text-muted-foreground hover:text-foreground transition-colors p-1 md:p-2 h-auto"
+                  >
+                    <MessageSquare className="h-4 w-4 md:h-6 md:w-6" />
+                  </Button>
 
                   {/* Like Button */}
                   <Button
