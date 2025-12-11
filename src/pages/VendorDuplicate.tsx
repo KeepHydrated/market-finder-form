@@ -121,21 +121,23 @@ const VendorDuplicate = () => {
   const [navigationMarketsOrder, setNavigationMarketsOrder] = useState<string[]>([]);
   const isMobile = useIsMobile();
   const [isTablet, setIsTablet] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
   const contentScrollRef = useRef<HTMLDivElement>(null);
   const desktopScrollRef = useRef<HTMLDivElement>(null); // For tablet layout
   const desktopScrollRef2 = useRef<HTMLDivElement>(null); // For desktop/mobile layout
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
 
-  // Check if viewport is tablet (768px - 1024px)
+  // Check if viewport is tablet (768px - 1024px) and track screen width
   useEffect(() => {
-    const checkTablet = () => {
+    const handleResize = () => {
       const width = window.innerWidth;
       setIsTablet(width >= 768 && width <= 1024);
+      setScreenWidth(width);
     };
     
-    checkTablet();
-    window.addEventListener('resize', checkTablet);
-    return () => window.removeEventListener('resize', checkTablet);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const hasInitialized = useRef(false);
@@ -2481,6 +2483,11 @@ const VendorDuplicate = () => {
           <ArrowUp className="h-5 w-5" />
         </Button>
       )}
+
+      {/* Screen Width Counter - Debug */}
+      <div className="fixed bottom-4 right-4 z-[200] bg-background/90 border rounded-md px-3 py-1.5 text-sm font-mono shadow-lg">
+        {screenWidth}px
+      </div>
     </>
   );
 };
