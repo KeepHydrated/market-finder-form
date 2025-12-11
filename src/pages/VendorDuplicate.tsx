@@ -1883,6 +1883,28 @@ const VendorDuplicate = () => {
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             )}
+
+                            {/* Message Button */}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                if (!user) {
+                                  toast({
+                                    title: "Authentication required",
+                                    description: "Please log in to message vendors",
+                                    variant: "destructive",
+                                  });
+                                  return;
+                                }
+                                setChatVendorId(selectedVendor.id);
+                                setChatVendorName(selectedVendor.store_name);
+                                setIsChatOpen(true);
+                              }}
+                              className="text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                              <MessageSquare className="h-5 w-5" />
+                            </Button>
                             
                             <Button
                               variant="ghost"
