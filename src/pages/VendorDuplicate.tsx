@@ -1356,9 +1356,9 @@ const VendorDuplicate = () => {
 
             {/* Vendor Details */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-4 gap-1 md:gap-0">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-lg md:text-xl font-bold text-foreground truncate">{selectedVendor.store_name}</h1>
+              <div className="flex items-center justify-between mb-4 gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <h1 className="text-lg md:text-xl font-bold text-foreground whitespace-nowrap">{selectedVendor.store_name}</h1>
                   {/* Rating */}
                   <div 
                     className="flex items-center gap-1 md:gap-2 cursor-pointer hover:bg-muted/50 px-1 md:px-2 py-1 rounded-md transition-colors"
