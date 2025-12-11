@@ -1356,22 +1356,20 @@ const VendorDuplicate = () => {
 
             {/* Vendor Details */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-4 gap-2">
-                <div className="flex items-center gap-2 min-w-0">
-                  <h1 className="text-lg md:text-xl font-bold text-foreground whitespace-nowrap">{selectedVendor.store_name}</h1>
-                  {/* Rating */}
-                  <div 
-                    className="flex items-center gap-1 md:gap-2 cursor-pointer hover:bg-muted/50 px-1 md:px-2 py-1 rounded-md transition-colors"
-                    onClick={() => setIsReviewModalOpen(true)}
-                  >
-                    <Star className="h-3.5 w-3.5 md:h-4 md:w-4 text-yellow-400 fill-current" />
-                    <span className="text-foreground font-medium text-sm md:text-base">
-                      {vendorReviews?.rating ? Number(vendorReviews.rating).toFixed(1) : '0.0'}
-                    </span>
-                    <span className="text-muted-foreground text-sm md:text-base">
-                      ({vendorReviews?.reviewCount ?? 0})
-                    </span>
-                  </div>
+              <div className="flex items-center mb-4 gap-2">
+                <h1 className="text-lg md:text-xl font-bold text-foreground whitespace-nowrap">{selectedVendor.store_name}</h1>
+                {/* Rating */}
+                <div 
+                  className="flex items-center gap-1 md:gap-2 cursor-pointer hover:bg-muted/50 px-1 md:px-2 py-1 rounded-md transition-colors"
+                  onClick={() => setIsReviewModalOpen(true)}
+                >
+                  <Star className="h-3.5 w-3.5 md:h-4 md:w-4 text-yellow-400 fill-current" />
+                  <span className="text-foreground font-medium text-sm md:text-base">
+                    {vendorReviews?.rating ? Number(vendorReviews.rating).toFixed(1) : '0.0'}
+                  </span>
+                  <span className="text-muted-foreground text-sm md:text-base">
+                    ({vendorReviews?.reviewCount ?? 0})
+                  </span>
                 </div>
                 <div className="flex items-center gap-0 md:gap-2 flex-shrink-0">
                   {/* 3-dot Menu */}
