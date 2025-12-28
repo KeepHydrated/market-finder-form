@@ -1,5 +1,8 @@
 project_id = "cxkvyrtdgbqxtcelytwl"
 
+[functions.send-vendor-invite]
+verify_jwt = false
+
 [functions.create-gelato-order]
 verify_jwt = true
 
