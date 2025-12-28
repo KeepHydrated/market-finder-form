@@ -53,7 +53,7 @@ export default function VendorSignup() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const marketId = searchParams.get("market");
+  const marketParam = searchParams.get("market");
 
   // Restore saved form data on mount (after auth redirect)
   useEffect(() => {
@@ -74,21 +74,30 @@ export default function VendorSignup() {
     }
   }, [user, toast]);
 
-  // Fetch market data from URL param
+  // Fetch market data from URL param (supports both ID and name)
   useEffect(() => {
     const fetchMarket = async () => {
-      if (!marketId) {
+      if (!marketParam) {
         setIsLoadingMarket(false);
         setMarketError("No market specified in the invite link.");
         return;
       }
 
       setIsLoadingMarket(true);
-      const { data, error } = await supabase
-        .from("markets")
-        .select("*")
-        .eq("id", parseInt(marketId))
-        .single();
+      
+      // Check if marketParam is a number (ID) or string (name)
+      const isNumeric = /^\d+$/.test(marketParam);
+      
+      let query = supabase.from("markets").select("*");
+      
+      if (isNumeric) {
+        query = query.eq("id", parseInt(marketParam));
+      } else {
+        // Search by name (case insensitive)
+        query = query.ilike("name", marketParam);
+      }
+      
+      const { data, error } = await query.maybeSingle();
 
       if (error || !data) {
         console.error("Error fetching market:", error);
@@ -102,7 +111,7 @@ export default function VendorSignup() {
     };
 
     fetchMarket();
-  }, [marketId]);
+  }, [marketParam]);
 
   const handleAddProduct = useCallback(() => {
     setShowAddProductForm(true);
@@ -175,7 +184,7 @@ export default function VendorSignup() {
         marketId: market.id
       };
       sessionStorage.setItem('pendingVendorApplication', JSON.stringify(formData));
-      navigate(`/auth?redirect=${encodeURIComponent(`/vendor-signup?market=${marketId}`)}`);
+      navigate(`/auth?redirect=${encodeURIComponent(`/vendor-signup?market=${market.id}`)}`);
       return;
     }
 
@@ -228,7 +237,7 @@ export default function VendorSignup() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [user, market, vendorApplicationData, products, toast, marketId, navigate]);
+  }, [user, market, vendorApplicationData, products, toast, navigate]);
 
   // Loading state
   if (authLoading || isLoadingMarket) {
