@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -130,10 +130,32 @@ const SearchPage = () => {
   const [currentVendorId, setCurrentVendorId] = useState<string | undefined>(undefined);
   const [currentVendorName, setCurrentVendorName] = useState<string | undefined>(undefined);
 
+  // Filter panel ref for click-outside detection
+  const filterPanelRef = useRef<HTMLDivElement>(null);
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     fetchVendors();
     getUserLocation();
   }, []);
+
+  // Close filter panel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        showFilters &&
+        filterPanelRef.current &&
+        filterButtonRef.current &&
+        !filterPanelRef.current.contains(event.target as Node) &&
+        !filterButtonRef.current.contains(event.target as Node)
+      ) {
+        setShowFilters(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showFilters]);
 
   useEffect(() => {
     if (userCoordinates) {
@@ -482,6 +504,7 @@ const SearchPage = () => {
           <div className="flex items-center gap-3">
             {/* Filter Toggle Button */}
             <Button 
+              ref={filterButtonRef}
               variant="outline" 
               className="gap-2"
               onClick={() => setShowFilters(!showFilters)}
@@ -554,7 +577,7 @@ const SearchPage = () => {
 
         {/* Expandable Filter Panel */}
         {showFilters && (
-          <div className="mb-6 p-4 border rounded-lg bg-background">
+          <div ref={filterPanelRef} className="mb-6 p-4 border rounded-lg bg-background">
             {/* Filter Tabs */}
             <div className="flex items-center gap-6 border-b pb-3 mb-4">
               <button
