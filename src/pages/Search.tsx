@@ -527,6 +527,18 @@ const SearchPage = () => {
                 <SelectItem value="most_recent" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Most Recent</SelectItem>
               </SelectContent>
             </Select>
+
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 w-[200px]"
+              />
+            </div>
           </div>
 
           {/* Right side: Result count and active filters */}
