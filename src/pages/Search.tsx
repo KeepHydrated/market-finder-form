@@ -445,11 +445,6 @@ const SearchPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Discover Local</h1>
-          <p className="text-muted-foreground">Find vendors, markets, and products near you</p>
-        </div>
 
         {/* Search Bar */}
         <div className="flex gap-4 mb-6">
