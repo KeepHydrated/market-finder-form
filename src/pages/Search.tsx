@@ -702,8 +702,7 @@ const SearchPage = () => {
               <div className="space-y-4">
                 {/* Day Tabs */}
                 <div className="flex gap-2 overflow-x-auto pb-2">
-                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayShort, index) => {
-                    const fullDay = DAYS[index === 6 ? 0 : index + 1]; // Map Mon=1, Sun=0
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayShort) => {
                     const dayMapping: Record<string, string> = {
                       'Mon': 'Monday', 'Tue': 'Tuesday', 'Wed': 'Wednesday',
                       'Thu': 'Thursday', 'Fri': 'Friday', 'Sat': 'Saturday', 'Sun': 'Sunday'
@@ -717,10 +716,6 @@ const SearchPage = () => {
                         key={dayShort}
                         onClick={() => {
                           setSelectedTimeDay(fullDayName);
-                          // Also toggle day selection
-                          if (!selectedDays.includes(fullDayName)) {
-                            setSelectedDays(prev => [...prev, fullDayName]);
-                          }
                         }}
                         className={cn(
                           "px-8 py-3 rounded-lg text-sm font-medium transition-colors min-w-[100px] border",
@@ -798,6 +793,19 @@ const SearchPage = () => {
                       <SelectItem value="PM">PM</SelectItem>
                     </SelectContent>
                   </Select>
+
+                  {/* Save Button */}
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      if (!selectedDays.includes(selectedTimeDay)) {
+                        setSelectedDays(prev => [...prev, selectedTimeDay]);
+                      }
+                    }}
+                    className="ml-2"
+                  >
+                    Save
+                  </Button>
                 </div>
               </div>
             )}
