@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { X, Send, Plus, Mail, Loader2, ShieldAlert, Eye } from 'lucide-react';
+import { X, Send, Plus, Mail, Loader2, ShieldAlert, Eye, Link2, Copy, Check, Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -49,14 +49,17 @@ export default function VendorInviteAdmin() {
   const [currentEmail, setCurrentEmail] = useState('');
   const [selectedMarketId, setSelectedMarketId] = useState<string>('');
   const [markets, setMarkets] = useState<Market[]>([]);
+  const [filteredMarkets, setFilteredMarkets] = useState<Market[]>([]);
+  const [marketSearch, setMarketSearch] = useState('');
   const [loadingMarkets, setLoadingMarkets] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [senderName, setSenderName] = useState('From Farmers Markets Team');
+  const [copied, setCopied] = useState(false);
   
   // Email content
   const [emailSubject, setEmailSubject] = useState(DEFAULT_SUBJECT);
   const [emailBody, setEmailBody] = useState(DEFAULT_BODY);
-  const [activeTab, setActiveTab] = useState('compose');
+  const [activeTab, setActiveTab] = useState('link');
 
   // Check access
   useEffect(() => {
@@ -97,6 +100,41 @@ export default function VendorInviteAdmin() {
       fetchMarkets();
     }
   }, [user, toast]);
+
+  // Filter markets based on search
+  useEffect(() => {
+    if (!marketSearch.trim()) {
+      setFilteredMarkets(markets);
+    } else {
+      const search = marketSearch.toLowerCase();
+      setFilteredMarkets(
+        markets.filter(m => 
+          m.name.toLowerCase().includes(search) ||
+          m.city.toLowerCase().includes(search) ||
+          m.state.toLowerCase().includes(search) ||
+          m.address.toLowerCase().includes(search)
+        )
+      );
+    }
+  }, [marketSearch, markets]);
+
+  const getSignupLink = () => {
+    if (!selectedMarketId) return '';
+    return `https://fromfarmersmarkets.com/vendor-signup?market=${selectedMarketId}`;
+  };
+
+  const copyLink = async () => {
+    const link = getSignupLink();
+    if (link) {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      toast({
+        title: "Link Copied!",
+        description: "The vendor signup link has been copied to your clipboard.",
+      });
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const getPreviewContent = (template: string) => {
     const selectedMarket = markets.find(m => m.id === Number(selectedMarketId));
@@ -287,123 +325,179 @@ export default function VendorInviteAdmin() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column - Settings & Recipients */}
+          {/* Left Column - Market Selection */}
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Settings</CardTitle>
+                <CardTitle>Select Market</CardTitle>
+                <CardDescription>Search and select a farmers market</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Select Market *</Label>
-                  {loadingMarkets ? (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Loading markets...
-                    </div>
-                  ) : (
-                    <Select value={selectedMarketId} onValueChange={setSelectedMarketId}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose a market..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {markets.map((market) => (
-                          <SelectItem key={market.id} value={String(market.id)}>
-                            {market.name} - {market.city}, {market.state}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="senderName">Sender Name</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="senderName"
-                    value={senderName}
-                    onChange={(e) => setSenderName(e.target.value)}
-                    placeholder="e.g., Nadia from From Farmers Markets"
+                    value={marketSearch}
+                    onChange={(e) => setMarketSearch(e.target.value)}
+                    placeholder="Search markets by name, city, or state..."
+                    className="pl-10"
                   />
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Recipients</CardTitle>
-                <CardDescription>Add email addresses to send invites to</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-2">
-                  <Input
-                    type="email"
-                    value={currentEmail}
-                    onChange={(e) => setCurrentEmail(e.target.value)}
-                    onKeyDown={handleKeyPress}
-                    onPaste={handlePaste}
-                    placeholder="Enter email and press Enter"
-                    disabled={isSending}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={addEmail}
-                    disabled={!currentEmail.trim() || isSending}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Press Enter or comma to add. You can paste multiple emails.
-                </p>
-
-                {emails.length > 0 && (
-                  <div className="space-y-2">
-                    <Label>{emails.length} recipient{emails.length > 1 ? 's' : ''}</Label>
-                    <div className="flex flex-wrap gap-2 p-3 border rounded-lg bg-muted/50 max-h-32 overflow-y-auto">
-                      {emails.map((email) => (
-                        <Badge key={email} variant="secondary" className="gap-1 pr-1">
-                          {email}
-                          <button
-                            type="button"
-                            onClick={() => removeEmail(email)}
-                            className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
-                            disabled={isSending}
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
+                
+                {loadingMarkets ? (
+                  <div className="flex items-center gap-2 text-muted-foreground py-4">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading markets...
+                  </div>
+                ) : (
+                  <div className="max-h-64 overflow-y-auto border rounded-lg">
+                    {filteredMarkets.length === 0 ? (
+                      <div className="p-4 text-center text-muted-foreground">
+                        No markets found
+                      </div>
+                    ) : (
+                      filteredMarkets.slice(0, 50).map((market) => (
+                        <button
+                          key={market.id}
+                          onClick={() => setSelectedMarketId(String(market.id))}
+                          className={`w-full text-left p-3 border-b last:border-b-0 hover:bg-muted/50 transition-colors ${
+                            selectedMarketId === String(market.id) ? 'bg-primary/10 border-l-4 border-l-primary' : ''
+                          }`}
+                        >
+                          <div className="font-medium">{market.name}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {market.address}, {market.city}, {market.state}
+                          </div>
+                        </button>
+                      ))
+                    )}
+                    {filteredMarkets.length > 50 && (
+                      <div className="p-3 text-center text-sm text-muted-foreground bg-muted/50">
+                        Showing first 50 results. Refine your search to see more.
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>
             </Card>
+
+            {/* Quick Link Generator */}
+            {selectedMarketId && (
+              <Card className="border-primary/50 bg-primary/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Link2 className="h-5 w-5" />
+                    Vendor Signup Link
+                  </CardTitle>
+                  <CardDescription>
+                    Share this link with vendors to invite them
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex gap-2">
+                    <Input
+                      value={getSignupLink()}
+                      readOnly
+                      className="font-mono text-sm"
+                    />
+                    <Button onClick={copyLink} variant="outline" size="icon">
+                      {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Selected: <strong>{markets.find(m => m.id === Number(selectedMarketId))?.name}</strong>
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
-          {/* Right Column - Email Compose */}
+          {/* Right Column - Email Compose (Optional) */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Mail className="h-5 w-5" />
-                Email Content
+                Send Email Invites (Optional)
               </CardTitle>
               <CardDescription>
-                Use {"{{marketName}}"}, {"{{signupLink}}"}, {"{{senderName}}"} as placeholders
+                Or send personalized emails to multiple vendors
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="compose">Compose</TabsTrigger>
-                  <TabsTrigger value="preview">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="link" disabled={!selectedMarketId}>Recipients</TabsTrigger>
+                  <TabsTrigger value="compose" disabled={!selectedMarketId}>Compose</TabsTrigger>
+                  <TabsTrigger value="preview" disabled={!selectedMarketId}>
                     <Eye className="h-4 w-4 mr-1" />
                     Preview
                   </TabsTrigger>
                 </TabsList>
                 
+                <TabsContent value="link" className="space-y-4 mt-4">
+                  {!selectedMarketId ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      Select a market first
+                    </div>
+                  ) : (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="senderName">Sender Name</Label>
+                        <Input
+                          id="senderName"
+                          value={senderName}
+                          onChange={(e) => setSenderName(e.target.value)}
+                          placeholder="e.g., Nadia from From Farmers Markets"
+                        />
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Input
+                          type="email"
+                          value={currentEmail}
+                          onChange={(e) => setCurrentEmail(e.target.value)}
+                          onKeyDown={handleKeyPress}
+                          onPaste={handlePaste}
+                          placeholder="Enter email and press Enter"
+                          disabled={isSending}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={addEmail}
+                          disabled={!currentEmail.trim() || isSending}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Press Enter or comma to add. You can paste multiple emails.
+                      </p>
+
+                      {emails.length > 0 && (
+                        <div className="space-y-2">
+                          <Label>{emails.length} recipient{emails.length > 1 ? 's' : ''}</Label>
+                          <div className="flex flex-wrap gap-2 p-3 border rounded-lg bg-muted/50 max-h-32 overflow-y-auto">
+                            {emails.map((email) => (
+                              <Badge key={email} variant="secondary" className="gap-1 pr-1">
+                                {email}
+                                <button
+                                  type="button"
+                                  onClick={() => removeEmail(email)}
+                                  className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
+                                  disabled={isSending}
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </TabsContent>
+
                 <TabsContent value="compose" className="space-y-4 mt-4">
                   <div className="space-y-2">
                     <Label htmlFor="subject">Subject *</Label>
@@ -422,10 +516,10 @@ export default function VendorInviteAdmin() {
                       value={emailBody}
                       onChange={(e) => setEmailBody(e.target.value)}
                       placeholder="Write your email message..."
-                      className="min-h-[300px] font-mono text-sm"
+                      className="min-h-[200px] font-mono text-sm"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Use **bold** for bold text and • for bullet points
+                      Use {"{{marketName}}"}, {"{{signupLink}}"}, {"{{senderName}}"} as placeholders. Use **bold** for bold.
                     </p>
                   </div>
                 </TabsContent>
