@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, Star, MapPin, Search, Loader2, Filter, X, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import { Heart, Star, MapPin, Search, Loader2, Filter, X, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Globe, MapPinned, RotateCcw } from "lucide-react";
 import { useLikes } from "@/hooks/useLikes";
 import { cn } from "@/lib/utils";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
@@ -97,6 +97,8 @@ const SearchPage = () => {
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<'relevancy' | 'rating' | 'distance' | 'name'>('relevancy');
+  const [filterTab, setFilterTab] = useState<'type' | 'times' | 'categories'>('type');
+  const [locationFilter, setLocationFilter] = useState<'all' | 'local'>('all');
   
   // Data state
   const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -469,53 +471,18 @@ const SearchPage = () => {
       <div className="container mx-auto px-4 py-8">
         
         {/* Filter Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
-            {/* Filter Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <Filter className="h-4 w-4" />
-                  Filter
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 bg-background">
-                <div className="px-2 py-1.5 text-sm font-semibold">Categories</div>
-                {CATEGORIES.map(category => (
-                  <DropdownMenuCheckboxItem
-                    key={category}
-                    checked={selectedCategories.includes(category)}
-                    onCheckedChange={() => {
-                      setSelectedCategories(prev => 
-                        prev.includes(category) 
-                          ? prev.filter(c => c !== category)
-                          : [...prev, category]
-                      );
-                    }}
-                  >
-                    {category}
-                  </DropdownMenuCheckboxItem>
-                ))}
-                <DropdownMenuSeparator />
-                <div className="px-2 py-1.5 text-sm font-semibold">Days</div>
-                {DAYS.map(day => (
-                  <DropdownMenuCheckboxItem
-                    key={day}
-                    checked={selectedDays.includes(day)}
-                    onCheckedChange={() => {
-                      setSelectedDays(prev => 
-                        prev.includes(day) 
-                          ? prev.filter(d => d !== day)
-                          : [...prev, day]
-                      );
-                    }}
-                  >
-                    {day}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Filter Toggle Button */}
+            <Button 
+              variant="outline" 
+              className="gap-2"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <Filter className="h-4 w-4" />
+              Filter
+              {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
 
             {/* Sort Dropdown */}
             <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
@@ -568,6 +535,7 @@ const SearchPage = () => {
                   setSearchQuery('');
                   setSelectedCategories([]);
                   setSelectedDays([]);
+                  setLocationFilter('all');
                 }}
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
@@ -576,6 +544,180 @@ const SearchPage = () => {
             )}
           </div>
         </div>
+
+        {/* Expandable Filter Panel */}
+        {showFilters && (
+          <div className="mb-6 p-4 border rounded-lg bg-background">
+            {/* Filter Tabs */}
+            <div className="flex items-center gap-6 border-b pb-3 mb-4">
+              <button
+                onClick={() => setFilterTab('type')}
+                className={cn(
+                  "text-sm font-medium pb-3 -mb-3 border-b-2 transition-colors",
+                  filterTab === 'type' 
+                    ? "text-foreground border-foreground" 
+                    : "text-muted-foreground border-transparent hover:text-foreground"
+                )}
+              >
+                Type
+              </button>
+              <button
+                onClick={() => setFilterTab('times')}
+                className={cn(
+                  "text-sm font-medium pb-3 -mb-3 border-b-2 transition-colors",
+                  filterTab === 'times' 
+                    ? "text-foreground border-foreground" 
+                    : "text-muted-foreground border-transparent hover:text-foreground"
+                )}
+              >
+                Times
+              </button>
+              <button
+                onClick={() => setFilterTab('categories')}
+                className={cn(
+                  "text-sm font-medium pb-3 -mb-3 border-b-2 transition-colors",
+                  filterTab === 'categories' 
+                    ? "text-foreground border-foreground" 
+                    : "text-muted-foreground border-transparent hover:text-foreground"
+                )}
+              >
+                Categories
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedCategories([]);
+                  setSelectedDays([]);
+                  setLocationFilter('all');
+                  setViewMode('vendors');
+                }}
+                className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
+              >
+                <RotateCcw className="h-3 w-3" />
+                Reset
+              </button>
+            </div>
+
+            {/* Filter Content */}
+            {filterTab === 'type' && (
+              <div className="flex items-center gap-6">
+                {/* Location Toggle */}
+                <div className="flex items-center gap-2 border rounded-full p-1">
+                  <button
+                    onClick={() => setLocationFilter('all')}
+                    className={cn(
+                      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors",
+                      locationFilter === 'all' 
+                        ? "bg-muted text-foreground" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Globe className="h-4 w-4" />
+                    All of US
+                  </button>
+                  <button
+                    onClick={() => setLocationFilter('local')}
+                    className={cn(
+                      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors",
+                      locationFilter === 'local' 
+                        ? "bg-muted text-foreground" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <MapPinned className="h-4 w-4" />
+                    Local
+                  </button>
+                </div>
+
+                {/* View Mode Toggle */}
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setViewMode('products')}
+                    className={cn(
+                      "px-4 py-1.5 text-sm transition-colors rounded",
+                      viewMode === 'products' 
+                        ? "bg-muted text-foreground font-medium" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Products
+                  </button>
+                  <button
+                    onClick={() => setViewMode('vendors')}
+                    className={cn(
+                      "px-4 py-1.5 text-sm transition-colors rounded",
+                      viewMode === 'vendors' 
+                        ? "bg-muted text-foreground font-medium" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Vendors
+                  </button>
+                  <button
+                    onClick={() => setViewMode('markets')}
+                    className={cn(
+                      "px-4 py-1.5 text-sm transition-colors rounded",
+                      viewMode === 'markets' 
+                        ? "bg-muted text-foreground font-medium" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Markets
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {filterTab === 'times' && (
+              <div className="flex flex-wrap gap-2">
+                {DAYS.map(day => (
+                  <button
+                    key={day}
+                    onClick={() => {
+                      setSelectedDays(prev => 
+                        prev.includes(day) 
+                          ? prev.filter(d => d !== day)
+                          : [...prev, day]
+                      );
+                    }}
+                    className={cn(
+                      "px-4 py-2 rounded-full text-sm border transition-colors",
+                      selectedDays.includes(day)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-foreground border-border hover:bg-muted"
+                    )}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {filterTab === 'categories' && (
+              <div className="flex flex-wrap gap-2">
+                {CATEGORIES.map(category => (
+                  <button
+                    key={category}
+                    onClick={() => {
+                      setSelectedCategories(prev => 
+                        prev.includes(category) 
+                          ? prev.filter(c => c !== category)
+                          : [...prev, category]
+                      );
+                    }}
+                    className={cn(
+                      "px-4 py-2 rounded-full text-sm border transition-colors",
+                      selectedCategories.includes(category)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-foreground border-border hover:bg-muted"
+                    )}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         {/* Results */}
         {viewMode === 'vendors' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
