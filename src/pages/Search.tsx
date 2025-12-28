@@ -797,14 +797,20 @@ const SearchPage = () => {
                   {/* Save Button */}
                   <Button
                     size="sm"
+                    variant={selectedDays.includes(selectedTimeDay) ? "outline" : "default"}
                     onClick={() => {
-                      if (!selectedDays.includes(selectedTimeDay)) {
+                      if (selectedDays.includes(selectedTimeDay)) {
+                        setSelectedDays(prev => prev.filter(d => d !== selectedTimeDay));
+                      } else {
                         setSelectedDays(prev => [...prev, selectedTimeDay]);
                       }
                     }}
-                    className="ml-2"
+                    className={cn(
+                      "ml-2",
+                      selectedDays.includes(selectedTimeDay) && "border-green-600 text-green-600 hover:bg-green-50"
+                    )}
                   >
-                    Save
+                    {selectedDays.includes(selectedTimeDay) ? "Saved" : "Save"}
                   </Button>
                 </div>
               </div>
