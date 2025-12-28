@@ -3,12 +3,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Search, Loader2, ShieldAlert, Link2, Copy, Check, Wrench, Mail } from 'lucide-react';
+import { Search, Loader2, ShieldAlert, Link2, Copy, Check, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { GlobalHeader } from '@/components/GlobalHeader';
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
 
 const ALLOWED_EMAIL = 'nadiachibri@gmail.com';
