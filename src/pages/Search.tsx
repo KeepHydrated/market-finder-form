@@ -90,7 +90,7 @@ const SearchPage = () => {
   const [viewMode, setViewMode] = useState<'vendors' | 'markets' | 'products'>('vendors');
   
   // Search and filter state
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || searchParams.get('q') || '');
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     searchParams.get('category') ? [searchParams.get('category')!] : []
   );
