@@ -19,6 +19,7 @@ import { VendorOrders } from '@/components/VendorOrders';
 import { FloatingChat } from '@/components/FloatingChat';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { BusinessCards } from '@/components/BusinessCards';
+import { VendorInviteEmail } from '@/components/VendorInviteEmail';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -979,6 +980,14 @@ export default function ShopManager() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Vendor Invite Email Section */}
+      <VendorInviteEmail 
+        markets={selectedFarmersMarkets.map(m => ({ 
+          name: m.name, 
+          place_id: m.place_id 
+        }))} 
+      />
 
       <Card className="border-destructive w-full">
         <CardHeader>
