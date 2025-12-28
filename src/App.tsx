@@ -10,6 +10,7 @@ import { ShoppingCart } from "@/components/shopping/ShoppingCart";
 import ScrollToTop from "@/components/ScrollToTop";
 import Homepage from "./pages/Homepage";
 import Test2 from "./pages/Test2";
+import Search from "./pages/Search";
 import VendorDuplicate from "./pages/VendorDuplicate";
 import Likes from "./pages/Likes";
 import Orders from "./pages/Orders";
@@ -45,6 +46,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Test2 />} />
                 <Route path="/home" element={<Test2 />} />
+                <Route path="/search" element={<Search />} />
                 <Route path="/homepage" element={<Homepage />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/market" element={<VendorDuplicate />} />
