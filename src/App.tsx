@@ -28,8 +28,6 @@ import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
 
 import VendorSignup from "./pages/VendorSignup";
-import VendorInviteAdmin from "./pages/VendorInviteAdmin";
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -65,8 +63,6 @@ const App = () => (
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/profile/:userId" element={<Profile />} />
                 <Route path="/vendor-signup" element={<VendorSignup />} />
-                <Route path="/admin/vendor-invite" element={<VendorInviteAdmin />} />
-                
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
