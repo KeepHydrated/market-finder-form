@@ -96,7 +96,7 @@ const SearchPage = () => {
   );
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState<'relevancy' | 'rating' | 'distance' | 'name'>('relevancy');
+  const [sortBy, setSortBy] = useState<'relevancy' | 'lowest_price' | 'highest_price' | 'top_rated' | 'most_recent'>('relevancy');
   const [filterTab, setFilterTab] = useState<'type' | 'times' | 'categories'>('type');
   const [locationFilter, setLocationFilter] = useState<'all' | 'local'>('all');
   const [selectedTimeDay, setSelectedTimeDay] = useState<string>('Monday');
@@ -516,14 +516,15 @@ const SearchPage = () => {
 
             {/* Sort Dropdown */}
             <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent className="bg-background">
-                <SelectItem value="relevancy">Relevancy</SelectItem>
-                <SelectItem value="rating">Rating</SelectItem>
-                <SelectItem value="distance">Distance</SelectItem>
-                <SelectItem value="name">Name</SelectItem>
+                <SelectItem value="relevancy" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Relevancy</SelectItem>
+                <SelectItem value="lowest_price" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Lowest Price</SelectItem>
+                <SelectItem value="highest_price" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Highest Price</SelectItem>
+                <SelectItem value="top_rated" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Top Rated Store</SelectItem>
+                <SelectItem value="most_recent" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Most Recent</SelectItem>
               </SelectContent>
             </Select>
           </div>
