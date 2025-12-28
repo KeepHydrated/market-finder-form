@@ -397,13 +397,23 @@ export default function VendorInviteAdmin() {
                     <Input
                       value={getSignupLink()}
                       readOnly
-                      className="font-mono text-sm"
+                      className="font-mono text-sm bg-background"
                     />
-                    <Button onClick={copyLink} variant="outline" size="icon">
-                      {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
-                    </Button>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <Button onClick={copyLink} className="w-full" size="lg">
+                    {copied ? (
+                      <>
+                        <Check className="h-4 w-4 mr-2 text-green-300" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-4 w-4 mr-2" />
+                        Copy Link
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-sm text-muted-foreground text-center">
                     Selected: <strong>{markets.find(m => m.id === Number(selectedMarketId))?.name}</strong>
                   </p>
                 </CardContent>
