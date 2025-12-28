@@ -6,10 +6,25 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, Star, MapPin, Search, Loader2, Filter, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, Star, MapPin, Search, Loader2, Filter, X, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { useLikes } from "@/hooks/useLikes";
 import { cn } from "@/lib/utils";
 import { ProductDetailModal } from "@/components/ProductDetailModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Product {
   id: string;
@@ -81,6 +96,7 @@ const SearchPage = () => {
   );
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState<'relevancy' | 'rating' | 'distance' | 'name'>('relevancy');
   
   // Data state
   const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -433,7 +449,6 @@ const SearchPage = () => {
   };
 
   const hasActiveFilters = selectedCategories.length > 0 || selectedDays.length > 0 || searchQuery;
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -442,10 +457,125 @@ const SearchPage = () => {
     );
   }
 
+  // Calculate total results
+  const totalResults = viewMode === 'vendors' 
+    ? filteredVendors.length 
+    : viewMode === 'markets' 
+      ? filteredMarkets.length 
+      : allProducts.length;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
+        
+        {/* Filter Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b">
+          <div className="flex items-center gap-3">
+            {/* Filter Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <Filter className="h-4 w-4" />
+                  Filter
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 bg-background">
+                <div className="px-2 py-1.5 text-sm font-semibold">Categories</div>
+                {CATEGORIES.map(category => (
+                  <DropdownMenuCheckboxItem
+                    key={category}
+                    checked={selectedCategories.includes(category)}
+                    onCheckedChange={() => {
+                      setSelectedCategories(prev => 
+                        prev.includes(category) 
+                          ? prev.filter(c => c !== category)
+                          : [...prev, category]
+                      );
+                    }}
+                  >
+                    {category}
+                  </DropdownMenuCheckboxItem>
+                ))}
+                <DropdownMenuSeparator />
+                <div className="px-2 py-1.5 text-sm font-semibold">Days</div>
+                {DAYS.map(day => (
+                  <DropdownMenuCheckboxItem
+                    key={day}
+                    checked={selectedDays.includes(day)}
+                    onCheckedChange={() => {
+                      setSelectedDays(prev => 
+                        prev.includes(day) 
+                          ? prev.filter(d => d !== day)
+                          : [...prev, day]
+                      );
+                    }}
+                  >
+                    {day}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
+            {/* Sort Dropdown */}
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent className="bg-background">
+                <SelectItem value="relevancy">Relevancy</SelectItem>
+                <SelectItem value="rating">Rating</SelectItem>
+                <SelectItem value="distance">Distance</SelectItem>
+                <SelectItem value="name">Name</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Right side: Result count and active filters */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-sm text-muted-foreground">
+              Showing {totalResults} result{totalResults !== 1 ? 's' : ''}
+            </span>
+
+            {/* Active filter badges */}
+            {searchQuery && (
+              <Badge variant="secondary" className="gap-1 pl-2 pr-1">
+                Search: "{searchQuery}"
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="ml-1 hover:bg-muted rounded-full p-0.5"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+
+            {selectedCategories.length > 0 && (
+              <Badge variant="outline" className="text-green-600 border-green-600">
+                Category: {selectedCategories.length === 1 ? selectedCategories[0] : `${selectedCategories.length} selected`}
+              </Badge>
+            )}
+
+            {selectedDays.length > 0 && (
+              <Badge variant="outline" className="text-green-600 border-green-600">
+                Days: {selectedDays.length === 1 ? selectedDays[0] : `${selectedDays.length} selected`}
+              </Badge>
+            )}
+
+            {hasActiveFilters && (
+              <button 
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategories([]);
+                  setSelectedDays([]);
+                }}
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Clear all
+              </button>
+            )}
+          </div>
+        </div>
         {/* Results */}
         {viewMode === 'vendors' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
