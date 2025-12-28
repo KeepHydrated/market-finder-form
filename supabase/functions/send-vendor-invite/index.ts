@@ -13,7 +13,31 @@ interface VendorInviteRequest {
   marketName: string;
   marketId: number;
   senderName?: string;
+  customSubject?: string;
+  customBody?: string;
 }
+
+// Convert simple markdown to HTML
+const markdownToHtml = (text: string): string => {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/^• (.*)$/gm, '<li style="margin-left: 20px;">$1</li>')
+    .replace(/\n/g, '<br/>');
+};
+
+// Replace placeholders in template
+const replacePlaceholders = (
+  template: string, 
+  marketName: string, 
+  signupLink: string, 
+  senderName: string
+): string => {
+  return template
+    .replace(/\{\{marketName\}\}/g, marketName)
+    .replace(/\{\{signupLink\}\}/g, `<a href="${signupLink}" style="color: #16a34a;">${signupLink}</a>`)
+    .replace(/\{\{senderName\}\}/g, senderName);
+};
 
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
@@ -22,7 +46,14 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { emails, marketName, marketId, senderName }: VendorInviteRequest = await req.json();
+    const { 
+      emails, 
+      marketName, 
+      marketId, 
+      senderName,
+      customSubject,
+      customBody 
+    }: VendorInviteRequest = await req.json();
 
     if (!emails || emails.length === 0) {
       throw new Error("No email addresses provided");
@@ -33,6 +64,93 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const signupLink = `https://fromfarmersmarkets.com/vendor-signup/${marketId}`;
+    const sender = senderName || "From Farmers Markets Team";
+    
+    // Use custom subject or default
+    const subject = customSubject 
+      ? replacePlaceholders(customSubject, marketName, signupLink, sender).replace(/<[^>]*>/g, '')
+      : `You're invited to sell at ${marketName}!`;
+    
+    // Generate email body
+    let emailBodyHtml: string;
+    
+    if (customBody) {
+      // Use custom body with placeholders replaced and markdown converted
+      const processedBody = replacePlaceholders(customBody, marketName, signupLink, sender);
+      const htmlBody = markdownToHtml(processedBody);
+      
+      emailBodyHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #16a34a; margin-bottom: 10px;">🌽 From Farmers Markets</h1>
+          </div>
+          
+          <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 12px; padding: 30px; margin-bottom: 20px;">
+            ${htmlBody}
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${signupLink}" style="background-color: #16a34a; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Apply to Become a Vendor</a>
+            </div>
+          </div>
+          
+          <div style="text-align: center; color: #666; font-size: 12px; margin-top: 30px;">
+            <p>© ${new Date().getFullYear()} From Farmers Markets. All rights reserved.</p>
+            <p>Connecting local vendors with their communities.</p>
+          </div>
+        </body>
+        </html>
+      `;
+    } else {
+      // Use default template
+      emailBodyHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #16a34a; margin-bottom: 10px;">🌽 From Farmers Markets</h1>
+          </div>
+          
+          <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 12px; padding: 30px; margin-bottom: 20px;">
+            <h2 style="color: #166534; margin-top: 0;">You're Invited to Join ${marketName}!</h2>
+            
+            <p>Hello!</p>
+            
+            <p>${sender} has invited you to become a vendor at <strong>${marketName}</strong> through From Farmers Markets.</p>
+            
+            <p>Join our growing community of local farmers, artisans, and producers to:</p>
+            
+            <ul style="color: #166534;">
+              <li>Reach more customers in your area</li>
+              <li>Manage your products and orders online</li>
+              <li>Connect directly with buyers</li>
+              <li>Grow your local business</li>
+            </ul>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${signupLink}" style="background-color: #16a34a; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Apply to Become a Vendor</a>
+            </div>
+            
+            <p style="font-size: 14px; color: #666;">Or copy this link: <a href="${signupLink}" style="color: #16a34a;">${signupLink}</a></p>
+          </div>
+          
+          <div style="text-align: center; color: #666; font-size: 12px; margin-top: 30px;">
+            <p>© ${new Date().getFullYear()} From Farmers Markets. All rights reserved.</p>
+            <p>Connecting local vendors with their communities.</p>
+          </div>
+        </body>
+        </html>
+      `;
+    }
     
     const results = [];
     const errors = [];
@@ -42,49 +160,8 @@ const handler = async (req: Request): Promise<Response> => {
         const emailResponse = await resend.emails.send({
           from: "From Farmers Markets <noreply@fromfarmersmarkets.com>",
           to: [email],
-          subject: `You're invited to sell at ${marketName}!`,
-          html: `
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            </head>
-            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #16a34a; margin-bottom: 10px;">🌽 From Farmers Markets</h1>
-              </div>
-              
-              <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 12px; padding: 30px; margin-bottom: 20px;">
-                <h2 style="color: #166534; margin-top: 0;">You're Invited to Join ${marketName}!</h2>
-                
-                <p>Hello!</p>
-                
-                <p>${senderName ? `${senderName} has invited you` : "You've been invited"} to become a vendor at <strong>${marketName}</strong> through From Farmers Markets.</p>
-                
-                <p>Join our growing community of local farmers, artisans, and producers to:</p>
-                
-                <ul style="color: #166534;">
-                  <li>Reach more customers in your area</li>
-                  <li>Manage your products and orders online</li>
-                  <li>Connect directly with buyers</li>
-                  <li>Grow your local business</li>
-                </ul>
-                
-                <div style="text-align: center; margin: 30px 0;">
-                  <a href="${signupLink}" style="background-color: #16a34a; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Apply to Become a Vendor</a>
-                </div>
-                
-                <p style="font-size: 14px; color: #666;">Or copy this link: <a href="${signupLink}" style="color: #16a34a;">${signupLink}</a></p>
-              </div>
-              
-              <div style="text-align: center; color: #666; font-size: 12px; margin-top: 30px;">
-                <p>© ${new Date().getFullYear()} From Farmers Markets. All rights reserved.</p>
-                <p>Connecting local vendors with their communities.</p>
-              </div>
-            </body>
-            </html>
-          `,
+          subject: subject,
+          html: emailBodyHtml,
         });
 
         console.log(`Email sent successfully to ${email}:`, emailResponse);
