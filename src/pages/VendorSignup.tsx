@@ -74,7 +74,7 @@ export default function VendorSignup() {
     }
   }, [user, toast]);
 
-  // Fetch market data from URL param (supports both ID and name)
+  // Fetch market data from URL param (supports ID, name, or address-based search)
   useEffect(() => {
     const fetchMarket = async () => {
       if (!marketParam) {
@@ -85,19 +85,40 @@ export default function VendorSignup() {
 
       setIsLoadingMarket(true);
       
-      // Check if marketParam is a number (ID) or string (name)
+      // Check if marketParam is a number (ID)
       const isNumeric = /^\d+$/.test(marketParam);
       
-      let query = supabase.from("markets").select("*");
+      let data = null;
+      let error = null;
       
       if (isNumeric) {
-        query = query.eq("id", parseInt(marketParam));
+        // Search by ID
+        const result = await supabase.from("markets").select("*").eq("id", parseInt(marketParam)).maybeSingle();
+        data = result.data;
+        error = result.error;
       } else {
-        // Search by name (case insensitive)
-        query = query.ilike("name", marketParam);
+        // First try exact name match
+        const nameResult = await supabase.from("markets").select("*").ilike("name", marketParam).maybeSingle();
+        
+        if (nameResult.data) {
+          data = nameResult.data;
+        } else {
+          // Extract city from the search string (e.g., "Canyon Farmers Market, 4th Ave, Canyon, TX")
+          const parts = marketParam.split(',').map(p => p.trim());
+          const marketName = parts[0]; // First part is likely the market name
+          
+          // Try searching by name containing the first part
+          const fuzzyResult = await supabase
+            .from("markets")
+            .select("*")
+            .ilike("name", `%${marketName}%`)
+            .limit(1)
+            .maybeSingle();
+          
+          data = fuzzyResult.data;
+          error = fuzzyResult.error;
+        }
       }
-      
-      const { data, error } = await query.maybeSingle();
 
       if (error || !data) {
         console.error("Error fetching market:", error);
