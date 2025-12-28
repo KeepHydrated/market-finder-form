@@ -32,6 +32,7 @@ import Profile from "./pages/Profile";
 import SubmitMarket from "./pages/SubmitMarket";
 
 import VendorSignup from "./pages/VendorSignup";
+import VendorInviteAdmin from "./pages/VendorInviteAdmin";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,7 @@ const App = () => (
                 <Route path="/submit-market" element={<SubmitMarket />} />
                 
                 <Route path="/vendor-signup" element={<VendorSignup />} />
+                <Route path="/admin/vendor-invite" element={<VendorInviteAdmin />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
