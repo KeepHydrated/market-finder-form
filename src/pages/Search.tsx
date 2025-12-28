@@ -620,6 +620,7 @@ const SearchPage = () => {
                   setSelectedDays([]);
                   setLocationFilter('all');
                   setViewMode('vendors');
+                  setSelectedTimeDay('Monday');
                 }}
                 className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
               >
