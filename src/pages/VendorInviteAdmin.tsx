@@ -3,9 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X, Send, Plus, Mail, Loader2, ShieldAlert } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { X, Send, Plus, Mail, Loader2, ShieldAlert, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,6 +23,23 @@ interface Market {
   state: string;
 }
 
+const DEFAULT_SUBJECT = "You're invited to sell at {{marketName}}!";
+const DEFAULT_BODY = `Hello!
+
+You've been invited to become a vendor at **{{marketName}}** through From Farmers Markets.
+
+Join our growing community of local farmers, artisans, and producers to:
+• Reach more customers in your area
+• Manage your products and orders online
+• Connect directly with buyers
+• Grow your local business
+
+Click the link below to apply:
+{{signupLink}}
+
+Best regards,
+{{senderName}}`;
+
 export default function VendorInviteAdmin() {
   const { user, loading } = useAuth();
   const { toast } = useToast();
@@ -32,7 +51,12 @@ export default function VendorInviteAdmin() {
   const [markets, setMarkets] = useState<Market[]>([]);
   const [loadingMarkets, setLoadingMarkets] = useState(true);
   const [isSending, setIsSending] = useState(false);
-  const [senderName, setSenderName] = useState('');
+  const [senderName, setSenderName] = useState('From Farmers Markets Team');
+  
+  // Email content
+  const [emailSubject, setEmailSubject] = useState(DEFAULT_SUBJECT);
+  const [emailBody, setEmailBody] = useState(DEFAULT_BODY);
+  const [activeTab, setActiveTab] = useState('compose');
 
   // Check access
   useEffect(() => {
@@ -73,6 +97,28 @@ export default function VendorInviteAdmin() {
       fetchMarkets();
     }
   }, [user, toast]);
+
+  const getPreviewContent = (template: string) => {
+    const selectedMarket = markets.find(m => m.id === Number(selectedMarketId));
+    const marketName = selectedMarket?.name || '[Market Name]';
+    const marketId = selectedMarket?.id || '0';
+    const signupLink = `https://fromfarmersmarkets.com/vendor-signup/${marketId}`;
+    
+    return template
+      .replace(/\{\{marketName\}\}/g, marketName)
+      .replace(/\{\{signupLink\}\}/g, signupLink)
+      .replace(/\{\{senderName\}\}/g, senderName || 'From Farmers Markets Team');
+  };
+
+  const renderMarkdownPreview = (text: string) => {
+    // Simple markdown to HTML conversion for preview
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/^• (.*)$/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>\n?)+/g, '<ul class="list-disc ml-4 my-2">$&</ul>')
+      .replace(/\n/g, '<br/>');
+  };
 
   const isValidEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -145,6 +191,24 @@ export default function VendorInviteAdmin() {
       return;
     }
 
+    if (!emailSubject.trim()) {
+      toast({
+        title: "No Subject",
+        description: "Please enter an email subject.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!emailBody.trim()) {
+      toast({
+        title: "No Message",
+        description: "Please enter an email message.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSending(true);
 
     try {
@@ -159,7 +223,9 @@ export default function VendorInviteAdmin() {
           emails,
           marketName: selectedMarket.name,
           marketId: selectedMarket.id,
-          senderName: senderName.trim() || undefined,
+          senderName: senderName.trim() || 'From Farmers Markets Team',
+          customSubject: emailSubject.trim(),
+          customBody: emailBody.trim(),
         },
       });
 
@@ -214,125 +280,194 @@ export default function VendorInviteAdmin() {
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">Vendor Invite Admin</h1>
-          <p className="text-muted-foreground">Send email invitations to vendors to join farmers markets</p>
+          <p className="text-muted-foreground">Compose and send email invitations to vendors</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5" />
-              Send Vendor Invites
-            </CardTitle>
-            <CardDescription>
-              Select a market and enter email addresses to send invitations
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Select Market *</Label>
-              {loadingMarkets ? (
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Loading markets...
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column - Settings & Recipients */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Settings</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Select Market *</Label>
+                  {loadingMarkets ? (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Loading markets...
+                    </div>
+                  ) : (
+                    <Select value={selectedMarketId} onValueChange={setSelectedMarketId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a market..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {markets.map((market) => (
+                          <SelectItem key={market.id} value={String(market.id)}>
+                            {market.name} - {market.city}, {market.state}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
-              ) : (
-                <Select value={selectedMarketId} onValueChange={setSelectedMarketId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose a market..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {markets.map((market) => (
-                      <SelectItem key={market.id} value={String(market.id)}>
-                        {market.name} - {market.city}, {market.state}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="senderName">Your Name (optional)</Label>
-              <Input
-                id="senderName"
-                value={senderName}
-                onChange={(e) => setSenderName(e.target.value)}
-                placeholder="e.g., Nadia from From Farmers Markets"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="emails">Email Addresses *</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="emails"
-                  type="email"
-                  value={currentEmail}
-                  onChange={(e) => setCurrentEmail(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  onPaste={handlePaste}
-                  placeholder="Enter email and press Enter"
-                  disabled={isSending}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={addEmail}
-                  disabled={!currentEmail.trim() || isSending}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Press Enter or comma to add. You can also paste multiple emails separated by commas, spaces, or newlines.
-              </p>
-            </div>
-
-            {emails.length > 0 && (
-              <div className="space-y-2">
-                <Label>{emails.length} recipient{emails.length > 1 ? 's' : ''}</Label>
-                <div className="flex flex-wrap gap-2 p-3 border rounded-lg bg-muted/50 max-h-48 overflow-y-auto">
-                  {emails.map((email) => (
-                    <Badge key={email} variant="secondary" className="gap-1 pr-1">
-                      {email}
-                      <button
-                        type="button"
-                        onClick={() => removeEmail(email)}
-                        className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
-                        disabled={isSending}
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))}
+                <div className="space-y-2">
+                  <Label htmlFor="senderName">Sender Name</Label>
+                  <Input
+                    id="senderName"
+                    value={senderName}
+                    onChange={(e) => setSenderName(e.target.value)}
+                    placeholder="e.g., Nadia from From Farmers Markets"
+                  />
                 </div>
-              </div>
-            )}
+              </CardContent>
+            </Card>
 
-            <Button
-              onClick={sendInvites}
-              disabled={emails.length === 0 || !selectedMarketId || isSending}
-              className="w-full"
-              size="lg"
-            >
-              {isSending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Send className="h-4 w-4 mr-2" />
-                  Send {emails.length > 0 ? `${emails.length} Invite${emails.length > 1 ? 's' : ''}` : 'Invites'}
-                </>
-              )}
-            </Button>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Recipients</CardTitle>
+                <CardDescription>Add email addresses to send invites to</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    type="email"
+                    value={currentEmail}
+                    onChange={(e) => setCurrentEmail(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    onPaste={handlePaste}
+                    placeholder="Enter email and press Enter"
+                    disabled={isSending}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={addEmail}
+                    disabled={!currentEmail.trim() || isSending}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Press Enter or comma to add. You can paste multiple emails.
+                </p>
+
+                {emails.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>{emails.length} recipient{emails.length > 1 ? 's' : ''}</Label>
+                    <div className="flex flex-wrap gap-2 p-3 border rounded-lg bg-muted/50 max-h-32 overflow-y-auto">
+                      {emails.map((email) => (
+                        <Badge key={email} variant="secondary" className="gap-1 pr-1">
+                          {email}
+                          <button
+                            type="button"
+                            onClick={() => removeEmail(email)}
+                            className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
+                            disabled={isSending}
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Email Compose */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5" />
+                Email Content
+              </CardTitle>
+              <CardDescription>
+                Use {"{{marketName}}"}, {"{{signupLink}}"}, {"{{senderName}}"} as placeholders
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="compose">Compose</TabsTrigger>
+                  <TabsTrigger value="preview">
+                    <Eye className="h-4 w-4 mr-1" />
+                    Preview
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="compose" className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="subject">Subject *</Label>
+                    <Input
+                      id="subject"
+                      value={emailSubject}
+                      onChange={(e) => setEmailSubject(e.target.value)}
+                      placeholder="Email subject..."
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="body">Message *</Label>
+                    <Textarea
+                      id="body"
+                      value={emailBody}
+                      onChange={(e) => setEmailBody(e.target.value)}
+                      placeholder="Write your email message..."
+                      className="min-h-[300px] font-mono text-sm"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Use **bold** for bold text and • for bullet points
+                    </p>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="preview" className="mt-4">
+                  <div className="border rounded-lg p-4 bg-white text-black min-h-[380px]">
+                    <div className="border-b pb-2 mb-4">
+                      <p className="text-sm text-gray-500">Subject:</p>
+                      <p className="font-semibold">{getPreviewContent(emailSubject)}</p>
+                    </div>
+                    <div 
+                      className="prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ 
+                        __html: renderMarkdownPreview(getPreviewContent(emailBody)) 
+                      }}
+                    />
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Send Button */}
+        <Button
+          onClick={sendInvites}
+          disabled={emails.length === 0 || !selectedMarketId || isSending || !emailSubject.trim() || !emailBody.trim()}
+          className="w-full"
+          size="lg"
+        >
+          {isSending ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Sending...
+            </>
+          ) : (
+            <>
+              <Send className="h-4 w-4 mr-2" />
+              Send {emails.length > 0 ? `${emails.length} Invite${emails.length > 1 ? 's' : ''}` : 'Invites'}
+            </>
+          )}
+        </Button>
       </div>
     </div>
   );
