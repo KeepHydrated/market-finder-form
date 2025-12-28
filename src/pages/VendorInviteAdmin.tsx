@@ -140,8 +140,6 @@ export default function VendorInviteAdmin() {
   return (
     <SidebarProvider>
       <div className="min-h-screen bg-background w-full">
-        <GlobalHeader />
-        
         <div className="flex w-full">
           {/* Sidebar */}
           <Sidebar className="border-r">
