@@ -631,7 +631,7 @@ const SearchPage = () => {
 
             {/* Filter Content */}
             {filterTab === 'type' && (
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                 {/* Location Toggle */}
                 <div className="flex items-center gap-2 border rounded-full p-1">
                   <button
