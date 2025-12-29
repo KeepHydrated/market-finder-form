@@ -556,8 +556,14 @@ const SearchPage = () => {
             )}
 
             {selectedCategories.length > 0 && !selectedCategories.includes('All') && (
-              <Badge variant="outline" className="text-green-600 border-green-600">
+              <Badge variant="secondary" className="gap-1 pl-2 pr-1">
                 Category: {selectedCategories.length === 1 ? selectedCategories[0] : `${selectedCategories.length} selected`}
+                <button 
+                  onClick={() => setSelectedCategories([])}
+                  className="ml-1 hover:bg-muted rounded-full p-0.5"
+                >
+                  <X className="h-3 w-3" />
+                </button>
               </Badge>
             )}
 
