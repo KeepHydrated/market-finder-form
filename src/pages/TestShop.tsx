@@ -138,11 +138,12 @@ export default function TestShop() {
 
   const getInviteLink = () => {
     if (!selectedMarket) return "";
+    const baseUrl = "https://fromfarmersmarkets.com";
     // For Google Places results (negative IDs), use google_place_id
     if (selectedMarket.id < 0 && selectedMarket.google_place_id) {
-      return `${window.location.origin}/my-shop?place_id=${selectedMarket.google_place_id}`;
+      return `${baseUrl}/my-shop?place_id=${selectedMarket.google_place_id}`;
     }
-    return `${window.location.origin}/my-shop?market=${selectedMarket.id}`;
+    return `${baseUrl}/my-shop?market=${selectedMarket.id}`;
   };
 
   const handleCopyLink = async () => {
