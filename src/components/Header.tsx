@@ -186,82 +186,84 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
               </h1>
             </Link>
             
-            {/* Category dropdown - hidden on md, shown on lg+ */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                 <Button variant="ghost" size="sm" className="ml-4 hidden lg:flex">
-                  {currentCategory || 'Category'}
-                  <ChevronDown className="h-4 w-4 ml-1" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl()} className="w-full font-semibold">
-                    All
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Fresh Flowers & Plants')} className="w-full">
-                    Fresh Flowers & Plants
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Bakery')} className="w-full">
-                    Bakery
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Dairy')} className="w-full">
-                    Dairy
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Rancher')} className="w-full">
-                    Rancher
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Beverages')} className="w-full">
-                    Beverages
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Seasonings & Spices')} className="w-full">
-                    Seasonings & Spices
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Pets')} className="w-full">
-                    Pets
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Home Goods')} className="w-full">
-                    Home Goods
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Farmers')} className="w-full">
-                    Farmers
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Ready to Eat')} className="w-full">
-                    Ready to Eat
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Packaged Goods & Snacks')} className="w-full">
-                    Packaged Goods & Snacks
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Artisan')} className="w-full">
-                    Artisan
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Category dropdown - hidden on md and on search page, shown on lg+ */}
+            {location.pathname !== '/search' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                   <Button variant="ghost" size="sm" className="ml-4 hidden lg:flex">
+                    {currentCategory || 'Category'}
+                    <ChevronDown className="h-4 w-4 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl()} className="w-full font-semibold">
+                      All
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Fresh Flowers & Plants')} className="w-full">
+                      Fresh Flowers & Plants
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Bakery')} className="w-full">
+                      Bakery
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Dairy')} className="w-full">
+                      Dairy
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Rancher')} className="w-full">
+                      Rancher
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Beverages')} className="w-full">
+                      Beverages
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Seasonings & Spices')} className="w-full">
+                      Seasonings & Spices
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Pets')} className="w-full">
+                      Pets
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Home Goods')} className="w-full">
+                      Home Goods
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Farmers')} className="w-full">
+                      Farmers
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Ready to Eat')} className="w-full">
+                      Ready to Eat
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Packaged Goods & Snacks')} className="w-full">
+                      Packaged Goods & Snacks
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Artisan')} className="w-full">
+                      Artisan
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
           
           {/* Search bar - hidden on md, shown on lg+ in first row */}
@@ -342,81 +344,83 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
           
           {/* Second row on md (iPad), hidden on mobile and lg+ */}
           <div className="w-full hidden md:flex lg:hidden items-center space-x-4 pb-3">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                 <Button variant="ghost" size="sm">
-                  {currentCategory || 'Category'}
-                  <ChevronDown className="h-4 w-4 ml-1" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl()} className="w-full font-semibold">
-                    All
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Fresh Flowers & Plants')} className="w-full">
-                    Fresh Flowers & Plants
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Bakery')} className="w-full">
-                    Bakery
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Dairy')} className="w-full">
-                    Dairy
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Rancher')} className="w-full">
-                    Rancher
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Beverages')} className="w-full">
-                    Beverages
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Seasonings & Spices')} className="w-full">
-                    Seasonings & Spices
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Pets')} className="w-full">
-                    Pets
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Home Goods')} className="w-full">
-                    Home Goods
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Farmers')} className="w-full">
-                    Farmers
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Ready to Eat')} className="w-full">
-                    Ready to Eat
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Packaged Goods & Snacks')} className="w-full">
-                    Packaged Goods & Snacks
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link to={getCategoryUrl('Artisan')} className="w-full">
-                    Artisan
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {location.pathname !== '/search' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                   <Button variant="ghost" size="sm">
+                    {currentCategory || 'Category'}
+                    <ChevronDown className="h-4 w-4 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56 bg-background border shadow-lg z-50">
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl()} className="w-full font-semibold">
+                      All
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Fresh Flowers & Plants')} className="w-full">
+                      Fresh Flowers & Plants
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Bakery')} className="w-full">
+                      Bakery
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Dairy')} className="w-full">
+                      Dairy
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Rancher')} className="w-full">
+                      Rancher
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Beverages')} className="w-full">
+                      Beverages
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Seasonings & Spices')} className="w-full">
+                      Seasonings & Spices
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Pets')} className="w-full">
+                      Pets
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Home Goods')} className="w-full">
+                      Home Goods
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Farmers')} className="w-full">
+                      Farmers
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Ready to Eat')} className="w-full">
+                      Ready to Eat
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Packaged Goods & Snacks')} className="w-full">
+                      Packaged Goods & Snacks
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={getCategoryUrl('Artisan')} className="w-full">
+                      Artisan
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             
             <form onSubmit={handleSearch} className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
