@@ -735,7 +735,7 @@ const SearchPage = () => {
 
                 {/* Time Range Selectors */}
                 <div className="flex items-center gap-3">
-                  <span className="font-medium min-w-[100px]">{selectedTimeDay}</span>
+                  <span className="font-medium min-w-[100px] hidden sm:block">{selectedTimeDay}</span>
                   
                   {/* Start Time */}
                   <Select 
