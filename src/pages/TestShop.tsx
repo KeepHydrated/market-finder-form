@@ -16,6 +16,7 @@ interface Market {
   hours: string | null;
   google_rating: number | null;
   google_rating_count: number | null;
+  google_place_id?: string;
 }
 
 // Helper to safely extract market name (handles case where name might be JSON object)
@@ -61,7 +62,7 @@ export default function TestShop() {
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Search markets
+  // Search markets - first local DB, then Google Places if no results
   useEffect(() => {
     const searchMarkets = async () => {
       if (!searchQuery.trim()) {
@@ -70,6 +71,8 @@ export default function TestShop() {
       }
 
       setIsLoading(true);
+      
+      // First, search local database
       const { data, error } = await supabase
         .from("markets")
         .select("*")
@@ -78,13 +81,52 @@ export default function TestShop() {
 
       if (error) {
         console.error("Error searching markets:", error);
-      } else {
-        setMarkets(data || []);
       }
+
+      // If local DB has results, use those
+      if (data && data.length > 0) {
+        setMarkets(data);
+        setIsLoading(false);
+        return;
+      }
+
+      // Otherwise, search Google Places
+      try {
+        const { data: googleData, error: googleError } = await supabase.functions.invoke(
+          "farmers-market-search",
+          { body: { query: searchQuery } }
+        );
+
+        if (googleError) {
+          console.error("Error searching Google Places:", googleError);
+          setMarkets([]);
+        } else if (googleData?.predictions) {
+          // Transform Google Places results to match Market interface
+          const googleMarkets: Market[] = googleData.predictions.map((place: any, index: number) => ({
+            id: -(index + 1), // Negative IDs for Google results
+            name: place.name,
+            address: place.address || place.structured_formatting?.secondary_text || "",
+            city: "",
+            state: "",
+            days: [],
+            hours: place.opening_hours?.weekday_text?.join(", ") || null,
+            google_rating: place.rating || null,
+            google_rating_count: place.user_ratings_total || null,
+            google_place_id: place.place_id,
+          }));
+          setMarkets(googleMarkets);
+        } else {
+          setMarkets([]);
+        }
+      } catch (err) {
+        console.error("Error calling Google Places:", err);
+        setMarkets([]);
+      }
+      
       setIsLoading(false);
     };
 
-    const debounce = setTimeout(searchMarkets, 300);
+    const debounce = setTimeout(searchMarkets, 500);
     return () => clearTimeout(debounce);
   }, [searchQuery]);
 
@@ -96,6 +138,10 @@ export default function TestShop() {
 
   const getInviteLink = () => {
     if (!selectedMarket) return "";
+    // For Google Places results (negative IDs), use google_place_id
+    if (selectedMarket.id < 0 && selectedMarket.google_place_id) {
+      return `${window.location.origin}/my-shop?place_id=${selectedMarket.google_place_id}`;
+    }
     return `${window.location.origin}/my-shop?market=${selectedMarket.id}`;
   };
 
