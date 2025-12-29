@@ -1864,6 +1864,25 @@ const VendorDuplicate = () => {
                                     Copy link
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
+                                    className="sm:hidden"
+                                    onClick={() => {
+                                      if (!user) {
+                                        toast({
+                                          title: "Authentication required",
+                                          description: "Please log in to message vendors",
+                                          variant: "destructive",
+                                        });
+                                        return;
+                                      }
+                                      setChatVendorId(selectedVendor.id);
+                                      setChatVendorName(selectedVendor.store_name);
+                                      setIsChatOpen(true);
+                                    }}
+                                  >
+                                    <MessageSquare className="h-4 w-4 mr-2" />
+                                    Message
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
                                     onClick={() => {
                                       if (!user) {
                                         toast({
