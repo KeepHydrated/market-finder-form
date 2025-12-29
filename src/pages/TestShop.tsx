@@ -255,24 +255,6 @@ export default function TestShop() {
                   </div>
                 </div>
 
-                {/* Preview Link */}
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => window.open(getInviteLink(), "_blank")}
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Preview Link
-                </Button>
-
-                {/* Clear Selection */}
-                <Button
-                  variant="ghost"
-                  className="w-full"
-                  onClick={() => setSelectedMarket(null)}
-                >
-                  Select Different Market
-                </Button>
               </CardContent>
             </Card>
           )}
