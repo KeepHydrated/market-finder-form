@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, Copy, Check, MapPin, ExternalLink } from "lucide-react";
+import { Search, Copy, Check, MapPin, ExternalLink, Clock, Star } from "lucide-react";
+
 interface Market {
   id: number;
   name: string;
@@ -13,6 +14,8 @@ interface Market {
   state: string;
   days: string[];
   hours: string | null;
+  google_rating: number | null;
+  google_rating_count: number | null;
 }
 
 // Helper to safely extract market name (handles case where name might be JSON object)
@@ -42,6 +45,12 @@ const getMarketAddress = (market: Market): string => {
     }
   }
   return `${market.address}, ${market.city}, ${market.state}`;
+};
+
+const openInGoogleMaps = (address: string, e: React.MouseEvent) => {
+  e.stopPropagation();
+  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  window.open(url, '_blank');
 };
 
 export default function TestShop() {
@@ -147,19 +156,66 @@ export default function TestShop() {
               )}
 
               {markets.length > 0 && (
-                <div className="mt-4 border rounded-lg divide-y max-h-64 overflow-y-auto">
-                  {markets.map((market) => (
-                    <button
-                      key={market.id}
-                      onClick={() => handleSelectMarket(market)}
-                      className="w-full p-3 text-left hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="font-medium text-foreground">{getMarketName(market)}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {market.city}, {market.state}
+                <div className="mt-4 border rounded-lg divide-y max-h-[400px] overflow-y-auto bg-background">
+                  {markets.map((market) => {
+                    const name = getMarketName(market);
+                    const address = getMarketAddress(market);
+                    return (
+                      <div
+                        key={market.id}
+                        onClick={() => handleSelectMarket(market)}
+                        className="p-4 hover:bg-muted/50 cursor-pointer transition-colors"
+                      >
+                        <div className="flex items-start gap-3">
+                          <MapPin className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                          <div className="flex-1 min-w-0 space-y-2">
+                            <div className="font-semibold text-foreground text-base">{name}</div>
+                            
+                            <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                              <MapPin className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                              <span>{address}</span>
+                            </div>
+
+                            {market.hours && (
+                              <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                                <Clock className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                                <div>
+                                  <span className="font-medium">Hours: </span>
+                                  <span>{market.hours}</span>
+                                </div>
+                              </div>
+                            )}
+
+                            {market.days && market.days.length > 0 && (
+                              <div className="text-sm text-muted-foreground">
+                                📅 {market.days.join(", ")}
+                              </div>
+                            )}
+
+                            {market.google_rating && (
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                                <span>{market.google_rating.toFixed(1)}</span>
+                                {market.google_rating_count && (
+                                  <span className="text-xs">({market.google_rating_count} reviews)</span>
+                                )}
+                              </div>
+                            )}
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => openInGoogleMaps(address, e)}
+                              className="mt-2"
+                            >
+                              <ExternalLink className="h-3 w-3 mr-2" />
+                              View on Map
+                            </Button>
+                          </div>
+                        </div>
                       </div>
-                    </button>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
