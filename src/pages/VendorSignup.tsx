@@ -9,10 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Plus, MapPin, CheckCircle, LogIn } from "lucide-react";
-import { GlobalHeader } from "@/components/GlobalHeader";
-import { ShopSidebar } from "@/components/ShopSidebar";
-import { ShopMobileNav } from "@/components/ShopMobileNav";
-import { SidebarProvider } from "@/components/ui/sidebar";
 
 interface Market {
   id: number;
@@ -23,6 +19,34 @@ interface Market {
   days: string[];
   hours: string | null;
 }
+
+// Helper to safely extract market name (handles case where name might be JSON object)
+const getMarketName = (market: Market): string => {
+  if (typeof market.name === 'string') {
+    if (market.name.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(market.name);
+        return parsed.name || market.name;
+      } catch {
+        return market.name;
+      }
+    }
+    return market.name;
+  }
+  return String(market.name);
+};
+
+const getMarketAddress = (market: Market): string => {
+  if (typeof market.name === 'string' && market.name.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(market.name);
+      if (parsed.address) return parsed.address;
+    } catch {
+      // fallback
+    }
+  }
+  return `${market.address}, ${market.city}, ${market.state}`;
+};
 
 interface Product {
   id: number;
@@ -317,120 +341,112 @@ export default function VendorSignup() {
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen bg-background w-full">
-        <GlobalHeader />
-        <ShopMobileNav />
-        
-        <div className="flex w-full">
-          <ShopSidebar />
-        
-        <main className="flex-1 p-4 md:p-8">
-          <div className="max-w-2xl mx-auto">
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl font-bold text-foreground">Join as a Vendor</h1>
-              <p className="text-muted-foreground mt-2">
-                Complete your profile to start selling at this market.
-              </p>
-            </div>
+    <div className="min-h-screen bg-background">
+      <main className="p-4 md:p-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-8 text-center">
+            <h1 className="text-3xl font-bold text-foreground">Join as a Vendor</h1>
+            <p className="text-muted-foreground mt-2">
+              Complete your profile to start selling at this market.
+            </p>
+          </div>
 
-        {/* Pre-filled Market Display */}
-        {market && (
-          <Card className="mb-6 bg-primary/5 border-primary/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-primary" />
-                Your Market
-              </CardTitle>
+          {/* Pre-filled Market Display */}
+          {market && (
+            <Card className="mb-6 bg-primary/5 border-primary/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-primary" />
+                  Your Market
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-1">
+                  <h3 className="font-semibold text-foreground text-lg">{getMarketName(market)}</h3>
+                  <p className="text-muted-foreground">
+                    {getMarketAddress(market)}
+                  </p>
+                  {market.days && market.days.length > 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      📅 {market.days.join(", ")}
+                    </p>
+                  )}
+                  {market.hours && (
+                    <p className="text-sm text-muted-foreground">
+                      🕒 {market.hours}
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Vendor Application Form - Always visible */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Shop Details</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-1">
-                <h3 className="font-semibold text-foreground text-lg">{market.name}</h3>
-                <p className="text-muted-foreground">
-                  {market.address}, {market.city}, {market.state}
-                </p>
-                {market.days && market.days.length > 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    📅 {market.days.join(", ")}
-                  </p>
-                )}
-                {market.hours && (
-                  <p className="text-sm text-muted-foreground">
-                    🕒 {market.hours}
-                  </p>
-                )}
-              </div>
+              <VendorApplication
+                data={vendorApplicationData}
+                onChange={setVendorApplicationData}
+                readOnly={false}
+              />
             </CardContent>
           </Card>
-        )}
 
-        {/* Vendor Application Form - Always visible */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Shop Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <VendorApplication
-              data={vendorApplicationData}
-              onChange={setVendorApplicationData}
-              readOnly={false}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Products Section */}
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Products</CardTitle>
-              <Button onClick={handleAddProduct} size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Product
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {products.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>No products added yet.</p>
-                <p className="text-sm">Add your products to showcase what you sell.</p>
+          {/* Products Section */}
+          <Card className="mb-6">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Products</CardTitle>
+                <Button onClick={handleAddProduct} size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Product
+                </Button>
               </div>
-            ) : (
-              <ProductGrid
-                products={products}
-                onDeleteProduct={handleDeleteProduct}
-                onDuplicateProduct={handleDuplicateProduct}
-              />
-            )}
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent>
+              {products.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No products added yet.</p>
+                  <p className="text-sm">Add your products to showcase what you sell.</p>
+                </div>
+              ) : (
+                <ProductGrid
+                  products={products}
+                  onDeleteProduct={handleDeleteProduct}
+                  onDuplicateProduct={handleDuplicateProduct}
+                />
+              )}
+            </CardContent>
+          </Card>
 
-            {/* Submit Button - Changes text based on auth status */}
-            <div className="flex justify-center">
-              <Button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                size="lg"
-                className="px-12"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Submitting...
-                  </>
-                ) : user ? (
-                  "Submit Application"
-                ) : (
-                  <>
-                    <LogIn className="h-4 w-4 mr-2" />
-                    Sign In / Sign Up to Submit
-                  </>
-                )}
-              </Button>
-            </div>
+          {/* Submit Button - Changes text based on auth status */}
+          <div className="flex justify-center">
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              size="lg"
+              className="px-12"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Submitting...
+                </>
+              ) : user ? (
+                "Submit Application"
+              ) : (
+                <>
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Sign In / Sign Up to Submit
+                </>
+              )}
+            </Button>
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
 
       {/* Add Product Form Modal */}
       <AddProductForm
@@ -452,7 +468,6 @@ export default function VendorSignup() {
           setShowAddProductForm(false);
         }}
       />
-      </div>
-    </SidebarProvider>
+    </div>
   );
 }
