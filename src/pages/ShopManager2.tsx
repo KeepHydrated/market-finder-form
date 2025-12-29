@@ -69,6 +69,7 @@ export default function ShopManager() {
   const urlParams = new URLSearchParams(location.search);
   const currentSection = urlParams.get('section') || 'setup';
   const prefilledMarketId = urlParams.get('market');
+  const prefilledPlaceId = urlParams.get('place_id');
   
   const [shopData, setShopData] = useState<ShopData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -129,13 +130,57 @@ export default function ShopManager() {
     }
   }, [user]);
 
-  // Pre-fill market from URL parameter
+  // Pre-fill market from URL parameter (either market ID or place_id)
   useEffect(() => {
-    const prefilMarket = async () => {
-      console.log('Checking prefill market:', { prefilledMarketId, selectedMarketsLength: selectedFarmersMarkets.length, loadingShop });
+    const prefillMarket = async () => {
+      console.log('Checking prefill market:', { prefilledMarketId, prefilledPlaceId, selectedMarketsLength: selectedFarmersMarkets.length, loadingShop });
       
-      // Only prefill if there's a market ID, we're not loading, and no markets are selected yet
-      if (prefilledMarketId && !loadingShop && selectedFarmersMarkets.length === 0) {
+      // Only prefill if we're not loading and no markets are selected yet
+      if (loadingShop || selectedFarmersMarkets.length > 0) return;
+
+      // Handle Google Places place_id
+      if (prefilledPlaceId) {
+        try {
+          console.log('Fetching Google Place details for place_id:', prefilledPlaceId);
+          
+          const { data: placeData, error } = await supabase.functions.invoke(
+            'farmers-market-search',
+            { body: { place_id: prefilledPlaceId } }
+          );
+
+          if (error) {
+            console.error('Error fetching place details:', error);
+            return;
+          }
+
+          console.log('Found Google Place:', placeData);
+
+          if (placeData) {
+            const formattedMarket = {
+              place_id: prefilledPlaceId,
+              name: placeData.name,
+              address: placeData.formatted_address,
+              structured_formatting: {
+                main_text: placeData.name,
+                secondary_text: placeData.formatted_address
+              }
+            };
+            console.log('Setting formatted Google Place market:', formattedMarket);
+            setSelectedFarmersMarkets([formattedMarket]);
+            
+            toast({
+              title: "Market Pre-filled",
+              description: `${placeData.name} has been added to your markets.`,
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching Google Place:', error);
+        }
+        return;
+      }
+      
+      // Handle database market ID
+      if (prefilledMarketId) {
         try {
           const marketId = parseInt(prefilledMarketId, 10);
           console.log('Attempting to prefill market ID:', marketId);
@@ -182,8 +227,8 @@ export default function ShopManager() {
       }
     };
 
-    prefilMarket();
-  }, [prefilledMarketId, loadingShop, selectedFarmersMarkets.length]);
+    prefillMarket();
+  }, [prefilledMarketId, prefilledPlaceId, loadingShop, selectedFarmersMarkets.length]);
 
   useEffect(() => {
     if (shopData) {
