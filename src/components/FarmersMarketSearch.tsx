@@ -356,10 +356,42 @@ export const FarmersMarketSearch = ({
 
   return (
     <div className="max-w-6xl space-y-6">
-      {/* Search Bar */}
+      {/* Search Bar with Selected Markets Inside */}
       <div className="relative max-w-2xl">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <div className="relative flex items-center flex-wrap gap-2 border border-input rounded-md bg-background px-3 py-2 min-h-[48px] focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+          <Search className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+          
+          {/* Selected Market Chips Inside Input */}
+          {selectedMarkets.map((market) => (
+            <Badge
+              key={market.place_id}
+              variant="secondary"
+              className="flex items-center gap-1.5 px-2 py-1 text-sm bg-primary/10 text-primary border-primary/20"
+            >
+              <div 
+                className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => handleMarketBadgeClick(market)}
+              >
+                <MapPin className="h-3 w-3" />
+                <span className="truncate max-w-[200px]">
+                  {market.structured_formatting?.main_text || market.name}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeMarket(market);
+                }}
+                disabled={!isEditing}
+                className="hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+          
+          {/* Search Input */}
           <Input
             ref={inputRef}
             type="text"
@@ -376,12 +408,12 @@ export const FarmersMarketSearch = ({
               setSearchQuery(e.target.value);
             }}
             onFocus={() => suggestions.length > 0 && isEditing && setShowSuggestions(true)}
-            className="pl-10 pr-4 py-3 text-lg"
+            className="flex-1 min-w-[150px] border-0 p-0 h-auto text-base focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
             autoComplete="off"
             disabled={selectedMarkets.length >= maxMarkets || !isEditing}
           />
           {loading && (
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+            <div className="flex-shrink-0">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
             </div>
           )}
@@ -485,43 +517,6 @@ export const FarmersMarketSearch = ({
           </div>
         )}
       </div>
-
-      {/* Selected Markets */}
-      {selectedMarkets.length > 0 && (
-        <div className="max-w-2xl space-y-3">
-          <Label className="text-muted-foreground">Selected Markets ({selectedMarkets.length}/{maxMarkets})</Label>
-          <div className="flex flex-wrap gap-2">
-            {selectedMarkets.map((market) => (
-              <Badge
-                key={market.place_id}
-                variant="secondary"
-                className="flex items-center gap-2 px-3 py-2 text-sm"
-              >
-                <div 
-                  className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-                  onClick={() => handleMarketBadgeClick(market)}
-                >
-                  <MapPin className="h-3 w-3" />
-                  <span className="truncate max-w-xs">
-                    {market.structured_formatting?.main_text || market.name}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeMarket(market);
-                  }}
-                  disabled={!isEditing}
-                  className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
