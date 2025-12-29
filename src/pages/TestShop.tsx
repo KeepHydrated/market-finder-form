@@ -96,7 +96,7 @@ export default function TestShop() {
 
   const getInviteLink = () => {
     if (!selectedMarket) return "";
-    return `${window.location.origin}/vendor-signup?market=${selectedMarket.id}`;
+    return `${window.location.origin}/my-shop?market=${selectedMarket.id}`;
   };
 
   const handleCopyLink = async () => {
