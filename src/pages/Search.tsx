@@ -94,6 +94,12 @@ const SearchPage = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     searchParams.get('category') ? [searchParams.get('category')!] : []
   );
+
+  // Sync searchQuery with URL params when they change (e.g., from header search)
+  useEffect(() => {
+    const urlSearch = searchParams.get('search') || searchParams.get('q') || '';
+    setSearchQuery(urlSearch);
+  }, [searchParams]);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<'relevancy' | 'lowest_price' | 'highest_price' | 'top_rated' | 'most_recent'>('relevancy');
