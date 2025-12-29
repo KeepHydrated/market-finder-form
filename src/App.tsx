@@ -17,6 +17,7 @@ import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
 import ShopManager2 from "./pages/ShopManager2";
+import TestShop from "./pages/TestShop";
 import Report from "./pages/Report";
 import Messages from "./pages/Messages";
 import Conversation from "./pages/Conversation";
@@ -58,6 +59,7 @@ const App = () => (
                 <Route path="/account" element={<AccountSettings />} />
                 <Route path="/order-success" element={<OrderSuccess />} />
                 <Route path="/my-shop" element={<ShopManager2 />} />
+                <Route path="/test" element={<TestShop />} />
                 <Route path="/commissions" element={<Commissions />} />
                 <Route path="/report" element={<Report />} />
                 <Route path="/messages" element={<Messages />} />
