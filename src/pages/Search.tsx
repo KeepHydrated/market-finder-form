@@ -555,6 +555,11 @@ const SearchPage = () => {
               </Badge>
             )}
 
+            {selectedCategories.length > 0 && !selectedCategories.includes('All') && (
+              <Badge variant="outline" className="text-green-600 border-green-600">
+                Category: {selectedCategories.length === 1 ? selectedCategories[0] : `${selectedCategories.length} selected`}
+              </Badge>
+            )}
 
             {selectedDays.length > 0 && (
               <Badge variant="outline" className="text-green-600 border-green-600">
