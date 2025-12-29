@@ -5,8 +5,6 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, Copy, Check, MapPin, ExternalLink } from "lucide-react";
-import { GlobalHeader } from "@/components/GlobalHeader";
-
 interface Market {
   id: number;
   name: string;
@@ -84,8 +82,6 @@ export default function TestShop() {
 
   return (
     <div className="min-h-screen bg-background">
-      <GlobalHeader />
-      
       <main className="p-4 md:p-8">
         <div className="max-w-xl mx-auto">
           <div className="mb-8 text-center">
