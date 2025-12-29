@@ -1902,7 +1902,7 @@ const VendorDuplicate = () => {
                               </DropdownMenu>
                             )}
 
-                            {/* Message Button */}
+                            {/* Message Button - hidden on mobile */}
                             <Button
                               variant="ghost"
                               size="sm"
@@ -1919,7 +1919,7 @@ const VendorDuplicate = () => {
                                 setChatVendorName(selectedVendor.store_name);
                                 setIsChatOpen(true);
                               }}
-                              className="text-muted-foreground hover:text-foreground transition-colors"
+                              className="text-muted-foreground hover:text-foreground transition-colors hidden sm:flex"
                             >
                               <MessageSquare className="h-5 w-5" />
                             </Button>
