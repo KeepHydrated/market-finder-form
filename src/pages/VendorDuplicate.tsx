@@ -1847,23 +1847,6 @@ const VendorDuplicate = () => {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="bg-background border shadow-md">
                                   <DropdownMenuItem
-                                    onClick={() => {
-                                      const vendorSlug = selectedVendor.store_name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                                      const baseUrl = window.location.hostname.includes('lovable.app') 
-                                        ? 'https://www.fromfarmersmarkets.com' 
-                                        : window.location.origin;
-                                      const url = `${baseUrl}/vendor/${vendorSlug}`;
-                                      navigator.clipboard.writeText(url);
-                                      toast({
-                                        title: "Link copied",
-                                        description: "Vendor link copied to clipboard",
-                                      });
-                                    }}
-                                  >
-                                    <Link className="h-4 w-4 mr-2" />
-                                    Copy link
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
                                     className="sm:hidden"
                                     onClick={() => {
                                       if (!user) {
@@ -1881,6 +1864,23 @@ const VendorDuplicate = () => {
                                   >
                                     <MessageSquare className="h-4 w-4 mr-2" />
                                     Message
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      const vendorSlug = selectedVendor.store_name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                                      const baseUrl = window.location.hostname.includes('lovable.app') 
+                                        ? 'https://www.fromfarmersmarkets.com' 
+                                        : window.location.origin;
+                                      const url = `${baseUrl}/vendor/${vendorSlug}`;
+                                      navigator.clipboard.writeText(url);
+                                      toast({
+                                        title: "Link copied",
+                                        description: "Vendor link copied to clipboard",
+                                      });
+                                    }}
+                                  >
+                                    <Link className="h-4 w-4 mr-2" />
+                                    Copy link
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() => {
