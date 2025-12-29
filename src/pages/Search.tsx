@@ -567,19 +567,6 @@ const SearchPage = () => {
               </Badge>
             )}
 
-            {hasActiveFilters && (
-              <button 
-                onClick={() => {
-                  setSearchQuery('');
-                  setSelectedCategories([]);
-                  setSelectedDays([]);
-                  setLocationFilter('all');
-                }}
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
-                Clear all
-              </button>
-            )}
           </div>
         </div>
 
