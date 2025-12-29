@@ -734,85 +734,89 @@ const SearchPage = () => {
                 </div>
 
                 {/* Time Range Selectors */}
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   <span className="font-medium min-w-[100px] hidden sm:block">{selectedTimeDay}</span>
                   
-                  {/* Start Time */}
-                  <Select 
-                    value={timeRange.startHour} 
-                    onValueChange={(v) => setTimeRange(prev => ({ ...prev, startHour: v }))}
-                  >
-                    <SelectTrigger className="w-[100px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background">
-                      {['12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00', '5:30', '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30'].map(time => (
-                        <SelectItem key={time} value={time}>{time}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {/* Start Time Row */}
+                  <div className="flex items-center gap-3">
+                    <Select 
+                      value={timeRange.startHour} 
+                      onValueChange={(v) => setTimeRange(prev => ({ ...prev, startHour: v }))}
+                    >
+                      <SelectTrigger className="w-[100px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background">
+                        {['12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00', '5:30', '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30'].map(time => (
+                          <SelectItem key={time} value={time}>{time}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    <Select 
+                      value={timeRange.startPeriod} 
+                      onValueChange={(v) => setTimeRange(prev => ({ ...prev, startPeriod: v }))}
+                    >
+                      <SelectTrigger className="w-[70px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background">
+                        <SelectItem value="AM">AM</SelectItem>
+                        <SelectItem value="PM">PM</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <span className="text-muted-foreground">to</span>
+                  </div>
                   
-                  <Select 
-                    value={timeRange.startPeriod} 
-                    onValueChange={(v) => setTimeRange(prev => ({ ...prev, startPeriod: v }))}
-                  >
-                    <SelectTrigger className="w-[70px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background">
-                      <SelectItem value="AM">AM</SelectItem>
-                      <SelectItem value="PM">PM</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  
-                  <span className="text-muted-foreground">to</span>
-                  
-                  {/* End Time */}
-                  <Select 
-                    value={timeRange.endHour} 
-                    onValueChange={(v) => setTimeRange(prev => ({ ...prev, endHour: v }))}
-                  >
-                    <SelectTrigger className="w-[100px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background">
-                      {['12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00', '5:30', '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30'].map(time => (
-                        <SelectItem key={time} value={time}>{time}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                  <Select 
-                    value={timeRange.endPeriod} 
-                    onValueChange={(v) => setTimeRange(prev => ({ ...prev, endPeriod: v }))}
-                  >
-                    <SelectTrigger className="w-[70px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background">
-                      <SelectItem value="AM">AM</SelectItem>
-                      <SelectItem value="PM">PM</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {/* End Time Row */}
+                  <div className="flex items-center gap-3">
+                    <Select 
+                      value={timeRange.endHour} 
+                      onValueChange={(v) => setTimeRange(prev => ({ ...prev, endHour: v }))}
+                    >
+                      <SelectTrigger className="w-[100px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background">
+                        {['12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00', '5:30', '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30'].map(time => (
+                          <SelectItem key={time} value={time}>{time}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    <Select 
+                      value={timeRange.endPeriod} 
+                      onValueChange={(v) => setTimeRange(prev => ({ ...prev, endPeriod: v }))}
+                    >
+                      <SelectTrigger className="w-[70px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background">
+                        <SelectItem value="AM">AM</SelectItem>
+                        <SelectItem value="PM">PM</SelectItem>
+                      </SelectContent>
+                    </Select>
 
-                  {/* Save Button */}
-                  <Button
-                    size="sm"
-                    variant={selectedDays.includes(selectedTimeDay) ? "outline" : "default"}
-                    onClick={() => {
-                      if (selectedDays.includes(selectedTimeDay)) {
-                        setSelectedDays(prev => prev.filter(d => d !== selectedTimeDay));
-                      } else {
-                        setSelectedDays(prev => [...prev, selectedTimeDay]);
-                      }
-                    }}
-                    className={cn(
-                      "ml-2",
-                      selectedDays.includes(selectedTimeDay) && "border-green-600 text-green-600 hover:bg-green-50"
-                    )}
-                  >
-                    {selectedDays.includes(selectedTimeDay) ? "Saved" : "Save"}
-                  </Button>
+                    {/* Save Button */}
+                    <Button
+                      size="sm"
+                      variant={selectedDays.includes(selectedTimeDay) ? "outline" : "default"}
+                      onClick={() => {
+                        if (selectedDays.includes(selectedTimeDay)) {
+                          setSelectedDays(prev => prev.filter(d => d !== selectedTimeDay));
+                        } else {
+                          setSelectedDays(prev => [...prev, selectedTimeDay]);
+                        }
+                      }}
+                      className={cn(
+                        "ml-2",
+                        selectedDays.includes(selectedTimeDay) && "border-green-600 text-green-600 hover:bg-green-50"
+                      )}
+                    >
+                      {selectedDays.includes(selectedTimeDay) ? "Saved" : "Save"}
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
