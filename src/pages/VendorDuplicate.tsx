@@ -1845,24 +1845,23 @@ const VendorDuplicate = () => {
                                     <MoreHorizontal className="h-5 w-5" />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
+                                <DropdownMenuContent align="end" className="bg-background border shadow-md">
                                   <DropdownMenuItem
                                     onClick={() => {
-                                      if (!user) {
-                                        toast({
-                                          title: "Authentication required",
-                                          description: "Please log in to message vendors",
-                                          variant: "destructive",
-                                        });
-                                        return;
-                                      }
-                                      setChatVendorId(selectedVendor.id);
-                                      setChatVendorName(selectedVendor.store_name);
-                                      setIsChatOpen(true);
+                                      const vendorSlug = selectedVendor.store_name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                                      const baseUrl = window.location.hostname.includes('lovable.app') 
+                                        ? 'https://www.fromfarmersmarkets.com' 
+                                        : window.location.origin;
+                                      const url = `${baseUrl}/vendor/${vendorSlug}`;
+                                      navigator.clipboard.writeText(url);
+                                      toast({
+                                        title: "Link copied",
+                                        description: "Vendor link copied to clipboard",
+                                      });
                                     }}
                                   >
-                                    <MessageSquare className="h-4 w-4 mr-2" />
-                                    Message
+                                    <Link className="h-4 w-4 mr-2" />
+                                    Copy link
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() => {
