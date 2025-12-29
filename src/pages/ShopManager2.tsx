@@ -135,8 +135,11 @@ export default function ShopManager() {
     const prefillMarket = async () => {
       console.log('Checking prefill market:', { prefilledMarketId, prefilledPlaceId, selectedMarketsLength: selectedFarmersMarkets.length, loadingShop });
       
-      // Only prefill if we're not loading and no markets are selected yet
-      if (loadingShop || selectedFarmersMarkets.length > 0) return;
+      // Only prefill if we're not loading and have a URL parameter
+      if (loadingShop) return;
+      
+      // Skip if no URL params for prefill
+      if (!prefilledMarketId && !prefilledPlaceId) return;
 
       // Handle Google Places place_id
       if (prefilledPlaceId) {
@@ -165,13 +168,24 @@ export default function ShopManager() {
                 secondary_text: placeData.formatted_address
               }
             };
-            console.log('Setting formatted Google Place market:', formattedMarket);
-            setSelectedFarmersMarkets([formattedMarket]);
             
-            toast({
-              title: "Market Pre-filled",
-              description: `${placeData.name} has been added to your markets.`,
-            });
+            // Check if this market is already selected
+            const isAlreadySelected = selectedFarmersMarkets.some(m => 
+              m.place_id === prefilledPlaceId || 
+              m.name?.toLowerCase() === placeData.name?.toLowerCase()
+            );
+            
+            if (!isAlreadySelected) {
+              console.log('Adding prefilled Google Place market:', formattedMarket);
+              setSelectedFarmersMarkets(prev => [formattedMarket, ...prev].slice(0, 3));
+              
+              toast({
+                title: "Market Pre-filled",
+                description: `${placeData.name} has been added to your markets.`,
+              });
+            } else {
+              console.log('Market already selected, skipping prefill');
+            }
           }
         } catch (error) {
           console.error('Error fetching Google Place:', error);
@@ -213,13 +227,24 @@ export default function ShopManager() {
                 secondary_text: market.address
               }
             };
-            console.log('Setting formatted market:', formattedMarket);
-            setSelectedFarmersMarkets([formattedMarket]);
             
-            toast({
-              title: "Market Pre-filled",
-              description: `${market.name} has been added to your markets.`,
-            });
+            // Check if this market is already selected
+            const isAlreadySelected = selectedFarmersMarkets.some(m => 
+              m.place_id === formattedMarket.place_id || 
+              m.name?.toLowerCase() === market.name?.toLowerCase()
+            );
+            
+            if (!isAlreadySelected) {
+              console.log('Adding prefilled market:', formattedMarket);
+              setSelectedFarmersMarkets(prev => [formattedMarket, ...prev].slice(0, 3));
+              
+              toast({
+                title: "Market Pre-filled",
+                description: `${market.name} has been added to your markets.`,
+              });
+            } else {
+              console.log('Market already selected, skipping prefill');
+            }
           }
         } catch (error) {
           console.error('Error fetching prefilled market:', error);
@@ -228,7 +253,7 @@ export default function ShopManager() {
     };
 
     prefillMarket();
-  }, [prefilledMarketId, prefilledPlaceId, loadingShop, selectedFarmersMarkets.length]);
+  }, [prefilledMarketId, prefilledPlaceId, loadingShop]);
 
   useEffect(() => {
     if (shopData) {
