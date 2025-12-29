@@ -15,6 +15,35 @@ interface Market {
   hours: string | null;
 }
 
+// Helper to safely extract market name (handles case where name might be JSON object)
+const getMarketName = (market: Market): string => {
+  if (typeof market.name === 'string') {
+    // Check if it's a JSON string
+    if (market.name.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(market.name);
+        return parsed.name || market.name;
+      } catch {
+        return market.name;
+      }
+    }
+    return market.name;
+  }
+  return String(market.name);
+};
+
+const getMarketAddress = (market: Market): string => {
+  if (typeof market.name === 'string' && market.name.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(market.name);
+      if (parsed.address) return parsed.address;
+    } catch {
+      // fallback to regular address
+    }
+  }
+  return `${market.address}, ${market.city}, ${market.state}`;
+};
+
 export default function TestShop() {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
@@ -125,7 +154,7 @@ export default function TestShop() {
                       onClick={() => handleSelectMarket(market)}
                       className="w-full p-3 text-left hover:bg-muted/50 transition-colors"
                     >
-                      <div className="font-medium text-foreground">{market.name}</div>
+                      <div className="font-medium text-foreground">{getMarketName(market)}</div>
                       <div className="text-sm text-muted-foreground">
                         {market.city}, {market.state}
                       </div>
@@ -144,9 +173,9 @@ export default function TestShop() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-foreground text-lg">{selectedMarket.name}</h3>
+                  <h3 className="font-semibold text-foreground text-lg">{getMarketName(selectedMarket)}</h3>
                   <p className="text-muted-foreground">
-                    {selectedMarket.address}, {selectedMarket.city}, {selectedMarket.state}
+                    {getMarketAddress(selectedMarket)}
                   </p>
                   {selectedMarket.days && selectedMarket.days.length > 0 && (
                     <p className="text-sm text-muted-foreground mt-1">
