@@ -29,6 +29,7 @@ import Auth from "./pages/Auth";
 import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
 import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 
 import VendorSignup from "./pages/VendorSignup";
 const queryClient = new QueryClient();
@@ -69,6 +70,7 @@ const App = () => (
                 <Route path="/profile/:userId" element={<Profile />} />
                 <Route path="/vendor-signup" element={<VendorSignup />} />
                 <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
