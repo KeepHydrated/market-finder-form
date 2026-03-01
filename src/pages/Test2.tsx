@@ -17,6 +17,7 @@ import categoryDairy from "@/assets/category-dairy.jpg";
 import categoryRancher from "@/assets/category-rancher.jpg";
 import categoryBeverages from "@/assets/category-beverages.jpg";
 import categoryFarmers from "@/assets/category-farmers.jpg";
+import sampleMarketImg from "@/assets/sample-market.jpg";
 
 interface Product {
   id: string;
@@ -1135,12 +1136,66 @@ const Test2 = () => {
             <div className="text-center py-12">
               <p className="text-muted-foreground">Loading markets...</p>
             </div>
-          ) : recommendedMarkets.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">No markets available yet.</p>
-            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Sample Market - always visible */}
+              <Card
+                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer rounded-2xl"
+                onClick={() => navigate('/market', { 
+                  state: { 
+                    type: 'market', 
+                    selectedMarket: {
+                      id: 'sample',
+                      name: 'Santa Monica Farmers Market',
+                      address: '2nd St & Arizona Ave, Santa Monica, CA',
+                      city: 'Santa Monica',
+                      state: 'CA',
+                      days: ['Wednesday', 'Saturday'],
+                      hours: '8:00 AM - 1:00 PM',
+                      google_rating: 4.7,
+                      google_rating_count: 1250,
+                      vendors: []
+                    }
+                  } 
+                })}
+              >
+                <div className="aspect-[4/3] bg-muted relative overflow-hidden">
+                  {/* Sample Badge */}
+                  <Badge className="absolute top-2 left-2 z-10 bg-amber-100 text-amber-800 hover:bg-amber-100 border-0 shadow-sm">
+                    Sample
+                  </Badge>
+
+                  <img 
+                    src={sampleMarketImg}
+                    alt="Santa Monica Farmers Market"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                <div className="p-4 space-y-3">
+                  <h3 className="text-base font-semibold text-foreground text-left">
+                    Santa Monica Farmers Market
+                  </h3>
+                  
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <p className="text-sm text-muted-foreground">
+                      2nd St & Arizona Ave, Santa Monica, CA
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    <Badge className="text-xs px-3 py-1 bg-green-100 text-green-700 hover:bg-green-100 border-0">
+                      Wednesday
+                    </Badge>
+                    <Badge className="text-xs px-3 py-1 bg-green-100 text-green-700 hover:bg-green-100 border-0">
+                      Saturday
+                    </Badge>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Real nearby markets */}
               {recommendedMarkets.map((market) => (
                 <Card
                   key={market.id}
