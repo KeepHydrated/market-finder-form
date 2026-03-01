@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { Footer } from "@/components/Footer";
 import { ShoppingCartProvider } from "@/contexts/ShoppingCartContext";
@@ -35,52 +36,54 @@ import VendorSignup from "./pages/VendorSignup";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <ShoppingCartProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <div className="min-h-screen flex flex-col">
-            <GlobalHeader />
-            <ShoppingCart />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Test2 />} />
-                <Route path="/home" element={<Test2 />} />
-                <Route path="/search" element={<Search />} />
-                <Route path="/homepage" element={<Homepage />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/market" element={<VendorDuplicate />} />
-                <Route path="/market/:marketSlug" element={<VendorDuplicate />} />
-                <Route path="/vendor/:vendorSlug" element={<VendorDuplicate />} />
-                <Route path="/likes" element={<Likes />} />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/account" element={<AccountSettings />} />
-                <Route path="/order-success" element={<OrderSuccess />} />
-                <Route path="/my-shop" element={<ShopManager2 />} />
-                <Route path="/test" element={<TestShop />} />
-                <Route path="/commissions" element={<Commissions />} />
-                <Route path="/report" element={<Report />} />
-                <Route path="/messages" element={<Messages />} />
-                <Route path="/messages/:conversationId" element={<Conversation />} />
-                <Route path="/analytics" element={<Analytics />} />
-                <Route path="/profile/:userId" element={<Profile />} />
-                <Route path="/vendor-signup" element={<VendorSignup />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<Terms />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </BrowserRouter>
-      </ShoppingCartProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <ShoppingCartProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ScrollToTop />
+            <div className="min-h-screen flex flex-col">
+              <GlobalHeader />
+              <ShoppingCart />
+              <main className="flex-1">
+                <Routes>
+                  <Route path="/" element={<Test2 />} />
+                  <Route path="/home" element={<Test2 />} />
+                  <Route path="/search" element={<Search />} />
+                  <Route path="/homepage" element={<Homepage />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/market" element={<VendorDuplicate />} />
+                  <Route path="/market/:marketSlug" element={<VendorDuplicate />} />
+                  <Route path="/vendor/:vendorSlug" element={<VendorDuplicate />} />
+                  <Route path="/likes" element={<Likes />} />
+                  <Route path="/orders" element={<Orders />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/account" element={<AccountSettings />} />
+                  <Route path="/order-success" element={<OrderSuccess />} />
+                  <Route path="/my-shop" element={<ShopManager2 />} />
+                  <Route path="/test" element={<TestShop />} />
+                  <Route path="/commissions" element={<Commissions />} />
+                  <Route path="/report" element={<Report />} />
+                  <Route path="/messages" element={<Messages />} />
+                  <Route path="/messages/:conversationId" element={<Conversation />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/profile/:userId" element={<Profile />} />
+                  <Route path="/vendor-signup" element={<VendorSignup />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/terms" element={<Terms />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          </BrowserRouter>
+        </ShoppingCartProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;
