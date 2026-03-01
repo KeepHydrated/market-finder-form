@@ -91,12 +91,33 @@ const Test2 = () => {
   const [zipcodeInput, setZipcodeInput] = useState('');
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [detectedLocation, setDetectedLocation] = useState<{city: string; state: string} | null>(null);
+  
+  // Sample vendors for demo market
+  const [sampleVendors, setSampleVendors] = useState<Vendor[]>([]);
 
   useEffect(() => {
     fetchRecommendedProducts();
     fetchRecommendedVendors();
     getUserLocationFast();
+    fetchSampleVendors();
   }, []);
+
+  const fetchSampleVendors = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('id, store_name, primary_specialty, description, products, google_rating, google_rating_count, market_address, latitude, longitude, selected_markets, market_days, is_sample')
+        .eq('is_sample', true)
+        .eq('status', 'accepted');
+
+      if (error) throw error;
+      if (data) {
+        setSampleVendors(data as unknown as Vendor[]);
+      }
+    } catch (error) {
+      console.error('Error fetching sample vendors:', error);
+    }
+  };
 
   // Fetch markets when user coordinates are available
   useEffect(() => {
@@ -1154,7 +1175,7 @@ const Test2 = () => {
                       hours: '8:00 AM - 1:00 PM',
                       google_rating: 4.7,
                       google_rating_count: 1250,
-                      vendors: []
+                      vendors: sampleVendors
                     }
                   } 
                 })}
