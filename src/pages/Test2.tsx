@@ -438,7 +438,6 @@ const Test2 = () => {
         .select('id, store_name, primary_specialty, description, products, google_rating, google_rating_count, market_address, latitude, longitude, selected_markets, market_days')
         .eq('status', 'accepted')
         .not('products', 'is', null)
-        .or('is_sample.is.null,is_sample.eq.false')
         .limit(20);
 
       if (error) throw error;
