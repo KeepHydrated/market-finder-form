@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { SEOHead } from "@/components/SEOHead";
 
 const Terms = () => {
   useEffect(() => {
@@ -7,6 +8,11 @@ const Terms = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Terms and Conditions | From Farmers Markets"
+        description="Read the terms and conditions for using From Farmers Markets, our marketplace connecting you with local farmers market vendors."
+        path="/terms"
+      />
       <div className="container mx-auto px-4 py-12 max-w-3xl">
         <h1 className="text-3xl font-bold text-foreground mb-8">Terms and Conditions</h1>
         <p className="text-sm text-muted-foreground mb-8">Last updated: March 1, 2026</p>

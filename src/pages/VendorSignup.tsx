@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { SEOHead } from "@/components/SEOHead";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -342,6 +343,11 @@ export default function VendorSignup() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Become a Vendor | Sell at Farmers Markets Online"
+        description="Join From Farmers Markets as a vendor. Reach more customers and grow your small business by selling your products online."
+        path="/vendor-signup"
+      />
       <main className="p-4 md:p-8">
         <div className="max-w-2xl mx-auto">
           <div className="mb-8 text-center">

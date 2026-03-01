@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -503,6 +504,11 @@ const SearchPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Search Farmers Market Vendors & Products | From Farmers Markets"
+        description="Browse and search for local farmers market vendors, fresh produce, flowers, baked goods, and more from small businesses across the US."
+        path="/search"
+      />
       <div className="container mx-auto px-4 py-8">
         
         {/* Filter Bar */}
