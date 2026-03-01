@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+import { SEOHead } from "@/components/SEOHead";
 import { useNavigate, useLocation, useSearchParams, useParams } from "react-router-dom";
 import { Store, MapPin, Clock, Star, Heart, Plus, X, Camera, Navigation, Pencil, ChevronLeft, ChevronRight, MessageSquare, ArrowUp, Flag, MoreHorizontal, Link } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -1214,6 +1215,11 @@ const VendorDuplicate = () => {
 
   return (
     <>
+      <SEOHead
+        title={`${acceptedSubmission.store_name} | From Farmers Markets`}
+        description={acceptedSubmission.description || `Shop from ${acceptedSubmission.store_name} — a local vendor on From Farmers Markets.`}
+        path={`/vendor/${acceptedSubmission.id}`}
+      />
       {isTablet ? (
         // iPad view - same as desktop layout but narrower
         <div className="min-h-screen bg-background">
