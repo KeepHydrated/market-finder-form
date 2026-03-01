@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { SEOHead } from "@/components/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
@@ -621,6 +622,11 @@ const Test2 = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Find Local Farmers Markets | Support Small Businesses"
+        description="Discover and shop from local farmers markets across the US. Support small vendors selling fresh produce, flowers, baked goods, and more."
+        path="/"
+      />
       <div className="container mx-auto px-4 py-8">
         <h1 className="sr-only">From Farmers Markets — Support Small Businesses</h1>
         {/* Farmers Market Banner */}

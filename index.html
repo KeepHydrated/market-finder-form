@@ -38,7 +38,42 @@
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Static SEO content visible to crawlers before React hydrates -->
+      <div style="max-width:1200px;margin:0 auto;padding:2rem;font-family:system-ui,sans-serif">
+        <header>
+          <h1>From Farmers Markets — Support Small Businesses</h1>
+          <p>Discover and shop from local farmers markets across the United States. Support small vendors selling fresh produce, flowers, baked goods, dairy, and more — not just the ones near you.</p>
+        </header>
+        <main>
+          <section>
+            <h2>Shop by Category</h2>
+            <ul>
+              <li><a href="/search?category=flowers">Flowers &amp; Bouquets</a></li>
+              <li><a href="/search?category=bakery">Bakery &amp; Baked Goods</a></li>
+              <li><a href="/search?category=dairy">Dairy &amp; Eggs</a></li>
+              <li><a href="/search?category=produce">Fresh Produce</a></li>
+              <li><a href="/search?category=beverages">Beverages</a></li>
+              <li><a href="/search?category=meat">Meat &amp; Rancher Products</a></li>
+            </ul>
+          </section>
+          <section>
+            <h2>Find Farmers Markets Near You</h2>
+            <p>Browse farmers markets in your area and discover local vendors offering fresh, locally-sourced products. From organic vegetables to artisan breads, find everything you need from small businesses in your community.</p>
+          </section>
+          <section>
+            <h2>Become a Vendor</h2>
+            <p>Are you a small business owner or farmer? <a href="/vendor-signup">Join From Farmers Markets</a> to reach more customers and grow your business online.</p>
+          </section>
+        </main>
+        <footer>
+          <nav>
+            <a href="/privacy">Privacy Policy</a> |
+            <a href="/terms">Terms of Service</a>
+          </nav>
+        </footer>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
