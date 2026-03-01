@@ -622,8 +622,9 @@ const Test2 = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
+        <h1 className="sr-only">From Farmers Markets — Support Small Businesses</h1>
         {/* Farmers Market Banner */}
-        <div className="mb-8 rounded-lg overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background border border-primary/20">
+        <section className="mb-8 rounded-lg overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background border border-primary/20" aria-label="Get started">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
             <div className="flex-1 p-6 md:p-8 text-center md:text-left">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
@@ -648,7 +649,7 @@ const Test2 = () => {
               />
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Recommended Products Section */}
         <div className="mb-12">

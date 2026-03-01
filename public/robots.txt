@@ -12,3 +12,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://fromfarmersmarkets.lovable.app/sitemap.xml
