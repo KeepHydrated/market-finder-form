@@ -8,7 +8,7 @@ export const Footer = () => {
 
   return (
     <>
-      <footer className="border-t bg-slate-900 text-slate-300 mt-auto">
+      <footer className="border-t bg-card text-foreground mt-auto">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-6">
@@ -23,7 +23,7 @@ export const Footer = () => {
               onClick={() => setIsChatOpen(true)}
               className="flex items-center gap-2 text-sm hover:text-white transition-colors cursor-pointer"
             >
-              <span className="text-slate-400">Questions and/or comments?</span>
+              <span className="text-muted-foreground">Questions and/or comments?</span>
               <span className="underline">We'd love to hear from you.</span>
               <MessageCircle className="h-4 w-4" />
             </button>
