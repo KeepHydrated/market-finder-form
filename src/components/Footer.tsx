@@ -12,16 +12,16 @@ export const Footer = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-6">
-              <Link to="/privacy" className="text-sm hover:text-white transition-colors">
+              <Link to="/privacy" className="text-sm">
                 Privacy
               </Link>
-              <Link to="/terms" className="text-sm hover:text-white transition-colors">
+              <Link to="/terms" className="text-sm">
                 Terms and Conditions
               </Link>
             </div>
             <button 
               onClick={() => setIsChatOpen(true)}
-              className="flex items-center gap-2 text-sm hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-2 text-sm cursor-pointer"
             >
               <span className="text-muted-foreground">Questions and/or comments?</span>
               <span className="underline">We'd love to hear from you.</span>
