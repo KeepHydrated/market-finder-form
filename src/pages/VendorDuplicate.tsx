@@ -2507,10 +2507,6 @@ const VendorDuplicate = () => {
         </Button>
       )}
 
-      {/* Screen Width Counter - Debug */}
-      <div className="fixed bottom-4 right-4 z-[200] bg-background/90 border rounded-md px-3 py-1.5 text-sm font-mono shadow-lg">
-        {screenWidth}px
-      </div>
     </>
   );
 };
