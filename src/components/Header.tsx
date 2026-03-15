@@ -294,38 +294,11 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
             )}
           </div>
           
-          {/* Search bar - hidden on md, shown on lg+ in first row */}
-          <div className="flex-1 max-w-md mx-8 hidden lg:block">
-            <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Search vendors, products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-8 bg-background/50 border-border"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={clearSearch}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </form>
-          </div>
           
           {/* Mobile navigation - centered home icon */}
           <div className="flex items-center justify-between md:justify-end w-full md:w-auto space-x-4 md:space-x-8 h-16">
             {/* Left icons on mobile */}
             <div className="flex items-center space-x-4 md:hidden">
-              {location.pathname === '/' && (
-                <Button variant="ghost" size="sm" onClick={() => setMobileSearchOpen(!mobileSearchOpen)}>
-                  <Search className="h-5 w-5" />
-                </Button>
-              )}
               <Link to="/likes">
                 <Button variant="ghost" size="sm">
                   <Heart className="h-5 w-5" />
@@ -464,53 +437,9 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
               </DropdownMenu>
             )}
             
-            <form onSubmit={handleSearch} className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Search vendors, products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-8 bg-background/50 border-border"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={clearSearch}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </form>
           </div>
         </div>
 
-        {/* Mobile search bar - expandable, homepage only */}
-        {mobileSearchOpen && location.pathname === '/' && (
-          <div className="md:hidden pb-3">
-            <form onSubmit={(e) => { handleSearch(e); setMobileSearchOpen(false); }} className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Search vendors, products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-8 bg-background/50 border-border"
-                autoFocus
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={clearSearch}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </form>
-          </div>
-        )}
       </div>
     </header>
   );
