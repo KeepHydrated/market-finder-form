@@ -508,28 +508,30 @@ const SearchPage = () => {
             {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
 
-          {/* Inline Category Chips */}
-          <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
-            {CATEGORIES.map(category => (
-              <button
-                key={category}
-                onClick={() => {
-                  setSelectedCategories(prev => 
-                    prev.includes(category) 
-                      ? prev.filter(c => c !== category)
-                      : [...prev, category]
-                  );
-                }}
-                className={cn(
-                  "px-3 py-1.5 rounded-full text-xs border transition-colors whitespace-nowrap",
-                  selectedCategories.includes(category)
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-background text-foreground border-border hover:bg-muted"
-                )}
-              >
-                {category}
-              </button>
-            ))}
+          {/* Inline Category Slider */}
+          <div className="flex-1 min-w-0 overflow-hidden relative">
+            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {CATEGORIES.map(category => (
+                <button
+                  key={category}
+                  onClick={() => {
+                    setSelectedCategories(prev => 
+                      prev.includes(category) 
+                        ? prev.filter(c => c !== category)
+                        : [...prev, category]
+                    );
+                  }}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-xs border transition-colors whitespace-nowrap flex-shrink-0",
+                    selectedCategories.includes(category)
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background text-foreground border-border hover:bg-muted"
+                  )}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Sort Dropdown - pinned right */}
