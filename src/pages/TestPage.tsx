@@ -13,10 +13,10 @@ const menuItems = [
 export default function TestPage() {
   const location = useLocation();
   const urlParams = new URLSearchParams(location.search);
-  const currentSection = urlParams.get("section") || "overview";
+  const currentSection = urlParams.get("section") || "dashboard";
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const currentTitle = menuItems.find((item) => item.section === currentSection)?.title || "Overview";
+  const currentTitle = menuItems.find((item) => item.section === currentSection)?.title || "Dashboard";
 
   const isActive = (section: string) => currentSection === section;
 
@@ -59,7 +59,7 @@ export default function TestPage() {
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile sticky header with hamburger — visible only on mobile */}
-        <div className="md:hidden fixed top-[57px] left-0 right-0 z-40 bg-background border-b border-border px-4 py-2.5 flex items-center gap-3">
+        <div className="md:hidden bg-background border-b border-border px-4 py-2.5 flex items-center gap-3">
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
@@ -87,8 +87,8 @@ export default function TestPage() {
             className="absolute inset-0 bg-black/40"
             onClick={() => setDrawerOpen(false)}
           />
-          <div className="absolute top-0 left-0 h-full w-[75%] max-w-[300px] bg-background shadow-xl">
-            <div className="flex justify-end px-5 pt-6 pb-2">
+          <div className="absolute top-0 left-0 h-full w-[75%] max-w-[300px] bg-background shadow-xl flex flex-col">
+            <div className="flex items-center justify-end px-5 pt-6 pb-2">
               <button
                 type="button"
                 onClick={() => setDrawerOpen(false)}
@@ -98,21 +98,8 @@ export default function TestPage() {
                 <X className="h-6 w-6 text-foreground" />
               </button>
             </div>
-            <div className="flex flex-col gap-1 px-4 pt-2 pb-4">
-              {menuItems.map((item) => (
-                <NavLink
-                  key={item.section}
-                  to={`/test?section=${item.section}`}
-                  onClick={() => setDrawerOpen(false)}
-                  className={`px-5 py-4 rounded-2xl transition-colors text-[17px] ${
-                    isActive(item.section)
-                      ? "bg-primary text-primary-foreground font-semibold"
-                      : "text-muted-foreground/70"
-                  }`}
-                >
-                  <span>{item.title}</span>
-                </NavLink>
-              ))}
+            <div className="px-3 pt-4">
+              {navContent(true)}
             </div>
           </div>
         </div>
