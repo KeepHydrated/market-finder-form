@@ -47,29 +47,22 @@ export function ShopMobileNav({ hasShopData = false }: ShopMobileNavProps) {
   const currentSection = urlParams.get("section") || "setup";
 
   const availableItems = menuItems.filter((item) => !item.requiresShop || hasShopData);
+  const currentTitle = menuItems.find((item) => item.section === currentSection)?.title || "Shop";
   const isActive = (section: string) => currentSection === section;
   const isOpen = openSide !== null;
 
   return (
     <>
-      <div className="sm:hidden fixed top-16 left-0 right-0 z-40 px-4 py-3 pointer-events-none flex justify-between">
+      <div className="sm:hidden fixed top-[57px] left-0 right-0 z-40 bg-background border-b border-border px-4 py-2.5 flex items-center gap-3">
         <button
           type="button"
           onClick={() => setOpenSide("left")}
-          className="pointer-events-auto p-2 rounded-md hover:bg-muted"
+          className="p-1.5 rounded-md hover:bg-muted"
           aria-label="Open shop menu"
         >
           <Menu className="h-5 w-5" />
         </button>
-
-        <button
-          type="button"
-          onClick={() => setOpenSide("right")}
-          className="pointer-events-auto p-2 rounded-md hover:bg-muted"
-          aria-label="Open shop menu"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
+        <span className="font-semibold text-sm">{currentTitle}</span>
       </div>
 
       {isOpen && (
