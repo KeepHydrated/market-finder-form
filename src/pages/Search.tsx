@@ -495,12 +495,12 @@ const SearchPage = () => {
       <div className="container mx-auto px-4 py-8">
         
         {/* Filter Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <div className="flex flex-wrap items-center gap-3 mb-4">
           {/* Filter Toggle Button */}
           <Button 
             ref={filterButtonRef}
             variant="outline" 
-            className="gap-2"
+            className="gap-2 flex-shrink-0"
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className="h-4 w-4" />
@@ -508,9 +508,33 @@ const SearchPage = () => {
             {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
 
+          {/* Inline Category Chips */}
+          <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
+            {CATEGORIES.map(category => (
+              <button
+                key={category}
+                onClick={() => {
+                  setSelectedCategories(prev => 
+                    prev.includes(category) 
+                      ? prev.filter(c => c !== category)
+                      : [...prev, category]
+                  );
+                }}
+                className={cn(
+                  "px-3 py-1.5 rounded-full text-xs border transition-colors whitespace-nowrap",
+                  selectedCategories.includes(category)
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-foreground border-border hover:bg-muted"
+                )}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+
           {/* Sort Dropdown - pinned right */}
           <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-[160px] flex-shrink-0">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent className="bg-background">
