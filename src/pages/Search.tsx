@@ -540,10 +540,6 @@ const SearchPage = () => {
               </SelectContent>
             </Select>
           </div>
-
-          <span className="text-sm text-muted-foreground">
-            Showing {totalResults} result{totalResults !== 1 ? 's' : ''}
-          </span>
         </div>
 
         {/* Main content area with sidebar filter */}
