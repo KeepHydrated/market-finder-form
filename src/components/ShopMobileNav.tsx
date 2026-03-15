@@ -62,6 +62,7 @@ const menuItems = [
 export function ShopMobileNav({ hasShopData = false }: ShopMobileNavProps) {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [openRight, setOpenRight] = useState(false);
   
   // Detect which shop page we're on
   const isMyShop2 = useMatch('/my-shop2');
