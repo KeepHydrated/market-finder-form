@@ -747,7 +747,7 @@ const SearchPage = () => {
                     setSelectedDays([]);
                     setLocationFilter('all');
                     setViewMode('products');
-                    setSelectedTimeDay('Monday');
+                    setSelectedTimeDays(['Monday']);
                   }}
                   className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mt-4 pt-4 border-t w-full"
                 >
