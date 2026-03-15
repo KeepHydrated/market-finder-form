@@ -512,34 +512,32 @@ const SearchPage = () => {
       <div className="container mx-auto px-4 py-8">
         
         {/* Filter Bar */}
-        <div className="flex flex-wrap items-center justify-end gap-4 mb-4">
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* Filter Toggle Button */}
-            <Button 
-              ref={filterButtonRef}
-              variant="outline" 
-              className="gap-2"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Filter className="h-4 w-4" />
-              Filter
-              {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </Button>
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          {/* Filter Toggle Button */}
+          <Button 
+            ref={filterButtonRef}
+            variant="outline" 
+            className="gap-2"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="h-4 w-4" />
+            Filter
+            {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
 
-            {/* Sort Dropdown */}
-            <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
-              <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent className="bg-background">
-                <SelectItem value="relevancy" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Relevancy</SelectItem>
-                <SelectItem value="lowest_price" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Lowest Price</SelectItem>
-                <SelectItem value="highest_price" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Highest Price</SelectItem>
-                <SelectItem value="top_rated" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Top Rated Store</SelectItem>
-                <SelectItem value="most_recent" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Most Recent</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Sort Dropdown - pinned right */}
+          <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent className="bg-background">
+              <SelectItem value="relevancy" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Relevancy</SelectItem>
+              <SelectItem value="lowest_price" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Lowest Price</SelectItem>
+              <SelectItem value="highest_price" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Highest Price</SelectItem>
+              <SelectItem value="top_rated" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Top Rated Store</SelectItem>
+              <SelectItem value="most_recent" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Most Recent</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Main content area with sidebar filter */}
