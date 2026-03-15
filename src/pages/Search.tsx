@@ -719,6 +719,7 @@ const SearchPage = () => {
                       })()}
                     </div>
                   )}
+                </div>
 
                 {/* Reset */}
                 <button
