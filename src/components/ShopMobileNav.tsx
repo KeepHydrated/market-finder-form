@@ -103,6 +103,31 @@ export function ShopMobileNav({ hasShopData = false }: ShopMobileNavProps) {
           </div>
         </SheetContent>
       </Sheet>
+      <Sheet open={openRight} onOpenChange={setOpenRight}>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="pointer-events-auto">
+            <Menu className="h-5 w-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="right" className="w-64">
+          <div className="flex flex-col gap-2 mt-8">
+            {availableItems.map((item) => (
+              <NavLink
+                key={item.section}
+                to={`${basePath}?section=${item.section}`}
+                onClick={() => setOpenRight(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive(item.section)
+                    ? "bg-primary text-primary-foreground font-medium"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                }`}
+              >
+                <span>{item.title}</span>
+              </NavLink>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
