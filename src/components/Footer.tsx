@@ -21,11 +21,13 @@ export const Footer = () => {
             </div>
             <button 
               onClick={() => setIsChatOpen(true)}
-              className="flex items-center gap-2 text-sm cursor-pointer"
+              className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 text-sm cursor-pointer"
             >
               <span className="text-muted-foreground">Questions and/or comments?</span>
-              <span className="underline">We'd love to hear from you.</span>
-              <MessageCircle className="h-4 w-4" />
+              <span className="flex items-center gap-2">
+                <span className="underline">We'd love to hear from you.</span>
+                <MessageCircle className="h-4 w-4" />
+              </span>
             </button>
           </div>
         </div>
