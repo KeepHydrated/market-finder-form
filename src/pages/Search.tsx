@@ -526,19 +526,6 @@ const SearchPage = () => {
               {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </Button>
 
-            {/* Sort Dropdown */}
-            <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
-              <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent className="bg-background">
-                <SelectItem value="relevancy" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Relevancy</SelectItem>
-                <SelectItem value="lowest_price" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Lowest Price</SelectItem>
-                <SelectItem value="highest_price" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Highest Price</SelectItem>
-                <SelectItem value="top_rated" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Top Rated Store</SelectItem>
-                <SelectItem value="most_recent" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Most Recent</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
