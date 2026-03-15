@@ -37,6 +37,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
   const [hasAnySubmission, setHasAnySubmission] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [newOrdersCount, setNewOrdersCount] = useState(0);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const isOnOrdersPage = location.pathname === '/my-shop' && location.search.includes('section=orders2');
   
   // Get current category if on search page
