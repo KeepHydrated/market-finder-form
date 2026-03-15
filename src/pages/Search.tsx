@@ -639,25 +639,33 @@ const SearchPage = () => {
                         'Thu': 'Thursday', 'Fri': 'Friday', 'Sat': 'Saturday', 'Sun': 'Sunday'
                       };
                       const fullDayName = dayMapping[dayShort];
-                      const isSelected = selectedTimeDay === fullDayName;
                       const isActive = selectedDays.includes(fullDayName);
+                      const isViewing = selectedTimeDay === fullDayName;
                       
                       return (
                         <button
                           key={dayShort}
                           onClick={() => {
-                            setSelectedTimeDay(fullDayName);
-                            if (!selectedDays.includes(fullDayName)) {
+                            if (isActive) {
+                              // Deselect day filter
+                              setSelectedDays(prev => prev.filter(d => d !== fullDayName));
+                              setDayTimeRanges(prev => {
+                                const next = { ...prev };
+                                delete next[fullDayName];
+                                return next;
+                              });
+                              setSelectedTimeDay(isViewing ? '' : selectedTimeDay);
+                            } else {
+                              // Select day filter
                               setSelectedDays(prev => [...prev, fullDayName]);
+                              setSelectedTimeDay(fullDayName);
                             }
                           }}
                           className={cn(
                             "px-2 py-2 rounded-lg text-xs font-medium transition-colors border",
-                            isSelected
+                            isActive
                               ? "bg-green-600 text-white border-green-600"
-                              : isActive
-                                ? "bg-green-100 text-green-700 border-green-200"
-                                : "bg-background text-foreground border-border hover:bg-muted"
+                              : "bg-background text-foreground border-border hover:bg-muted"
                           )}
                         >
                           {dayShort}
@@ -667,42 +675,22 @@ const SearchPage = () => {
                   </div>
 
                   {/* Per-day Time Range */}
-                  {selectedDays.length > 0 && (
-                    <div className="space-y-3">
+                  {selectedTimeDay && selectedDays.includes(selectedTimeDay) && (
+                    <div className="space-y-2">
+                      <span className="text-xs font-medium">{selectedTimeDay}</span>
                       {(() => {
-                        const day = selectedTimeDay;
-                        const tr = getTimeRange(day);
+                        const tr = getTimeRange(selectedTimeDay);
                         const timeOptions = ['12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00', '5:30', '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30'];
                         return (
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-medium">{day}</span>
-                              <button
-                                onClick={() => {
-                                  setSelectedDays(prev => prev.filter(d => d !== day));
-                                  setDayTimeRanges(prev => {
-                                    const next = { ...prev };
-                                    delete next[day];
-                                    return next;
-                                  });
-                                  if (selectedTimeDay === day) {
-                                    const remaining = selectedDays.filter(d => d !== day);
-                                    setSelectedTimeDay(remaining[0] || 'Monday');
-                                  }
-                                }}
-                                className="text-xs text-muted-foreground hover:text-destructive"
-                              >
-                                <X className="h-3 w-3" />
-                              </button>
-                            </div>
+                          <>
                             <div className="flex items-center gap-2">
-                              <Select value={tr.startHour} onValueChange={(v) => updateDayTimeRange(day, { startHour: v })}>
+                              <Select value={tr.startHour} onValueChange={(v) => updateDayTimeRange(selectedTimeDay, { startHour: v })}>
                                 <SelectTrigger className="w-[80px] h-8 text-xs"><SelectValue /></SelectTrigger>
                                 <SelectContent className="bg-background">
                                   {timeOptions.map(time => <SelectItem key={time} value={time}>{time}</SelectItem>)}
                                 </SelectContent>
                               </Select>
-                              <Select value={tr.startPeriod} onValueChange={(v) => updateDayTimeRange(day, { startPeriod: v })}>
+                              <Select value={tr.startPeriod} onValueChange={(v) => updateDayTimeRange(selectedTimeDay, { startPeriod: v })}>
                                 <SelectTrigger className="w-[60px] h-8 text-xs"><SelectValue /></SelectTrigger>
                                 <SelectContent className="bg-background">
                                   <SelectItem value="AM">AM</SelectItem>
@@ -712,13 +700,13 @@ const SearchPage = () => {
                             </div>
                             <span className="text-xs text-muted-foreground">to</span>
                             <div className="flex items-center gap-2">
-                              <Select value={tr.endHour} onValueChange={(v) => updateDayTimeRange(day, { endHour: v })}>
+                              <Select value={tr.endHour} onValueChange={(v) => updateDayTimeRange(selectedTimeDay, { endHour: v })}>
                                 <SelectTrigger className="w-[80px] h-8 text-xs"><SelectValue /></SelectTrigger>
                                 <SelectContent className="bg-background">
                                   {timeOptions.map(time => <SelectItem key={time} value={time}>{time}</SelectItem>)}
                                 </SelectContent>
                               </Select>
-                              <Select value={tr.endPeriod} onValueChange={(v) => updateDayTimeRange(day, { endPeriod: v })}>
+                              <Select value={tr.endPeriod} onValueChange={(v) => updateDayTimeRange(selectedTimeDay, { endPeriod: v })}>
                                 <SelectTrigger className="w-[60px] h-8 text-xs"><SelectValue /></SelectTrigger>
                                 <SelectContent className="bg-background">
                                   <SelectItem value="AM">AM</SelectItem>
@@ -726,12 +714,11 @@ const SearchPage = () => {
                                 </SelectContent>
                               </Select>
                             </div>
-                          </div>
+                          </>
                         );
                       })()}
                     </div>
                   )}
-                </div>
 
                 {/* Reset */}
                 <button
