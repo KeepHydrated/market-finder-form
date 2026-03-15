@@ -624,32 +624,6 @@ const SearchPage = () => {
                   </div>
                 </div>
 
-                {/* Categories */}
-                <div className="mb-5">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3">Categories</h3>
-                  <div className="flex flex-wrap gap-1.5">
-                    {CATEGORIES.map(category => (
-                      <button
-                        key={category}
-                        onClick={() => {
-                          setSelectedCategories(prev => 
-                            prev.includes(category) 
-                              ? prev.filter(c => c !== category)
-                              : [...prev, category]
-                          );
-                        }}
-                        className={cn(
-                          "px-3 py-1.5 rounded-full text-xs border transition-colors",
-                          selectedCategories.includes(category)
-                            ? "bg-primary text-primary-foreground border-primary"
-                            : "bg-background text-foreground border-border hover:bg-muted"
-                        )}
-                      >
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                </div>
 
                 {/* Days / Times */}
                 <div>
