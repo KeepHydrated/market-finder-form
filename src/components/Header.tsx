@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { CartButton } from "@/components/shopping/CartButton";
-import { ArrowLeft, Heart, Store, ChevronDown, Search, DollarSign, Home } from "lucide-react";
+import { ArrowLeft, Heart, Store, ChevronDown, Search, DollarSign, Home, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -146,12 +146,26 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
     }
   }, [user, isOnOrdersPage]);
 
-  // Clear search query when navigating to homepage
+  // Sync search query with URL params
   useEffect(() => {
     if (location.pathname === '/') {
       setSearchQuery('');
+    } else if (location.pathname === '/search') {
+      const urlSearch = searchParams.get('search') || searchParams.get('q') || '';
+      setSearchQuery(urlSearch);
     }
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    if (location.pathname === '/search') {
+      const params = new URLSearchParams(location.search);
+      params.delete('search');
+      params.delete('q');
+      const remaining = params.toString();
+      navigate(remaining ? `/search?${remaining}` : '/search');
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -275,8 +289,17 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 placeholder="Search vendors, products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-background/50 border-border"
+                className="pl-10 pr-8 bg-background/50 border-border"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={clearSearch}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </form>
           </div>
           
@@ -429,8 +452,17 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
                 placeholder="Search vendors, products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-background/50 border-border"
+                className="pl-10 pr-8 bg-background/50 border-border"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={clearSearch}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </form>
           </div>
         </div>
