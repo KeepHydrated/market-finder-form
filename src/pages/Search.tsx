@@ -106,7 +106,7 @@ const SearchPage = () => {
   const [sortBy, setSortBy] = useState<'relevancy' | 'lowest_price' | 'highest_price' | 'top_rated' | 'most_recent'>('relevancy');
   const [filterTab, setFilterTab] = useState<'times' | 'categories'>('times');
   const [locationFilter, setLocationFilter] = useState<'all' | 'local'>('all');
-  const [selectedTimeDay, setSelectedTimeDay] = useState<string>('Monday');
+  const [selectedTimeDay, setSelectedTimeDay] = useState<string>('');
   const defaultTimeRange = { startHour: '12:00', startPeriod: 'AM', endHour: '11:30', endPeriod: 'PM' };
   const [dayTimeRanges, setDayTimeRanges] = useState<Record<string, {startHour: string; startPeriod: string; endHour: string; endPeriod: string}>>({});
   
