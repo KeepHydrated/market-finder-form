@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { NavLink, useLocation, useMatch } from "react-router-dom";
 import { 
-  Package, 
-  Settings, 
-  ShoppingBag,
-  TestTube,
-  Wrench,
   Menu,
-  Store
 } from "lucide-react";
 import {
   Sheet,
@@ -22,37 +16,26 @@ interface ShopMobileNavProps {
 const menuItems = [
   { 
     title: "Overview", 
-    icon: TestTube, 
     section: "overview",
     requiresShop: true 
   },
   { 
     title: "Setup", 
-    icon: Wrench, 
     section: "setup",
     requiresShop: false 
   },
   { 
     title: "Products", 
-    icon: Package, 
     section: "products",
     requiresShop: false 
   },
   { 
     title: "Orders", 
-    icon: ShoppingBag, 
     section: "orders2",
     requiresShop: true 
   },
-  // { 
-  //   title: "Business Cards", 
-  //   icon: Store, 
-  //   section: "cards",
-  //   requiresShop: true 
-  // },
   { 
     title: "Account", 
-    icon: Settings, 
     section: "account",
     requiresShop: true 
   },
@@ -62,7 +45,6 @@ export function ShopMobileNav({ hasShopData = false }: ShopMobileNavProps) {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   
-  // Detect which shop page we're on
   const isMyShop2 = useMatch('/my-shop2');
   const basePath = isMyShop2 ? '/my-shop2' : '/my-shop';
   
@@ -76,14 +58,25 @@ export function ShopMobileNav({ hasShopData = false }: ShopMobileNavProps) {
   const isActive = (section: string) => currentSection === section;
 
   return (
-    <div className="sm:hidden fixed top-16 left-0 right-0 z-40 px-4 py-3 pointer-events-none flex justify-between">
+    <>
+      {/* Hamburger buttons - fixed position, pointer-events only on buttons */}
+      <div className="sm:hidden fixed top-16 left-0 right-0 z-40 px-4 py-3 pointer-events-none flex justify-between">
+        <button 
+          onClick={() => setOpen(true)}
+          className="pointer-events-auto p-2 rounded-md hover:bg-muted"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <button 
+          onClick={() => setOpen(true)}
+          className="pointer-events-auto p-2 rounded-md hover:bg-muted"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+      </div>
+
+      {/* Sheet rendered outside the fixed container */}
       <Sheet open={open} onOpenChange={setOpen}>
-        <Button variant="ghost" size="icon" className="pointer-events-auto" onClick={() => setOpen(true)}>
-          <Menu className="h-5 w-5" />
-        </Button>
-        <Button variant="ghost" size="icon" className="pointer-events-auto" onClick={() => setOpen(true)}>
-          <Menu className="h-5 w-5" />
-        </Button>
         <SheetContent side="left" className="w-64">
           <div className="flex flex-col gap-2 mt-8">
             {availableItems.map((item) => (
@@ -103,6 +96,6 @@ export function ShopMobileNav({ hasShopData = false }: ShopMobileNavProps) {
           </div>
         </SheetContent>
       </Sheet>
-    </div>
+    </>
   );
 }
