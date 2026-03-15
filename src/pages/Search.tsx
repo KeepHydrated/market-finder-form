@@ -553,11 +553,20 @@ const SearchPage = () => {
           </Select>
         </div>
 
+        {/* Top filter panel for small screens */}
+        {showFilters && (
+          <div ref={filterPanelRef} className="block md:hidden mb-6 space-y-6">
+            <div className="p-4 border rounded-lg bg-background">
+              {/* This will be filled by duplicating filter content or we restructure */}
+            </div>
+          </div>
+        )}
+
         {/* Main content area with sidebar filter */}
         <div className="flex gap-6">
-          {/* Sidebar Filter Panel */}
+          {/* Sidebar Filter Panel - hidden on small screens */}
           {showFilters && (
-            <div ref={filterPanelRef} className="w-64 flex-shrink-0 space-y-6">
+            <div ref={filterPanelRef} className="hidden md:block w-64 flex-shrink-0 space-y-6">
               <div className="p-4 border rounded-lg bg-background">
                 {/* Location Toggle */}
                 <div className="mb-5">
