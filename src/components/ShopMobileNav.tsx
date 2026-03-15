@@ -97,7 +97,6 @@ export function ShopMobileNav({ hasShopData = false }: ShopMobileNavProps) {
                     : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                 }`}
               >
-                <item.icon className="h-5 w-5" />
                 <span>{item.title}</span>
               </NavLink>
             ))}
