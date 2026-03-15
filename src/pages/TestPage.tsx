@@ -87,20 +87,19 @@ export default function TestPage() {
             className="absolute inset-0 bg-black/40"
             onClick={() => setDrawerOpen(false)}
           />
-          <div className="absolute top-0 left-0 h-full w-64 bg-background border-r border-border shadow-lg">
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <p className="text-sm font-semibold">Menu</p>
+          <div className="absolute top-0 left-0 h-full w-72 bg-background border-r border-border shadow-lg flex flex-col">
+            <div className="flex items-center justify-end p-4">
               <button
                 type="button"
                 onClick={() => setDrawerOpen(false)}
                 className="p-1.5 rounded-md hover:bg-muted"
                 aria-label="Close menu"
               >
-                <X className="h-5 w-5" />
+                <X className="h-6 w-6" />
               </button>
             </div>
-            <div className="p-4">
-              {navContent}
+            <div className="px-4 pb-4">
+              {navContent(true)}
             </div>
           </div>
         </div>
