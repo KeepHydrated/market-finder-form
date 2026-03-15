@@ -88,7 +88,7 @@ const SearchPage = () => {
   const { toggleLike, isLiked } = useLikes();
   
   // View mode: vendors, markets, or products
-  const [viewMode, setViewMode] = useState<'vendors' | 'markets' | 'products'>('vendors');
+  const [viewMode, setViewMode] = useState<'vendors' | 'markets' | 'products'>('products');
   
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || searchParams.get('q') || '');
