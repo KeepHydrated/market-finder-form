@@ -106,7 +106,7 @@ const SearchPage = () => {
   const [sortBy, setSortBy] = useState<'relevancy' | 'lowest_price' | 'highest_price' | 'top_rated' | 'most_recent'>('relevancy');
   const [filterTab, setFilterTab] = useState<'times' | 'categories'>('times');
   const [locationFilter, setLocationFilter] = useState<'all' | 'local'>('all');
-  const [selectedTimeDay, setSelectedTimeDay] = useState<string>('Monday');
+  const [selectedTimeDays, setSelectedTimeDays] = useState<string[]>(['Monday']);
   const [timeRange, setTimeRange] = useState<{startHour: string; startPeriod: string; endHour: string; endPeriod: string}>({
     startHour: '12:00',
     startPeriod: 'AM',
@@ -635,13 +635,17 @@ const SearchPage = () => {
                         'Thu': 'Thursday', 'Fri': 'Friday', 'Sat': 'Saturday', 'Sun': 'Sunday'
                       };
                       const fullDayName = dayMapping[dayShort];
-                      const isSelected = selectedTimeDay === fullDayName;
+                      const isSelected = selectedTimeDays.includes(fullDayName);
                       const isActive = selectedDays.includes(fullDayName);
                       
                       return (
                         <button
                           key={dayShort}
-                          onClick={() => setSelectedTimeDay(fullDayName)}
+                          onClick={() => setSelectedTimeDays(prev => 
+                            prev.includes(fullDayName) 
+                              ? prev.length > 1 ? prev.filter(d => d !== fullDayName) : prev
+                              : [...prev, fullDayName]
+                          )}
                           className={cn(
                             "px-2 py-2 rounded-lg text-xs font-medium transition-colors border",
                             isSelected
@@ -659,7 +663,7 @@ const SearchPage = () => {
 
                   {/* Time Range */}
                   <div className="space-y-2">
-                    <span className="text-xs font-medium">{selectedTimeDay}</span>
+                    <span className="text-xs font-medium">{selectedTimeDays.join(', ')}</span>
                     <div className="flex items-center gap-2">
                       <Select 
                         value={timeRange.startHour} 
@@ -717,20 +721,21 @@ const SearchPage = () => {
                     </div>
                     <Button
                       size="sm"
-                      variant={selectedDays.includes(selectedTimeDay) ? "outline" : "default"}
+                      variant={selectedTimeDays.every(d => selectedDays.includes(d)) ? "outline" : "default"}
                       onClick={() => {
-                        if (selectedDays.includes(selectedTimeDay)) {
-                          setSelectedDays(prev => prev.filter(d => d !== selectedTimeDay));
+                        const allSaved = selectedTimeDays.every(d => selectedDays.includes(d));
+                        if (allSaved) {
+                          setSelectedDays(prev => prev.filter(d => !selectedTimeDays.includes(d)));
                         } else {
-                          setSelectedDays(prev => [...prev, selectedTimeDay]);
+                          setSelectedDays(prev => [...new Set([...prev, ...selectedTimeDays])]);
                         }
                       }}
                       className={cn(
                         "w-full mt-2",
-                        selectedDays.includes(selectedTimeDay) && "border-green-600 text-green-600 hover:bg-green-50"
+                        selectedTimeDays.every(d => selectedDays.includes(d)) && "border-green-600 text-green-600 hover:bg-green-50"
                       )}
                     >
-                      {selectedDays.includes(selectedTimeDay) ? "Saved" : "Save"}
+                      {selectedTimeDays.every(d => selectedDays.includes(d)) ? "Saved" : "Save"}
                     </Button>
                   </div>
                 </div>
@@ -742,7 +747,7 @@ const SearchPage = () => {
                     setSelectedDays([]);
                     setLocationFilter('all');
                     setViewMode('products');
-                    setSelectedTimeDay('Monday');
+                    setSelectedTimeDays(['Monday']);
                   }}
                   className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mt-4 pt-4 border-t w-full"
                 >
