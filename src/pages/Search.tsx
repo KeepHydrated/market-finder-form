@@ -705,29 +705,6 @@ const SearchPage = () => {
       />
       <div className="container mx-auto px-4 py-8">
 
-        {/* Mobile Search Bar */}
-        <div className="md:hidden mb-4">
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            const input = e.currentTarget.elements.namedItem('mobileSearch') as HTMLInputElement;
-            const val = input?.value?.trim();
-            if (val) {
-              setSearchQuery(val);
-              const params = new URLSearchParams(searchParams);
-              params.set('search', val);
-              window.history.replaceState({}, '', `/search?${params.toString()}`);
-            }
-          }} className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
-            <Input
-              name="mobileSearch"
-              type="text"
-              placeholder="Search vendors, products, markets..."
-              defaultValue={searchQuery}
-              className="pl-12 pr-4 h-12 text-base rounded-full border-border bg-background/50"
-            />
-          </form>
-        </div>
         
         {/* Filter Bar */}
         <div className="flex flex-wrap items-center gap-6 mb-4">

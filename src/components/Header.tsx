@@ -440,6 +440,30 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
           </div>
         </div>
 
+        {/* Mobile search bar - right under header, on / and /search */}
+        {(location.pathname === '/' || location.pathname === '/search') && (
+          <div className="md:hidden pb-3">
+            <form onSubmit={handleSearch} className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+              <Input
+                type="text"
+                placeholder="Search vendors, products, markets..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 pr-8 h-11 text-base rounded-full border-border bg-background/50"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={clearSearch}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </form>
+          </div>
+        )}
       </div>
     </header>
   );
