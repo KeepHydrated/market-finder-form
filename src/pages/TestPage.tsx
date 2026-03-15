@@ -87,19 +87,32 @@ export default function TestPage() {
             className="absolute inset-0 bg-black/40"
             onClick={() => setDrawerOpen(false)}
           />
-          <div className="absolute top-0 left-0 h-full w-[75%] max-w-[300px] bg-background shadow-xl flex flex-col">
-            <div className="flex items-center justify-end px-5 pt-6 pb-2">
+          <div className="absolute top-0 left-0 h-full w-64 bg-background border-r border-border shadow-lg">
+            <div className="flex justify-end p-4">
               <button
                 type="button"
                 onClick={() => setDrawerOpen(false)}
-                className="p-1"
+                className="p-2 rounded-md hover:bg-muted"
                 aria-label="Close menu"
               >
-                <X className="h-6 w-6 text-foreground" />
+                <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="px-3 pt-4">
-              {navContent(true)}
+            <div className="flex flex-col gap-2 px-4 pb-4">
+              {menuItems.map((item) => (
+                <NavLink
+                  key={item.section}
+                  to={`/test?section=${item.section}`}
+                  onClick={() => setDrawerOpen(false)}
+                  className={`px-4 py-3 rounded-lg transition-colors ${
+                    isActive(item.section)
+                      ? "bg-primary text-primary-foreground font-medium"
+                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  }`}
+                >
+                  <span>{item.title}</span>
+                </NavLink>
+              ))}
             </div>
           </div>
         </div>
