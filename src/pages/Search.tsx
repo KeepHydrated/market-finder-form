@@ -514,32 +514,6 @@ const SearchPage = () => {
         {/* Filter Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3 flex-wrap">
-            {/* Location Toggle - always visible */}
-            <div className="flex items-center gap-2 border rounded-full p-1">
-              <button
-                onClick={() => setLocationFilter('all')}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors",
-                  locationFilter === 'all' 
-                    ? "bg-muted text-foreground" 
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                All of US
-              </button>
-              <button
-                onClick={() => setLocationFilter('local')}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors",
-                  locationFilter === 'local' 
-                    ? "bg-muted text-foreground" 
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                Local
-              </button>
-            </div>
-
             {/* Filter Toggle Button */}
             <Button 
               ref={filterButtonRef}
