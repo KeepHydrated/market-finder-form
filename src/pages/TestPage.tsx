@@ -16,7 +16,7 @@ export default function TestPage() {
   const currentSection = urlParams.get("section") || "overview";
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const currentTitle = menuItems.find((item) => item.section === currentSection)?.title || "Dashboard";
+  const currentTitle = menuItems.find((item) => item.section === currentSection)?.title || "Overview";
 
   const isActive = (section: string) => currentSection === section;
 
