@@ -629,6 +629,23 @@ const Test2 = () => {
       />
       <div className="container mx-auto px-4 py-8">
         <h1 className="sr-only">From Farmers Markets — Support Small Businesses</h1>
+        
+        {/* Search Bar */}
+        <div className="mb-6 max-w-2xl mx-auto">
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            const query = (e.currentTarget.elements.namedItem('homeSearch') as HTMLInputElement)?.value?.trim();
+            if (query) navigate(`/search?search=${encodeURIComponent(query)}`);
+          }} className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+            <Input
+              name="homeSearch"
+              type="text"
+              placeholder="Search vendors, products, markets..."
+              className="pl-12 pr-4 h-12 text-base rounded-full border-border bg-background/50"
+            />
+          </form>
+        </div>
         {/* Farmers Market Banner */}
         <section className="mb-8 rounded-lg overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background border border-primary/20" aria-label="Get started">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
