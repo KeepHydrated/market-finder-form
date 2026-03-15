@@ -104,7 +104,7 @@ const SearchPage = () => {
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<'relevancy' | 'lowest_price' | 'highest_price' | 'top_rated' | 'most_recent'>('relevancy');
-  const [filterTab, setFilterTab] = useState<'type' | 'times' | 'categories'>('type');
+  const [filterTab, setFilterTab] = useState<'times' | 'categories'>('times');
   const [locationFilter, setLocationFilter] = useState<'all' | 'local'>('all');
   const [selectedTimeDay, setSelectedTimeDay] = useState<string>('Monday');
   const [timeRange, setTimeRange] = useState<{startHour: string; startPeriod: string; endHour: string; endPeriod: string}>({
@@ -513,7 +513,72 @@ const SearchPage = () => {
         
         {/* Filter Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Location Toggle - always visible */}
+            <div className="flex items-center gap-2 border rounded-full p-1">
+              <button
+                onClick={() => setLocationFilter('all')}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors",
+                  locationFilter === 'all' 
+                    ? "bg-muted text-foreground" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Globe className="h-4 w-4" />
+                All of US
+              </button>
+              <button
+                onClick={() => setLocationFilter('local')}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors",
+                  locationFilter === 'local' 
+                    ? "bg-muted text-foreground" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <MapPinned className="h-4 w-4" />
+                Local
+              </button>
+            </div>
+
+            {/* View Mode Toggle - always visible */}
+            <div className="flex items-center gap-1 border rounded-full p-1">
+              <button
+                onClick={() => setViewMode('products')}
+                className={cn(
+                  "px-3 py-1.5 text-sm transition-colors rounded-full",
+                  viewMode === 'products' 
+                    ? "bg-muted text-foreground font-medium" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Products
+              </button>
+              <button
+                onClick={() => setViewMode('vendors')}
+                className={cn(
+                  "px-3 py-1.5 text-sm transition-colors rounded-full",
+                  viewMode === 'vendors' 
+                    ? "bg-muted text-foreground font-medium" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Vendors
+              </button>
+              <button
+                onClick={() => setViewMode('markets')}
+                className={cn(
+                  "px-3 py-1.5 text-sm transition-colors rounded-full",
+                  viewMode === 'markets' 
+                    ? "bg-muted text-foreground font-medium" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Markets
+              </button>
+            </div>
+
             {/* Filter Toggle Button */}
             <Button 
               ref={filterButtonRef}
@@ -588,17 +653,6 @@ const SearchPage = () => {
             {/* Filter Tabs */}
             <div className="flex items-center gap-6 border-b pb-3 mb-4">
               <button
-                onClick={() => setFilterTab('type')}
-                className={cn(
-                  "text-sm font-medium pb-3 -mb-3 border-b-2 transition-colors",
-                  filterTab === 'type' 
-                    ? "text-foreground border-foreground" 
-                    : "text-muted-foreground border-transparent hover:text-foreground"
-                )}
-              >
-                Type
-              </button>
-              <button
                 onClick={() => setFilterTab('times')}
                 className={cn(
                   "text-sm font-medium pb-3 -mb-3 border-b-2 transition-colors",
@@ -625,7 +679,7 @@ const SearchPage = () => {
                   setSelectedCategories([]);
                   setSelectedDays([]);
                   setLocationFilter('all');
-                  setViewMode('vendors');
+                  setViewMode('products');
                   setSelectedTimeDay('Monday');
                 }}
                 className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
@@ -636,74 +690,6 @@ const SearchPage = () => {
             </div>
 
             {/* Filter Content */}
-            {filterTab === 'type' && (
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-                {/* Location Toggle */}
-                <div className="flex items-center gap-2 border rounded-full p-1">
-                  <button
-                    onClick={() => setLocationFilter('all')}
-                    className={cn(
-                      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors",
-                      locationFilter === 'all' 
-                        ? "bg-muted text-foreground" 
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    <Globe className="h-4 w-4" />
-                    All of US
-                  </button>
-                  <button
-                    onClick={() => setLocationFilter('local')}
-                    className={cn(
-                      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors",
-                      locationFilter === 'local' 
-                        ? "bg-muted text-foreground" 
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    <MapPinned className="h-4 w-4" />
-                    Local
-                  </button>
-                </div>
-
-                {/* View Mode Toggle */}
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setViewMode('products')}
-                    className={cn(
-                      "px-4 py-1.5 text-sm transition-colors rounded",
-                      viewMode === 'products' 
-                        ? "bg-muted text-foreground font-medium" 
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    Products
-                  </button>
-                  <button
-                    onClick={() => setViewMode('vendors')}
-                    className={cn(
-                      "px-4 py-1.5 text-sm transition-colors rounded",
-                      viewMode === 'vendors' 
-                        ? "bg-muted text-foreground font-medium" 
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    Vendors
-                  </button>
-                  <button
-                    onClick={() => setViewMode('markets')}
-                    className={cn(
-                      "px-4 py-1.5 text-sm transition-colors rounded",
-                      viewMode === 'markets' 
-                        ? "bg-muted text-foreground font-medium" 
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    Markets
-                  </button>
-                </div>
-              </div>
-            )}
 
             {filterTab === 'times' && (
               <div className="space-y-4">
