@@ -591,11 +591,11 @@ const SearchPage = () => {
                 {/* View Mode Toggle */}
                 <div className="mb-5">
                   <h3 className="text-sm font-medium text-muted-foreground mb-3">View</h3>
-                  <div className="flex items-center gap-1 border rounded-full p-1">
+                  <div className="inline-flex items-center gap-1 border rounded-full p-1">
                     <button
                       onClick={() => setViewMode('products')}
                       className={cn(
-                        "flex-1 px-3 py-1.5 text-sm transition-colors rounded-full text-center",
+                        "px-3 py-1.5 text-xs transition-colors rounded-full text-center whitespace-nowrap",
                         viewMode === 'products' 
                           ? "bg-muted text-foreground font-medium" 
                           : "text-muted-foreground hover:text-foreground"
@@ -606,7 +606,7 @@ const SearchPage = () => {
                     <button
                       onClick={() => setViewMode('vendors')}
                       className={cn(
-                        "flex-1 px-3 py-1.5 text-sm transition-colors rounded-full text-center",
+                        "px-3 py-1.5 text-xs transition-colors rounded-full text-center whitespace-nowrap",
                         viewMode === 'vendors' 
                           ? "bg-muted text-foreground font-medium" 
                           : "text-muted-foreground hover:text-foreground"
@@ -617,7 +617,7 @@ const SearchPage = () => {
                     <button
                       onClick={() => setViewMode('markets')}
                       className={cn(
-                        "flex-1 px-3 py-1.5 text-sm transition-colors rounded-full text-center",
+                        "px-3 py-1.5 text-xs transition-colors rounded-full text-center whitespace-nowrap",
                         viewMode === 'markets' 
                           ? "bg-muted text-foreground font-medium" 
                           : "text-muted-foreground hover:text-foreground"
