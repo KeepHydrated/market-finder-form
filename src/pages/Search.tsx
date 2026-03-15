@@ -663,7 +663,7 @@ const SearchPage = () => {
 
                   {/* Time Range */}
                   <div className="space-y-2">
-                    <span className="text-xs font-medium">{selectedTimeDay}</span>
+                    <span className="text-xs font-medium">{selectedTimeDays.join(', ')}</span>
                     <div className="flex items-center gap-2">
                       <Select 
                         value={timeRange.startHour} 
