@@ -585,6 +585,35 @@ const SearchPage = () => {
           {showFilters && (
             <div ref={filterPanelRef} className="w-64 flex-shrink-0 space-y-6">
               <div className="p-4 border rounded-lg bg-background">
+                {/* Location Toggle */}
+                <div className="mb-5">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-3">Location</h3>
+                  <div className="flex items-center gap-1 border rounded-full p-1">
+                    <button
+                      onClick={() => setLocationFilter('all')}
+                      className={cn(
+                        "flex-1 px-3 py-1.5 text-sm transition-colors rounded-full text-center",
+                        locationFilter === 'all' 
+                          ? "bg-muted text-foreground font-medium" 
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      All of US
+                    </button>
+                    <button
+                      onClick={() => setLocationFilter('local')}
+                      className={cn(
+                        "flex-1 px-3 py-1.5 text-sm transition-colors rounded-full text-center",
+                        locationFilter === 'local' 
+                          ? "bg-muted text-foreground font-medium" 
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Local
+                    </button>
+                  </div>
+                </div>
+
                 {/* View Mode Toggle */}
                 <div className="mb-5">
                   <h3 className="text-sm font-medium text-muted-foreground mb-3">View</h3>
