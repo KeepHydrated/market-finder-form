@@ -77,7 +77,7 @@ export function ShopMobileNav({ hasShopData = false }: ShopMobileNavProps) {
   const isActive = (section: string) => currentSection === section;
 
   return (
-    <div className="sm:hidden fixed top-16 left-0 right-0 bg-background z-40 px-4 py-3">
+    <div className="sm:hidden fixed top-16 left-0 right-0 z-40 px-4 py-3 pointer-events-none">
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
           <Button variant="ghost" size="icon">
