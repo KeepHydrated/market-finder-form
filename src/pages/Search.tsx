@@ -102,7 +102,7 @@ const SearchPage = () => {
     setSearchQuery(urlSearch);
   }, [searchParams]);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [sortBy, setSortBy] = useState<'relevancy' | 'lowest_price' | 'highest_price' | 'top_rated' | 'most_recent'>('relevancy');
   const [filterTab, setFilterTab] = useState<'times' | 'categories'>('times');
   const [locationFilter, setLocationFilter] = useState<'all' | 'local'>('all');
@@ -146,23 +146,6 @@ const SearchPage = () => {
     getUserLocation();
   }, []);
 
-  // Close filter panel when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        showFilters &&
-        filterPanelRef.current &&
-        filterButtonRef.current &&
-        !filterPanelRef.current.contains(event.target as Node) &&
-        !filterButtonRef.current.contains(event.target as Node)
-      ) {
-        setShowFilters(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showFilters]);
 
   useEffect(() => {
     if (userCoordinates) {
