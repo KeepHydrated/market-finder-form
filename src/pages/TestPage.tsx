@@ -13,7 +13,7 @@ const menuItems = [
 export default function TestPage() {
   const location = useLocation();
   const urlParams = new URLSearchParams(location.search);
-  const currentSection = urlParams.get("section") || "dashboard";
+  const currentSection = urlParams.get("section") || "overview";
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const currentTitle = menuItems.find((item) => item.section === currentSection)?.title || "Dashboard";
