@@ -1398,7 +1398,7 @@ export default function ShopManager() {
           <ShopSidebar hasShopData={!!shopData} />
           <ShopMobileNav hasShopData={!!shopData} />
           
-          <main className="flex-1 w-full">
+          <main className="flex-1 w-full overflow-y-auto pt-14 sm:pt-0">
             {renderContent()}
           </main>
         </div>
