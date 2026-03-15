@@ -104,7 +104,7 @@ const SearchPage = () => {
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<'relevancy' | 'lowest_price' | 'highest_price' | 'top_rated' | 'most_recent'>('relevancy');
-  const [filterTab, setFilterTab] = useState<'type' | 'times' | 'categories'>('type');
+  const [filterTab, setFilterTab] = useState<'times' | 'categories'>('times');
   const [locationFilter, setLocationFilter] = useState<'all' | 'local'>('all');
   const [selectedTimeDay, setSelectedTimeDay] = useState<string>('Monday');
   const [timeRange, setTimeRange] = useState<{startHour: string; startPeriod: string; endHour: string; endPeriod: string}>({
