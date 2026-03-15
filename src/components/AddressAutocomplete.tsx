@@ -63,7 +63,7 @@ export const AddressAutocomplete = ({
           console.log('Input element:', inputRef.current);
 
           // Create the traditional Google Places Autocomplete
-          const autocomplete = new google.maps.places.Autocomplete(inputRef.current, {
+          const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
             types: ['address'],
             // Removed country restriction for global addresses
           });
