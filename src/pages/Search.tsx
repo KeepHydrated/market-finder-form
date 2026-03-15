@@ -721,20 +721,21 @@ const SearchPage = () => {
                     </div>
                     <Button
                       size="sm"
-                      variant={selectedDays.includes(selectedTimeDay) ? "outline" : "default"}
+                      variant={selectedTimeDays.every(d => selectedDays.includes(d)) ? "outline" : "default"}
                       onClick={() => {
-                        if (selectedDays.includes(selectedTimeDay)) {
-                          setSelectedDays(prev => prev.filter(d => d !== selectedTimeDay));
+                        const allSaved = selectedTimeDays.every(d => selectedDays.includes(d));
+                        if (allSaved) {
+                          setSelectedDays(prev => prev.filter(d => !selectedTimeDays.includes(d)));
                         } else {
-                          setSelectedDays(prev => [...prev, selectedTimeDay]);
+                          setSelectedDays(prev => [...new Set([...prev, ...selectedTimeDays])]);
                         }
                       }}
                       className={cn(
                         "w-full mt-2",
-                        selectedDays.includes(selectedTimeDay) && "border-green-600 text-green-600 hover:bg-green-50"
+                        selectedTimeDays.every(d => selectedDays.includes(d)) && "border-green-600 text-green-600 hover:bg-green-50"
                       )}
                     >
-                      {selectedDays.includes(selectedTimeDay) ? "Saved" : "Save"}
+                      {selectedTimeDays.every(d => selectedDays.includes(d)) ? "Saved" : "Save"}
                     </Button>
                   </div>
                 </div>
