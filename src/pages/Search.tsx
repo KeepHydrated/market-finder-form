@@ -525,7 +525,6 @@ const SearchPage = () => {
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <Globe className="h-4 w-4" />
                 All of US
               </button>
               <button
