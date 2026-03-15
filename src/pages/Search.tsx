@@ -639,17 +639,18 @@ const SearchPage = () => {
                         'Thu': 'Thursday', 'Fri': 'Friday', 'Sat': 'Saturday', 'Sun': 'Sunday'
                       };
                       const fullDayName = dayMapping[dayShort];
-                      const isSelected = selectedTimeDays.includes(fullDayName);
+                      const isSelected = selectedTimeDay === fullDayName;
                       const isActive = selectedDays.includes(fullDayName);
                       
                       return (
                         <button
                           key={dayShort}
-                          onClick={() => setSelectedTimeDays(prev => 
-                            prev.includes(fullDayName) 
-                              ? prev.length > 1 ? prev.filter(d => d !== fullDayName) : prev
-                              : [...prev, fullDayName]
-                          )}
+                          onClick={() => {
+                            setSelectedTimeDay(fullDayName);
+                            if (!selectedDays.includes(fullDayName)) {
+                              setSelectedDays(prev => [...prev, fullDayName]);
+                            }
+                          }}
                           className={cn(
                             "px-2 py-2 rounded-lg text-xs font-medium transition-colors border",
                             isSelected
@@ -665,83 +666,71 @@ const SearchPage = () => {
                     })}
                   </div>
 
-                  {/* Time Range */}
-                  <div className="space-y-2">
-                    <span className="text-xs font-medium">{selectedTimeDays.join(', ')}</span>
-                    <div className="flex items-center gap-2">
-                      <Select 
-                        value={timeRange.startHour} 
-                        onValueChange={(v) => setTimeRange(prev => ({ ...prev, startHour: v }))}
-                      >
-                        <SelectTrigger className="w-[80px] h-8 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background">
-                          {['12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00', '5:30', '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30'].map(time => (
-                            <SelectItem key={time} value={time}>{time}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Select 
-                        value={timeRange.startPeriod} 
-                        onValueChange={(v) => setTimeRange(prev => ({ ...prev, startPeriod: v }))}
-                      >
-                        <SelectTrigger className="w-[60px] h-8 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background">
-                          <SelectItem value="AM">AM</SelectItem>
-                          <SelectItem value="PM">PM</SelectItem>
-                        </SelectContent>
-                      </Select>
+                  {/* Per-day Time Range */}
+                  {selectedDays.length > 0 && (
+                    <div className="space-y-3">
+                      {(() => {
+                        const day = selectedTimeDay;
+                        const tr = getTimeRange(day);
+                        const timeOptions = ['12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00', '5:30', '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30'];
+                        return (
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-medium">{day}</span>
+                              <button
+                                onClick={() => {
+                                  setSelectedDays(prev => prev.filter(d => d !== day));
+                                  setDayTimeRanges(prev => {
+                                    const next = { ...prev };
+                                    delete next[day];
+                                    return next;
+                                  });
+                                  if (selectedTimeDay === day) {
+                                    const remaining = selectedDays.filter(d => d !== day);
+                                    setSelectedTimeDay(remaining[0] || 'Monday');
+                                  }
+                                }}
+                                className="text-xs text-muted-foreground hover:text-destructive"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Select value={tr.startHour} onValueChange={(v) => updateDayTimeRange(day, { startHour: v })}>
+                                <SelectTrigger className="w-[80px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                                <SelectContent className="bg-background">
+                                  {timeOptions.map(time => <SelectItem key={time} value={time}>{time}</SelectItem>)}
+                                </SelectContent>
+                              </Select>
+                              <Select value={tr.startPeriod} onValueChange={(v) => updateDayTimeRange(day, { startPeriod: v })}>
+                                <SelectTrigger className="w-[60px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                                <SelectContent className="bg-background">
+                                  <SelectItem value="AM">AM</SelectItem>
+                                  <SelectItem value="PM">PM</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <span className="text-xs text-muted-foreground">to</span>
+                            <div className="flex items-center gap-2">
+                              <Select value={tr.endHour} onValueChange={(v) => updateDayTimeRange(day, { endHour: v })}>
+                                <SelectTrigger className="w-[80px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                                <SelectContent className="bg-background">
+                                  {timeOptions.map(time => <SelectItem key={time} value={time}>{time}</SelectItem>)}
+                                </SelectContent>
+                              </Select>
+                              <Select value={tr.endPeriod} onValueChange={(v) => updateDayTimeRange(day, { endPeriod: v })}>
+                                <SelectTrigger className="w-[60px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                                <SelectContent className="bg-background">
+                                  <SelectItem value="AM">AM</SelectItem>
+                                  <SelectItem value="PM">PM</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
-                    <span className="text-xs text-muted-foreground">to</span>
-                    <div className="flex items-center gap-2">
-                      <Select 
-                        value={timeRange.endHour} 
-                        onValueChange={(v) => setTimeRange(prev => ({ ...prev, endHour: v }))}
-                      >
-                        <SelectTrigger className="w-[80px] h-8 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background">
-                          {['12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00', '5:30', '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30'].map(time => (
-                            <SelectItem key={time} value={time}>{time}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Select 
-                        value={timeRange.endPeriod} 
-                        onValueChange={(v) => setTimeRange(prev => ({ ...prev, endPeriod: v }))}
-                      >
-                        <SelectTrigger className="w-[60px] h-8 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background">
-                          <SelectItem value="AM">AM</SelectItem>
-                          <SelectItem value="PM">PM</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant={selectedTimeDays.every(d => selectedDays.includes(d)) ? "outline" : "default"}
-                      onClick={() => {
-                        const allSaved = selectedTimeDays.every(d => selectedDays.includes(d));
-                        if (allSaved) {
-                          setSelectedDays(prev => prev.filter(d => !selectedTimeDays.includes(d)));
-                        } else {
-                          setSelectedDays(prev => [...new Set([...prev, ...selectedTimeDays])]);
-                        }
-                      }}
-                      className={cn(
-                        "w-full mt-2",
-                        selectedTimeDays.every(d => selectedDays.includes(d)) && "border-green-600 text-green-600 hover:bg-green-50"
-                      )}
-                    >
-                      {selectedTimeDays.every(d => selectedDays.includes(d)) ? "Saved" : "Save"}
-                    </Button>
-                  </div>
+                  )}
                 </div>
 
                 {/* Reset */}
