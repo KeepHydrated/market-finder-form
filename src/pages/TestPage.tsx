@@ -20,20 +20,28 @@ export default function TestPage() {
 
   const isActive = (section: string) => currentSection === section;
 
-  const navContent = (
-    <nav className="flex flex-col gap-1">
+  const navContent = (mobile = false) => (
+    <nav className={`flex flex-col ${mobile ? "gap-2" : "gap-1"}`}>
       {menuItems.map((item) => (
         <NavLink
           key={item.section}
           to={`/test?section=${item.section}`}
           onClick={() => setDrawerOpen(false)}
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-sm ${
-            isActive(item.section)
-              ? "bg-primary text-primary-foreground font-medium"
-              : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          className={`flex items-center transition-colors ${
+            mobile
+              ? `px-5 py-4 rounded-full text-lg ${
+                  isActive(item.section)
+                    ? "bg-primary text-primary-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
+                }`
+              : `gap-3 px-4 py-3 rounded-lg text-sm ${
+                  isActive(item.section)
+                    ? "bg-primary text-primary-foreground font-medium"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                }`
           }`}
         >
-          <item.icon className="h-4 w-4 shrink-0" />
+          {!mobile && <item.icon className="h-4 w-4 shrink-0" />}
           <span>{item.title}</span>
         </NavLink>
       ))}
@@ -45,7 +53,7 @@ export default function TestPage() {
       {/* Desktop/iPad sidebar — hidden on mobile */}
       <aside className="hidden md:flex flex-col w-56 border-r border-border bg-background sticky top-[57px] h-[calc(100vh-57px)] p-4">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4 px-4">Menu</p>
-        {navContent}
+        {navContent()}
       </aside>
 
       {/* Main content area */}
@@ -79,20 +87,19 @@ export default function TestPage() {
             className="absolute inset-0 bg-black/40"
             onClick={() => setDrawerOpen(false)}
           />
-          <div className="absolute top-0 left-0 h-full w-64 bg-background border-r border-border shadow-lg">
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <p className="text-sm font-semibold">Menu</p>
+          <div className="absolute top-0 left-0 h-full w-72 bg-background border-r border-border shadow-lg flex flex-col">
+            <div className="flex items-center justify-end p-4">
               <button
                 type="button"
                 onClick={() => setDrawerOpen(false)}
                 className="p-1.5 rounded-md hover:bg-muted"
                 aria-label="Close menu"
               >
-                <X className="h-5 w-5" />
+                <X className="h-6 w-6" />
               </button>
             </div>
-            <div className="p-4">
-              {navContent}
+            <div className="px-4 pb-4">
+              {navContent(true)}
             </div>
           </div>
         </div>
