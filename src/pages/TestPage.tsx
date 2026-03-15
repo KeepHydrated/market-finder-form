@@ -53,7 +53,7 @@ export default function TestPage() {
       {/* Desktop/iPad sidebar — hidden on mobile */}
       <aside className="hidden md:flex flex-col w-56 border-r border-border bg-background sticky top-[57px] h-[calc(100vh-57px)] p-4">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4 px-4">Menu</p>
-        {navContent}
+        {navContent()}
       </aside>
 
       {/* Main content area */}
