@@ -73,8 +73,6 @@ export default function TestPage() {
 
         {/* Page content */}
         <main className="flex-1 p-4 md:p-8">
-          <h1 className="text-2xl font-bold mb-4">{currentTitle}</h1>
-          <p className="text-muted-foreground">This is the {currentTitle.toLowerCase()} section.</p>
         </main>
       </div>
 
