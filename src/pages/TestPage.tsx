@@ -3,11 +3,11 @@ import { NavLink, useLocation } from "react-router-dom";
 import { Menu, X, Home, Settings, Users, BarChart3, FileText } from "lucide-react";
 
 const menuItems = [
-  { title: "Dashboard", section: "dashboard", icon: Home },
-  { title: "Analytics", section: "analytics", icon: BarChart3 },
-  { title: "Users", section: "users", icon: Users },
-  { title: "Content", section: "content", icon: FileText },
-  { title: "Settings", section: "settings", icon: Settings },
+  { title: "Overview", section: "overview", icon: Home },
+  { title: "Setup", section: "setup", icon: Settings },
+  { title: "Products", section: "products", icon: FileText },
+  { title: "Orders", section: "orders", icon: BarChart3 },
+  { title: "Account", section: "account", icon: Users },
 ];
 
 export default function TestPage() {
