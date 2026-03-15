@@ -21,7 +21,7 @@ export default function TestPage() {
   const isActive = (section: string) => currentSection === section;
 
   const navContent = (mobile = false) => (
-    <nav className={`flex flex-col ${mobile ? "gap-2" : "gap-1"}`}>
+    <nav className={`flex flex-col ${mobile ? "gap-0" : "gap-1"}`}>
       {menuItems.map((item) => (
         <NavLink
           key={item.section}
@@ -29,10 +29,10 @@ export default function TestPage() {
           onClick={() => setDrawerOpen(false)}
           className={`flex items-center transition-colors ${
             mobile
-              ? `px-5 py-4 rounded-full text-lg ${
+              ? `px-5 py-4 rounded-2xl text-[17px] tracking-wide ${
                   isActive(item.section)
                     ? "bg-primary text-primary-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground/60"
                 }`
               : `gap-3 px-4 py-3 rounded-lg text-sm ${
                   isActive(item.section)
