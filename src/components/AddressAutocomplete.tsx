@@ -3,7 +3,12 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { supabase } from '@/integrations/supabase/client';
 import './AddressAutocomplete.css';
 
-/// <reference types="google.maps" />
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 
 interface AddressAutocompleteProps {
   value: string;
