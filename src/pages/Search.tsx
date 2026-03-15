@@ -635,13 +635,17 @@ const SearchPage = () => {
                         'Thu': 'Thursday', 'Fri': 'Friday', 'Sat': 'Saturday', 'Sun': 'Sunday'
                       };
                       const fullDayName = dayMapping[dayShort];
-                      const isSelected = selectedTimeDay === fullDayName;
+                      const isSelected = selectedTimeDays.includes(fullDayName);
                       const isActive = selectedDays.includes(fullDayName);
                       
                       return (
                         <button
                           key={dayShort}
-                          onClick={() => setSelectedTimeDay(fullDayName)}
+                          onClick={() => setSelectedTimeDays(prev => 
+                            prev.includes(fullDayName) 
+                              ? prev.length > 1 ? prev.filter(d => d !== fullDayName) : prev
+                              : [...prev, fullDayName]
+                          )}
                           className={cn(
                             "px-2 py-2 rounded-lg text-xs font-medium transition-colors border",
                             isSelected
