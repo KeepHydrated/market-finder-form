@@ -59,7 +59,7 @@ export default function TestPage() {
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile sticky header with hamburger — visible only on mobile */}
-        <div className="md:hidden bg-background border-b border-border px-4 py-2.5 flex items-center gap-3">
+        <div className="md:hidden fixed top-[57px] left-0 right-0 z-40 bg-background border-b border-border px-4 py-2.5 flex items-center gap-3">
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
