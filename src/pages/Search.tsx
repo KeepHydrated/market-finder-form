@@ -542,43 +542,6 @@ const SearchPage = () => {
               </button>
             </div>
 
-            {/* View Mode Toggle - always visible */}
-            <div className="flex items-center gap-1 border rounded-full p-1">
-              <button
-                onClick={() => setViewMode('products')}
-                className={cn(
-                  "px-3 py-1.5 text-sm transition-colors rounded-full",
-                  viewMode === 'products' 
-                    ? "bg-muted text-foreground font-medium" 
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                Products
-              </button>
-              <button
-                onClick={() => setViewMode('vendors')}
-                className={cn(
-                  "px-3 py-1.5 text-sm transition-colors rounded-full",
-                  viewMode === 'vendors' 
-                    ? "bg-muted text-foreground font-medium" 
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                Vendors
-              </button>
-              <button
-                onClick={() => setViewMode('markets')}
-                className={cn(
-                  "px-3 py-1.5 text-sm transition-colors rounded-full",
-                  viewMode === 'markets' 
-                    ? "bg-muted text-foreground font-medium" 
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                Markets
-              </button>
-            </div>
-
             {/* Filter Toggle Button */}
             <Button 
               ref={filterButtonRef}
@@ -604,7 +567,6 @@ const SearchPage = () => {
                 <SelectItem value="most_recent" className="data-[state=checked]:bg-amber-100 data-[state=checked]:text-foreground">Most Recent</SelectItem>
               </SelectContent>
             </Select>
-
           </div>
 
           {/* Right side: Result count and active filters */}
@@ -613,7 +575,6 @@ const SearchPage = () => {
               Showing {totalResults} result{totalResults !== 1 ? 's' : ''}
             </span>
 
-            {/* Active filter badges */}
             {searchQuery && (
               <Badge variant="secondary" className="gap-1 pl-2 pr-1">
                 Search: "{searchQuery}"
@@ -643,154 +604,172 @@ const SearchPage = () => {
                 Days: {selectedDays.length === 1 ? selectedDays[0] : `${selectedDays.length} selected`}
               </Badge>
             )}
-
           </div>
         </div>
 
-        {/* Expandable Filter Panel */}
-        {showFilters && (
-          <div ref={filterPanelRef} className="mb-6 p-4 border rounded-lg bg-background">
-            {/* Filter Tabs */}
-            <div className="flex items-center gap-6 border-b pb-3 mb-4">
-              <button
-                onClick={() => setFilterTab('times')}
-                className={cn(
-                  "text-sm font-medium pb-3 -mb-3 border-b-2 transition-colors",
-                  filterTab === 'times' 
-                    ? "text-foreground border-foreground" 
-                    : "text-muted-foreground border-transparent hover:text-foreground"
-                )}
-              >
-                Times
-              </button>
-              <button
-                onClick={() => setFilterTab('categories')}
-                className={cn(
-                  "text-sm font-medium pb-3 -mb-3 border-b-2 transition-colors",
-                  filterTab === 'categories' 
-                    ? "text-foreground border-foreground" 
-                    : "text-muted-foreground border-transparent hover:text-foreground"
-                )}
-              >
-                Categories
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedCategories([]);
-                  setSelectedDays([]);
-                  setLocationFilter('all');
-                  setViewMode('products');
-                  setSelectedTimeDay('Monday');
-                }}
-                className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
-              >
-                <RotateCcw className="h-3 w-3" />
-                Reset
-              </button>
-            </div>
-
-            {/* Filter Content */}
-
-            {filterTab === 'times' && (
-              <div className="space-y-4">
-                {/* Day Tabs */}
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayShort) => {
-                    const dayMapping: Record<string, string> = {
-                      'Mon': 'Monday', 'Tue': 'Tuesday', 'Wed': 'Wednesday',
-                      'Thu': 'Thursday', 'Fri': 'Friday', 'Sat': 'Saturday', 'Sun': 'Sunday'
-                    };
-                    const fullDayName = dayMapping[dayShort];
-                    const isSelected = selectedTimeDay === fullDayName;
-                    const isActive = selectedDays.includes(fullDayName);
-                    
-                    return (
-                      <button
-                        key={dayShort}
-                        onClick={() => {
-                          setSelectedTimeDay(fullDayName);
-                        }}
-                        className={cn(
-                          "px-8 py-3 rounded-lg text-sm font-medium transition-colors min-w-[100px] border",
-                          isSelected
-                            ? "bg-green-600 text-white border-green-600"
-                            : isActive
-                              ? "bg-green-100 text-green-700 border-green-200"
-                              : "bg-background text-foreground border-border hover:bg-muted"
-                        )}
-                      >
-                        {dayShort}
-                      </button>
-                    );
-                  })}
+        {/* Main content area with sidebar filter */}
+        <div className="flex gap-6">
+          {/* Sidebar Filter Panel */}
+          {showFilters && (
+            <div ref={filterPanelRef} className="w-64 flex-shrink-0 space-y-6">
+              <div className="p-4 border rounded-lg bg-background">
+                {/* View Mode Toggle */}
+                <div className="mb-5">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-3">View</h3>
+                  <div className="flex items-center gap-1 border rounded-full p-1">
+                    <button
+                      onClick={() => setViewMode('products')}
+                      className={cn(
+                        "flex-1 px-3 py-1.5 text-sm transition-colors rounded-full text-center",
+                        viewMode === 'products' 
+                          ? "bg-muted text-foreground font-medium" 
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Products
+                    </button>
+                    <button
+                      onClick={() => setViewMode('vendors')}
+                      className={cn(
+                        "flex-1 px-3 py-1.5 text-sm transition-colors rounded-full text-center",
+                        viewMode === 'vendors' 
+                          ? "bg-muted text-foreground font-medium" 
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Vendors
+                    </button>
+                    <button
+                      onClick={() => setViewMode('markets')}
+                      className={cn(
+                        "flex-1 px-3 py-1.5 text-sm transition-colors rounded-full text-center",
+                        viewMode === 'markets' 
+                          ? "bg-muted text-foreground font-medium" 
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Markets
+                    </button>
+                  </div>
                 </div>
 
-                {/* Time Range Selectors */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <span className="font-medium min-w-[100px] hidden sm:block">{selectedTimeDay}</span>
-                  
-                  {/* Start Time Row */}
-                  <div className="flex items-center gap-3">
-                    <Select 
-                      value={timeRange.startHour} 
-                      onValueChange={(v) => setTimeRange(prev => ({ ...prev, startHour: v }))}
-                    >
-                      <SelectTrigger className="w-[100px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background">
-                        {['12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00', '5:30', '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30'].map(time => (
-                          <SelectItem key={time} value={time}>{time}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    
-                    <Select 
-                      value={timeRange.startPeriod} 
-                      onValueChange={(v) => setTimeRange(prev => ({ ...prev, startPeriod: v }))}
-                    >
-                      <SelectTrigger className="w-[70px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background">
-                        <SelectItem value="AM">AM</SelectItem>
-                        <SelectItem value="PM">PM</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    <span className="text-muted-foreground">to</span>
+                {/* Categories */}
+                <div className="mb-5">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-3">Categories</h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {CATEGORIES.map(category => (
+                      <button
+                        key={category}
+                        onClick={() => {
+                          setSelectedCategories(prev => 
+                            prev.includes(category) 
+                              ? prev.filter(c => c !== category)
+                              : [...prev, category]
+                          );
+                        }}
+                        className={cn(
+                          "px-3 py-1.5 rounded-full text-xs border transition-colors",
+                          selectedCategories.includes(category)
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background text-foreground border-border hover:bg-muted"
+                        )}
+                      >
+                        {category}
+                      </button>
+                    ))}
                   </div>
-                  
-                  {/* End Time Row */}
-                  <div className="flex items-center gap-3">
-                    <Select 
-                      value={timeRange.endHour} 
-                      onValueChange={(v) => setTimeRange(prev => ({ ...prev, endHour: v }))}
-                    >
-                      <SelectTrigger className="w-[100px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background">
-                        {['12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00', '5:30', '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30'].map(time => (
-                          <SelectItem key={time} value={time}>{time}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    
-                    <Select 
-                      value={timeRange.endPeriod} 
-                      onValueChange={(v) => setTimeRange(prev => ({ ...prev, endPeriod: v }))}
-                    >
-                      <SelectTrigger className="w-[70px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background">
-                        <SelectItem value="AM">AM</SelectItem>
-                        <SelectItem value="PM">PM</SelectItem>
-                      </SelectContent>
-                    </Select>
+                </div>
 
-                    {/* Save Button */}
+                {/* Days / Times */}
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground mb-3">Times</h3>
+                  <div className="grid grid-cols-4 gap-1.5 mb-3">
+                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayShort) => {
+                      const dayMapping: Record<string, string> = {
+                        'Mon': 'Monday', 'Tue': 'Tuesday', 'Wed': 'Wednesday',
+                        'Thu': 'Thursday', 'Fri': 'Friday', 'Sat': 'Saturday', 'Sun': 'Sunday'
+                      };
+                      const fullDayName = dayMapping[dayShort];
+                      const isSelected = selectedTimeDay === fullDayName;
+                      const isActive = selectedDays.includes(fullDayName);
+                      
+                      return (
+                        <button
+                          key={dayShort}
+                          onClick={() => setSelectedTimeDay(fullDayName)}
+                          className={cn(
+                            "px-2 py-2 rounded-lg text-xs font-medium transition-colors border",
+                            isSelected
+                              ? "bg-green-600 text-white border-green-600"
+                              : isActive
+                                ? "bg-green-100 text-green-700 border-green-200"
+                                : "bg-background text-foreground border-border hover:bg-muted"
+                          )}
+                        >
+                          {dayShort}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Time Range */}
+                  <div className="space-y-2">
+                    <span className="text-xs font-medium">{selectedTimeDay}</span>
+                    <div className="flex items-center gap-2">
+                      <Select 
+                        value={timeRange.startHour} 
+                        onValueChange={(v) => setTimeRange(prev => ({ ...prev, startHour: v }))}
+                      >
+                        <SelectTrigger className="w-[80px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background">
+                          {['12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00', '5:30', '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30'].map(time => (
+                            <SelectItem key={time} value={time}>{time}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select 
+                        value={timeRange.startPeriod} 
+                        onValueChange={(v) => setTimeRange(prev => ({ ...prev, startPeriod: v }))}
+                      >
+                        <SelectTrigger className="w-[60px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background">
+                          <SelectItem value="AM">AM</SelectItem>
+                          <SelectItem value="PM">PM</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <span className="text-xs text-muted-foreground">to</span>
+                    <div className="flex items-center gap-2">
+                      <Select 
+                        value={timeRange.endHour} 
+                        onValueChange={(v) => setTimeRange(prev => ({ ...prev, endHour: v }))}
+                      >
+                        <SelectTrigger className="w-[80px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background">
+                          {['12:00', '12:30', '1:00', '1:30', '2:00', '2:30', '3:00', '3:30', '4:00', '4:30', '5:00', '5:30', '6:00', '6:30', '7:00', '7:30', '8:00', '8:30', '9:00', '9:30', '10:00', '10:30', '11:00', '11:30'].map(time => (
+                            <SelectItem key={time} value={time}>{time}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select 
+                        value={timeRange.endPeriod} 
+                        onValueChange={(v) => setTimeRange(prev => ({ ...prev, endPeriod: v }))}
+                      >
+                        <SelectTrigger className="w-[60px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background">
+                          <SelectItem value="AM">AM</SelectItem>
+                          <SelectItem value="PM">PM</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                     <Button
                       size="sm"
                       variant={selectedDays.includes(selectedTimeDay) ? "outline" : "default"}
@@ -802,7 +781,7 @@ const SearchPage = () => {
                         }
                       }}
                       className={cn(
-                        "ml-2",
+                        "w-full mt-2",
                         selectedDays.includes(selectedTimeDay) && "border-green-600 text-green-600 hover:bg-green-50"
                       )}
                     >
@@ -810,35 +789,27 @@ const SearchPage = () => {
                     </Button>
                   </div>
                 </div>
-              </div>
-            )}
 
-            {filterTab === 'categories' && (
-              <div className="flex flex-wrap gap-2">
-                {CATEGORIES.map(category => (
-                  <button
-                    key={category}
-                    onClick={() => {
-                      setSelectedCategories(prev => 
-                        prev.includes(category) 
-                          ? prev.filter(c => c !== category)
-                          : [...prev, category]
-                      );
-                    }}
-                    className={cn(
-                      "px-4 py-2 rounded-full text-sm border transition-colors",
-                      selectedCategories.includes(category)
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background text-foreground border-border hover:bg-muted"
-                    )}
-                  >
-                    {category}
-                  </button>
-                ))}
+                {/* Reset */}
+                <button
+                  onClick={() => {
+                    setSelectedCategories([]);
+                    setSelectedDays([]);
+                    setLocationFilter('all');
+                    setViewMode('products');
+                    setSelectedTimeDay('Monday');
+                  }}
+                  className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mt-4 pt-4 border-t w-full"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  Reset all filters
+                </button>
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+
+          {/* Results Area */}
+          <div className="flex-1 min-w-0">
         {/* Results */}
         {viewMode === 'vendors' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
