@@ -21,15 +21,6 @@ interface HeaderProps {
   showBackButton?: boolean;
 }
 
-const WidthIndicator = () => {
-  const [width, setWidth] = useState(window.innerWidth);
-  useEffect(() => {
-    const handler = () => setWidth(window.innerWidth);
-    window.addEventListener('resize', handler);
-    return () => window.removeEventListener('resize', handler);
-  }, []);
-  return <>{width}px</>;
-};
 
 export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderProps) => {
   const location = useLocation();
@@ -191,9 +182,6 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
 
   return (
     <header className="bg-card shadow-sm border-b sticky top-0 z-50 relative">
-      <div className="absolute top-1 right-1 bg-muted text-muted-foreground text-[10px] font-mono px-1.5 py-0.5 rounded opacity-70 z-[60]">
-        <WidthIndicator />
-      </div>
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap justify-between items-center lg:h-16">
           {/* First row on all screens */}
