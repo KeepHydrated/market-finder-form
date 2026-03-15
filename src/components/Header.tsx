@@ -21,6 +21,16 @@ interface HeaderProps {
   showBackButton?: boolean;
 }
 
+const WidthIndicator = () => {
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handler = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  return <>{width}px</>;
+};
+
 export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderProps) => {
   const location = useLocation();
   const navigate = useNavigate();
