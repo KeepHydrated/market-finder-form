@@ -513,7 +513,72 @@ const SearchPage = () => {
         
         {/* Filter Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Location Toggle - always visible */}
+            <div className="flex items-center gap-2 border rounded-full p-1">
+              <button
+                onClick={() => setLocationFilter('all')}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors",
+                  locationFilter === 'all' 
+                    ? "bg-muted text-foreground" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Globe className="h-4 w-4" />
+                All of US
+              </button>
+              <button
+                onClick={() => setLocationFilter('local')}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors",
+                  locationFilter === 'local' 
+                    ? "bg-muted text-foreground" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <MapPinned className="h-4 w-4" />
+                Local
+              </button>
+            </div>
+
+            {/* View Mode Toggle - always visible */}
+            <div className="flex items-center gap-1 border rounded-full p-1">
+              <button
+                onClick={() => setViewMode('products')}
+                className={cn(
+                  "px-3 py-1.5 text-sm transition-colors rounded-full",
+                  viewMode === 'products' 
+                    ? "bg-muted text-foreground font-medium" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Products
+              </button>
+              <button
+                onClick={() => setViewMode('vendors')}
+                className={cn(
+                  "px-3 py-1.5 text-sm transition-colors rounded-full",
+                  viewMode === 'vendors' 
+                    ? "bg-muted text-foreground font-medium" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Vendors
+              </button>
+              <button
+                onClick={() => setViewMode('markets')}
+                className={cn(
+                  "px-3 py-1.5 text-sm transition-colors rounded-full",
+                  viewMode === 'markets' 
+                    ? "bg-muted text-foreground font-medium" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Markets
+              </button>
+            </div>
+
             {/* Filter Toggle Button */}
             <Button 
               ref={filterButtonRef}
