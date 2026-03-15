@@ -146,23 +146,6 @@ const SearchPage = () => {
     getUserLocation();
   }, []);
 
-  // Close filter panel when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        showFilters &&
-        filterPanelRef.current &&
-        filterButtonRef.current &&
-        !filterPanelRef.current.contains(event.target as Node) &&
-        !filterButtonRef.current.contains(event.target as Node)
-      ) {
-        setShowFilters(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showFilters]);
 
   useEffect(() => {
     if (userCoordinates) {
