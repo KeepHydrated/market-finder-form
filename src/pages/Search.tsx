@@ -525,7 +525,6 @@ const SearchPage = () => {
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <Globe className="h-4 w-4" />
                 All of US
               </button>
               <button
@@ -537,7 +536,6 @@ const SearchPage = () => {
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <MapPinned className="h-4 w-4" />
                 Local
               </button>
             </div>
