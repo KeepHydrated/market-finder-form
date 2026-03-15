@@ -78,7 +78,7 @@ export function ShopMobileNav({ hasShopData = false }: ShopMobileNavProps) {
 
   return (
     <div className="sm:hidden fixed top-16 left-0 right-0 z-40 px-4 py-3 pointer-events-none">
-      <Sheet modal={false} open={open} onOpenChange={setOpen}>
+      <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
           <Button variant="ghost" size="icon" className="pointer-events-auto">
             <Menu className="h-5 w-5" />
