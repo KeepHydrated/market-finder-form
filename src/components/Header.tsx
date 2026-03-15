@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { CartButton } from "@/components/shopping/CartButton";
 import { ArrowLeft, Heart, Store, ChevronDown, Search, DollarSign, Home, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import {
