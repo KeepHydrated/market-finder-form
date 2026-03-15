@@ -495,7 +495,7 @@ const SearchPage = () => {
       <div className="container mx-auto px-4 py-8">
         
         {/* Filter Bar */}
-        <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="flex flex-wrap items-center gap-6 mb-4">
           {/* Filter Toggle Button */}
           <Button 
             ref={filterButtonRef}
