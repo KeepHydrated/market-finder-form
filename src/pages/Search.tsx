@@ -692,8 +692,8 @@ const SearchPage = () => {
             {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
 
-          {/* Inline Category Slider */}
-          <div className="flex-1 min-w-0 overflow-hidden relative">
+          {/* Inline Category Slider - hidden on mobile, shown in filter panel instead */}
+          <div className="hidden md:block flex-1 min-w-0 overflow-hidden relative">
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {CATEGORIES.map(category => (
                 <button
