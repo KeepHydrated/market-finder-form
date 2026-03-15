@@ -146,12 +146,26 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
     }
   }, [user, isOnOrdersPage]);
 
-  // Clear search query when navigating to homepage
+  // Sync search query with URL params
   useEffect(() => {
     if (location.pathname === '/') {
       setSearchQuery('');
+    } else if (location.pathname === '/search') {
+      const urlSearch = searchParams.get('search') || searchParams.get('q') || '';
+      setSearchQuery(urlSearch);
     }
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    if (location.pathname === '/search') {
+      const params = new URLSearchParams(location.search);
+      params.delete('search');
+      params.delete('q');
+      const remaining = params.toString();
+      navigate(remaining ? `/search?${remaining}` : '/search');
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
