@@ -19,6 +19,7 @@ import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
 import ShopManager2 from "./pages/ShopManager2";
 import TestShop from "./pages/TestShop";
+import TestPage from "./pages/TestPage";
 import Report from "./pages/Report";
 import Messages from "./pages/Messages";
 import Conversation from "./pages/Conversation";
