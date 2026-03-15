@@ -21,7 +21,7 @@ export default function TestPage() {
   const isActive = (section: string) => currentSection === section;
 
   const navContent = (mobile = false) => (
-    <nav className={`flex flex-col ${mobile ? "gap-2" : "gap-1"}`}>
+    <nav className={`flex flex-col ${mobile ? "gap-0" : "gap-1"}`}>
       {menuItems.map((item) => (
         <NavLink
           key={item.section}
@@ -29,10 +29,10 @@ export default function TestPage() {
           onClick={() => setDrawerOpen(false)}
           className={`flex items-center transition-colors ${
             mobile
-              ? `px-5 py-4 rounded-full text-lg ${
+              ? `px-5 py-4 rounded-2xl text-[17px] tracking-wide ${
                   isActive(item.section)
                     ? "bg-primary text-primary-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground/60"
                 }`
               : `gap-3 px-4 py-3 rounded-lg text-sm ${
                   isActive(item.section)
@@ -87,18 +87,18 @@ export default function TestPage() {
             className="absolute inset-0 bg-black/40"
             onClick={() => setDrawerOpen(false)}
           />
-          <div className="absolute top-0 left-0 h-full w-72 bg-background border-r border-border shadow-lg flex flex-col">
-            <div className="flex items-center justify-end p-4">
+          <div className="absolute top-0 left-0 h-full w-[75%] max-w-[300px] bg-background shadow-xl flex flex-col">
+            <div className="flex items-center justify-end px-5 pt-6 pb-2">
               <button
                 type="button"
                 onClick={() => setDrawerOpen(false)}
-                className="p-1.5 rounded-md hover:bg-muted"
+                className="p-1"
                 aria-label="Close menu"
               >
-                <X className="h-6 w-6" />
+                <X className="h-6 w-6 text-foreground" />
               </button>
             </div>
-            <div className="px-4 pb-4">
+            <div className="px-3 pt-4">
               {navContent(true)}
             </div>
           </div>
