@@ -22,6 +22,7 @@ import { BusinessCards } from '@/components/BusinessCards';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -61,10 +62,11 @@ const SPECIALTY_CATEGORIES = [
 export default function ShopManager() {
   console.log("ShopManager component rendering...");
   const { user, loading } = useAuth();
+  const isMobile = useIsMobile();
   const { toast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Get current section from URL params
   const urlParams = new URLSearchParams(location.search);
   const currentSection = urlParams.get('section') || 'setup';
@@ -1394,9 +1396,9 @@ export default function ShopManager() {
   return (
     <>
       <SidebarProvider>
-        <div className="min-h-screen flex w-screen bg-background overflow-x-hidden">
-          <ShopSidebar hasShopData={!!shopData} />
-          <ShopMobileNav hasShopData={!!shopData} />
+        <div className="min-h-screen flex w-full bg-background overflow-x-hidden">
+          {!isMobile && <ShopSidebar hasShopData={!!shopData} />}
+          {isMobile && <ShopMobileNav hasShopData={!!shopData} />}
           
           <main className="flex-1 w-full pt-14 sm:pt-0">
             {renderContent()}
