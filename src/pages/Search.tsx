@@ -541,42 +541,9 @@ const SearchPage = () => {
             </Select>
           </div>
 
-          {/* Right side: Result count and active filters */}
-          <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-sm text-muted-foreground">
-              Showing {totalResults} result{totalResults !== 1 ? 's' : ''}
-            </span>
-
-            {searchQuery && (
-              <Badge variant="secondary" className="gap-1 pl-2 pr-1">
-                Search: "{searchQuery}"
-                <button 
-                  onClick={() => setSearchQuery('')}
-                  className="ml-1 hover:bg-muted rounded-full p-0.5"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            )}
-
-            {selectedCategories.length > 0 && !selectedCategories.includes('All') && (
-              <Badge variant="secondary" className="gap-1 pl-2 pr-1">
-                Category: {selectedCategories.length === 1 ? selectedCategories[0] : `${selectedCategories.length} selected`}
-                <button 
-                  onClick={() => setSelectedCategories([])}
-                  className="ml-1 hover:bg-muted rounded-full p-0.5"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            )}
-
-            {selectedDays.length > 0 && (
-              <Badge variant="outline" className="text-green-600 border-green-600">
-                Days: {selectedDays.length === 1 ? selectedDays[0] : `${selectedDays.length} selected`}
-              </Badge>
-            )}
-          </div>
+          <span className="text-sm text-muted-foreground">
+            Showing {totalResults} result{totalResults !== 1 ? 's' : ''}
+          </span>
         </div>
 
         {/* Main content area with sidebar filter */}
