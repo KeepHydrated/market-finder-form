@@ -512,7 +512,7 @@ const SearchPage = () => {
       <div className="container mx-auto px-4 py-8">
         
         {/* Filter Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <div className="flex flex-wrap items-center gap-4 mb-4">
           <div className="flex items-center gap-3 flex-wrap">
             {/* Filter Toggle Button */}
             <Button 
