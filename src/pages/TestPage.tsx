@@ -20,20 +20,28 @@ export default function TestPage() {
 
   const isActive = (section: string) => currentSection === section;
 
-  const navContent = (
-    <nav className="flex flex-col gap-1">
+  const navContent = (mobile = false) => (
+    <nav className={`flex flex-col ${mobile ? "gap-2" : "gap-1"}`}>
       {menuItems.map((item) => (
         <NavLink
           key={item.section}
           to={`/test?section=${item.section}`}
           onClick={() => setDrawerOpen(false)}
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-sm ${
-            isActive(item.section)
-              ? "bg-primary text-primary-foreground font-medium"
-              : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          className={`flex items-center transition-colors ${
+            mobile
+              ? `px-5 py-4 rounded-full text-lg ${
+                  isActive(item.section)
+                    ? "bg-primary text-primary-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
+                }`
+              : `gap-3 px-4 py-3 rounded-lg text-sm ${
+                  isActive(item.section)
+                    ? "bg-primary text-primary-foreground font-medium"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                }`
           }`}
         >
-          <item.icon className="h-4 w-4 shrink-0" />
+          {!mobile && <item.icon className="h-4 w-4 shrink-0" />}
           <span>{item.title}</span>
         </NavLink>
       ))}
