@@ -1126,7 +1126,8 @@ const SearchPage = () => {
             )}
           </div>
         )}
-      </div>
+          </div>
+        </div>
       
       {/* Product Detail Modal */}
       <ProductDetailModal
