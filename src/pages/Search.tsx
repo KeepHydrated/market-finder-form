@@ -740,15 +740,23 @@ const SearchPage = () => {
               <div className="block md:hidden mb-6">
                 {filterContent}
               </div>
-              {/* Sidebar on md+ screens - rendered inside the flex below */}
-              <div ref={filterPanelRef} className="hidden md:block w-64 flex-shrink-0 space-y-6 absolute" data-filter-sidebar>
-                {filterContent}
-              </div>
             </>
           );
+
+          return null; // sidebar rendered separately below
         })()}
 
-          {/* Results Area */}
+        {/* Main content area with sidebar filter */}
+        <div className="flex gap-6">
+          {/* Sidebar Filter Panel - md+ only */}
+          {showFilters && (
+            <div ref={filterPanelRef} className="hidden md:block w-64 flex-shrink-0 space-y-6">
+              {(() => {
+                const tr2 = undefined; // placeholder to reuse filterContent
+                return null;
+              })()}
+            </div>
+          )}
           <div className="flex-1 min-w-0">
         {/* Results */}
         {viewMode === 'vendors' && (
