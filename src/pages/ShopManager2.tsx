@@ -62,10 +62,11 @@ const SPECIALTY_CATEGORIES = [
 export default function ShopManager() {
   console.log("ShopManager component rendering...");
   const { user, loading } = useAuth();
+  const isMobile = useIsMobile();
   const { toast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Get current section from URL params
   const urlParams = new URLSearchParams(location.search);
   const currentSection = urlParams.get('section') || 'setup';
