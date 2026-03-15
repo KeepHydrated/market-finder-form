@@ -321,6 +321,11 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
           <div className="flex items-center justify-between md:justify-end w-full md:w-auto space-x-4 md:space-x-8 h-16">
             {/* Left icons on mobile */}
             <div className="flex items-center space-x-4 md:hidden">
+              {location.pathname === '/' && (
+                <Button variant="ghost" size="sm" onClick={() => setMobileSearchOpen(!mobileSearchOpen)}>
+                  <Search className="h-5 w-5" />
+                </Button>
+              )}
               <Link to="/likes">
                 <Button variant="ghost" size="sm">
                   <Heart className="h-5 w-5" />
