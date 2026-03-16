@@ -1698,6 +1698,7 @@ const VendorDuplicate = () => {
         <div className="min-h-screen bg-background">
           <div className="flex flex-col md:flex-row">
             {/* Left column/Top section - sticky on desktop, at top on mobile */}
+            {(!selectedVendor || isMarketDetailsModalOpen) && (
             <div className="w-full md:w-96 md:h-screen md:sticky md:top-0 bg-green-50 border-b md:border-b-0 md:border-r">
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
