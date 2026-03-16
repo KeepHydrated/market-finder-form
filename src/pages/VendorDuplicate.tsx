@@ -1356,6 +1356,7 @@ const VendorDuplicate = () => {
                 })()}
               </div>
             </div>
+            )}
             
             {/* Main content - right column */}
             <div ref={desktopScrollRef} className="flex-1 overflow-y-auto h-screen">
