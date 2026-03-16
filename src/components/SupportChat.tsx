@@ -134,6 +134,15 @@ export function SupportChat({ isOpen, onClose }: SupportChatProps) {
       .from('conversations')
       .update({ last_message_at: new Date().toISOString() })
       .eq('id', conversationId);
+
+    // Send SMS notification (fire and forget)
+    supabase.functions.invoke('send-chat-sms', {
+      body: {
+        message: text,
+        senderName: user.email || 'Customer',
+        chatType: 'support',
+      },
+    }).catch(err => console.error('SMS notification failed:', err));
   };
 
   if (!isOpen) return null;

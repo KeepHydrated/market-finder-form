@@ -277,6 +277,15 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
       .update({ last_message_at: new Date().toISOString() })
       .eq('id', conversation.id);
 
+    // Send SMS notification (fire and forget)
+    supabase.functions.invoke('send-chat-sms', {
+      body: {
+        message: messageText,
+        senderName: user.email || 'Customer',
+        chatType: 'order',
+      },
+    }).catch(err => console.error('SMS notification failed:', err));
+
     // Refocus again after async operations
     input?.focus();
   };
