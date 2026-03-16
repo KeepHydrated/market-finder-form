@@ -129,6 +129,7 @@ const VendorDuplicate = () => {
   const desktopScrollRef2 = useRef<HTMLDivElement>(null); // For desktop/mobile layout
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [isMarketDetailsModalOpen, setIsMarketDetailsModalOpen] = useState(false);
+  const [viewingProduct, setViewingProduct] = useState<any>(null);
 
   // Check if viewport is tablet (768px - 1024px) and track screen width
   useEffect(() => {
