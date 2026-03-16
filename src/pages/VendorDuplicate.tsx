@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ProductGrid } from "@/components/ProductGrid";
+import { ProductDetailView } from "@/components/ProductDetailView";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useToast } from "@/hooks/use-toast";
@@ -128,6 +129,7 @@ const VendorDuplicate = () => {
   const desktopScrollRef2 = useRef<HTMLDivElement>(null); // For desktop/mobile layout
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [isMarketDetailsModalOpen, setIsMarketDetailsModalOpen] = useState(false);
+  const [viewingProduct, setViewingProduct] = useState<any>(null);
 
   // Check if viewport is tablet (768px - 1024px) and track screen width
   useEffect(() => {
@@ -1515,13 +1517,23 @@ const VendorDuplicate = () => {
 
              {/* Products Section */}
             <div className="space-y-6">
-              {selectedVendor.products && selectedVendor.products.length > 0 ? (
+              {viewingProduct && selectedVendor ? (
+                <ProductDetailView
+                  product={viewingProduct}
+                  products={selectedVendor.products || []}
+                  onBack={() => setViewingProduct(null)}
+                  onProductChange={setViewingProduct}
+                  vendorId={selectedVendor.id}
+                  vendorName={selectedVendor.store_name}
+                />
+              ) : selectedVendor.products && selectedVendor.products.length > 0 ? (
                 <ProductGrid 
                   products={selectedVendor.products} 
                   vendorId={selectedVendor.id}
                   vendorName={selectedVendor.store_name}
                   hideVendorName={true}
                   initialProductId={searchParams.get('product') || undefined}
+                  onProductClick={(product) => setViewingProduct(product)}
                 />
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
@@ -2005,13 +2017,23 @@ const VendorDuplicate = () => {
                     </div>
 
                     <div className="space-y-6">
-                      {selectedVendor.products && selectedVendor.products.length > 0 ? (
+                      {viewingProduct && selectedVendor ? (
+                        <ProductDetailView
+                          product={viewingProduct}
+                          products={selectedVendor.products || []}
+                          onBack={() => setViewingProduct(null)}
+                          onProductChange={setViewingProduct}
+                          vendorId={selectedVendor.id}
+                          vendorName={selectedVendor.store_name}
+                        />
+                      ) : selectedVendor.products && selectedVendor.products.length > 0 ? (
                         <ProductGrid 
                           products={selectedVendor.products} 
                           vendorId={selectedVendor.id}
                           vendorName={selectedVendor.store_name}
                           hideVendorName={true}
                           initialProductId={searchParams.get('product') || undefined}
+                          onProductClick={(product) => setViewingProduct(product)}
                         />
                       ) : (
                         <div className="text-center py-8 text-muted-foreground">
