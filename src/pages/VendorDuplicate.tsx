@@ -1835,6 +1835,16 @@ const VendorDuplicate = () => {
                   <div className="space-y-6">
                     {/* Vendor Details */}
                     <div className="mb-6">
+                      {/* Farmers Market Name */}
+                      {(selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term) && (
+                        <button
+                          onClick={() => setSelectedVendor(null)}
+                          className="text-xs text-muted-foreground hover:underline cursor-pointer mb-1 flex items-center gap-1"
+                        >
+                          <MapPin className="h-3 w-3" />
+                          {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}
+                        </button>
+                      )}
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
                           <h1 className="text-xl font-bold text-foreground whitespace-nowrap">{selectedVendor.store_name}</h1>
