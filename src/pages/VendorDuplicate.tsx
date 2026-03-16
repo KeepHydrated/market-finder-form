@@ -1517,13 +1517,23 @@ const VendorDuplicate = () => {
 
              {/* Products Section */}
             <div className="space-y-6">
-              {selectedVendor.products && selectedVendor.products.length > 0 ? (
+              {viewingProduct && selectedVendor ? (
+                <ProductDetailView
+                  product={viewingProduct}
+                  products={selectedVendor.products || []}
+                  onBack={() => setViewingProduct(null)}
+                  onProductChange={setViewingProduct}
+                  vendorId={selectedVendor.id}
+                  vendorName={selectedVendor.store_name}
+                />
+              ) : selectedVendor.products && selectedVendor.products.length > 0 ? (
                 <ProductGrid 
                   products={selectedVendor.products} 
                   vendorId={selectedVendor.id}
                   vendorName={selectedVendor.store_name}
                   hideVendorName={true}
                   initialProductId={searchParams.get('product') || undefined}
+                  onProductClick={(product) => setViewingProduct(product)}
                 />
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
