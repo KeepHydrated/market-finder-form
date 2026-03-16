@@ -1368,8 +1368,8 @@ const VendorDuplicate = () => {
               {/* Farmers Market Name */}
               {(selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term) && (
                 <button
-                  onClick={() => setSelectedVendor(null)}
-                  className="text-xs text-muted-foreground hover:underline cursor-pointer mb-1 flex items-center gap-1"
+                  onClick={() => setIsMarketDetailsModalOpen(true)}
+                  className="text-xs text-primary-foreground bg-primary hover:bg-primary/90 cursor-pointer mb-2 flex items-center gap-1 px-2.5 py-1 rounded-full transition-colors"
                 >
                   <MapPin className="h-3 w-3" />
                   {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}
