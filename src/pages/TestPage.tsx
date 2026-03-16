@@ -375,7 +375,6 @@ export default function TestPage() {
                 }`
           }`}
         >
-          {!mobile && <item.icon className="h-4 w-4 shrink-0" />}
           <span>{item.title}</span>
         </NavLink>
       ))}
