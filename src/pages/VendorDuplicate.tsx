@@ -127,6 +127,7 @@ const VendorDuplicate = () => {
   const desktopScrollRef = useRef<HTMLDivElement>(null); // For tablet layout
   const desktopScrollRef2 = useRef<HTMLDivElement>(null); // For desktop/mobile layout
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+  const [isMarketDetailsModalOpen, setIsMarketDetailsModalOpen] = useState(false);
 
   // Check if viewport is tablet (768px - 1024px) and track screen width
   useEffect(() => {
@@ -1367,8 +1368,8 @@ const VendorDuplicate = () => {
               {/* Farmers Market Name */}
               {(selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term) && (
                 <button
-                  onClick={() => setSelectedVendor(null)}
-                  className="text-xs text-muted-foreground hover:underline cursor-pointer mb-1 flex items-center gap-1"
+                  onClick={() => setIsMarketDetailsModalOpen(true)}
+                  className="text-xs text-primary-foreground bg-primary hover:bg-primary/90 cursor-pointer mb-2 flex items-center gap-1 px-2.5 py-1 rounded-full transition-colors"
                 >
                   <MapPin className="h-3 w-3" />
                   {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}
@@ -1838,8 +1839,8 @@ const VendorDuplicate = () => {
                       {/* Farmers Market Name */}
                       {(selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term) && (
                         <button
-                          onClick={() => setSelectedVendor(null)}
-                          className="text-xs text-muted-foreground hover:underline cursor-pointer mb-1 flex items-center gap-1"
+                          onClick={() => setIsMarketDetailsModalOpen(true)}
+                          className="text-xs text-primary-foreground bg-primary hover:bg-primary/90 cursor-pointer mb-2 flex items-center gap-1 px-2.5 py-1 rounded-full transition-colors"
                         >
                           <MapPin className="h-3 w-3" />
                           {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}
@@ -2525,6 +2526,89 @@ const VendorDuplicate = () => {
         >
           <ArrowUp className="h-5 w-5" />
         </Button>
+      )}
+
+      {/* Market Details Modal */}
+      {acceptedSubmission && (
+        <Dialog open={isMarketDetailsModalOpen} onOpenChange={setIsMarketDetailsModalOpen}>
+          <DialogContent className="sm:max-w-[500px] p-6">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-foreground">
+                  {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={async () => {
+                    await toggleLike(acceptedSubmission.id, 'vendor');
+                  }}
+                  className={cn(
+                    "transition-colors",
+                    isLiked(acceptedSubmission.id, 'vendor')
+                      ? "text-red-500 hover:text-red-600"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Heart 
+                    className={cn(
+                      "h-5 w-5 transition-colors",
+                      isLiked(acceptedSubmission.id, 'vendor') && "fill-current"
+                    )} 
+                  />
+                </Button>
+              </div>
+
+              {(selectedMarketAddress || acceptedSubmission.market_address) && (
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                  <div>
+                    <p className="text-muted-foreground text-base font-normal">
+                      {cleanAddress(selectedMarketAddress || acceptedSubmission.market_address)}
+                    </p>
+                    {distance && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <Navigation className="h-3 w-3 text-muted-foreground" />
+                        <p className="text-muted-foreground text-sm">{distance}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-start gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div className="text-muted-foreground text-base font-normal whitespace-pre-line">
+                  {marketOpeningHours?.open_now !== undefined && (
+                    <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
+                      marketOpeningHours.open_now 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {marketOpeningHours.open_now ? 'Open Now' : 'Currently Closed'}
+                    </div>
+                  )}
+                  <div>
+                    {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => (
+                      <div key={index}>{line}</div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                <span className="text-foreground font-semibold text-lg">
+                  {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
+                   acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
+                </span>
+                <span className="text-muted-foreground text-sm">
+                  ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0}) Google reviews
+                </span>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
 
     </>
