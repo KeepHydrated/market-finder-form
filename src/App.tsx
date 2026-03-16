@@ -17,7 +17,7 @@ import Likes from "./pages/Likes";
 import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
 import OrderSuccess from "./pages/OrderSuccess";
-
+import ShopManager2 from "./pages/ShopManager2";
 import TestShop from "./pages/TestShop";
 import TestPage from "./pages/TestPage";
 import Report from "./pages/Report";
@@ -63,8 +63,8 @@ const App = () => (
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/account" element={<AccountSettings />} />
                   <Route path="/order-success" element={<OrderSuccess />} />
-                  
-                  <Route path="/my-shop" element={<TestPage />} />
+                  <Route path="/my-shop" element={<ShopManager2 />} />
+                  <Route path="/test" element={<TestPage />} />
                   <Route path="/commissions" element={<Commissions />} />
                   <Route path="/report" element={<Report />} />
                   <Route path="/messages" element={<Messages />} />
