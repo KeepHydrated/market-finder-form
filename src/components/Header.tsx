@@ -283,7 +283,7 @@ export const Header = ({ user, profile, onBackClick, showBackButton }: HeaderPro
           </div>
           
           {/* Desktop search bar - on / and /search */}
-          {(location.pathname === '/' || location.pathname === '/search') && (
+          {(
             <div className="flex-1 max-w-md mx-8 hidden md:block">
               <form onSubmit={handleSearch} className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
