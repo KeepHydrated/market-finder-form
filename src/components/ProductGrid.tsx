@@ -334,6 +334,10 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
   }, [initialProductId, products]);
 
   const handleProductClick = (product: Product) => {
+    if (onProductClickOverride) {
+      onProductClickOverride(product);
+      return;
+    }
     setSelectedProduct(product);
     setIsModalOpen(true);
   };
