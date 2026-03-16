@@ -1871,6 +1871,13 @@ const VendorDuplicate = () => {
                       )}
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
+                          <div className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            {selectedVendor.products?.[0]?.images?.[0] ? (
+                              <img src={selectedVendor.products[0].images[0]} alt={selectedVendor.store_name} className="h-full w-full rounded-full object-cover" />
+                            ) : (
+                              <span className="text-primary font-semibold text-sm md:text-base">{selectedVendor.store_name.charAt(0).toUpperCase()}</span>
+                            )}
+                          </div>
                           <h1 className="text-xl font-bold text-foreground whitespace-nowrap">{selectedVendor.store_name}</h1>
                           {/* Rating */}
                           <div 
