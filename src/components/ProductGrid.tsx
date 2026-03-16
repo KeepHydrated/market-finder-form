@@ -33,6 +33,7 @@ interface ProductGridProps {
   vendorName?: string;
   hideVendorName?: boolean;
   initialProductId?: string; // Product ID to open on mount
+  onProductClick?: (product: Product) => void; // Override default modal behavior
 }
 
 interface ProductCardProps {
