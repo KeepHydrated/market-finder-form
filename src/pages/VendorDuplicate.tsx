@@ -1830,6 +1830,7 @@ const VendorDuplicate = () => {
                 })()}
               </div>
             </div>
+            )}
             
             {/* Main content - right column, scrollable - FULL WIDTH ON MOBILE */}
             <div ref={desktopScrollRef2} className="flex-1 w-full overflow-y-auto md:h-screen">
