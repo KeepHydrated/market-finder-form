@@ -1373,7 +1373,7 @@ const VendorDuplicate = () => {
               {(selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term) && (
                 <button
                   onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)}
-                  className="text-xs text-primary-foreground bg-primary hover:bg-primary/90 cursor-pointer mb-2 flex items-center gap-1 px-2.5 py-1 rounded-full transition-colors"
+                  className="text-xs text-foreground bg-green-50 hover:bg-green-100 border border-green-200 cursor-pointer mb-2 flex items-center gap-1 px-2.5 py-1 rounded-full transition-colors"
                 >
                   <MapPin className="h-3 w-3" />
                   {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}
