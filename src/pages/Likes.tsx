@@ -1136,7 +1136,7 @@ const Likes = () => {
                             : "hover:bg-muted/50"
                         }`}
                       >
-                        <tab.icon className="mr-2 h-4 w-4" />
+                        
                         <span>{tab.title}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
