@@ -1227,7 +1227,7 @@ const VendorDuplicate = () => {
           <div className="flex">
             {/* Left column - sticky sidebar, hidden when vendor selected unless toggled */}
             {(!selectedVendor || isMarketDetailsModalOpen) && (
-            <div className="w-80 h-screen sticky top-0 bg-green-50 border-r overflow-y-auto">
+            <div className="w-80 bg-green-50 border-r overflow-y-auto">
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
                   <button 
@@ -1699,7 +1699,7 @@ const VendorDuplicate = () => {
           <div className="flex flex-col md:flex-row">
             {/* Left column/Top section - sticky on desktop, at top on mobile */}
             {(!selectedVendor || isMarketDetailsModalOpen) && (
-            <div className="w-full md:w-96 md:h-screen md:sticky md:top-0 bg-green-50 border-b md:border-b-0 md:border-r">
+            <div className="w-full md:w-96 bg-green-50 border-b md:border-b-0 md:border-r">
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
