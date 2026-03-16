@@ -291,7 +291,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClic
   );
 };
 
-export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId, vendorName, hideVendorName = false, initialProductId }: ProductGridProps) => {
+export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId, vendorName, hideVendorName = false, initialProductId, onProductClick: onProductClickOverride }: ProductGridProps) => {
   // Character limits
   const NAME_LIMIT = 20;
   const DESCRIPTION_LIMIT = 200;
