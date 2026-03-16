@@ -1371,13 +1371,15 @@ const VendorDuplicate = () => {
             <div className="mb-6">
               {/* Farmers Market Name */}
               {(selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term) && (
-                <button
-                  onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)}
-                  className="text-xs text-foreground bg-green-50 hover:bg-green-100 border border-green-200 cursor-pointer mb-2 flex items-center gap-1 px-2.5 py-1 rounded-full transition-colors"
-                >
-                  <MapPin className="h-3 w-3" />
-                  {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}
-                </button>
+                <div className="bg-green-50 -mx-4 px-4 py-2 mb-3 border-b border-green-200">
+                  <button
+                    onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)}
+                    className="text-xs text-foreground cursor-pointer flex items-center gap-1 hover:text-primary transition-colors"
+                  >
+                    <MapPin className="h-3 w-3 text-primary" />
+                    {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}
+                  </button>
+                </div>
               )}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
