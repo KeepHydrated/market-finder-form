@@ -1684,8 +1684,8 @@ const VendorDuplicate = () => {
         // Desktop and Mobile view - original non-collapsible layout  
         <div className="min-h-screen bg-background">
           {/* Green accent bar under header */}
-          <div className="w-full bg-secondary px-4 py-2 flex items-center">
-            <ChevronRight className="h-4 w-4 text-secondary-foreground" />
+          <div className="w-full bg-green-50 px-4 py-2 flex items-center">
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </div>
           <div className="flex flex-col md:flex-row">
             {/* Left column/Top section - sticky on desktop, at top on mobile */}
