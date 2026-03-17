@@ -1238,7 +1238,7 @@ const VendorDuplicate = () => {
               </button>
             )}
           </div>
-          <div className={`w-full bg-green-50 border-b transition-all duration-300 overflow-hidden ${isSidebarCollapsed ? 'max-h-0 border-b-0' : 'max-h-[80vh]'}`}>
+          <div className={`w-full bg-green-50 border-b overflow-hidden transition-[max-height,opacity,border] duration-500 ease-in-out ${isSidebarCollapsed ? 'max-h-0 border-b-0 opacity-0' : 'max-h-[80vh] opacity-100'}`}>
             <div className="overflow-y-auto">
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
