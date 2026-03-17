@@ -1224,9 +1224,22 @@ const VendorDuplicate = () => {
       {isTablet ? (
         // iPad view - same as desktop layout but narrower
         <div className="min-h-screen bg-background">
-          <div className="flex">
-            {/* Left column - sticky sidebar */}
-            <div className="w-80 h-screen sticky top-0 bg-green-50 border-r overflow-y-auto">
+          <div className="w-full bg-green-50 px-4 py-2 flex items-center gap-2">
+            <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="hover:opacity-70 transition-opacity">
+              {isSidebarCollapsed ? (
+                <ChevronRight className="h-4 w-4 text-muted-foreground rotate-90" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-muted-foreground -rotate-90" />
+              )}
+            </button>
+            {isSidebarCollapsed && (
+              <span className="text-xs text-muted-foreground">
+                {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market"}
+              </span>
+            )}
+          </div>
+          <div className={`w-full bg-green-50 border-b transition-all duration-300 overflow-hidden ${isSidebarCollapsed ? 'max-h-0 border-b-0' : 'max-h-[80vh]'}`}>
+            <div className="overflow-y-auto">
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
                   <button 
