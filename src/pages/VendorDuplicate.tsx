@@ -1813,7 +1813,7 @@ const VendorDuplicate = () => {
                           {cleanAddress(selectedMarketAddress || acceptedSubmission.market_address)}
                         </p>
                         {distance && (
-                          <div className="flex items-center gap-1.5 bg-foreground/10 rounded-full px-2.5 py-0.5">
+                          <div className="flex items-center gap-1.5 bg-foreground/10 rounded-full px-2.5 py-0.5 ml-4">
                             <Navigation className="h-3 w-3 text-foreground/60" />
                             <p className="text-foreground/70 text-xs font-medium">{distance}</p>
                           </div>
