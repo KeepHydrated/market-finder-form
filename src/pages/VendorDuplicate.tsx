@@ -1827,9 +1827,9 @@ const VendorDuplicate = () => {
                             {marketOpeningHours.open_now ? 'Open Now' : 'Currently Closed'}
                           </div>
                         )}
-                        <div>
+                        <div className="flex flex-wrap gap-x-3 gap-y-1">
                           {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => (
-                            <div key={index}>{line}</div>
+                            <span key={index} className="whitespace-nowrap">{line}</span>
                           ))}
                         </div>
                       </div>
