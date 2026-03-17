@@ -1759,18 +1759,18 @@ const VendorDuplicate = () => {
                   <div className="pb-4 space-y-3 pt-3">
                     <div className="flex items-start gap-2">
                       <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                      <div>
+                      <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-muted-foreground text-sm">
                           {cleanAddress(selectedMarketAddress || acceptedSubmission.market_address)}
                         </p>
                         {distance && (
-                          <div className="flex items-center gap-1 mt-1">
+                          <div className="flex items-center gap-1">
                             <Navigation className="h-3 w-3 text-muted-foreground" />
                             <p className="text-muted-foreground text-sm">{distance}</p>
                           </div>
                         )}
                         {isLoadingDistance && (
-                          <p className="text-muted-foreground text-sm mt-1">Calculating distance...</p>
+                          <p className="text-muted-foreground text-sm">Calculating distance...</p>
                         )}
                       </div>
                     </div>
