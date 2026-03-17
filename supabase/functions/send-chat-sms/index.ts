@@ -2,12 +2,10 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const GATEWAY_URL = 'https://connector-gateway.lovable.dev/twilio';
-const ADMIN_PHONE = '+16074781452';
-const TWILIO_FROM = '+16074781452';
+const RECEIVE_SMS_URL = 'https://zsgfcqrpbzwyxhyuqubl.supabase.co/functions/v1/receive-sms';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -15,12 +13,6 @@ serve(async (req) => {
   }
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY is not configured');
-
-    const TWILIO_API_KEY = Deno.env.get('TWILIO_API_KEY');
-    if (!TWILIO_API_KEY) throw new Error('TWILIO_API_KEY is not configured');
-
     const { message, senderName, chatType } = await req.json();
 
     if (!message) {
@@ -31,33 +23,32 @@ serve(async (req) => {
     }
 
     const prefix = chatType === 'support' ? '🆘 Support' : '💬 Order Chat';
-    const smsBody = `${prefix} from ${senderName || 'Customer'}:\n${message}`;
+    const body = `${prefix} from ${senderName || 'Customer'}:\n${message}`;
 
-    const response = await fetch(`${GATEWAY_URL}/Messages.json`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'X-Connection-Api-Key': TWILIO_API_KEY,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        To: ADMIN_PHONE,
-        From: TWILIO_FROM,
-        Body: smsBody,
-      }),
+    const formData = new URLSearchParams({
+      From: '+10000000000',
+      Body: body,
+      MessageSid: crypto.randomUUID(),
+      NumMedia: '0',
     });
 
-    const data = await response.json();
+    const response = await fetch(RECEIVE_SMS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString(),
+    });
+
     if (!response.ok) {
-      throw new Error(`Twilio API error [${response.status}]: ${JSON.stringify(data)}`);
+      const errorText = await response.text();
+      throw new Error(`receive-sms error [${response.status}]: ${errorText}`);
     }
 
-    return new Response(JSON.stringify({ success: true, sid: data.sid }), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error: unknown) {
-    console.error('Error sending SMS:', error);
+    console.error('Error forwarding chat message:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(JSON.stringify({ success: false, error: errorMessage }), {
       status: 500,
