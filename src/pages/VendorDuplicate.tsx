@@ -1371,10 +1371,10 @@ const VendorDuplicate = () => {
             <div className="mb-6">
                {/* Farmers Market Name */}
               {(selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term) && (
-                <div className="bg-green-50 -mx-4 -mt-6 px-4 py-2 border-b border-green-200">
+                <div className="bg-green-50 -mx-4 -mt-6 px-4 py-1 border-b border-green-200 flex justify-end">
                   <button
                     onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)}
-                    className="text-xs text-foreground cursor-pointer flex items-center gap-1 hover:text-primary transition-colors"
+                    className="text-xs text-foreground cursor-pointer flex items-center gap-1 hover:text-primary transition-colors p-1"
                   >
                     {isMarketDetailsModalOpen ? <ChevronRight className="h-5 w-5 text-muted-foreground" /> : <ChevronLeft className="h-5 w-5 text-muted-foreground" />}
                     {!isMarketDetailsModalOpen && <MapPin className="h-3 w-3 text-primary" />}
@@ -1382,7 +1382,7 @@ const VendorDuplicate = () => {
                   </button>
                 </div>
               )}
-              <div className="flex items-center justify-between mb-4 mt-3">
+              <div className="flex items-center justify-between mb-4 mt-4">
                 <div className="flex items-center gap-2">
                   <div className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                     {selectedVendor.products?.[0]?.images?.[0] ? (
@@ -1864,10 +1864,10 @@ const VendorDuplicate = () => {
                     <div className="mb-6">
                       {/* Farmers Market Name */}
                       {(selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term) && (
-                        <div className="bg-green-50 -mx-4 -mt-6 px-4 py-2 border-b border-green-200">
+                        <div className="bg-green-50 -mx-4 -mt-6 px-4 py-1 border-b border-green-200 flex justify-end">
                           <button
                             onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)}
-                            className="text-xs text-foreground cursor-pointer flex items-center gap-1 hover:text-primary transition-colors"
+                            className="text-xs text-foreground cursor-pointer flex items-center gap-1 hover:text-primary transition-colors p-1"
                           >
                             {isMarketDetailsModalOpen ? <ChevronRight className="h-5 w-5 text-muted-foreground" /> : <ChevronLeft className="h-5 w-5 text-muted-foreground" />}
                             {!isMarketDetailsModalOpen && <MapPin className="h-3 w-3 text-primary" />}
@@ -1875,7 +1875,7 @@ const VendorDuplicate = () => {
                           </button>
                         </div>
                       )}
-                      <div className="flex items-center justify-between mb-4 mt-3">
+                      <div className="flex items-center justify-between mb-4 mt-4">
                         <div className="flex items-center gap-2">
                           <div className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                             {selectedVendor.products?.[0]?.images?.[0] ? (
