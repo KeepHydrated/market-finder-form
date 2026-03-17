@@ -33,7 +33,6 @@ interface ProductGridProps {
   vendorName?: string;
   hideVendorName?: boolean;
   initialProductId?: string; // Product ID to open on mount
-  onProductClick?: (product: Product) => void; // Override default modal behavior
 }
 
 interface ProductCardProps {
@@ -291,7 +290,7 @@ const ProductCard = ({ product, onProductClick, onDeleteProduct, onDuplicateClic
   );
 };
 
-export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId, vendorName, hideVendorName = false, initialProductId, onProductClick: onProductClickOverride }: ProductGridProps) => {
+export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onEditProduct, vendorId, vendorName, hideVendorName = false, initialProductId }: ProductGridProps) => {
   // Character limits
   const NAME_LIMIT = 20;
   const DESCRIPTION_LIMIT = 200;
@@ -334,10 +333,6 @@ export const ProductGrid = ({ products, onDeleteProduct, onDuplicateProduct, onE
   }, [initialProductId, products]);
 
   const handleProductClick = (product: Product) => {
-    if (onProductClickOverride) {
-      onProductClickOverride(product);
-      return;
-    }
     setSelectedProduct(product);
     setIsModalOpen(true);
   };

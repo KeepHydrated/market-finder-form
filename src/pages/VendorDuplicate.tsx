@@ -16,7 +16,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ProductGrid } from "@/components/ProductGrid";
-import { ProductDetailView } from "@/components/ProductDetailView";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { useToast } from "@/hooks/use-toast";
@@ -128,10 +127,6 @@ const VendorDuplicate = () => {
   const desktopScrollRef = useRef<HTMLDivElement>(null); // For tablet layout
   const desktopScrollRef2 = useRef<HTMLDivElement>(null); // For desktop/mobile layout
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
-  const [isMarketDetailsModalOpen, setIsMarketDetailsModalOpen] = useState(false);
-  const [showMarketVendors, setShowMarketVendors] = useState(false);
-  const [viewingProduct, setViewingProduct] = useState<any>(null);
-  const [marketPhotoUrl, setMarketPhotoUrl] = useState<string | null>(null);
 
   // Check if viewport is tablet (768px - 1024px) and track screen width
   useEffect(() => {
@@ -530,41 +525,6 @@ const VendorDuplicate = () => {
       
       // Fetch ratings for this vendor
       fetchVendorRatings([matchingVendor.id]);
-
-      // Fetch other vendors at the same market
-      const marketName = matchingVendor.selected_market;
-      if (marketName) {
-        try {
-          const { data: coVendors } = await supabase
-            .from('submissions')
-            .select('*')
-            .eq('status', 'accepted')
-            .neq('id', matchingVendor.id);
-          
-          if (coVendors) {
-            const sameMarketVendors = coVendors.filter((v: any) => {
-              if (v.selected_market === marketName) return true;
-              if (v.selected_markets && Array.isArray(v.selected_markets)) {
-                return v.selected_markets.some((m: any) => 
-                  (typeof m === 'string' ? m : m.name) === marketName
-                );
-              }
-              return false;
-            });
-            if (sameMarketVendors.length > 0) {
-              const parsed = sameMarketVendors.map((s: any) => ({
-                ...s,
-                products: typeof s.products === 'string' ? JSON.parse(s.products) : (s.products || []),
-                market_hours: typeof s.market_hours === 'string' ? JSON.parse(s.market_hours) : s.market_hours,
-              }));
-              setAllVendors([matchingVendor, ...parsed]);
-              fetchVendorRatings([matchingVendor.id, ...parsed.map((v: any) => v.id)]);
-            }
-          }
-        } catch (e) {
-          console.error('Error fetching co-vendors:', e);
-        }
-      }
     } catch (error) {
       console.error('Error fetching vendor by slug:', error);
       toast({
@@ -1032,20 +992,6 @@ const VendorDuplicate = () => {
           reviewCount: market.user_ratings_total
         });
         
-        // Fetch market photo if place_id available
-        if (market.place_id) {
-          try {
-            const { data: photoData } = await supabase.functions.invoke('get-place-photo', {
-              body: { place_id: market.place_id }
-            });
-            if (photoData?.photoUrl) {
-              setMarketPhotoUrl(photoData.photoUrl);
-            }
-          } catch (e) {
-            console.error('Error fetching market photo:', e);
-          }
-        }
-        
         // Update the selected market address if not already set
         if (!selectedMarketAddress) {
           setSelectedMarketAddress(market.address);
@@ -1277,178 +1223,141 @@ const VendorDuplicate = () => {
       {isTablet ? (
         // iPad view - same as desktop layout but narrower
         <div className="min-h-screen bg-background">
-          {/* Collapsible Market Info - above vendor content */}
-          {selectedVendor && (selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term) && (
-            <div className="bg-green-50 border-b border-green-200">
-              <div className="mx-auto px-4 max-w-xl">
-                <div className="flex items-center gap-2 py-2">
-                  <div
-                    className="flex-1 text-sm text-foreground flex items-center gap-2"
+          <div className="flex">
+            {/* Left column - sticky sidebar */}
+            <div className="w-80 h-screen sticky top-0 bg-green-50 border-r overflow-y-auto">
+              <div className="space-y-6 px-4 pt-6 pb-6">
+                <div className="flex items-center justify-between">
+                  <button 
+                    className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors text-left"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('✅ Market name BUTTON clicked - clearing selected vendor');
+                      setSelectedVendor(null);
+                    }}
                   >
-                    {marketPhotoUrl ? (
-                      <img src={marketPhotoUrl} alt="" className="h-7 w-7 rounded-full object-cover flex-shrink-0" />
-                    ) : (
-                      <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                    )}
-                    <span className="font-medium">{selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}</span>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <Star className="h-3.5 w-3.5 text-yellow-500 fill-current" />
-                      <span className="text-foreground font-medium text-xs">
-                        {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
-                         acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
-                      </span>
-                      <span className="text-muted-foreground text-xs">
-                        ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0})
-                      </span>
-                    </div>
-                    <button onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)} className="ml-auto p-1 cursor-pointer hover:bg-accent rounded">
-                      <ChevronRight className={cn("h-4 w-4 text-muted-foreground transition-transform -rotate-90", isMarketDetailsModalOpen && "rotate-90")} />
-                    </button>
-                  </div>
+                    {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
+                  </button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex-shrink-0 h-8 w-8 p-0"
-                    onClick={async (e) => {
-                      e.stopPropagation();
+                    onClick={async () => {
                       if (acceptedSubmission) {
                         await toggleLike(acceptedSubmission.id, 'vendor');
                       }
                     }}
+                    className={cn(
+                      "transition-colors",
+                      acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor')
+                        ? "text-red-500 hover:text-red-600"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
                   >
                     <Heart 
                       className={cn(
-                        "h-4 w-4 transition-colors",
-                        acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') 
-                          ? "text-red-500 fill-current" 
-                          : "text-muted-foreground"
+                        "h-5 w-5 transition-colors",
+                        acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') && "fill-current"
                       )} 
                     />
                   </Button>
                 </div>
-                {isMarketDetailsModalOpen && (
-                  <div className="pb-5 space-y-5 pt-4">
-                    <div className="flex items-start gap-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-muted-foreground text-sm">
-                          {cleanAddress(selectedMarketAddress || acceptedSubmission.market_address)}
-                        </p>
-                        {distance && (
-                          <div className="flex items-center gap-1.5 bg-foreground/10 rounded-full px-2.5 py-0.5 ml-4">
-                            <Navigation className="h-3 w-3 text-foreground/60" />
-                            <p className="text-foreground/70 text-xs font-medium">{distance}</p>
-                          </div>
-                        )}
-                        {isLoadingDistance && (
-                          <p className="text-muted-foreground text-sm">Calculating distance...</p>
-                        )}
-                      </div>
-                    </div>
 
-                    <div className="flex items-start gap-2">
-                      <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-                      <div className="text-muted-foreground text-sm whitespace-pre-line">
-                        {marketOpeningHours?.open_now !== undefined && (
-                          <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
-                            marketOpeningHours.open_now 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {marketOpeningHours.open_now ? 'Open Now' : 'Currently Closed'}
-                          </div>
-                        )}
-                        <div className="flex gap-10 overflow-x-auto">
-                          {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => {
-                            const sepIdx = line.search(/[:,]/);
-                            const day = sepIdx > 0 ? line.substring(0, sepIdx).trim().substring(0, 3) : line.substring(0, 3);
-                            const time = sepIdx > 0 ? line.substring(sepIdx + 1).trim() : '';
-                            return (
-                              <div key={index} className="flex flex-col items-start min-w-0">
-                                <span className="font-medium text-foreground text-xs">{day}</span>
-                                <span className="text-[10px] text-muted-foreground whitespace-nowrap">{time}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-
-                    {navigationMarketsOrder.length > 1 && (() => {
-                      const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
-                      const currentPosition = navigationMarketsOrder.indexOf(currentMarket);
-                      return (
-                        <div className="flex items-center gap-4 pt-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"
-                            onClick={() => { if (currentPosition > 0) switchToMarket(navigationMarketsOrder[currentPosition - 1], false); }}
-                            disabled={currentPosition <= 0}
-                          >
-                            <ChevronLeft className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"
-                            onClick={() => { if (currentPosition >= 0 && currentPosition < navigationMarketsOrder.length - 1) switchToMarket(navigationMarketsOrder[currentPosition + 1], false); }}
-                            disabled={currentPosition < 0 || currentPosition >= navigationMarketsOrder.length - 1}
-                          >
-                            <ChevronRight className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      );
-                    })()}
-
-                    {/* View all vendors button */}
-                    {allVendors.length >= 1 && (
-                      <div className="pt-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-primary hover:text-primary/80 p-0 h-auto text-sm font-medium"
-                          onClick={() => setShowMarketVendors(!showMarketVendors)}
-                        >
-                          {showMarketVendors ? 'Hide vendors' : `View all vendors (${allVendors.length})`}
-                        </Button>
-                        {showMarketVendors && (
-                          <div className="mt-3 space-y-2">
-                            {allVendors.map((vendor) => (
-                              <div
-                                key={vendor.id}
-                                className={cn(
-                                  "flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors hover:bg-accent",
-                                  selectedVendor?.id === vendor.id && "bg-accent"
-                                )}
-                                onClick={() => {
-                                  setAcceptedSubmission(vendor);
-                                  setSelectedVendor(vendor);
-                                  setShowMarketVendors(false);
-                                }}
-                              >
-                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                  {vendor.products?.[0]?.images?.[0] ? (
-                                    <img src={vendor.products[0].images[0]} alt={vendor.store_name} className="h-full w-full rounded-full object-cover" />
-                                  ) : (
-                                    <span className="text-primary font-semibold text-xs">{vendor.store_name.charAt(0).toUpperCase()}</span>
-                                  )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-foreground truncate">{vendor.store_name}</p>
-                                  {vendor.primary_specialty && (
-                                    <p className="text-xs text-muted-foreground truncate">{vendor.primary_specialty}</p>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                  <div>
+                    <p className="text-muted-foreground text-base font-normal">
+                      {cleanAddress(selectedMarketAddress || acceptedSubmission.market_address)}
+                    </p>
+                    {distance && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <Navigation className="h-3 w-3 text-muted-foreground" />
+                        <p className="text-muted-foreground text-sm">{distance}</p>
                       </div>
                     )}
+                    {isLoadingDistance && (
+                      <p className="text-muted-foreground text-sm mt-1">Calculating distance...</p>
+                    )}
                   </div>
-                )}
+                </div>
+
+                <div className="flex items-start gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
+                  <div className="text-muted-foreground text-base font-normal whitespace-pre-line">
+                    {marketOpeningHours?.open_now !== undefined && (
+                      <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
+                        marketOpeningHours.open_now 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {marketOpeningHours.open_now ? 'Open Now' : 'Currently Closed'}
+                      </div>
+                    )}
+                    <div>
+                      {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => (
+                        <div key={index}>{line}</div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2">
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                    <span className="text-foreground font-semibold text-lg">
+                      {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
+                       acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
+                    </span>
+                    <span className="text-muted-foreground text-sm">
+                      ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0}) Google reviews
+                    </span>
+                  </div>
+                </div>
+
+                {selectedVendor && navigationMarketsOrder.length > 1 && (() => {
+                  const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
+                  const currentPosition = navigationMarketsOrder.indexOf(currentMarket);
+                  
+                  return (
+                    <div className="mt-4 flex items-center justify-start gap-4">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                        onClick={() => {
+                          if (currentPosition > 0) {
+                            const previousMarket = navigationMarketsOrder[currentPosition - 1];
+                            switchToMarket(previousMarket, false);
+                          }
+                        }}
+                        disabled={currentPosition <= 0}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                        onClick={() => {
+                          if (currentPosition >= 0 && currentPosition < navigationMarketsOrder.length - 1) {
+                            const nextMarket = navigationMarketsOrder[currentPosition + 1];
+                            switchToMarket(nextMarket, false);
+                          }
+                        }}
+                        disabled={currentPosition < 0 || currentPosition >= navigationMarketsOrder.length - 1}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
-          )}
-
-          {/* Main content - single column */}
-          <div ref={desktopScrollRef} className="flex-1">
-            <div className="mx-auto px-4 py-6 max-w-xl">
+            
+            {/* Main content - right column */}
+            <div ref={desktopScrollRef} className="flex-1 overflow-y-auto h-screen">
+              <div className="mx-auto px-4 py-6 max-w-xl">
                   {selectedVendor ? (
           // Show selected vendor details
           <div className="space-y-6">
@@ -1457,13 +1366,6 @@ const VendorDuplicate = () => {
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    {selectedVendor.products?.[0]?.images?.[0] ? (
-                      <img src={selectedVendor.products[0].images[0]} alt={selectedVendor.store_name} className="h-full w-full rounded-full object-cover" />
-                    ) : (
-                      <span className="text-primary font-semibold text-sm md:text-base">{selectedVendor.store_name.charAt(0).toUpperCase()}</span>
-                    )}
-                  </div>
                   <h1 className="text-lg md:text-xl font-bold text-foreground whitespace-nowrap">{selectedVendor.store_name}</h1>
                   {/* Rating */}
                   <div 
@@ -1600,23 +1502,13 @@ const VendorDuplicate = () => {
 
              {/* Products Section */}
             <div className="space-y-6">
-              {viewingProduct && selectedVendor ? (
-                <ProductDetailView
-                  product={viewingProduct}
-                  products={selectedVendor.products || []}
-                  onBack={() => setViewingProduct(null)}
-                  onProductChange={setViewingProduct}
-                  vendorId={selectedVendor.id}
-                  vendorName={selectedVendor.store_name}
-                />
-              ) : selectedVendor.products && selectedVendor.products.length > 0 ? (
+              {selectedVendor.products && selectedVendor.products.length > 0 ? (
                 <ProductGrid 
                   products={selectedVendor.products} 
                   vendorId={selectedVendor.id}
                   vendorName={selectedVendor.store_name}
                   hideVendorName={true}
                   initialProductId={searchParams.get('product') || undefined}
-                  onProductClick={(product) => setViewingProduct(product)}
                 />
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
@@ -1786,182 +1678,148 @@ const VendorDuplicate = () => {
         )}
               </div>
             </div>
+          </div>
         </div>
       ) : (
         // Desktop and Mobile view - original non-collapsible layout  
         <div className="min-h-screen bg-background">
-          {/* Collapsible Market Info - above vendor content */}
-          {selectedVendor && (selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term) && (
-            <div className="bg-green-50 border-b border-green-200">
-              <div className="mx-auto px-4 md:max-w-5xl">
-                <div className="flex items-center gap-2 py-2">
-                  <div
-                    className="flex-1 text-sm text-foreground flex items-center gap-2"
-                  >
-                    {marketPhotoUrl ? (
-                      <img src={marketPhotoUrl} alt="" className="h-7 w-7 rounded-full object-cover flex-shrink-0" />
-                    ) : (
-                      <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                    )}
-                    <span className="font-medium">{selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}</span>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <Star className="h-3.5 w-3.5 text-yellow-500 fill-current" />
-                      <span className="text-foreground font-medium text-xs">
-                        {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
-                         acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
-                      </span>
-                      <span className="text-muted-foreground text-xs">
-                        ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0})
-                      </span>
-                    </div>
-                    <button onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)} className="ml-auto p-1 cursor-pointer hover:bg-accent rounded">
-                      <ChevronRight className={cn("h-4 w-4 text-muted-foreground transition-transform -rotate-90", isMarketDetailsModalOpen && "rotate-90")} />
+          <div className="flex flex-col md:flex-row">
+            {/* Left column/Top section - sticky on desktop, at top on mobile */}
+            <div className="w-full md:w-96 md:h-screen md:sticky md:top-0 bg-green-50 border-b md:border-b-0 md:border-r">
+              <div className="space-y-6 px-4 pt-6 pb-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <button 
+                      className="text-black text-xl font-bold cursor-pointer hover:text-gray-600 transition-colors text-left"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('✅ Market name BUTTON clicked - clearing selected vendor');
+                        setSelectedVendor(null);
+                      }}
+                    >
+                      {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
                     </button>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex-shrink-0 h-8 w-8 p-0"
-                    onClick={async (e) => {
-                      e.stopPropagation();
+                    onClick={async () => {
                       if (acceptedSubmission) {
                         await toggleLike(acceptedSubmission.id, 'vendor');
                       }
                     }}
+                    className={cn(
+                      "transition-colors",
+                      acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor')
+                        ? "text-red-500 hover:text-red-600"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
                   >
                     <Heart 
                       className={cn(
-                        "h-4 w-4 transition-colors",
-                        acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') 
-                          ? "text-red-500 fill-current" 
-                          : "text-muted-foreground"
+                        "h-5 w-5 transition-colors",
+                        acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') && "fill-current"
                       )} 
                     />
                   </Button>
                 </div>
-                {isMarketDetailsModalOpen && (
-                  <div className="pb-5 space-y-5 pt-4">
-                    <div className="flex items-start gap-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-muted-foreground text-sm">
-                          {cleanAddress(selectedMarketAddress || acceptedSubmission.market_address)}
-                        </p>
-                        {distance && (
-                          <div className="flex items-center gap-1.5 bg-foreground/10 rounded-full px-2.5 py-0.5 ml-4">
-                            <Navigation className="h-3 w-3 text-foreground/60" />
-                            <p className="text-foreground/70 text-xs font-medium">{distance}</p>
-                          </div>
-                        )}
-                        {isLoadingDistance && (
-                          <p className="text-muted-foreground text-sm">Calculating distance...</p>
-                        )}
-                      </div>
-                    </div>
 
-                    <div className="flex items-start gap-2">
-                      <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-                      <div className="text-muted-foreground text-sm whitespace-pre-line">
-                        {marketOpeningHours?.open_now !== undefined && (
-                          <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
-                            marketOpeningHours.open_now 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {marketOpeningHours.open_now ? 'Open Now' : 'Currently Closed'}
-                          </div>
-                        )}
-                        <div className="flex gap-10 overflow-x-auto">
-                          {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => {
-                            const sepIdx = line.search(/[:,]/);
-                            const day = sepIdx > 0 ? line.substring(0, sepIdx).trim().substring(0, 3) : line.substring(0, 3);
-                            const time = sepIdx > 0 ? line.substring(sepIdx + 1).trim() : '';
-                            return (
-                              <div key={index} className="flex flex-col items-start min-w-0">
-                                <span className="font-medium text-foreground text-xs">{day}</span>
-                                <span className="text-[10px] text-muted-foreground whitespace-nowrap">{time}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-
-                    {navigationMarketsOrder.length > 1 && (() => {
-                      const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
-                      const currentPosition = navigationMarketsOrder.indexOf(currentMarket);
-                      return (
-                        <div className="flex items-center gap-4 pt-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"
-                            onClick={() => { if (currentPosition > 0) switchToMarket(navigationMarketsOrder[currentPosition - 1], false); }}
-                            disabled={currentPosition <= 0}
-                          >
-                            <ChevronLeft className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"
-                            onClick={() => { if (currentPosition >= 0 && currentPosition < navigationMarketsOrder.length - 1) switchToMarket(navigationMarketsOrder[currentPosition + 1], false); }}
-                            disabled={currentPosition < 0 || currentPosition >= navigationMarketsOrder.length - 1}
-                          >
-                            <ChevronRight className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      );
-                    })()}
-
-                    {/* View all vendors button */}
-                    {allVendors.length >= 1 && (
-                      <div className="pt-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-primary hover:text-primary/80 p-0 h-auto text-sm font-medium"
-                          onClick={() => setShowMarketVendors(!showMarketVendors)}
-                        >
-                          {showMarketVendors ? 'Hide vendors' : `View all vendors (${allVendors.length})`}
-                        </Button>
-                        {showMarketVendors && (
-                          <div className="mt-3 space-y-2">
-                            {allVendors.map((vendor) => (
-                              <div
-                                key={vendor.id}
-                                className={cn(
-                                  "flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors hover:bg-accent",
-                                  selectedVendor?.id === vendor.id && "bg-accent"
-                                )}
-                                onClick={() => {
-                                  setAcceptedSubmission(vendor);
-                                  setSelectedVendor(vendor);
-                                  setShowMarketVendors(false);
-                                }}
-                              >
-                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                  {vendor.products?.[0]?.images?.[0] ? (
-                                    <img src={vendor.products[0].images[0]} alt={vendor.store_name} className="h-full w-full rounded-full object-cover" />
-                                  ) : (
-                                    <span className="text-primary font-semibold text-xs">{vendor.store_name.charAt(0).toUpperCase()}</span>
-                                  )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-foreground truncate">{vendor.store_name}</p>
-                                  {vendor.primary_specialty && (
-                                    <p className="text-xs text-muted-foreground truncate">{vendor.primary_specialty}</p>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                  <div>
+                    <p className="text-muted-foreground text-base font-normal">
+                      {cleanAddress(selectedMarketAddress || acceptedSubmission.market_address)}
+                    </p>
+                    {distance && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <Navigation className="h-3 w-3 text-muted-foreground" />
+                        <p className="text-muted-foreground text-sm">{distance}</p>
                       </div>
                     )}
+                    {isLoadingDistance && (
+                      <p className="text-muted-foreground text-sm mt-1">Calculating distance...</p>
+                    )}
                   </div>
-                )}
+                </div>
+
+                <div className="flex items-start gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
+                  <div className="text-muted-foreground text-base font-normal whitespace-pre-line">
+                    {marketOpeningHours?.open_now !== undefined && (
+                      <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
+                        marketOpeningHours.open_now 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {marketOpeningHours.open_now ? 'Open Now' : 'Currently Closed'}
+                      </div>
+                    )}
+                    <div>
+                      {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => (
+                        <div key={index}>{line}</div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2">
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                    <span className="text-foreground font-semibold text-lg">
+                      {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
+                       acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
+                    </span>
+                    <span className="text-muted-foreground text-sm">
+                      ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0}) Google reviews
+                    </span>
+                  </div>
+                </div>
+
+                {selectedVendor && navigationMarketsOrder.length > 1 && (() => {
+                  const currentMarket = selectedMarketName || acceptedSubmission.selected_market;
+                  const currentPosition = navigationMarketsOrder.indexOf(currentMarket);
+                  
+                  return (
+                    <div className="mt-4 flex items-center justify-start gap-4">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                        onClick={() => {
+                          if (currentPosition > 0) {
+                            const previousMarket = navigationMarketsOrder[currentPosition - 1];
+                            switchToMarket(previousMarket, false);
+                          }
+                        }}
+                        disabled={currentPosition <= 0}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                        onClick={() => {
+                          if (currentPosition >= 0 && currentPosition < navigationMarketsOrder.length - 1) {
+                            const nextMarket = navigationMarketsOrder[currentPosition + 1];
+                            switchToMarket(nextMarket, false);
+                          }
+                        }}
+                        disabled={currentPosition < 0 || currentPosition >= navigationMarketsOrder.length - 1}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
-          )}
-
-          {/* Main content - single column */}
-          <div ref={desktopScrollRef2} className="flex-1 w-full">
-            <div className="mx-auto px-4 py-6 md:max-w-5xl">
+            
+            {/* Main content - right column, scrollable - FULL WIDTH ON MOBILE */}
+            <div ref={desktopScrollRef2} className="flex-1 w-full overflow-y-auto md:h-screen">
+              <div className="mx-auto px-4 py-6 md:max-w-5xl">
                 {selectedVendor ? (
                   // Show selected vendor details
                   <div className="space-y-6">
@@ -1969,13 +1827,6 @@ const VendorDuplicate = () => {
                     <div className="mb-6">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                          <div className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            {selectedVendor.products?.[0]?.images?.[0] ? (
-                              <img src={selectedVendor.products[0].images[0]} alt={selectedVendor.store_name} className="h-full w-full rounded-full object-cover" />
-                            ) : (
-                              <span className="text-primary font-semibold text-sm md:text-base">{selectedVendor.store_name.charAt(0).toUpperCase()}</span>
-                            )}
-                          </div>
                           <h1 className="text-xl font-bold text-foreground whitespace-nowrap">{selectedVendor.store_name}</h1>
                           {/* Rating */}
                           <div 
@@ -2129,23 +1980,13 @@ const VendorDuplicate = () => {
                     </div>
 
                     <div className="space-y-6">
-                      {viewingProduct && selectedVendor ? (
-                        <ProductDetailView
-                          product={viewingProduct}
-                          products={selectedVendor.products || []}
-                          onBack={() => setViewingProduct(null)}
-                          onProductChange={setViewingProduct}
-                          vendorId={selectedVendor.id}
-                          vendorName={selectedVendor.store_name}
-                        />
-                      ) : selectedVendor.products && selectedVendor.products.length > 0 ? (
+                      {selectedVendor.products && selectedVendor.products.length > 0 ? (
                         <ProductGrid 
                           products={selectedVendor.products} 
                           vendorId={selectedVendor.id}
                           vendorName={selectedVendor.store_name}
                           hideVendorName={true}
                           initialProductId={searchParams.get('product') || undefined}
-                          onProductClick={(product) => setViewingProduct(product)}
                         />
                       ) : (
                         <div className="text-center py-8 text-muted-foreground">
@@ -2275,6 +2116,7 @@ const VendorDuplicate = () => {
                 )}
               </div>
             </div>
+          </div>
         </div>
       )}
 
