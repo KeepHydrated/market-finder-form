@@ -1266,7 +1266,7 @@ const VendorDuplicate = () => {
                       </span>
                     </div>
                     <ChevronRight className={cn("h-4 w-4 text-muted-foreground ml-auto transition-transform", isMarketDetailsModalOpen && "rotate-90")} />
-                  </button>
+                  </div>
                   <Button
                     variant="ghost"
                     size="sm"
