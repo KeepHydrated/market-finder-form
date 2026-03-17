@@ -1280,41 +1280,7 @@ const VendorDuplicate = () => {
                   </Button>
                 </div>
                 {isMarketDetailsModalOpen && (
-                  <div className="pb-4 space-y-3 border-t border-green-200 pt-3">
-                    <div className="flex items-center justify-between">
-                      <button 
-                        className="text-foreground text-lg font-bold cursor-pointer hover:text-muted-foreground transition-colors text-left"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setSelectedVendor(null);
-                        }}
-                      >
-                        {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
-                      </button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={async () => {
-                          if (acceptedSubmission) {
-                            await toggleLike(acceptedSubmission.id, 'vendor');
-                          }
-                        }}
-                        className={cn(
-                          "transition-colors",
-                          acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor')
-                            ? "text-red-500 hover:text-red-600"
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        <Heart 
-                          className={cn(
-                            "h-5 w-5 transition-colors",
-                            acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') && "fill-current"
-                          )} 
-                        />
-                      </Button>
-                    </div>
+                  <div className="pb-4 space-y-3 pt-3">
 
                     <div className="flex items-start gap-2">
                       <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
@@ -1774,41 +1740,7 @@ const VendorDuplicate = () => {
                   </Button>
                 </div>
                 {isMarketDetailsModalOpen && (
-                  <div className="pb-4 space-y-3 border-t border-green-200 pt-3">
-                    <div className="flex items-center justify-between">
-                      <button 
-                        className="text-foreground text-lg font-bold cursor-pointer hover:text-muted-foreground transition-colors text-left"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setSelectedVendor(null);
-                        }}
-                      >
-                        {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
-                      </button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={async () => {
-                          if (acceptedSubmission) {
-                            await toggleLike(acceptedSubmission.id, 'vendor');
-                          }
-                        }}
-                        className={cn(
-                          "transition-colors",
-                          acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor')
-                            ? "text-red-500 hover:text-red-600"
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        <Heart 
-                          className={cn(
-                            "h-5 w-5 transition-colors",
-                            acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') && "fill-current"
-                          )} 
-                        />
-                      </Button>
-                    </div>
+                  <div className="pb-4 space-y-3 pt-3">
 
                     <div className="flex items-start gap-2">
                       <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
