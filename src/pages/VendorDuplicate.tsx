@@ -1690,7 +1690,6 @@ const VendorDuplicate = () => {
         )}
               </div>
             </div>
-          </div>
         </div>
       ) : (
         // Desktop and Mobile view - original non-collapsible layout  
