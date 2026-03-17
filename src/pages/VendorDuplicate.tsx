@@ -1687,16 +1687,17 @@ const VendorDuplicate = () => {
           {/* Green accent bar under header */}
           <div className="w-full bg-green-50 px-4 py-2 flex items-center gap-2">
             <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="hover:opacity-70 transition-opacity">
+              {/* Desktop: left/right chevrons */}
               {isSidebarCollapsed ? (
-                <ChevronLeft className="h-4 w-4 text-muted-foreground md:block hidden" />
+                <ChevronLeft className="h-4 w-4 text-muted-foreground lg:block hidden" />
               ) : (
-                <ChevronRight className="h-4 w-4 text-muted-foreground md:block hidden" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground lg:block hidden" />
               )}
               {/* Mobile/tablet: up/down chevrons */}
               {isSidebarCollapsed ? (
-                <ChevronRight className="h-4 w-4 text-muted-foreground md:hidden rotate-90" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground lg:hidden rotate-90" />
               ) : (
-                <ChevronRight className="h-4 w-4 text-muted-foreground md:hidden -rotate-90" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground lg:hidden -rotate-90" />
               )}
             </button>
             {isSidebarCollapsed && (
