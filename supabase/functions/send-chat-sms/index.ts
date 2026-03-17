@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, senderName, chatType } = await req.json();
+    const { message, senderName, chatType, conversationId } = await req.json();
 
     if (!message) {
       return new Response(JSON.stringify({ error: 'Message is required' }), {
@@ -31,6 +31,10 @@ serve(async (req) => {
       MessageSid: crypto.randomUUID(),
       NumMedia: '0',
     });
+
+    if (conversationId) {
+      formData.set('ConversationId', conversationId);
+    }
 
     const response = await fetch(RECEIVE_SMS_URL, {
       method: 'POST',

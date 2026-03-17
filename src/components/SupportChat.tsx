@@ -135,14 +135,15 @@ export function SupportChat({ isOpen, onClose }: SupportChatProps) {
       .update({ last_message_at: new Date().toISOString() })
       .eq('id', conversationId);
 
-    // Send SMS notification (fire and forget)
+    // Forward to external webhook (fire and forget)
     supabase.functions.invoke('send-chat-sms', {
       body: {
         message: text,
         senderName: user.email || 'Customer',
         chatType: 'support',
+        conversationId,
       },
-    }).catch(err => console.error('SMS notification failed:', err));
+    }).catch(err => console.error('Chat forwarding failed:', err));
   };
 
   if (!isOpen) return null;
