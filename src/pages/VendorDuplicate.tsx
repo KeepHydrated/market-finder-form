@@ -1391,6 +1391,13 @@ const VendorDuplicate = () => {
             </div>
           )}
 
+          {/* Market Photo Banner */}
+          {selectedVendor && marketPhotoUrl && (
+            <div className="w-full">
+              <img src={marketPhotoUrl} alt={selectedMarketName || "Market"} className="w-full h-40 object-cover" />
+            </div>
+          )}
+
           {/* Main content - single column */}
           <div ref={desktopScrollRef} className="flex-1">
             <div className="mx-auto px-4 py-6 max-w-xl">
@@ -1882,6 +1889,13 @@ const VendorDuplicate = () => {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Market Photo Banner */}
+          {selectedVendor && marketPhotoUrl && (
+            <div className="w-full">
+              <img src={marketPhotoUrl} alt={selectedMarketName || "Market"} className="w-full h-48 object-cover" />
             </div>
           )}
 
