@@ -1714,9 +1714,9 @@ const VendorDuplicate = () => {
               )}
             </button>
             {isSidebarCollapsed && (
-              <span className="text-xs text-muted-foreground">
+              <button onClick={() => setIsSidebarCollapsed(false)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                 {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market"}
-              </span>
+              </button>
             )}
           </div>
           {/* Mobile/tablet: collapsible top panel */}
