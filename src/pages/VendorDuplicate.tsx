@@ -1688,9 +1688,15 @@ const VendorDuplicate = () => {
           <div className="w-full bg-green-50 px-4 py-2 flex items-center gap-2">
             <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="hover:opacity-70 transition-opacity">
               {isSidebarCollapsed ? (
-                <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+                <ChevronLeft className="h-4 w-4 text-muted-foreground md:block hidden" />
               ) : (
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground md:block hidden" />
+              )}
+              {/* Mobile/tablet: up/down chevrons */}
+              {isSidebarCollapsed ? (
+                <ChevronRight className="h-4 w-4 text-muted-foreground md:hidden rotate-90" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-muted-foreground md:hidden -rotate-90" />
               )}
             </button>
             {isSidebarCollapsed && (
@@ -1699,9 +1705,98 @@ const VendorDuplicate = () => {
               </span>
             )}
           </div>
+          {/* Mobile/tablet: collapsible top panel */}
+          <div className={`md:hidden w-full bg-green-50 border-b transition-all duration-300 overflow-hidden ${isSidebarCollapsed ? 'max-h-0 border-b-0' : 'max-h-[80vh]'}`}>
+            <div className="space-y-6 px-4 pt-4 pb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <button 
+                    className="text-foreground text-xl font-bold cursor-pointer hover:opacity-70 transition-opacity text-left"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedVendor(null);
+                    }}
+                  >
+                    {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
+                  </button>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={async () => {
+                    if (acceptedSubmission) {
+                      await toggleLike(acceptedSubmission.id, 'vendor');
+                    }
+                  }}
+                  className={cn(
+                    "transition-colors",
+                    acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor')
+                      ? "text-red-500 hover:text-red-600"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Heart 
+                    className={cn(
+                      "h-5 w-5 transition-colors",
+                      acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') && "fill-current"
+                    )} 
+                  />
+                </Button>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="text-muted-foreground text-base font-normal">
+                    {cleanAddress(selectedMarketAddress || acceptedSubmission.market_address)}
+                  </p>
+                  {distance && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <Navigation className="h-3 w-3 text-muted-foreground" />
+                      <p className="text-muted-foreground text-sm">{distance}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div className="text-muted-foreground text-base font-normal whitespace-pre-line">
+                  {marketOpeningHours?.open_now !== undefined && (
+                    <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${
+                      marketOpeningHours.open_now 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {marketOpeningHours.open_now ? 'Open Now' : 'Currently Closed'}
+                    </div>
+                  )}
+                  <div>
+                    {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => (
+                      <div key={index}>{line}</div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <div className="flex items-center gap-2 mt-0.5">
+                  <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                  <span className="text-foreground font-semibold text-lg">
+                    {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
+                     acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
+                  </span>
+                  <span className="text-muted-foreground text-sm">
+                    ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0}) Google reviews
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="flex flex-col md:flex-row">
-            {/* Left column/Top section - sticky on desktop, at top on mobile */}
-            <div className={`w-full md:sticky md:top-0 bg-green-50 border-b md:border-b-0 md:border-r transition-all duration-300 ${isSidebarCollapsed ? 'md:w-0 md:overflow-hidden md:border-r-0' : 'md:w-96 md:h-screen'}`}>
+            {/* Left column - desktop only sidebar */}
+            <div className={`hidden md:block md:sticky md:top-0 bg-green-50 md:border-r transition-all duration-300 ${isSidebarCollapsed ? 'md:w-0 md:overflow-hidden md:border-r-0' : 'md:w-96 md:h-screen'}`}>
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
