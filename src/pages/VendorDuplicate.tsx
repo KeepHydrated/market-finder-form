@@ -130,6 +130,7 @@ const VendorDuplicate = () => {
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [isMarketDetailsModalOpen, setIsMarketDetailsModalOpen] = useState(false);
   const [viewingProduct, setViewingProduct] = useState<any>(null);
+  const [marketPhotoUrl, setMarketPhotoUrl] = useState<string | null>(null);
 
   // Check if viewport is tablet (768px - 1024px) and track screen width
   useEffect(() => {
