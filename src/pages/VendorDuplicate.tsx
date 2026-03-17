@@ -1739,18 +1739,40 @@ const VendorDuplicate = () => {
           {selectedVendor && (selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term) && (
             <div className="bg-green-50 border-b border-green-200">
               <div className="mx-auto px-4 md:max-w-5xl">
-                <button
-                  onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)}
-                  className="w-full py-2.5 text-sm text-foreground cursor-pointer flex items-center gap-2 hover:text-primary transition-colors"
-                >
-                  {marketPhotoUrl ? (
-                    <img src={marketPhotoUrl} alt="" className="h-7 w-7 rounded-full object-cover flex-shrink-0" />
-                  ) : (
-                    <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                  )}
-                  <span className="font-medium">{selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}</span>
-                  <ChevronRight className={cn("h-4 w-4 text-muted-foreground ml-auto transition-transform", isMarketDetailsModalOpen && "rotate-90")} />
-                </button>
+                <div className="flex items-center gap-2 py-2">
+                  <button
+                    onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)}
+                    className="flex-1 text-sm text-foreground cursor-pointer flex items-center gap-2 hover:text-primary transition-colors"
+                  >
+                    {marketPhotoUrl ? (
+                      <img src={marketPhotoUrl} alt="" className="h-7 w-7 rounded-full object-cover flex-shrink-0" />
+                    ) : (
+                      <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                    )}
+                    <span className="font-medium">{selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}</span>
+                    <ChevronRight className={cn("h-4 w-4 text-muted-foreground ml-auto transition-transform", isMarketDetailsModalOpen && "rotate-90")} />
+                  </button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex-shrink-0 h-8 w-8 p-0"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      if (acceptedSubmission) {
+                        await toggleLike(acceptedSubmission.id, 'vendor');
+                      }
+                    }}
+                  >
+                    <Heart 
+                      className={cn(
+                        "h-4 w-4 transition-colors",
+                        acceptedSubmission && isLiked(acceptedSubmission.id, 'vendor') 
+                          ? "text-red-500 fill-current" 
+                          : "text-muted-foreground"
+                      )} 
+                    />
+                  </Button>
+                </div>
                 {isMarketDetailsModalOpen && (
                   <div className="pb-4 space-y-3 border-t border-green-200 pt-3">
                     <div className="flex items-center justify-between">
