@@ -1291,30 +1291,6 @@ const VendorDuplicate = () => {
                 </div>
                 {isMarketDetailsModalOpen && (
                   <div className="pb-4 space-y-3 pt-3">
-                    {/* Market name with photo and rating */}
-                    <div className="flex items-center gap-2">
-                      {marketPhotoUrl ? (
-                        <img src={marketPhotoUrl} alt="" className="h-8 w-8 rounded-full object-cover flex-shrink-0" />
-                      ) : (
-                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                      )}
-                      <span className="text-foreground font-bold text-base">
-                        {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
-                      </span>
-                      <div className="flex items-center gap-1 ml-auto">
-                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                        <span className="text-foreground font-semibold text-sm">
-                          {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
-                           acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
-                        </span>
-                        <span className="text-muted-foreground text-xs">
-                          ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0})
-                        </span>
-                      </div>
-                    </div>
-
                     <div className="flex items-start gap-2">
                       <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
                       <div>
@@ -1781,30 +1757,6 @@ const VendorDuplicate = () => {
                 </div>
                 {isMarketDetailsModalOpen && (
                   <div className="pb-4 space-y-3 pt-3">
-                    {/* Market name with photo and rating */}
-                    <div className="flex items-center gap-2">
-                      {marketPhotoUrl ? (
-                        <img src={marketPhotoUrl} alt="" className="h-8 w-8 rounded-full object-cover flex-shrink-0" />
-                      ) : (
-                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                      )}
-                      <span className="text-foreground font-bold text-base">
-                        {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market Location"}
-                      </span>
-                      <div className="flex items-center gap-1 ml-auto">
-                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                        <span className="text-foreground font-semibold text-sm">
-                          {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
-                           acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
-                        </span>
-                        <span className="text-muted-foreground text-xs">
-                          ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0})
-                        </span>
-                      </div>
-                    </div>
-
                     <div className="flex items-start gap-2">
                       <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
                       <div>
