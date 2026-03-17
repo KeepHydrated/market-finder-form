@@ -1686,11 +1686,17 @@ const VendorDuplicate = () => {
         <div className="min-h-screen bg-background">
           {/* Green accent bar under header */}
           <div className="w-full bg-green-50 px-4 py-2 flex items-center">
-            <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+            <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="hover:opacity-70 transition-opacity">
+              {isSidebarCollapsed ? (
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+              )}
+            </button>
           </div>
           <div className="flex flex-col md:flex-row">
             {/* Left column/Top section - sticky on desktop, at top on mobile */}
-            <div className="w-full md:w-96 md:h-screen md:sticky md:top-0 bg-green-50 border-b md:border-b-0 md:border-r">
+            <div className={`w-full md:sticky md:top-0 bg-green-50 border-b md:border-b-0 md:border-r transition-all duration-300 ${isSidebarCollapsed ? 'md:w-0 md:overflow-hidden md:border-r-0' : 'md:w-96 md:h-screen'}`}>
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
