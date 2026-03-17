@@ -996,6 +996,20 @@ const VendorDuplicate = () => {
           reviewCount: market.user_ratings_total
         });
         
+        // Fetch market photo if place_id available
+        if (market.place_id) {
+          try {
+            const { data: photoData } = await supabase.functions.invoke('get-place-photo', {
+              body: { place_id: market.place_id }
+            });
+            if (photoData?.photoUrl) {
+              setMarketPhotoUrl(photoData.photoUrl);
+            }
+          } catch (e) {
+            console.error('Error fetching market photo:', e);
+          }
+        }
+        
         // Update the selected market address if not already set
         if (!selectedMarketAddress) {
           setSelectedMarketAddress(market.address);
