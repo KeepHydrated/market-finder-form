@@ -1892,6 +1892,13 @@ const VendorDuplicate = () => {
             </div>
           )}
 
+          {/* Market Photo Banner */}
+          {selectedVendor && marketPhotoUrl && (
+            <div className="w-full">
+              <img src={marketPhotoUrl} alt={selectedMarketName || "Market"} className="w-full h-48 object-cover" />
+            </div>
+          )}
+
           {/* Main content - single column */}
           <div ref={desktopScrollRef2} className="flex-1 w-full">
             <div className="mx-auto px-4 py-6 md:max-w-5xl">
