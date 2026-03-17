@@ -277,14 +277,15 @@ export function FloatingChat({ isOpen, onClose, vendorId, vendorName, orderItems
       .update({ last_message_at: new Date().toISOString() })
       .eq('id', conversation.id);
 
-    // Send SMS notification (fire and forget)
+    // Forward to external webhook (fire and forget)
     supabase.functions.invoke('send-chat-sms', {
       body: {
         message: messageText,
         senderName: user.email || 'Customer',
         chatType: 'order',
+        conversationId: conversation.id,
       },
-    }).catch(err => console.error('SMS notification failed:', err));
+    }).catch(err => console.error('Chat forwarding failed:', err));
 
     // Refocus again after async operations
     input?.focus();
