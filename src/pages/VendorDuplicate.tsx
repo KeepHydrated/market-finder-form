@@ -1707,7 +1707,7 @@ const VendorDuplicate = () => {
             )}
           </div>
           {/* Mobile/tablet: collapsible top panel */}
-          <div className={`md:hidden w-full bg-green-50 border-b transition-all duration-300 overflow-hidden ${isSidebarCollapsed ? 'max-h-0 border-b-0' : 'max-h-[80vh]'}`}>
+          <div className={`lg:hidden w-full bg-green-50 border-b transition-all duration-300 overflow-hidden ${isSidebarCollapsed ? 'max-h-0 border-b-0' : 'max-h-[80vh]'}`}>
             <div className="space-y-6 px-4 pt-4 pb-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
