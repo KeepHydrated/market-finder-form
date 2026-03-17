@@ -1793,7 +1793,7 @@ const VendorDuplicate = () => {
                             const day = sepIdx > 0 ? line.substring(0, sepIdx).trim().substring(0, 3) : line.substring(0, 3);
                             const time = sepIdx > 0 ? line.substring(sepIdx + 1).trim() : '';
                             return (
-                              <div key={index} className="flex flex-col items-center text-center min-w-0">
+                              <div key={index} className="flex flex-col items-start min-w-0">
                                 <span className="font-medium text-foreground text-xs">{day}</span>
                                 <span className="text-[10px] text-muted-foreground whitespace-nowrap">{time}</span>
                               </div>
