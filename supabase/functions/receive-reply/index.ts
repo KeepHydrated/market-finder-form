@@ -27,9 +27,6 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const prefix = chatType === 'support' ? '🆘 Support' : '💬 Order Chat';
-    const fullMessage = `${prefix} from ${senderName || 'Customer'}:\n${message}`;
-
     // If we have a conversation_id, insert the reply directly as admin
     if (conversationId) {
       // Verify conversation exists
@@ -46,13 +43,13 @@ serve(async (req) => {
         });
       }
 
-      // Insert the message as admin
+      // Insert the raw message as admin (no prefix needed for direct replies)
       const { error: msgError } = await supabase
         .from('messages')
         .insert({
           conversation_id: conversationId,
           sender_id: ADMIN_USER_ID,
-          message: fullMessage,
+          message: message,
         });
 
       if (msgError) {
