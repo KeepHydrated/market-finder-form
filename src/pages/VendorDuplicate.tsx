@@ -1233,9 +1233,9 @@ const VendorDuplicate = () => {
               )}
             </button>
             {isSidebarCollapsed && (
-              <span className="text-xs text-muted-foreground">
+              <button onClick={() => setIsSidebarCollapsed(false)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                 {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market"}
-              </span>
+              </button>
             )}
           </div>
           <div className={`w-full bg-green-50 border-b transition-all duration-300 overflow-hidden ${isSidebarCollapsed ? 'max-h-0 border-b-0' : 'max-h-[80vh]'}`}>
