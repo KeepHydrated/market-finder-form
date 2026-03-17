@@ -1872,6 +1872,52 @@ const VendorDuplicate = () => {
                         </div>
                       );
                     })()}
+
+                    {/* View all vendors button */}
+                    {allVendors.length > 1 && (
+                      <div className="pt-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-primary hover:text-primary/80 p-0 h-auto text-sm font-medium"
+                          onClick={() => setShowMarketVendors(!showMarketVendors)}
+                        >
+                          {showMarketVendors ? 'Hide vendors' : `View all vendors (${allVendors.length})`}
+                        </Button>
+                        {showMarketVendors && (
+                          <div className="mt-3 space-y-2">
+                            {allVendors.map((vendor) => (
+                              <div
+                                key={vendor.id}
+                                className={cn(
+                                  "flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors hover:bg-accent",
+                                  selectedVendor?.id === vendor.id && "bg-accent"
+                                )}
+                                onClick={() => {
+                                  setAcceptedSubmission(vendor);
+                                  setSelectedVendor(vendor);
+                                  setShowMarketVendors(false);
+                                }}
+                              >
+                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                  {vendor.products?.[0]?.images?.[0] ? (
+                                    <img src={vendor.products[0].images[0]} alt={vendor.store_name} className="h-full w-full rounded-full object-cover" />
+                                  ) : (
+                                    <span className="text-primary font-semibold text-xs">{vendor.store_name.charAt(0).toUpperCase()}</span>
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-foreground truncate">{vendor.store_name}</p>
+                                  {vendor.primary_specialty && (
+                                    <p className="text-xs text-muted-foreground truncate">{vendor.primary_specialty}</p>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
