@@ -69,7 +69,10 @@ serve(async (req) => {
       });
     }
 
-    // Fallback: forward to external receive-sms webhook
+    // Fallback: forward to external receive-sms webhook with prefix
+    const prefix = chatType === 'support' ? '🆘 Support' : '💬 Order Chat';
+    const fullMessage = `${prefix} from ${senderName || 'Customer'}:\n${message}`;
+
     const RECEIVE_SMS_URL = 'https://zsgfcqrpbzwyxhyuqubl.supabase.co/functions/v1/receive-sms';
     const formData = new URLSearchParams({
       From: '+10000000000',
