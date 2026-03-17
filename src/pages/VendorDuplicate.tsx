@@ -1687,16 +1687,17 @@ const VendorDuplicate = () => {
           {/* Green accent bar under header */}
           <div className="w-full bg-green-50 px-4 py-2 flex items-center gap-2">
             <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="hover:opacity-70 transition-opacity">
+              {/* Desktop: left/right chevrons */}
               {isSidebarCollapsed ? (
-                <ChevronLeft className="h-4 w-4 text-muted-foreground md:block hidden" />
+                <ChevronLeft className="h-4 w-4 text-muted-foreground lg:block hidden" />
               ) : (
-                <ChevronRight className="h-4 w-4 text-muted-foreground md:block hidden" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground lg:block hidden" />
               )}
               {/* Mobile/tablet: up/down chevrons */}
               {isSidebarCollapsed ? (
-                <ChevronRight className="h-4 w-4 text-muted-foreground md:hidden rotate-90" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground lg:hidden rotate-90" />
               ) : (
-                <ChevronRight className="h-4 w-4 text-muted-foreground md:hidden -rotate-90" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground lg:hidden -rotate-90" />
               )}
             </button>
             {isSidebarCollapsed && (
@@ -1706,7 +1707,7 @@ const VendorDuplicate = () => {
             )}
           </div>
           {/* Mobile/tablet: collapsible top panel */}
-          <div className={`md:hidden w-full bg-green-50 border-b transition-all duration-300 overflow-hidden ${isSidebarCollapsed ? 'max-h-0 border-b-0' : 'max-h-[80vh]'}`}>
+          <div className={`lg:hidden w-full bg-green-50 border-b transition-all duration-300 overflow-hidden ${isSidebarCollapsed ? 'max-h-0 border-b-0' : 'max-h-[80vh]'}`}>
             <div className="space-y-6 px-4 pt-4 pb-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -1794,9 +1795,9 @@ const VendorDuplicate = () => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row">
+          <div className="flex flex-col lg:flex-row">
             {/* Left column - desktop only sidebar */}
-            <div className={`hidden md:block md:sticky md:top-0 bg-green-50 md:border-r transition-all duration-300 ${isSidebarCollapsed ? 'md:w-0 md:overflow-hidden md:border-r-0' : 'md:w-96 md:h-screen'}`}>
+            <div className={`hidden lg:block lg:sticky lg:top-0 bg-green-50 lg:border-r transition-all duration-300 ${isSidebarCollapsed ? 'lg:w-0 lg:overflow-hidden lg:border-r-0' : 'lg:w-96 lg:h-screen'}`}>
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
