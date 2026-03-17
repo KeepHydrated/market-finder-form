@@ -1256,6 +1256,16 @@ const VendorDuplicate = () => {
                       <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
                     )}
                     <span className="font-medium">{selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}</span>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <Star className="h-3.5 w-3.5 text-yellow-500 fill-current" />
+                      <span className="text-foreground font-medium text-xs">
+                        {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
+                         acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
+                      </span>
+                      <span className="text-muted-foreground text-xs">
+                        ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0})
+                      </span>
+                    </div>
                     <ChevronRight className={cn("h-4 w-4 text-muted-foreground ml-auto transition-transform", isMarketDetailsModalOpen && "rotate-90")} />
                   </button>
                   <Button
@@ -1728,6 +1738,16 @@ const VendorDuplicate = () => {
                       <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
                     )}
                     <span className="font-medium">{selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}</span>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <Star className="h-3.5 w-3.5 text-yellow-500 fill-current" />
+                      <span className="text-foreground font-medium text-xs">
+                        {marketReviews?.rating ? marketReviews.rating.toFixed(1) : 
+                         acceptedSubmission.google_rating ? acceptedSubmission.google_rating.toFixed(1) : '0.0'}
+                      </span>
+                      <span className="text-muted-foreground text-xs">
+                        ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0})
+                      </span>
+                    </div>
                     <ChevronRight className={cn("h-4 w-4 text-muted-foreground ml-auto transition-transform", isMarketDetailsModalOpen && "rotate-90")} />
                   </button>
                   <Button
