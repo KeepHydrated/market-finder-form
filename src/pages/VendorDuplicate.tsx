@@ -1685,7 +1685,7 @@ const VendorDuplicate = () => {
         // Desktop and Mobile view - original non-collapsible layout  
         <div className="min-h-screen bg-background">
           {/* Green accent bar under header */}
-          <div className="w-full bg-green-50 px-4 py-2 flex items-center">
+          <div className="w-full bg-green-50 px-4 py-2 flex items-center gap-2">
             <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="hover:opacity-70 transition-opacity">
               {isSidebarCollapsed ? (
                 <ChevronLeft className="h-4 w-4 text-muted-foreground" />
@@ -1693,6 +1693,11 @@ const VendorDuplicate = () => {
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               )}
             </button>
+            {isSidebarCollapsed && (
+              <span className="text-xs text-muted-foreground">
+                {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term || "Market"}
+              </span>
+            )}
           </div>
           <div className="flex flex-col md:flex-row">
             {/* Left column/Top section - sticky on desktop, at top on mobile */}
