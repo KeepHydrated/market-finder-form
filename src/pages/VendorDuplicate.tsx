@@ -1718,6 +1718,19 @@ const VendorDuplicate = () => {
       ) : (
         // Desktop and Mobile view - original non-collapsible layout  
         <div className="min-h-screen bg-background">
+          {/* Green bar spanning full width above sidebar + content */}
+          {selectedVendor && (selectedMarketName || acceptedSubmission?.selected_market || acceptedSubmission?.search_term) && (
+            <div className="bg-green-50 px-4 py-1 border-b border-green-200 flex justify-end">
+              <button
+                onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)}
+                className="text-xs text-foreground cursor-pointer flex items-center gap-1 hover:text-primary transition-colors p-1"
+              >
+                {isMarketDetailsModalOpen ? <ChevronRight className="h-5 w-5 text-muted-foreground" /> : <ChevronLeft className="h-5 w-5 text-muted-foreground" />}
+                {!isMarketDetailsModalOpen && <MapPin className="h-3 w-3 text-primary" />}
+                {!isMarketDetailsModalOpen && (selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term)}
+              </button>
+            </div>
+          )}
           <div className="flex flex-col md:flex-row">
             {/* Left column/Top section - sticky on desktop, at top on mobile */}
             {(!selectedVendor || isMarketDetailsModalOpen) && (
