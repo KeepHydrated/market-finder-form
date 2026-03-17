@@ -1238,7 +1238,7 @@ const VendorDuplicate = () => {
               </button>
             )}
           </div>
-          <div className={`w-full bg-green-50 border-b transition-all duration-300 overflow-hidden ${isSidebarCollapsed ? 'max-h-0 border-b-0' : 'max-h-[80vh]'}`}>
+          <div className={`w-full bg-green-50 border-b overflow-hidden transition-[max-height,opacity,border] duration-500 ease-in-out ${isSidebarCollapsed ? 'max-h-0 border-b-0 opacity-0' : 'max-h-[80vh] opacity-100'}`}>
             <div className="overflow-y-auto">
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
@@ -1720,7 +1720,7 @@ const VendorDuplicate = () => {
             )}
           </div>
           {/* Mobile/tablet: collapsible top panel */}
-          <div className={`lg:hidden w-full bg-green-50 border-b transition-all duration-300 overflow-hidden ${isSidebarCollapsed ? 'max-h-0 border-b-0' : 'max-h-[80vh]'}`}>
+          <div className={`lg:hidden w-full bg-green-50 border-b overflow-hidden transition-[max-height,opacity,border] duration-500 ease-in-out ${isSidebarCollapsed ? 'max-h-0 border-b-0 opacity-0' : 'max-h-[80vh] opacity-100'}`}>
             <div className="space-y-6 px-4 pt-4 pb-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -1810,7 +1810,7 @@ const VendorDuplicate = () => {
           </div>
           <div className="flex flex-col lg:flex-row">
             {/* Left column - desktop only sidebar */}
-            <div className={`hidden lg:block lg:sticky lg:top-0 bg-green-50 lg:border-r transition-all duration-300 ${isSidebarCollapsed ? 'lg:w-0 lg:overflow-hidden lg:border-r-0' : 'lg:w-96 lg:h-screen'}`}>
+            <div className={`hidden lg:block lg:sticky lg:top-0 bg-green-50 lg:border-r overflow-hidden transition-[width,opacity,border] duration-500 ease-in-out ${isSidebarCollapsed ? 'lg:w-0 lg:border-r-0 lg:opacity-0' : 'lg:w-96 lg:h-screen lg:opacity-100'}`}>
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
