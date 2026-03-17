@@ -1266,7 +1266,7 @@ const VendorDuplicate = () => {
                       </span>
                     </div>
                     <button onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)} className="ml-auto p-1 cursor-pointer hover:bg-accent rounded">
-                      <ChevronRight className={cn("h-4 w-4 text-muted-foreground transition-transform", isMarketDetailsModalOpen && "rotate-90")} />
+                      <ChevronRight className={cn("h-4 w-4 text-muted-foreground transition-transform -rotate-90", isMarketDetailsModalOpen && "rotate-90")} />
                     </button>
                   </div>
                   <Button
@@ -1733,7 +1733,7 @@ const VendorDuplicate = () => {
                       </span>
                     </div>
                     <button onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)} className="ml-auto p-1 cursor-pointer hover:bg-accent rounded">
-                      <ChevronRight className={cn("h-4 w-4 text-muted-foreground transition-transform", isMarketDetailsModalOpen && "rotate-90")} />
+                      <ChevronRight className={cn("h-4 w-4 text-muted-foreground transition-transform -rotate-90", isMarketDetailsModalOpen && "rotate-90")} />
                     </button>
                   </div>
                   <Button
