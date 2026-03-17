@@ -1835,10 +1835,18 @@ const VendorDuplicate = () => {
                             {marketOpeningHours.open_now ? 'Open Now' : 'Currently Closed'}
                           </div>
                         )}
-                        <div className="flex flex-wrap gap-x-3 gap-y-1">
-                          {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => (
-                            <span key={index} className="whitespace-nowrap">{line}</span>
-                          ))}
+                        <div className="flex gap-3 overflow-x-auto">
+                          {formatSchedule(acceptedSubmission.market_days, acceptedSubmission.market_hours).map((line, index) => {
+                            const parts = line.split(/[:,]\s*/);
+                            const day = parts[0]?.substring(0, 3);
+                            const time = line.substring(line.indexOf(':') + 1).trim() || line.substring(line.indexOf(',') + 1).trim();
+                            return (
+                              <div key={index} className="flex flex-col items-center text-center min-w-0">
+                                <span className="font-medium text-foreground text-xs">{day}</span>
+                                <span className="text-[10px] text-muted-foreground whitespace-nowrap">{time}</span>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     </div>
