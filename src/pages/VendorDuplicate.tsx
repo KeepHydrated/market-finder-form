@@ -1711,9 +1711,8 @@ const VendorDuplicate = () => {
             <div className="bg-green-50 border-b border-green-200">
               <div className="mx-auto px-4 md:max-w-5xl">
                 <div className="flex items-center gap-2 py-2">
-                  <button
-                    onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)}
-                    className="flex-1 text-sm text-foreground cursor-pointer flex items-center gap-2 hover:text-primary transition-colors"
+                  <div
+                    className="flex-1 text-sm text-foreground flex items-center gap-2"
                   >
                     {marketPhotoUrl ? (
                       <img src={marketPhotoUrl} alt="" className="h-7 w-7 rounded-full object-cover flex-shrink-0" />
