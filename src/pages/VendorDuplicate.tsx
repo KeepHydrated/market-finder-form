@@ -530,6 +530,41 @@ const VendorDuplicate = () => {
       
       // Fetch ratings for this vendor
       fetchVendorRatings([matchingVendor.id]);
+
+      // Fetch other vendors at the same market
+      const marketName = matchingVendor.selected_market;
+      if (marketName) {
+        try {
+          const { data: coVendors } = await supabase
+            .from('submissions')
+            .select('*')
+            .eq('status', 'accepted')
+            .neq('id', matchingVendor.id);
+          
+          if (coVendors) {
+            const sameMarketVendors = coVendors.filter((v: any) => {
+              if (v.selected_market === marketName) return true;
+              if (v.selected_markets && Array.isArray(v.selected_markets)) {
+                return v.selected_markets.some((m: any) => 
+                  (typeof m === 'string' ? m : m.name) === marketName
+                );
+              }
+              return false;
+            });
+            if (sameMarketVendors.length > 0) {
+              const parsed = sameMarketVendors.map((s: any) => ({
+                ...s,
+                products: typeof s.products === 'string' ? JSON.parse(s.products) : (s.products || []),
+                market_hours: typeof s.market_hours === 'string' ? JSON.parse(s.market_hours) : s.market_hours,
+              }));
+              setAllVendors([matchingVendor, ...parsed]);
+              fetchVendorRatings([matchingVendor.id, ...parsed.map((v: any) => v.id)]);
+            }
+          }
+        } catch (e) {
+          console.error('Error fetching co-vendors:', e);
+        }
+      }
     } catch (error) {
       console.error('Error fetching vendor by slug:', error);
       toast({
