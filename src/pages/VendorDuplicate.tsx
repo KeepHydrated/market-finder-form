@@ -1688,9 +1688,9 @@ const VendorDuplicate = () => {
           <div className="w-full bg-green-50 px-4 py-2 flex items-center">
             <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="hover:opacity-70 transition-opacity">
               {isSidebarCollapsed ? (
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              ) : (
                 <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
               )}
             </button>
           </div>
