@@ -2134,7 +2134,6 @@ const VendorDuplicate = () => {
                 )}
               </div>
             </div>
-          </div>
         </div>
       )}
 
