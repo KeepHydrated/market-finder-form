@@ -1291,6 +1291,7 @@ const VendorDuplicate = () => {
                 </div>
                 {isMarketDetailsModalOpen && (
                   <div className="pb-4 space-y-3 pt-3">
+                    <div className="flex items-start gap-2">
                       <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
                       <div>
                         <p className="text-muted-foreground text-sm">
