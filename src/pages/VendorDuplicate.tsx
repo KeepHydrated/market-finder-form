@@ -1732,7 +1732,9 @@ const VendorDuplicate = () => {
                         ({marketReviews?.reviewCount ?? acceptedSubmission.google_rating_count ?? 0})
                       </span>
                     </div>
-                    <ChevronRight className={cn("h-4 w-4 text-muted-foreground ml-auto transition-transform", isMarketDetailsModalOpen && "rotate-90")} />
+                    <button onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)} className="ml-auto p-1 cursor-pointer hover:bg-accent rounded">
+                      <ChevronRight className={cn("h-4 w-4 text-muted-foreground transition-transform", isMarketDetailsModalOpen && "rotate-90")} />
+                    </button>
                   </div>
                   <Button
                     variant="ghost"
