@@ -1909,7 +1909,7 @@ const VendorDuplicate = () => {
                     })()}
 
                     {/* View all vendors button */}
-                    {allVendors.length > 1 && (
+                    {allVendors.length >= 1 && (
                       <div className="pt-1">
                         <Button
                           variant="ghost"
