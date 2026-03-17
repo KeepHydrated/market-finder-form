@@ -1376,6 +1376,7 @@ const VendorDuplicate = () => {
                     onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)}
                     className="text-xs text-foreground cursor-pointer flex items-center gap-1 hover:text-primary transition-colors"
                   >
+                    <ChevronLeft className="h-3 w-3 text-muted-foreground" />
                     <MapPin className="h-3 w-3 text-primary" />
                     {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}
                   </button>
@@ -1868,6 +1869,7 @@ const VendorDuplicate = () => {
                             onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)}
                             className="text-xs text-foreground cursor-pointer flex items-center gap-1 hover:text-primary transition-colors"
                           >
+                            <ChevronLeft className="h-3 w-3 text-muted-foreground" />
                             <MapPin className="h-3 w-3 text-primary" />
                             {selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}
                           </button>
