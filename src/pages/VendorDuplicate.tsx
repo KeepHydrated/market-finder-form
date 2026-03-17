@@ -1795,9 +1795,9 @@ const VendorDuplicate = () => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row">
+          <div className="flex flex-col lg:flex-row">
             {/* Left column - desktop only sidebar */}
-            <div className={`hidden md:block md:sticky md:top-0 bg-green-50 md:border-r transition-all duration-300 ${isSidebarCollapsed ? 'md:w-0 md:overflow-hidden md:border-r-0' : 'md:w-96 md:h-screen'}`}>
+            <div className={`hidden lg:block lg:sticky lg:top-0 bg-green-50 lg:border-r transition-all duration-300 ${isSidebarCollapsed ? 'lg:w-0 lg:overflow-hidden lg:border-r-0' : 'lg:w-96 lg:h-screen'}`}>
               <div className="space-y-6 px-4 pt-6 pb-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
