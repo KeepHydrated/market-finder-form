@@ -130,6 +130,7 @@ const VendorDuplicate = () => {
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [isMarketDetailsModalOpen, setIsMarketDetailsModalOpen] = useState(false);
   const [viewingProduct, setViewingProduct] = useState<any>(null);
+  const [marketPhotoUrl, setMarketPhotoUrl] = useState<string | null>(null);
 
   // Check if viewport is tablet (768px - 1024px) and track screen width
   useEffect(() => {
@@ -995,6 +996,20 @@ const VendorDuplicate = () => {
           reviewCount: market.user_ratings_total
         });
         
+        // Fetch market photo if place_id available
+        if (market.place_id) {
+          try {
+            const { data: photoData } = await supabase.functions.invoke('get-place-photo', {
+              body: { place_id: market.place_id }
+            });
+            if (photoData?.photoUrl) {
+              setMarketPhotoUrl(photoData.photoUrl);
+            }
+          } catch (e) {
+            console.error('Error fetching market photo:', e);
+          }
+        }
+        
         // Update the selected market address if not already set
         if (!selectedMarketAddress) {
           setSelectedMarketAddress(market.address);
@@ -1234,7 +1249,11 @@ const VendorDuplicate = () => {
                   onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)}
                   className="w-full py-2.5 text-sm text-foreground cursor-pointer flex items-center gap-2 hover:text-primary transition-colors"
                 >
-                  <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                  {marketPhotoUrl ? (
+                    <img src={marketPhotoUrl} alt="" className="h-7 w-7 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                  )}
                   <span className="font-medium">{selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}</span>
                   <ChevronRight className={cn("h-4 w-4 text-muted-foreground ml-auto transition-transform", isMarketDetailsModalOpen && "rotate-90")} />
                 </button>
@@ -1702,7 +1721,11 @@ const VendorDuplicate = () => {
                   onClick={() => setIsMarketDetailsModalOpen(!isMarketDetailsModalOpen)}
                   className="w-full py-2.5 text-sm text-foreground cursor-pointer flex items-center gap-2 hover:text-primary transition-colors"
                 >
-                  <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                  {marketPhotoUrl ? (
+                    <img src={marketPhotoUrl} alt="" className="h-7 w-7 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                  )}
                   <span className="font-medium">{selectedMarketName || acceptedSubmission.selected_market || acceptedSubmission.search_term}</span>
                   <ChevronRight className={cn("h-4 w-4 text-muted-foreground ml-auto transition-transform", isMarketDetailsModalOpen && "rotate-90")} />
                 </button>
