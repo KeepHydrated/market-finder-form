@@ -516,6 +516,7 @@ export type Database = {
           selected_markets: Json | null
           status: string | null
           store_name: string
+          stripe_account_id: string | null
           updated_at: string
           user_id: string
           vacation_mode: boolean | null
@@ -540,6 +541,7 @@ export type Database = {
           selected_markets?: Json | null
           status?: string | null
           store_name: string
+          stripe_account_id?: string | null
           updated_at?: string
           user_id: string
           vacation_mode?: boolean | null
@@ -564,6 +566,7 @@ export type Database = {
           selected_markets?: Json | null
           status?: string | null
           store_name?: string
+          stripe_account_id?: string | null
           updated_at?: string
           user_id?: string
           vacation_mode?: boolean | null

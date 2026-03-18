@@ -80,6 +80,16 @@ serve(async (req) => {
     const totalAmount = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
     logStep("Calculated total", { totalAmount });
 
+    // Look up vendor's Stripe Connect account
+    const { data: vendorData } = await supabaseClient
+      .from('submissions')
+      .select('stripe_account_id')
+      .eq('id', vendor_id)
+      .single();
+    
+    const vendorStripeAccountId = vendorData?.stripe_account_id;
+    logStep("Vendor Stripe account", { vendorStripeAccountId });
+
     // Create order in database
     const { data: order, error: orderError } = await supabaseClient
       .from('orders')
@@ -115,9 +125,9 @@ serve(async (req) => {
     if (itemsError) throw new Error(`Failed to create order items: ${itemsError.message}`);
     logStep("Created order items", { count: orderItems.length });
 
-    // Create commission record for nadiachibri@gmail.com (3% commission)
+    // Create commission record for nadiachibri@gmail.com (2% commission)
     const commissionEmail = "nadiachibri@gmail.com";
-    const commissionRate = 0.03; // 3%
+    const commissionRate = 0.02; // 2%
     const commissionAmount = Math.round(totalAmount * commissionRate);
     
     const { error: commissionError } = await supabaseClient
@@ -153,7 +163,7 @@ serve(async (req) => {
     }));
 
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams: any = {
       customer: customerId,
       customer_email: customerId ? undefined : finalCustomerEmail,
       line_items: lineItems,
@@ -165,7 +175,20 @@ serve(async (req) => {
         vendor_id,
         vendor_name
       }
-    });
+    };
+
+    // If vendor has Stripe Connect, route payment to them with 2% application fee
+    if (vendorStripeAccountId) {
+      sessionParams.payment_intent_data = {
+        application_fee_amount: commissionAmount,
+        transfer_data: {
+          destination: vendorStripeAccountId,
+        },
+      };
+      logStep("Using Stripe Connect", { destination: vendorStripeAccountId, applicationFee: commissionAmount });
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     // Update order with Stripe session ID
     await supabaseClient

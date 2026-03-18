@@ -90,6 +90,16 @@ serve(async (req) => {
     const totalAmount = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
     logStep("Calculated total", { totalAmount });
 
+    // Look up vendor's Stripe Connect account
+    const { data: vendorData } = await supabaseClient
+      .from('submissions')
+      .select('stripe_account_id')
+      .eq('id', vendor_id)
+      .single();
+    
+    const vendorStripeAccountId = vendorData?.stripe_account_id;
+    logStep("Vendor Stripe account", { vendorStripeAccountId });
+
     // Create order in database
     const { data: order, error: orderError } = await supabaseClient
       .from('orders')
@@ -125,9 +135,9 @@ serve(async (req) => {
     if (itemsError) throw new Error(`Failed to create order items: ${itemsError.message}`);
     logStep("Created order items", { count: orderItems.length });
 
-    // Create commission record for nadiachibri@gmail.com (3% commission)
+    // Create commission record for nadiachibri@gmail.com (2% commission)
     const commissionEmail = "nadiachibri@gmail.com";
-    const commissionRate = 0.03; // 3%
+    const commissionRate = 0.02; // 2%
     const commissionAmount = Math.round(totalAmount * commissionRate);
     
     const { error: commissionError } = await supabaseClient
@@ -161,6 +171,15 @@ serve(async (req) => {
       },
       receipt_email: finalCustomerEmail,
     };
+
+    // If vendor has Stripe Connect, route payment to them with 2% application fee
+    if (vendorStripeAccountId) {
+      paymentIntentParams.application_fee_amount = commissionAmount;
+      paymentIntentParams.transfer_data = {
+        destination: vendorStripeAccountId,
+      };
+      logStep("Using Stripe Connect", { destination: vendorStripeAccountId, applicationFee: commissionAmount });
+    }
 
     // If payment method provided, attach it and optionally confirm
     if (payment_method_id) {
