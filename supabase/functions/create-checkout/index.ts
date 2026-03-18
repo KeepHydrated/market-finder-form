@@ -80,6 +80,16 @@ serve(async (req) => {
     const totalAmount = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
     logStep("Calculated total", { totalAmount });
 
+    // Look up vendor's Stripe Connect account
+    const { data: vendorData } = await supabaseClient
+      .from('submissions')
+      .select('stripe_account_id')
+      .eq('id', vendor_id)
+      .single();
+    
+    const vendorStripeAccountId = vendorData?.stripe_account_id;
+    logStep("Vendor Stripe account", { vendorStripeAccountId });
+
     // Create order in database
     const { data: order, error: orderError } = await supabaseClient
       .from('orders')
