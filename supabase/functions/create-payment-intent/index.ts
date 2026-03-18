@@ -135,9 +135,9 @@ serve(async (req) => {
     if (itemsError) throw new Error(`Failed to create order items: ${itemsError.message}`);
     logStep("Created order items", { count: orderItems.length });
 
-    // Create commission record for nadiachibri@gmail.com (3% commission)
+    // Create commission record for nadiachibri@gmail.com (2% commission)
     const commissionEmail = "nadiachibri@gmail.com";
-    const commissionRate = 0.03; // 3%
+    const commissionRate = 0.02; // 2%
     const commissionAmount = Math.round(totalAmount * commissionRate);
     
     const { error: commissionError } = await supabaseClient
