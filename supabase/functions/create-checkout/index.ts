@@ -163,7 +163,7 @@ serve(async (req) => {
     }));
 
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams: any = {
       customer: customerId,
       customer_email: customerId ? undefined : finalCustomerEmail,
       line_items: lineItems,
@@ -175,7 +175,20 @@ serve(async (req) => {
         vendor_id,
         vendor_name
       }
-    });
+    };
+
+    // If vendor has Stripe Connect, route payment to them with 2% application fee
+    if (vendorStripeAccountId) {
+      sessionParams.payment_intent_data = {
+        application_fee_amount: commissionAmount,
+        transfer_data: {
+          destination: vendorStripeAccountId,
+        },
+      };
+      logStep("Using Stripe Connect", { destination: vendorStripeAccountId, applicationFee: commissionAmount });
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     // Update order with Stripe session ID
     await supabaseClient

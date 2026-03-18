@@ -172,6 +172,15 @@ serve(async (req) => {
       receipt_email: finalCustomerEmail,
     };
 
+    // If vendor has Stripe Connect, route payment to them with 2% application fee
+    if (vendorStripeAccountId) {
+      paymentIntentParams.application_fee_amount = commissionAmount;
+      paymentIntentParams.transfer_data = {
+        destination: vendorStripeAccountId,
+      };
+      logStep("Using Stripe Connect", { destination: vendorStripeAccountId, applicationFee: commissionAmount });
+    }
+
     // If payment method provided, attach it and optionally confirm
     if (payment_method_id) {
       paymentIntentParams.payment_method = payment_method_id;

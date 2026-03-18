@@ -87,7 +87,7 @@ export default function Commissions() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold mb-2">Commission Dashboard</h1>
-          <p className="text-muted-foreground">Track your 3% commission earnings from all marketplace sales</p>
+          <p className="text-muted-foreground">Track your 2% commission earnings from all marketplace sales</p>
         </div>
         <Button 
           onClick={fetchCommissions} 
