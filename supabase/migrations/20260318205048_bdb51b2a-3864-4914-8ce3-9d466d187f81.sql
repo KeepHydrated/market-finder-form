@@ -1,0 +1,1 @@
+ALTER TABLE public.commissions ALTER COLUMN commission_rate SET DEFAULT 0.02;
