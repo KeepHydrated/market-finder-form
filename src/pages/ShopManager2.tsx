@@ -996,11 +996,93 @@ export default function ShopManager() {
     </div>
   );
 
+  const [connectStatus, setConnectStatus] = useState<{connected: boolean; charges_enabled: boolean; details_submitted: boolean} | null>(null);
+  const [connectLoading, setConnectLoading] = useState(false);
+
+  useEffect(() => {
+    if (shopData?.id && user) {
+      checkConnectStatus();
+    }
+  }, [shopData?.id, user]);
+
+  const checkConnectStatus = async () => {
+    if (!shopData?.id) return;
+    try {
+      const { data, error } = await supabase.functions.invoke('check-connect-status', {
+        body: { vendor_id: shopData.id },
+      });
+      if (!error && data) setConnectStatus(data);
+    } catch (e) {
+      console.error('Error checking connect status:', e);
+    }
+  };
+
+  const handleConnectStripe = async () => {
+    if (!shopData?.id) return;
+    setConnectLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-connect-account', {
+        body: { vendor_id: shopData.id },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message || "Failed to start Stripe onboarding", variant: "destructive" });
+    } finally {
+      setConnectLoading(false);
+    }
+  };
+
   const renderAccount = () => (
     <div className="space-y-6 ml-4 sm:ml-52 mr-4 sm:mr-8 max-w-3xl pt-2 sm:pt-[40px] pb-4">
       <div>
         <h2 className="hidden sm:block text-2xl font-bold mb-2">Shop Settings And Preferences</h2>
       </div>
+
+      {/* Stripe Connect Card */}
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5" />
+            Payment Setup
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {connectStatus?.charges_enabled ? (
+            <div className="flex items-center gap-3 p-4 border rounded-lg bg-green-50 border-green-200">
+              <Badge className="bg-green-600">Connected</Badge>
+              <div>
+                <h3 className="font-medium text-green-800">Stripe Connected</h3>
+                <p className="text-sm text-green-700">You're set up to receive payments directly to your bank account.</p>
+              </div>
+            </div>
+          ) : connectStatus?.connected && !connectStatus?.details_submitted ? (
+            <div className="flex flex-col gap-3 p-4 border rounded-lg bg-yellow-50 border-yellow-200">
+              <div>
+                <h3 className="font-medium text-yellow-800">Onboarding Incomplete</h3>
+                <p className="text-sm text-yellow-700">You started connecting your Stripe account but haven't finished. Complete setup to receive payments.</p>
+              </div>
+              <Button onClick={handleConnectStripe} disabled={connectLoading} className="w-fit">
+                {connectLoading ? 'Loading...' : 'Complete Stripe Setup'}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3 p-4 border rounded-lg">
+              <div>
+                <h3 className="font-medium">Connect Stripe to Get Paid</h3>
+                <p className="text-sm text-muted-foreground">
+                  Connect your Stripe account to receive payments directly when customers purchase your products. A 2% platform fee applies.
+                </p>
+              </div>
+              <Button onClick={handleConnectStripe} disabled={connectLoading} className="w-fit">
+                {connectLoading ? 'Loading...' : 'Connect with Stripe'}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Card className="w-full">
         <CardHeader>
