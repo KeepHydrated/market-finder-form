@@ -1817,7 +1817,7 @@ const VendorDuplicate = () => {
               />
             )}
             {/* Left column - desktop only sidebar (overlays content) */}
-            <div className={`hidden lg:block lg:absolute lg:top-0 lg:left-0 lg:z-20 bg-green-50 lg:border-r lg:shadow-lg overflow-hidden transition-transform duration-500 ease-in-out lg:w-96 lg:h-screen ${isSidebarCollapsed ? 'lg:-translate-x-full lg:pointer-events-none' : 'lg:translate-x-0'}`}>
+            <div className={`hidden lg:block lg:absolute lg:top-0 lg:left-0 lg:z-20 bg-green-50 lg:shadow-lg overflow-hidden transition-transform duration-500 ease-in-out lg:w-96 lg:h-screen ${isSidebarCollapsed ? 'lg:-translate-x-full lg:pointer-events-none' : 'lg:translate-x-0'}`}>
 
 
               <div className="space-y-6 px-4 pt-6 pb-6">
