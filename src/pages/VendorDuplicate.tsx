@@ -1953,7 +1953,7 @@ const VendorDuplicate = () => {
             
             {/* Main content - right column, scrollable - FULL WIDTH ON MOBILE */}
             <div ref={desktopScrollRef2} className="flex-1 w-full overflow-y-auto md:h-screen">
-              <div className="mx-auto px-4 py-6 md:max-w-5xl">
+              <div className="px-4 py-6 md:max-w-5xl lg:px-10">
                 {selectedVendor ? (
                   // Show selected vendor details
                   <div className="space-y-6">
