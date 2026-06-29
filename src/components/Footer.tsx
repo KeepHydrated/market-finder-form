@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { SupportChat } from "./SupportChat";
 
 export const Footer = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const location = useLocation();
+
+  if (location.pathname.startsWith("/vendor")) return null;
+
 
   return (
     <>
