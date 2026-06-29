@@ -1372,7 +1372,7 @@ const VendorDuplicate = () => {
           
           {/* Main content */}
           <div ref={desktopScrollRef} className="min-h-screen">
-            <div className="mx-auto px-4 py-6 max-w-xl">
+            <div className="px-4 py-6 max-w-xl">
                   {selectedVendor ? (
           // Show selected vendor details
           <div className="space-y-6">
